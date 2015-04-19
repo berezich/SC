@@ -1,0 +1,33 @@
+<resources>
+    <string name="app_name">SportConnector</string>
+
+    <!-- main/search frame-->
+    <string name="frame_main_title">Поиск</string>
+    <string name="btn_main_1">СПАРРИНГ ПАРТНЕРЫ</string>
+    <string name="btn_main_2">ТРЕНЕРЫ</string>
+    <string name="btn_main_3">КОРТЫ</string>
+    <!-- main/search frame-->
+
+    <!-- main/portfolio frame-->
+    <string name="frame_profile_title">Моя страница</string>
+    <!-- main/portfolio frame-->
+
+    <!-- main/msg frame-->
+    <string name="frame_msg_title">Мои сообщения</string>
+    <!-- main/msg frame-->
+
+    <!-- main/photo frame-->
+    <string name="frame_photo_title">Мои фотографии</string>
+    <!-- main/photo frame-->
+
+    <!-- main/fiends frame-->
+    <string name="frame_friends_title">Мои друзья</string>
+    <!-- main/fiends frame-->
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="action_example">Example action</string>
+
+    <string name="action_settings">Settings</string>
+</resources>
