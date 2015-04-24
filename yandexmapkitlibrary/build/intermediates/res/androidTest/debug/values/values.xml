@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- From: file:/C:/Andorid/Android_Studio_projects/SportConnector/yandexmapkitlibrary/build/intermediates/bundles/debug/res/values/values.xml -->
+    <!-- From: file:/C:/Users/Berezkin.TM-SERV/Documents/GitHub/SportConnector/yandexmapkitlibrary/build/intermediates/bundles/debug/res/values/values.xml -->
     <eat-comment/>
     <string name="ymk_findme_not_found">Не удалось определить местоположение</string>
     <string name="ymk_kilometers_short">км</string>

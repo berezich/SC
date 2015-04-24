@@ -48,8 +48,7 @@ public class Tile {
 
     public Tile(ScreenPoint point, double zoom) {
         _id = 0;
-        _bounds = new Bounds(new ScreenPoint(0,0),new ScreenPoint(0,0));
-        final int MAX_ZOOM = 20;
+        final int MAX_ZOOM = 17;
         Bounds bounds = new Bounds(new ScreenPoint(0,0), new ScreenPoint(256,256));
         String code = "";
         int binCode = 0;
@@ -80,6 +79,7 @@ public class Tile {
             _code = binCode;
             _name = code;
         }
+        _bounds = bounds;
     }
 
     public String name() {

@@ -71,8 +71,9 @@ public class YaMapFragment extends Fragment implements OnMapListener {
         mapView = (MapView)  rootView.findViewById(R.id.map);
         mapView.showBuiltInScreenButtons(true);
         mapView.showJamsButton(false);
-        MapController mapController = mapView.getMapController();
+        mapController = mapView.getMapController();
         mapController.addMapListener(this);
+        mapController.setZoomCurrent(2);
         ImageButton btn;
         btn = (ImageButton) rootView.findViewById(R.id.map_btn_coach);
         btn.setOnClickListener(new btnClickListener());
@@ -122,7 +123,7 @@ public class YaMapFragment extends Fragment implements OnMapListener {
 
         mapView.showBuiltInScreenButtons(true);
         mapView.showJamsButton(false);
-        mapController = mapView.getMapController();
+
         switch (mapEvent.getMsg()) {
             case MapEvent.MSG_SCALE_BEGIN:
                 //textView.setText("MSG_SCALE_BEGIN");
@@ -146,7 +147,8 @@ public class YaMapFragment extends Fragment implements OnMapListener {
             case MapEvent.MSG_ZOOM_END:
                 Log.d(TAG, "ZOOM = " + mapController.getZoomCurrent());
                 loadedTiles.clear();
-                curTiles = visibleTileList();
+                addNewObj();
+                Log.d(TAG, "loadedTiles num = " + loadedTiles.size());
                 //textView.setText("MSG_ZOOM_END");
                 break;
 
@@ -161,54 +163,79 @@ public class YaMapFragment extends Fragment implements OnMapListener {
                 Log.d(TAG, "mapCenter = " + mapController.getMapCenter().toString());
                 Log.d(TAG, "mapHeight = " + mapController.getHeight());
                 Log.d(TAG, "mapWidth = " + mapController.getWidth());
-                curTiles = visibleTileList();
+                addNewObj();
+                Log.d(TAG, "loadedTiles num = " + loadedTiles.size());
+                //curTiles = visibleTileList();
                 break;
             default:
                 //textView.setText("MSG_EMPTY");
                 break;
         }
+        int i;
+
     }
 
     //получаем таблицу видимых tiles
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    private HashMap<String,Tile> visibleTileList()
+    private HashMap<String,Tile> buildTiles()
     {
 
-        HashMap<String,Tile> tiles = new HashMap<String,Tile>();
-        Size size = new Size(mapController.getWidth(),mapController.getHeight());
-        ScreenPoint center = mapController.getScreenPoint(mapController.getMapCenter());
-        double mapZoom = mapController.getZoomCurrent()+1;
-        double zoomFactor = Math.pow(2,-mapZoom);
-        ScreenPoint pixelCenter = new ScreenPoint(center.getX()*(float)zoomFactor, (center.getY()*(float)zoomFactor));
-        Size pixelSize = new Size((int)(size.getWidth()*zoomFactor),(int)(size.getHeight()*zoomFactor));
-        int tileSize = (int)(256 * zoomFactor);
-        //нам нужны пиксельные границы в пространстве нулевого зума расширенная до углов тайлов
-        //Tile.Bounds pixelBounds = new Tile.Bounds(new ScreenPoint((float)Math.max(0,pixelCenter.getX() - pixelSize.getWidth() * .5), (float) Math.max(0,pixelCenter.getY() - pixelSize.getHeight() * .5)),new ScreenPoint((float) Math.min(256, pixelCenter.getX() + pixelSize.getWidth() * .5), (float)Math.min(256,pixelCenter.getY() + pixelSize.getHeight() * .5)));
-        ScreenPoint pixelStart  = new ScreenPoint((float)Math.max(0,pixelCenter.getX() - pixelSize.getWidth() * .5), (float) Math.max(0,pixelCenter.getY() - pixelSize.getHeight() * .5));
-        ScreenPoint pixelEnd  = new ScreenPoint((float) Math.min(256, pixelCenter.getX() + pixelSize.getWidth() * .5), (float)Math.min(256,pixelCenter.getY() + pixelSize.getHeight() * .5));
-        double quadZoom = mapZoom;
-        //quadZoom = mapZoom - this.zoomOffset,
-        double quadFactor = Math.pow(2, -quadZoom);
-        tiles.clear();
-        boolean xfill = true;
-        Tile tile;
-        //набиваем квады, пока они не выходях за пределы экрана
-        for (int x = 0; xfill; x += tileSize) {
-            for (int y = 0; ; y += tileSize) {
-                tile = new Tile(new ScreenPoint( (float)(0 + pixelStart.getX() + x), (float)(0 + pixelStart.getY() + y)), quadZoom);
-                tiles.put(tile.name(), tile);
-                if (tile.bounds().p2().getY() >= pixelEnd.getY()) {
-                    if (tile.bounds().p2().getX() >= pixelEnd.getX()) {
-                        xfill = false;
+
+            HashMap<String,Tile> tiles = new HashMap<String,Tile>();
+        try {
+            Size size = new Size(mapController.getWidth(),mapController.getHeight());
+            ScreenPoint center = mapController.getScreenPoint(mapController.getMapCenter());
+            Log.d(TAG,"CENTER = "+center.getX()+" "+center.getY());
+            double mapZoom = mapController.getZoomCurrent()+1;
+            double zoomFactor = Math.pow(2,-mapZoom);
+            ScreenPoint pixelCenter = new ScreenPoint(center.getX()*(float)zoomFactor, (center.getY()*(float)zoomFactor));
+            Log.d(TAG,"PIX CENTER = "+pixelCenter.getX()+" "+pixelCenter.getY());
+            Size pixelSize = new Size(size.getWidth()*zoomFactor,size.getHeight()*zoomFactor);
+            int tileSize = (int)(256 * zoomFactor);
+            //нам нужны пиксельные границы в пространстве нулевого зума расширенная до углов тайлов
+            //Tile.Bounds pixelBounds = new Tile.Bounds(new ScreenPoint((float)Math.max(0,pixelCenter.getX() - pixelSize.getWidth() * .5), (float) Math.max(0,pixelCenter.getY() - pixelSize.getHeight() * .5)),new ScreenPoint((float) Math.min(256, pixelCenter.getX() + pixelSize.getWidth() * .5), (float)Math.min(256,pixelCenter.getY() + pixelSize.getHeight() * .5)));
+            ScreenPoint pixelStart  = new ScreenPoint((float)Math.max(0,pixelCenter.getX() - pixelSize.getWidth() * .5), (float) Math.max(0,pixelCenter.getY() - pixelSize.getHeight() * .5));
+            ScreenPoint pixelEnd  = new ScreenPoint((float) Math.min(256, pixelCenter.getX() + pixelSize.getWidth() * .5), (float)Math.min(256,pixelCenter.getY() + pixelSize.getHeight() * .5));
+            double quadZoom = mapZoom;
+            //quadZoom = mapZoom - this.zoomOffset,
+            double quadFactor = Math.pow(2, -quadZoom);
+            tiles.clear();
+            boolean xfill = true;
+            Tile tile;
+            //набиваем квады, пока они не выходях за пределы экрана
+            for (int x = 0; xfill; x += tileSize) {
+                for (int y = 0; ; y += tileSize) {
+                    tile = new Tile(new ScreenPoint( (float)(0 + pixelStart.getX() + x), (float)(0 + pixelStart.getY() + y)), quadZoom);
+                    tiles.put(tile.name(), tile);
+                    if (tile.bounds().p2().getY() >= pixelEnd.getY()) {
+                        if (tile.bounds().p2().getX() >= pixelEnd.getX()) {
+                            xfill = false;
+                            break;
+                        }
                         break;
                     }
-                    break;
+
                 }
+            }
+
+            return tiles;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return tiles;
+        }
+    }
+    void addNewObj()
+    {
+        String str="";
+        curTiles = buildTiles();
+        for (String key : curTiles.keySet()) {
+            str += key.toString() + ",";
+            if (!loadedTiles.containsKey(key)) {
+                loadedTiles.put(key, curTiles.get(key));
 
             }
         }
+        Log.d(TAG,"curTiles: "+str);
 
-        return tiles;
     }
     class btnClickListener implements View.OnClickListener
     {
@@ -234,6 +261,24 @@ public class YaMapFragment extends Fragment implements OnMapListener {
             }
 
             return false;
+        }
+    }
+    public class Size
+    {
+        double _width;
+        double _height;
+
+        public Size(double _width, double _height) {
+            this._width = _width;
+            this._height = _height;
+        }
+
+        public double getWidth() {
+            return _width;
+        }
+
+        public double getHeight() {
+            return _height;
         }
     }
 }
