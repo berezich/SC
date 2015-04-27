@@ -11,7 +11,7 @@ import ru.yandex.yandexmapkit.utils.ScreenPoint;
  */
 public class Tile {
 
-    public class Bounds
+    public static class Bounds
     {
         private ScreenPoint _p1;
         private ScreenPoint _p2;
@@ -93,6 +93,11 @@ public class Tile {
     public int numChildesSpots() {
         return _numChildesSpots;
     }
+
+    public void set_numChildesSpots(int _numChildesSpots) {
+        this._numChildesSpots = _numChildesSpots;
+    }
+
     public Bounds bounds() {
         return _bounds;
     }

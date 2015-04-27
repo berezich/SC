@@ -3,6 +3,7 @@ package com.berezich.sportconnector.YaMap;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.Application;
+import android.content.res.Resources;
 import android.graphics.Point;
 import android.os.Build;
 import android.os.Debug;
@@ -21,6 +22,7 @@ import android.widget.TextView;
 
 import com.berezich.sportconnector.MainActivity;
 import com.berezich.sportconnector.MainFragment.Filters;
+import com.berezich.sportconnector.YaMap.Tile;
 import com.berezich.sportconnector.R;
 
 import java.util.HashMap;
@@ -28,8 +30,12 @@ import java.util.List;
 
 import ru.yandex.yandexmapkit.MapController;
 import ru.yandex.yandexmapkit.MapView;
+import ru.yandex.yandexmapkit.OverlayManager;
 import ru.yandex.yandexmapkit.map.MapEvent;
 import ru.yandex.yandexmapkit.map.OnMapListener;
+import ru.yandex.yandexmapkit.overlay.Overlay;
+import ru.yandex.yandexmapkit.overlay.OverlayItem;
+import ru.yandex.yandexmapkit.overlay.balloon.BalloonItem;
 import ru.yandex.yandexmapkit.utils.GeoPoint;
 import ru.yandex.yandexmapkit.utils.ScreenPoint;
 
@@ -46,11 +52,15 @@ public class YaMapFragment extends Fragment implements OnMapListener {
     private static final String TAG = "YaMapFragment";
     private MapView mapView;
     private MapController mapController;
+    private OverlayManager overlayManager;
+    private Overlay overlay;
+    private Resources res;
 
     //список tiles уже отисованых на карте при данном масштабе
     private HashMap<String,Tile> loadedTiles = new HashMap<String,Tile>();
     //список tiles показываемых на экране
     private HashMap<String,Tile> curTiles = new HashMap<String,Tile>();
+    private HashMap<String,Tile> allTiles = new HashMap<String,Tile>();
 
     public YaMapFragment setArgs(int sectionNumber, Filters filter) {
 
@@ -62,6 +72,7 @@ public class YaMapFragment extends Fragment implements OnMapListener {
     }
 
     public YaMapFragment() {
+        getTilesFromCache();
     }
 
     @Override
@@ -74,6 +85,15 @@ public class YaMapFragment extends Fragment implements OnMapListener {
         mapController = mapView.getMapController();
         mapController.addMapListener(this);
         mapController.setZoomCurrent(2);
+
+
+        // Create a layer of objects for the map
+        overlay = new Overlay(mapController);
+        overlayManager = mapController.getOverlayManager();
+        overlayManager.addOverlay(overlay);
+
+        res = getResources();
+
         ImageButton btn;
         btn = (ImageButton) rootView.findViewById(R.id.map_btn_coach);
         btn.setOnClickListener(new btnClickListener());
@@ -233,12 +253,25 @@ public class YaMapFragment extends Fragment implements OnMapListener {
     void addNewObj()
     {
         String str="";
+        OverlayItem marker;
         curTiles = buildTiles();
+        Tile tile;
         for (String key : curTiles.keySet()) {
             str += key.toString() + ",";
             if (!loadedTiles.containsKey(key)) {
-                loadedTiles.put(key, curTiles.get(key));
-
+                tile = curTiles.get(key);
+                loadedTiles.put(key, tile);
+                if(tile.numChildesSpots()>0) {
+                    // Create an object for the layer
+                    marker = new OverlayItem(new GeoPoint(77.161658, -116.718267 ), res.getDrawable(R.drawable.court_2));
+                    // Create a balloon model for the object
+                    BalloonItem balloonMarker = new BalloonItem(this.getActivity(), marker.getGeoPoint());
+                    balloonMarker.setText(String.valueOf(tile.numChildesSpots()));
+//        // Add the balloon model to the object
+                    marker.setBalloonItem(balloonMarker);
+                    // Add the object to the layer
+                    overlay.addOverlayItem(marker);
+                }
             }
         }
         Log.d(TAG,"curTiles: "+str);
@@ -287,5 +320,20 @@ public class YaMapFragment extends Fragment implements OnMapListener {
         public double getHeight() {
             return _height;
         }
+    }
+
+    private void getTilesFromCache()
+    {
+        Tile tile = new Tile(1,0,"00",new Tile.Bounds(new ScreenPoint(0,0),new ScreenPoint(0,0)));
+        tile.set_numChildesSpots(3);
+        allTiles.put(tile.name(),tile);
+
+        tile = new Tile(1,30,"30",new Tile.Bounds(new ScreenPoint(0,0),new ScreenPoint(0,0)));
+        tile.set_numChildesSpots(7);
+        allTiles.put(tile.name(),tile);
+
+        tile = new Tile(1,22,"22",new Tile.Bounds(new ScreenPoint(0,0),new ScreenPoint(0,0)));
+        tile.set_numChildesSpots(9);
+        allTiles.put(tile.name(),tile);
     }
 }
