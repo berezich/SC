@@ -183,14 +183,21 @@ public class YaMapFragment extends Fragment implements OnMapListener {
             HashMap<String,Tile> tiles = new HashMap<String,Tile>();
         try {
             Size size = new Size(mapController.getWidth(),mapController.getHeight());
-            ScreenPoint center = mapController.getScreenPoint(mapController.getMapCenter());
-            Log.d(TAG,"CENTER = "+center.getX()+" "+center.getY());
+            //ScreenPoint center = mapController.getScreenPoint(mapController.getMapCenter());
+            ScreenPoint pixCenterGeo = mapController.getScreenPoint(new GeoPoint(0,0));
+            //Log.d(TAG,"CENTER = "+center.getX()+" "+center.getY());
             double mapZoom = mapController.getZoomCurrent()+1;
             double zoomFactor = Math.pow(2,-mapZoom);
-            ScreenPoint pixelCenter = new ScreenPoint(center.getX()*(float)zoomFactor, (center.getY()*(float)zoomFactor));
-            Log.d(TAG,"PIX CENTER = "+pixelCenter.getX()+" "+pixelCenter.getY());
+            //ScreenPoint pixelCenter = new ScreenPoint(center.getX()*(float)zoomFactor, (center.getY()*(float)zoomFactor));
+            //Log.d(TAG,"PIX CENTER = "+pixelCenter.getX()+" "+pixelCenter.getY());
+            Log.d(TAG,"PIX GEOCENTER = "+pixCenterGeo.getX()+" "+pixCenterGeo.getY());
             Size pixelSize = new Size(size.getWidth()*zoomFactor,size.getHeight()*zoomFactor);
             int tileSize = (int)(256 * zoomFactor);
+            int mapSize = (int)(256*Math.pow(2,mapZoom));
+            ScreenPoint tilePixCenter = new ScreenPoint((float)(mapSize*0.5),(float)(mapSize*0.5));
+            ScreenPoint pixelCenter = new ScreenPoint(tilePixCenter.getX()-pixCenterGeo.getX()+(float)(mapController.getWidth()*0.5),tilePixCenter.getY()-pixCenterGeo.getY()+(float)(mapController.getHeight()*0.5));
+            pixelCenter = new ScreenPoint(pixelCenter.getX()*(float)zoomFactor, (pixelCenter.getY()*(float)zoomFactor));
+            Log.d(TAG,"PIX CENTER = "+pixelCenter.getX()+" "+pixelCenter.getY());
             //нам нужны пиксельные границы в пространстве нулевого зума расширенная до углов тайлов
             //Tile.Bounds pixelBounds = new Tile.Bounds(new ScreenPoint((float)Math.max(0,pixelCenter.getX() - pixelSize.getWidth() * .5), (float) Math.max(0,pixelCenter.getY() - pixelSize.getHeight() * .5)),new ScreenPoint((float) Math.min(256, pixelCenter.getX() + pixelSize.getWidth() * .5), (float)Math.min(256,pixelCenter.getY() + pixelSize.getHeight() * .5)));
             ScreenPoint pixelStart  = new ScreenPoint((float)Math.max(0,pixelCenter.getX() - pixelSize.getWidth() * .5), (float) Math.max(0,pixelCenter.getY() - pixelSize.getHeight() * .5));
