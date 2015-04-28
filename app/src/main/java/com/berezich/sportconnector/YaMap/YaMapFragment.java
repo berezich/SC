@@ -22,6 +22,7 @@ import android.widget.TextView;
 
 import com.berezich.sportconnector.MainActivity;
 import com.berezich.sportconnector.MainFragment.Filters;
+import com.berezich.sportconnector.SportObjects.Spot;
 import com.berezich.sportconnector.YaMap.Tile;
 import com.berezich.sportconnector.R;
 
@@ -231,8 +232,8 @@ public class YaMapFragment extends Fragment implements OnMapListener {
             //Log.d(TAG,"PIX CENTER = "+pixelCenter.getX()+" "+pixelCenter.getY());
             Log.d(TAG,"PIX GEOCENTER = "+pixCenterGeo.getX()+" "+pixCenterGeo.getY());
             Size pixelSize = new Size(size.getWidth()*zoomFactor,size.getHeight()*zoomFactor);
-            int tileSize = (int)(256 * zoomFactor);
-            int mapSize = (int)(256*Math.pow(2,mapZoom));
+            float tileSize = (float)(256 * zoomFactor);
+            float mapSize = (float)(256*Math.pow(2,mapZoom));
             ScreenPoint tilePixCenter = new ScreenPoint((float)(mapSize*0.5),(float)(mapSize*0.5));
             ScreenPoint pixelCenter = new ScreenPoint(tilePixCenter.getX()-pixCenterGeo.getX()+(float)(mapController.getWidth()*0.5),tilePixCenter.getY()-pixCenterGeo.getY()+(float)(mapController.getHeight()*0.5));
             pixelCenter = new ScreenPoint(pixelCenter.getX()*(float)zoomFactor, (pixelCenter.getY()*(float)zoomFactor));
@@ -248,8 +249,8 @@ public class YaMapFragment extends Fragment implements OnMapListener {
             boolean xfill = true;
             Tile tile;
             //набиваем квады, пока они не выходях за пределы экрана
-            for (int x = 0; xfill; x += tileSize) {
-                for (int y = 0; ; y += tileSize) {
+            for (float x = 0; xfill; x += tileSize) {
+                for (float y = 0; ; y += tileSize) {
                     tile = new Tile(new ScreenPoint( (float)(0 + pixelStart.getX() + x), (float)(0 + pixelStart.getY() + y)), quadZoom);
                     tiles.put(tile.name(), tile);
                     if (tile.bounds().p2().getY() >= pixelEnd.getY()) {
@@ -395,5 +396,15 @@ public class YaMapFragment extends Fragment implements OnMapListener {
         tile.set_numChildesSpots(4);
         allTiles.put(tile.name(),tile);
 
+    }
+    private void addSpot(Spot spot)
+    {
+        String tileName;
+        tileName = spot.tileName();
+        Tile tile = allTiles.get(tileName);
+        if(tile!=null)
+        {
+            
+        }
     }
 }
