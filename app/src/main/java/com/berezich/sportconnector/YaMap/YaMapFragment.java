@@ -84,7 +84,7 @@ public class YaMapFragment extends Fragment implements OnMapListener {
         mapView.showJamsButton(false);
         mapController = mapView.getMapController();
         mapController.addMapListener(this);
-        mapController.setZoomCurrent(2);
+        mapController.setZoomCurrent(7);
 
 
         // Create a layer of objects for the map
@@ -93,6 +93,24 @@ public class YaMapFragment extends Fragment implements OnMapListener {
         overlayManager.addOverlay(overlay);
 
         res = getResources();
+        /*
+        OverlayItem marker;
+        OverlayItem marker1;
+        // Create an object for the layer
+        marker = new OverlayItem(new GeoPoint(77.161658, -116.718267 ), res.getDrawable(R.drawable.court_2));
+        marker1 = new OverlayItem(new GeoPoint(77.161658, 0 ), res.getDrawable(R.drawable.court_2));
+        // Create a balloon model for the object
+        BalloonItem balloonMarker = new BalloonItem(this.getActivity(), marker.getGeoPoint());
+        balloonMarker.setText("Test");
+//        // Add the balloon model to the object
+        marker.setBalloonItem(balloonMarker);
+        balloonMarker = new BalloonItem(this.getActivity(), marker.getGeoPoint());
+        balloonMarker.setText("Test");
+        marker1.setBalloonItem(balloonMarker);
+        // Add the object to the layer
+        overlay.addOverlayItem(marker);
+        overlay.addOverlayItem(marker1);
+        */
 
         ImageButton btn;
         btn = (ImageButton) rootView.findViewById(R.id.map_btn_coach);
@@ -166,6 +184,7 @@ public class YaMapFragment extends Fragment implements OnMapListener {
                 break;
             case MapEvent.MSG_ZOOM_END:
                 Log.d(TAG, "ZOOM = " + mapController.getZoomCurrent());
+                overlay.clearOverlayItems();
                 loadedTiles.clear();
                 addNewObj();
                 Log.d(TAG, "loadedTiles num = " + loadedTiles.size());
@@ -250,28 +269,48 @@ public class YaMapFragment extends Fragment implements OnMapListener {
             return tiles;
         }
     }
+    private ScreenPoint globalPxToPhonePx(ScreenPoint globalPix,double zoom)
+    {
+        float zoomFactor = (float)Math.pow(2,zoom);
+        int mapPixSize = (int) (256*zoomFactor);
+        ScreenPoint mapCenter = mapController.getScreenPoint(new GeoPoint(0,0));
+        ScreenPoint phonePix = new ScreenPoint((float)(globalPix.getX()-mapPixSize*.5+mapCenter.getX()),(float)(globalPix.getY()-mapPixSize*.5+mapCenter.getY()));
+        return phonePix;
+    }
     void addNewObj()
     {
         String str="";
         OverlayItem marker;
+        ScreenPoint tileGlobalCenter;
+        ScreenPoint tilePhoneCenter;
         curTiles = buildTiles();
         Tile tile;
         for (String key : curTiles.keySet()) {
             str += key.toString() + ",";
             if (!loadedTiles.containsKey(key)) {
+                //tile = allTiles.get(key);
                 tile = curTiles.get(key);
                 loadedTiles.put(key, tile);
-                if(tile.numChildesSpots()>0) {
+                //tile = allTiles.get(key);
+                //if(tile!=null && tile.numChildesSpots()>0) {
                     // Create an object for the layer
-                    marker = new OverlayItem(new GeoPoint(77.161658, -116.718267 ), res.getDrawable(R.drawable.court_2));
+                    double zoomFactor = Math.pow(2,tile.name().length());
+                    Tile.Bounds bounds = tile.bounds();
+                    Tile.Bounds _bounds = new Tile.Bounds(new ScreenPoint((float)(bounds.p1().getX()*zoomFactor),(float)(bounds.p1().getY()*zoomFactor)),new ScreenPoint((float)(bounds.p2().getX()*zoomFactor),(float)(bounds.p2().getY()*zoomFactor)));
+                    tileGlobalCenter = new ScreenPoint((float)((_bounds.p1().getX()+_bounds.p2().getX())*.5),(float)((_bounds.p1().getY()+_bounds.p2().getY())*.5));
+                    tilePhoneCenter = globalPxToPhonePx(tileGlobalCenter,tile.name().length());
+                    marker = new OverlayItem(mapController.getGeoPoint(tilePhoneCenter), res.getDrawable(R.drawable.court_2));
+
                     // Create a balloon model for the object
                     BalloonItem balloonMarker = new BalloonItem(this.getActivity(), marker.getGeoPoint());
-                    balloonMarker.setText(String.valueOf(tile.numChildesSpots()));
+                    //balloonMarker.setText(String.valueOf(tile.numChildesSpots()));
+                    balloonMarker.setText(String.valueOf(tile.name()));
 //        // Add the balloon model to the object
                     marker.setBalloonItem(balloonMarker);
                     // Add the object to the layer
                     overlay.addOverlayItem(marker);
-                }
+
+                //}
             }
         }
         Log.d(TAG,"curTiles: "+str);
@@ -324,16 +363,37 @@ public class YaMapFragment extends Fragment implements OnMapListener {
 
     private void getTilesFromCache()
     {
-        Tile tile = new Tile(1,0,"00",new Tile.Bounds(new ScreenPoint(0,0),new ScreenPoint(0,0)));
+        Tile tile = new Tile(1,"00");
+        tile.set_numChildesSpots(1);
+        allTiles.put(tile.name(),tile);
+
+        tile = new Tile(2,"01");
+        tile.set_numChildesSpots(2);
+        allTiles.put(tile.name(),tile);
+
+        tile = new Tile(3,"02");
         tile.set_numChildesSpots(3);
         allTiles.put(tile.name(),tile);
 
-        tile = new Tile(1,30,"30",new Tile.Bounds(new ScreenPoint(0,0),new ScreenPoint(0,0)));
-        tile.set_numChildesSpots(7);
+        tile = new Tile(4,"03");
+        tile.set_numChildesSpots(4);
         allTiles.put(tile.name(),tile);
 
-        tile = new Tile(1,22,"22",new Tile.Bounds(new ScreenPoint(0,0),new ScreenPoint(0,0)));
-        tile.set_numChildesSpots(9);
+        tile = new Tile(5,"20");
+        tile.set_numChildesSpots(1);
         allTiles.put(tile.name(),tile);
+
+        tile = new Tile(6,"21");
+        tile.set_numChildesSpots(2);
+        allTiles.put(tile.name(),tile);
+
+        tile = new Tile(7,"22");
+        tile.set_numChildesSpots(3);
+        allTiles.put(tile.name(),tile);
+
+        tile = new Tile(8,"23");
+        tile.set_numChildesSpots(4);
+        allTiles.put(tile.name(),tile);
+
     }
 }

@@ -1,5 +1,7 @@
 package com.berezich.sportconnector.YaMap;
 
+import android.util.Log;
+
 import com.berezich.sportconnector.SportObjects.Spot;
 
 import java.util.List;
@@ -10,7 +12,8 @@ import ru.yandex.yandexmapkit.utils.ScreenPoint;
  * Created by berezkin on 23.04.2015.
  */
 public class Tile {
-
+    final int MAX_ZOOM = 17;
+    final String TAB = "YaMap.Tile";
     public static class Bounds
     {
         private ScreenPoint _p1;
@@ -46,9 +49,60 @@ public class Tile {
         _bounds = bounds;
     }
 
+    public Tile(int id, String name)
+    {
+        _id = id;
+        _name = name;
+        while(name.startsWith("0"))
+            name = name.substring(1);
+
+        try {
+            int len,i=0;
+            while ((len = name.length())>1) {
+                this._code += Math.pow(2, i) * Integer.parseInt(String.valueOf(name.charAt(len-1)));
+                name = name.substring(0,len-2);
+                i++;
+            }
+            if(name.length()==1)
+            this._code += Math.pow(2, i) * Integer.parseInt(String.valueOf(name.charAt(len-1)));
+        }
+        catch(NumberFormatException ex){
+            _code = 0;
+            Log.d(TAB,ex.getMessage());
+            Log.d(TAB,ex.getStackTrace().toString());
+        }
+
+        _bounds = codeToRegion(_code,_name.length());
+    }
+    private Bounds codeToRegion(int bincode, int length)
+    {
+        double zoomFactor = Math.pow(2,length);
+        //Bounds bounds = new Bounds(new ScreenPoint(0,0),new ScreenPoint((float)(256*zoomFactor),(float)(256*zoomFactor)));
+        Bounds bounds = new Bounds(new ScreenPoint(0,0),new ScreenPoint(256,256));
+        ScreenPoint center;
+        int zcode,xdel,ydel;
+        for (int i = 0, maxZoom = MAX_ZOOM; i < length; i++, maxZoom--) {
+            //центр ноды
+            center = new ScreenPoint((float)((bounds.p1().getX() + bounds.p2().getX()) * 0.5),(float)((bounds.p1().getY() + bounds.p2().getY()) * 0.5));
+            zcode = 3 & (bincode >> (2 * maxZoom));
+            xdel = zcode & 1;
+            ydel = zcode & 2;
+            //меняем границы, переходя в ребенка
+            if (xdel!=0)
+                bounds.p1().setX(center.getX());
+            else
+                bounds.p2().setX(center.getX());
+
+            if (ydel!=0)
+                bounds.p1().setY(center.getY());
+            else
+                bounds.p2().setY(center.getY());
+        }
+        return bounds;
+    }
     public Tile(ScreenPoint point, double zoom) {
         _id = 0;
-        final int MAX_ZOOM = 17;
+
         Bounds bounds = new Bounds(new ScreenPoint(0,0), new ScreenPoint(256,256));
         String code = "";
         int binCode = 0;
