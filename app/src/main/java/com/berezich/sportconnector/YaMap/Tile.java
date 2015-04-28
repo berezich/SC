@@ -4,6 +4,7 @@ import android.util.Log;
 
 import com.berezich.sportconnector.SportObjects.Spot;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import ru.yandex.yandexmapkit.utils.ScreenPoint;
@@ -12,7 +13,7 @@ import ru.yandex.yandexmapkit.utils.ScreenPoint;
  * Created by berezkin on 23.04.2015.
  */
 public class Tile {
-    final int MAX_ZOOM = 17;
+    public static final int MAX_ZOOM = 16;
     final String TAB = "YaMap.Tile";
     public static class Bounds
     {
@@ -32,26 +33,23 @@ public class Tile {
             return _p2;
         }
     }
-    private int _id;
-    private String _name;
-    private int _code;
-    private List<Spot> _spots;
-    private int _numChildesSpots;
+    private String _name="";
+    private int _code=0;
+    private List<Spot> _spots = new ArrayList<Spot>();
+    private int _numChildesSpots=0;
 
 
 
     private Bounds _bounds;
 
-    public Tile(int id, int _code, String _name, Bounds bounds) {
-        _id = id;
+    public Tile( int _code, String _name, Bounds bounds) {
         this._code = _code;
         this._name = _name;
         _bounds = bounds;
     }
 
-    public Tile(int id, String name)
+    public Tile(String name)
     {
-        _id = id;
         _name = name;
         while(name.startsWith("0"))
             name = name.substring(1);
@@ -101,7 +99,6 @@ public class Tile {
         return bounds;
     }
     public Tile(ScreenPoint point, double zoom) {
-        _id = 0;
 
         Bounds bounds = new Bounds(new ScreenPoint(0,0), new ScreenPoint(256,256));
         String code = "";
@@ -150,6 +147,10 @@ public class Tile {
 
     public void set_numChildesSpots(int _numChildesSpots) {
         this._numChildesSpots = _numChildesSpots;
+    }
+
+    public List<Spot> spots() {
+        return _spots;
     }
 
     public Bounds bounds() {

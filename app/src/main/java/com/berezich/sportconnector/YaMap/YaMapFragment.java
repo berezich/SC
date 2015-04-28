@@ -49,8 +49,9 @@ public class YaMapFragment extends Fragment implements OnMapListener {
      * fragment.
      */
     private static final String ARG_SECTION_NUMBER = "section_number";
-    private static Filters _filter;
     private static final String TAG = "YaMapFragment";
+    private final int MAX_COURT_LIMIT = 1;
+    private static Filters _filter;
     private MapView mapView;
     private MapController mapController;
     private OverlayManager overlayManager;
@@ -85,7 +86,7 @@ public class YaMapFragment extends Fragment implements OnMapListener {
         mapView.showJamsButton(false);
         mapController = mapView.getMapController();
         mapController.addMapListener(this);
-        mapController.setZoomCurrent(7);
+        //mapController.setZoomCurrent(7);
 
 
         // Create a layer of objects for the map
@@ -364,47 +365,75 @@ public class YaMapFragment extends Fragment implements OnMapListener {
 
     private void getTilesFromCache()
     {
-        Tile tile = new Tile(1,"00");
+        /*
+        Tile tile = new Tile("00");
         tile.set_numChildesSpots(1);
         allTiles.put(tile.name(),tile);
 
-        tile = new Tile(2,"01");
+        tile = new Tile("01");
         tile.set_numChildesSpots(2);
         allTiles.put(tile.name(),tile);
 
-        tile = new Tile(3,"02");
+        tile = new Tile("02");
         tile.set_numChildesSpots(3);
         allTiles.put(tile.name(),tile);
 
-        tile = new Tile(4,"03");
+        tile = new Tile("03");
         tile.set_numChildesSpots(4);
         allTiles.put(tile.name(),tile);
 
-        tile = new Tile(5,"20");
+        tile = new Tile("20");
         tile.set_numChildesSpots(1);
         allTiles.put(tile.name(),tile);
 
-        tile = new Tile(6,"21");
+        tile = new Tile("21");
         tile.set_numChildesSpots(2);
         allTiles.put(tile.name(),tile);
 
-        tile = new Tile(7,"22");
+        tile = new Tile("22");
         tile.set_numChildesSpots(3);
         allTiles.put(tile.name(),tile);
 
-        tile = new Tile(8,"23");
+        tile = new Tile("23");
         tile.set_numChildesSpots(4);
         allTiles.put(tile.name(),tile);
+        */
+
+        Spot spot;
+        spot = new Spot(0,new GeoPoint(55.778234, 37.588539),"1203101010333012","Комета");
+        addSpot(spot);
+        spot = new Spot(1,new GeoPoint(55.796051, 37.537766),"1203101010330023","Теннисный клуб ЦСКА");
+        addSpot(spot);
 
     }
     private void addSpot(Spot spot)
     {
         String tileName;
-        tileName = spot.tileName();
-        Tile tile = allTiles.get(tileName);
-        if(tile!=null)
-        {
-            
+        Tile tile;
+        int level=2;
+        List<Spot> spots;
+        while(level<=Tile.MAX_ZOOM) {
+            tileName = spot.tileName().substring(0,level);
+
+            tile = allTiles.get(tileName);
+            if (tile == null) {
+                tile = new Tile(tileName);
+                spots = tile.spots();
+                spots.add(spot);
+                allTiles.put(tile.name(),tile);
+                break;
+            }
+            else
+            {
+                if(tile.numChildesSpots()==0|| tile.spots().size()<MAX_COURT_LIMIT ||level==Tile.MAX_ZOOM){
+                    spots = tile.spots();
+                    spots.add(spot);
+                    break;
+                }
+                for(int i=0; i<tile.spots(); i++)
+
+            }
+            level++;
         }
     }
 }
