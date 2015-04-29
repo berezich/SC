@@ -3,6 +3,7 @@ package com.berezich.sportconnector.SportObjects;
 import android.support.annotation.NonNull;
 
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -18,11 +19,9 @@ public class Spot {
     private String _tileName;
     private GeoPoint _geoCoord;
     private String _name;
-    private List<Coach> _coaches;
-    private List<Partner> _partners ;
-
-
-    private boolean _favorite;
+    private List<Coach> _coaches = new ArrayList<Coach>();
+    private List<Partner> _partners = new ArrayList<Partner>() ;
+    private boolean _favorite = false;
 
     public Spot(int _id, GeoPoint geoCoord, String tileName, String _name) {
         this._id = _id;

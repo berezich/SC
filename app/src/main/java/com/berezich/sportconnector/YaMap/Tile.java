@@ -9,6 +9,8 @@ import java.util.List;
 
 import ru.yandex.yandexmapkit.utils.ScreenPoint;
 
+import static com.berezich.sportconnector.YaMap.YaMapFragment.globalPxToPhonePx;
+
 /**
  * Created by berezkin on 23.04.2015.
  */
@@ -137,6 +139,13 @@ public class Tile {
         return bounds;
     }
 
+    public ScreenPoint getPixCenter()
+    {
+        double zoomFactor = Math.pow(2, _name.length());
+        Bounds bounds = new Tile.Bounds(new ScreenPoint((float) (_bounds.p1().getX() * zoomFactor), (float) (_bounds.p1().getY() * zoomFactor)), new ScreenPoint((float) (_bounds.p2().getX() * zoomFactor), (float) (_bounds.p2().getY() * zoomFactor)));
+        ScreenPoint tileGlobalCenter = new ScreenPoint((float) ((bounds.p1().getX() + bounds.p2().getX()) * .5), (float) ((bounds.p1().getY() + bounds.p2().getY()) * .5));
+        return globalPxToPhonePx(tileGlobalCenter, _name.length());
+    }
 
     public String name() {
         return _name;
