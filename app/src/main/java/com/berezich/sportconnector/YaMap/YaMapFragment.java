@@ -22,10 +22,12 @@ import android.widget.TextView;
 
 import com.berezich.sportconnector.MainActivity;
 import com.berezich.sportconnector.MainFragment.Filters;
+import com.berezich.sportconnector.SportObjects.InfoTile;
 import com.berezich.sportconnector.SportObjects.Spot;
 import com.berezich.sportconnector.YaMap.Tile;
 import com.berezich.sportconnector.R;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -62,7 +64,7 @@ public class YaMapFragment extends Fragment implements OnMapListener {
     private HashMap<String,Tile> loadedTiles = new HashMap<String,Tile>();
     //список tiles показываемых на экране
     private HashMap<String,Tile> curTiles = new HashMap<String,Tile>();
-    private HashMap<String,Tile> allTiles = new HashMap<String,Tile>();
+    private HashMap<String,InfoTile> infoTiles = new HashMap<String,InfoTile>();
 
     public YaMapFragment setArgs(int sectionNumber, Filters filter) {
 
@@ -95,24 +97,6 @@ public class YaMapFragment extends Fragment implements OnMapListener {
         overlayManager.addOverlay(overlay);
 
         res = getResources();
-        /*
-        OverlayItem marker;
-        OverlayItem marker1;
-        // Create an object for the layer
-        marker = new OverlayItem(new GeoPoint(77.161658, -116.718267 ), res.getDrawable(R.drawable.court_2));
-        marker1 = new OverlayItem(new GeoPoint(77.161658, 0 ), res.getDrawable(R.drawable.court_2));
-        // Create a balloon model for the object
-        BalloonItem balloonMarker = new BalloonItem(this.getActivity(), marker.getGeoPoint());
-        balloonMarker.setText("Test");
-//        // Add the balloon model to the object
-        marker.setBalloonItem(balloonMarker);
-        balloonMarker = new BalloonItem(this.getActivity(), marker.getGeoPoint());
-        balloonMarker.setText("Test");
-        marker1.setBalloonItem(balloonMarker);
-        // Add the object to the layer
-        overlay.addOverlayItem(marker);
-        overlay.addOverlayItem(marker1);
-        */
 
         ImageButton btn;
         btn = (ImageButton) rootView.findViewById(R.id.map_btn_coach);
@@ -167,6 +151,8 @@ public class YaMapFragment extends Fragment implements OnMapListener {
         switch (mapEvent.getMsg()) {
             case MapEvent.MSG_SCALE_BEGIN:
                 //textView.setText("MSG_SCALE_BEGIN");
+                overlay.clearOverlayItems();
+                loadedTiles.clear();
                 break;
             case MapEvent.MSG_SCALE_MOVE:
                 //textView.setText("MSG_SCALE_MOVE");
@@ -176,18 +162,19 @@ public class YaMapFragment extends Fragment implements OnMapListener {
                 Log.d(TAG, "mapCenter = " + mapController.getMapCenter().toString());
                 Log.d(TAG, "mapHeight = " + mapController.getHeight());
                 Log.d(TAG, "mapWidth = " + mapController.getWidth());
+                addNewObj();
                 break;
 
             case MapEvent.MSG_ZOOM_BEGIN:
                 //textView.setText("MSG_ZOOM_BEGIN");
+                overlay.clearOverlayItems();
+                loadedTiles.clear();
                 break;
             case MapEvent.MSG_ZOOM_MOVE:
                 //textView.setText("MSG_ZOOM_MOVE");
                 break;
             case MapEvent.MSG_ZOOM_END:
                 Log.d(TAG, "ZOOM = " + mapController.getZoomCurrent());
-                overlay.clearOverlayItems();
-                loadedTiles.clear();
                 addNewObj();
                 Log.d(TAG, "loadedTiles num = " + loadedTiles.size());
                 //textView.setText("MSG_ZOOM_END");
@@ -285,34 +272,68 @@ public class YaMapFragment extends Fragment implements OnMapListener {
         OverlayItem marker;
         ScreenPoint tileGlobalCenter;
         ScreenPoint tilePhoneCenter;
+        List<Spot> spots;
+        Spot spot;
+        double zoomFactor;
+        Tile.Bounds bounds,_bounds;
+        boolean f1,f2;
         curTiles = buildTiles();
+        InfoTile tileInfo;
         Tile tile;
         for (String key : curTiles.keySet()) {
             str += key.toString() + ",";
             if (!loadedTiles.containsKey(key)) {
-                //tile = allTiles.get(key);
                 tile = curTiles.get(key);
                 loadedTiles.put(key, tile);
-                //tile = allTiles.get(key);
-                //if(tile!=null && tile.numChildesSpots()>0) {
-                    // Create an object for the layer
-                    double zoomFactor = Math.pow(2,tile.name().length());
-                    Tile.Bounds bounds = tile.bounds();
-                    Tile.Bounds _bounds = new Tile.Bounds(new ScreenPoint((float)(bounds.p1().getX()*zoomFactor),(float)(bounds.p1().getY()*zoomFactor)),new ScreenPoint((float)(bounds.p2().getX()*zoomFactor),(float)(bounds.p2().getY()*zoomFactor)));
-                    tileGlobalCenter = new ScreenPoint((float)((_bounds.p1().getX()+_bounds.p2().getX())*.5),(float)((_bounds.p1().getY()+_bounds.p2().getY())*.5));
-                    tilePhoneCenter = globalPxToPhonePx(tileGlobalCenter,tile.name().length());
-                    marker = new OverlayItem(mapController.getGeoPoint(tilePhoneCenter), res.getDrawable(R.drawable.court_2));
+                //tileInfo = allTiles.get(key);
+                tileInfo = InfoTile.findInfoTile(key, infoTiles);
+                if(tileInfo!=null ) {
+                    f1 = tileInfo.numChildesSpots()>0;
+                    f2 = tileInfo.name().equals(tile.name());
+                    if(f1&&f2)
+                    {
+                    //if((f1 = (tileInfo.numChildesSpots()>0)) && (f2 = (tileInfo.name() == tile.name()))) {
+                        // Create an object for the layer
+                        zoomFactor = Math.pow(2, tile.name().length());
+                        bounds = tile.bounds();
+                        _bounds = new Tile.Bounds(new ScreenPoint((float) (bounds.p1().getX() * zoomFactor), (float) (bounds.p1().getY() * zoomFactor)), new ScreenPoint((float) (bounds.p2().getX() * zoomFactor), (float) (bounds.p2().getY() * zoomFactor)));
+                        tileGlobalCenter = new ScreenPoint((float) ((_bounds.p1().getX() + _bounds.p2().getX()) * .5), (float) ((_bounds.p1().getY() + _bounds.p2().getY()) * .5));
+                        tilePhoneCenter = globalPxToPhonePx(tileGlobalCenter, tile.name().length());
 
-                    // Create a balloon model for the object
-                    BalloonItem balloonMarker = new BalloonItem(this.getActivity(), marker.getGeoPoint());
-                    //balloonMarker.setText(String.valueOf(tile.numChildesSpots()));
-                    balloonMarker.setText(String.valueOf(tile.name()));
+                        //marker = new OverlayItem(mapController.getGeoPoint(tilePhoneCenter), res.getDrawable(R.drawable.court_2));
+                        marker = new OverlayItem(tileInfo.averagePoint(), res.getDrawable(R.drawable.court_2));
+
+                        // Create a balloon model for the object
+                        BalloonItem balloonMarker = new BalloonItem(this.getActivity(), marker.getGeoPoint());
+                        balloonMarker.setText(tileInfo.getNumSpotToString("спот"));
+                        //balloonMarker.setText(String.valueOf(tile.name()));
 //        // Add the balloon model to the object
-                    marker.setBalloonItem(balloonMarker);
-                    // Add the object to the layer
-                    overlay.addOverlayItem(marker);
+                        marker.setBalloonItem(balloonMarker);
+                        // Add the object to the layer
+                        overlay.addOverlayItem(marker);
+                    }
+                    else
+                    {
+                        if(!tileInfo.name().equals(tile.name())) {
+                            int i;
+                            i = 1 + 1;
+                        }
+                        spots = tileInfo.spots();
+                        for(int i=0; i<spots.size(); i++){
+                            spot = spots.get(i);
+                            marker = new OverlayItem(spot.geoCoord(), res.getDrawable(R.drawable.court_2));
 
-                //}
+                            // Create a balloon model for the object
+                            BalloonItem balloonMarker = new BalloonItem(this.getActivity(), marker.getGeoPoint());
+                            balloonMarker.setText(spot.name());
+                            //balloonMarker.setText(String.valueOf(tile.name()));
+//        // Add the balloon model to the object
+                            marker.setBalloonItem(balloonMarker);
+                            // Add the object to the layer
+                            overlay.addOverlayItem(marker);
+                        }
+                    }
+                }
             }
         }
         Log.d(TAG,"curTiles: "+str);
@@ -401,39 +422,71 @@ public class YaMapFragment extends Fragment implements OnMapListener {
 
         Spot spot;
         spot = new Spot(0,new GeoPoint(55.778234, 37.588539),"1203101010333012","Комета");
-        addSpot(spot);
+        addSpot(spot,true);
         spot = new Spot(1,new GeoPoint(55.796051, 37.537766),"1203101010330023","Теннисный клуб ЦСКА");
-        addSpot(spot);
+        addSpot(spot,true);
+        spot = new Spot(2,new GeoPoint(55.795504, 37.541117),"1203101010330032","Европейская школа Тенниса");
+        addSpot(spot,true);
+        spot = new Spot(3,new GeoPoint(55.792503, 37.536984),"1203101010330201","Европейская школа Тенниса");
+        addSpot(spot,true);
 
+        spot = new Spot(4,new GeoPoint(55.804162, 37.561679),"1203101010330101","Теннисенок");
+        addSpot(spot,true);
+
+        spot = new Spot(5,new GeoPoint(55.768345, 37.693669),"1203101011223301","Планета тенниса");
+        addSpot(spot,true);
+
+        spot = new Spot(6,new GeoPoint(55.715099, 37.555023),"1203101012112302","TennisVIP");
+        addSpot(spot,true);
+
+
+
+
+        int i=1;
     }
-    private void addSpot(Spot spot)
+    private void addSpot(Spot spot, boolean isNew)
     {
         String tileName;
-        Tile tile;
+        InfoTile tile,nextTile;
         int level=2;
-        List<Spot> spots;
+        List<Spot> spots, spotsToAdd = new ArrayList<Spot>();
         while(level<=Tile.MAX_ZOOM) {
             tileName = spot.tileName().substring(0,level);
 
-            tile = allTiles.get(tileName);
+            tile = infoTiles.get(tileName);
             if (tile == null) {
-                tile = new Tile(tileName);
+                tile = new InfoTile(tileName);
                 spots = tile.spots();
                 spots.add(spot);
-                allTiles.put(tile.name(),tile);
+                tile.set_averagePoint(spot.geoCoord());
+                infoTiles.put(tile.name(),tile);
                 break;
             }
             else
             {
-                if(tile.numChildesSpots()==0|| tile.spots().size()<MAX_COURT_LIMIT ||level==Tile.MAX_ZOOM){
+                if(tile.numChildesSpots()==0 && tile.spots().size()<MAX_COURT_LIMIT ||level==Tile.MAX_ZOOM){
                     spots = tile.spots();
                     spots.add(spot);
                     break;
                 }
-                for(int i=0; i<tile.spots(); i++)
-
+                if(tile.spots().size()>0) {
+                    tile.set_numChildesSpots(tile.spots().size());
+                    tile.set_averagePoint(InfoTile.calcAveragePoint(tile.spots()));
+                    tile.addPoint(spot.geoCoord());
+                    tile.set_numChildesSpots(tile.numChildesSpots()+1);
+                    spotsToAdd.addAll(tile.spots());
+                    tile.spots().clear();
+                }
+                else if(isNew) {
+                    tile.addPoint(spot.geoCoord());
+                    tile.set_numChildesSpots(tile.numChildesSpots() + 1);
+                }
             }
             level++;
         }
+        for(int i=0; i<spotsToAdd.size(); i++)
+            addSpot(spotsToAdd.get(i),false);
     }
+
+
 }

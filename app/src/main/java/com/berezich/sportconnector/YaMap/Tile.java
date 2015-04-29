@@ -70,34 +70,11 @@ public class Tile {
             Log.d(TAB,ex.getStackTrace().toString());
         }
 
-        _bounds = codeToRegion(_code,_name.length());
+        //_bounds = codeToRegion(_code,_name.length());
+        //not used
+        _bounds = new Bounds(new ScreenPoint(0,0),new ScreenPoint(0,0));
     }
-    private Bounds codeToRegion(int bincode, int length)
-    {
-        double zoomFactor = Math.pow(2,length);
-        //Bounds bounds = new Bounds(new ScreenPoint(0,0),new ScreenPoint((float)(256*zoomFactor),(float)(256*zoomFactor)));
-        Bounds bounds = new Bounds(new ScreenPoint(0,0),new ScreenPoint(256,256));
-        ScreenPoint center;
-        int zcode,xdel,ydel;
-        for (int i = 0, maxZoom = MAX_ZOOM; i < length; i++, maxZoom--) {
-            //центр ноды
-            center = new ScreenPoint((float)((bounds.p1().getX() + bounds.p2().getX()) * 0.5),(float)((bounds.p1().getY() + bounds.p2().getY()) * 0.5));
-            zcode = 3 & (bincode >> (2 * maxZoom));
-            xdel = zcode & 1;
-            ydel = zcode & 2;
-            //меняем границы, переходя в ребенка
-            if (xdel!=0)
-                bounds.p1().setX(center.getX());
-            else
-                bounds.p2().setX(center.getX());
 
-            if (ydel!=0)
-                bounds.p1().setY(center.getY());
-            else
-                bounds.p2().setY(center.getY());
-        }
-        return bounds;
-    }
     public Tile(ScreenPoint point, double zoom) {
 
         Bounds bounds = new Bounds(new ScreenPoint(0,0), new ScreenPoint(256,256));
@@ -132,6 +109,34 @@ public class Tile {
         }
         _bounds = bounds;
     }
+
+    private Bounds codeToRegion(int bincode, int length)
+    {
+        double zoomFactor = Math.pow(2,length);
+        //Bounds bounds = new Bounds(new ScreenPoint(0,0),new ScreenPoint((float)(256*zoomFactor),(float)(256*zoomFactor)));
+        Bounds bounds = new Bounds(new ScreenPoint(0,0),new ScreenPoint(256,256));
+        ScreenPoint center;
+        int zcode,xdel,ydel;
+        for (int i = 0, maxZoom = MAX_ZOOM; i < length; i++, maxZoom--) {
+            //центр ноды
+            center = new ScreenPoint((float)((bounds.p1().getX() + bounds.p2().getX()) * 0.5),(float)((bounds.p1().getY() + bounds.p2().getY()) * 0.5));
+            zcode = 3 & (bincode >> (2 * maxZoom));
+            xdel = zcode & 1;
+            ydel = zcode & 2;
+            //меняем границы, переходя в ребенка
+            if (xdel!=0)
+                bounds.p1().setX(center.getX());
+            else
+                bounds.p2().setX(center.getX());
+
+            if (ydel!=0)
+                bounds.p1().setY(center.getY());
+            else
+                bounds.p2().setY(center.getY());
+        }
+        return bounds;
+    }
+
 
     public String name() {
         return _name;
