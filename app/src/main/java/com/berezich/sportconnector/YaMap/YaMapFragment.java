@@ -115,6 +115,8 @@ public class YaMapFragment extends Fragment implements OnMapListener {
         btn.setOnClickListener(new btnClickListener());
         btn.setOnTouchListener(new btnOnTouchListener());
 
+        addNewObj();
+
         /*btn = (ImageButton) rootView.findViewById(R.id.map_btn_court_2);
         btn.setOnClickListener(new btnClickListener());
         btn.setOnTouchListener(new btnOnTouchListener());*/
@@ -301,7 +303,7 @@ public class YaMapFragment extends Fragment implements OnMapListener {
                         tilePhoneCenter = globalPxToPhonePx(tileGlobalCenter, tile.name().length());
 
                         //marker = new OverlayItem(mapController.getGeoPoint(tilePhoneCenter), res.getDrawable(R.drawable.court_2));
-                        marker = new OverlayItem(tileInfo.averagePoint(), res.getDrawable(R.drawable.court_2));
+                        marker = new OverlayItem(tileInfo.averagePoint(), res.getDrawable(R.drawable.baloon_purple));
 
                         // Create a balloon model for the object
                         BalloonItem balloonMarker = new BalloonItem(this.getActivity(), marker.getGeoPoint());
@@ -321,8 +323,8 @@ public class YaMapFragment extends Fragment implements OnMapListener {
                         spots = tileInfo.spots();
                         for(int i=0; i<spots.size(); i++){
                             spot = spots.get(i);
-                            marker = new OverlayItem(spot.geoCoord(), res.getDrawable(R.drawable.court_2));
-
+                            marker = new OverlayItem(spot.geoCoord(), res.getDrawable(R.drawable.baloon_purple));
+                            marker.setOffsetY(50);
                             // Create a balloon model for the object
                             BalloonItem balloonMarker = new BalloonItem(this.getActivity(), marker.getGeoPoint());
                             balloonMarker.setText(spot.name());
