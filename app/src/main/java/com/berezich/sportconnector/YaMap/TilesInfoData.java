@@ -1,6 +1,8 @@
 package com.berezich.sportconnector.YaMap;
 
+import com.berezich.sportconnector.SportObjects.Coach;
 import com.berezich.sportconnector.SportObjects.InfoTile;
+import com.berezich.sportconnector.SportObjects.Partner;
 import com.berezich.sportconnector.SportObjects.Spot;
 
 import java.util.ArrayList;
@@ -14,6 +16,7 @@ import ru.yandex.yandexmapkit.utils.GeoPoint;
  */
 public class TilesInfoData {
     private static HashMap<String,InfoTile> _infoTiles = new HashMap<String,InfoTile>();
+    private static HashMap<Integer, Spot> _allSpots = new HashMap<Integer, Spot>();
     private static final int MAX_COURT_LIMIT = 1;
 
     public static void getTilesFromCache()
@@ -54,11 +57,24 @@ public class TilesInfoData {
 
         _infoTiles.clear();
         Spot spot;
+        Partner partner;
+        Coach coach;
         spot = new Spot(0,new GeoPoint(55.778234, 37.588539),"1203101010333012","Комета");
-        addSpot(spot,true);
+        coach = new Coach(0,"Петя","Иванов",33);
+        spot.set_favorite(true);
+        spot.coaches().add(coach);
+        addSpot(spot, true);
+
         spot = new Spot(1,new GeoPoint(55.796051, 37.537766),"1203101010330023","Теннисный клуб ЦСКА");
+        partner = new Partner(0,"Вася","Клюев",44);
+        spot.partners().add(partner);
+        coach = new Coach(1,"Иван","Мартирасян",30);
+        spot.coaches().add(coach);
+        spot.set_favorite(true);
         addSpot(spot,true);
+
         spot = new Spot(2,new GeoPoint(55.795504, 37.541117),"1203101010330032","Европейская школа Тенниса");
+        spot.set_favorite(true);
         addSpot(spot,true);
         spot = new Spot(3,new GeoPoint(55.792503, 37.536984),"1203101010330201","Европейская школа Тенниса");
         addSpot(spot,true);
@@ -72,17 +88,15 @@ public class TilesInfoData {
         spot = new Spot(6,new GeoPoint(55.715099, 37.555023),"1203101012112302","TennisVIP");
         addSpot(spot,true);
 
-
-
-
-        int i=1;
     }
     public static void addSpot(Spot spot, boolean isNew)
     {
         String tileName;
         InfoTile tile,nextTile;
         int level=2;
-        List<Spot> spots, spotsToAdd = new ArrayList<Spot>();
+        List<Integer> spots,spotsToAdd = new ArrayList<Integer>();
+        if(isNew)
+            _allSpots.put(spot.id(),spot);
         while(level<=Tile.MAX_ZOOM) {
             tileName = spot.tileName().substring(0,level);
 
@@ -90,22 +104,21 @@ public class TilesInfoData {
             if (tile == null) {
                 tile = new InfoTile(tileName);
                 spots = tile.spots();
-                spots.add(spot);
-                tile.set_averagePoint(spot.geoCoord());
+                spots.add(spot.id());
                 _infoTiles.put(tile.name(),tile);
                 break;
             }
             else
             {
-                if(tile.infoChildSpots().size()==0 && tile.spots().size()<MAX_COURT_LIMIT ||level==Tile.MAX_ZOOM){
+                if(tile.getChildSpots(InfoTile.Filters.Fxx1x).size()==0 && tile.spots().size()<MAX_COURT_LIMIT ||level==Tile.MAX_ZOOM){
                     spots = tile.spots();
-                    spots.add(spot);
+                    spots.add(spot.id());
                     break;
                 }
                 if(tile.spots().size()>0) {
                     //tile.set_numChildesSpots(tile.spots().size());
                     tile.addInfoChildSpots(tile.spots());
-                    tile.set_averagePoint(InfoTile.calcAveragePoint(tile.spots()));
+                    //tile.set_averagePoint(InfoTile.calcAveragePoint(tile.spots()));
                     //tile.addPoint(spot.geoCoord());
                     //tile.set_numChildesSpots(tile.numChildesSpots()+1);
                     tile.addInfoChildSpot(spot);
@@ -121,7 +134,7 @@ public class TilesInfoData {
             level++;
         }
         for(int i=0; i<spotsToAdd.size(); i++)
-            addSpot(spotsToAdd.get(i),false);
+            addSpot(allSpots().get(spotsToAdd.get(i)),false);
     }
     public static InfoTile findInfoTile(String key){
         int level = key.length();
@@ -137,5 +150,9 @@ public class TilesInfoData {
     }
     public static HashMap<String, InfoTile> infoTiles() {
         return _infoTiles;
+    }
+
+    public static HashMap<Integer, Spot> allSpots() {
+        return _allSpots;
     }
 }

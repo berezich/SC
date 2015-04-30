@@ -62,6 +62,7 @@ public class YaMapFragment extends Fragment implements OnMapListener {
     private boolean isCoaches=false;
     private boolean isPartners=false;
     private boolean isFavorite=false;
+    private InfoTile.Filters curFilter;
 
     //список tiles уже отисованых на карте при данном масштабе
     private HashMap<String,Tile> loadedTiles = new HashMap<String,Tile>();
@@ -80,7 +81,7 @@ public class YaMapFragment extends Fragment implements OnMapListener {
             isPartners = true;
         if(filter == Filters.COURT)
             isCourts = true;
-
+        setCurFilter();
         return this;
     }
 
@@ -175,6 +176,7 @@ public class YaMapFragment extends Fragment implements OnMapListener {
                 Log.d(TAG, "mapHeight = " + mapController.getHeight());
                 Log.d(TAG, "mapWidth = " + mapController.getWidth());
                 displayNewObj();
+                mapController.notifyRepaint();
                 break;
 
             case MapEvent.MSG_ZOOM_BEGIN:
@@ -188,6 +190,7 @@ public class YaMapFragment extends Fragment implements OnMapListener {
             case MapEvent.MSG_ZOOM_END:
                 Log.d(TAG, "ZOOM = " + mapController.getZoomCurrent());
                 displayNewObj();
+                mapController.notifyRepaint();
                 Log.d(TAG, "loadedTiles num = " + loadedTiles.size());
                 //textView.setText("MSG_ZOOM_END");
                 break;
@@ -204,6 +207,7 @@ public class YaMapFragment extends Fragment implements OnMapListener {
                 Log.d(TAG, "mapHeight = " + mapController.getHeight());
                 Log.d(TAG, "mapWidth = " + mapController.getWidth());
                 displayNewObj();
+                mapController.notifyRepaint();
                 Log.d(TAG, "loadedTiles num = " + loadedTiles.size());
                 //curTiles = visibleTileList();
                 break;
@@ -281,21 +285,25 @@ public class YaMapFragment extends Fragment implements OnMapListener {
         double zoomFactor;
         Tile.Bounds bounds,_bounds;
         boolean f1,f2;
-        curTiles = buildTiles();
-        InfoTile tileInfo;
-        Tile tile;
-        for (String key : curTiles.keySet()) {
-            str += key.toString() + ",";
-            if (!loadedTiles.containsKey(key)) {
-                tile = curTiles.get(key);
-                loadedTiles.put(key, tile);
-                //tileInfo = allTiles.get(key);
-                tileInfo = TilesInfoData.findInfoTile(key);
-                if(tileInfo!=null ) {
-                    if((tileInfo.infoChildSpots().size()>0)&&tileInfo.name().equals(tile.name()))
-                        showGrpSpot(tileInfo);
-                    else
-                        showSpots(tileInfo);
+        if(curFilter!= InfoTile.Filters.F0000)
+        {
+            curTiles = buildTiles();
+            InfoTile tileInfo;
+            Tile tile;
+            for (String key : curTiles.keySet()) {
+                str += key.toString() + ",";
+                if (!loadedTiles.containsKey(key)) {
+                    tile = curTiles.get(key);
+                    loadedTiles.put(key, tile);
+                    //tileInfo = allTiles.get(key);
+                    tileInfo = TilesInfoData.findInfoTile(key);
+                    if (tileInfo != null) {
+
+                        if ((tileInfo.getChildSpots(curFilter).size() > 0) && tileInfo.name().equals(tile.name()))
+                            showGrpOrChildSpot(tileInfo, curFilter);
+                        else
+                            showSpots(tileInfo, curFilter);
+                    }
                 }
             }
         }
@@ -307,8 +315,7 @@ public class YaMapFragment extends Fragment implements OnMapListener {
         @Override
         public void onClick(View view) {
             Log.d(TAG,"button onClick!!!");
-            loadedTiles.clear();
-            displayNewObj();
+
             return;
         }
     }
@@ -319,66 +326,174 @@ public class YaMapFragment extends Fragment implements OnMapListener {
             ImageButton btn = (ImageButton) v;
             // show interest in events resulting from ACTION_DOWN
             if(event.getAction()==MotionEvent.ACTION_DOWN) {
-                btn.setPressed(!btn.isPressed());
-                if(v.getId() == R.id.map_btn_coach)
+                //btn.setPressed(!btn.isPressed());
                 switch (v.getId())
                 {
                     case R.id.map_btn_coach:
                         isCoaches = !isCoaches;
+                        btn.setPressed(isCoaches);
+                        if(!isCoaches)
+                            activateButtons(Buttons.COURT,false);
                         break;
                     case R.id.map_btn_partner:
                         isPartners = !isPartners;
+                        btn.setPressed(isPartners);
+                        if(!isPartners)
+                            activateButtons(Buttons.COURT,false);
                         break;
                     case R.id.map_btn_court:
                         isCourts = !isCourts;
+                        btn.setPressed(isCourts);
+                        if(isCourts)
+                            activateButtons(Buttons.ALL,true);
                         break;
                     case R.id.map_btn_star:
                         isFavorite = !isFavorite;
+                        btn.setPressed(isFavorite);
+                        if(!isFavorite)
+                            activateButtons(Buttons.COURT,false);
                         break;
                 }
-
+                loadedTiles.clear();
+                setCurFilter();
+                overlay.clearOverlayItems();
+                displayNewObj();
+                mapController.notifyRepaint();
                 return true;
             }
             if(event.getAction()==MotionEvent.ACTION_UP) {
+
                 btn.performClick();
                 return true;
             }
 
-            return false;
+            return true;
         }
     }
-    void showSpots(InfoTile infoTile)
+    static enum Buttons{ALL,COUCH,PARTNER,FAVORITE,COURT}
+    private void activateButtons(Buttons buttonType,boolean b) {
+        ImageButton btn;
+        if(buttonType == Buttons.ALL || buttonType == Buttons.COUCH) {
+            isCoaches = b;
+            btn = (ImageButton) getView().findViewById(R.id.map_btn_coach);
+            btn.setPressed(b);
+        }
+        if(buttonType == Buttons.ALL || buttonType == Buttons.PARTNER) {
+            isPartners = b;
+            btn = (ImageButton) getView().findViewById(R.id.map_btn_partner);
+            btn.setPressed(b);
+        }
+        if(buttonType == Buttons.ALL || buttonType == Buttons.PARTNER) {
+            isFavorite = b;
+            btn = (ImageButton) getView().findViewById(R.id.map_btn_star);
+            btn.setPressed(b);
+        }
+        if(buttonType == Buttons.ALL || buttonType == Buttons.COURT) {
+            isCourts = b;
+            btn = (ImageButton) getView().findViewById(R.id.map_btn_court);
+            btn.setPressed(b);
+        }
+    }
+
+    void showSpots(InfoTile infoTile, InfoTile.Filters filter)
     {
-        List<Spot> spots = infoTile.spots();
+        List<Integer> spots = infoTile.spots();
         Spot spot;
         OverlayItem marker;
         for(int i=0; i<spots.size(); i++){
-            spot = spots.get(i);
-            marker = new OverlayItem(spot.geoCoord(), res.getDrawable(R.drawable.baloon_purple));
+            spot = TilesInfoData.allSpots().get(spots.get(i));
+            if(InfoTile.isAppropriate(spot, filter)) {
+                marker = new OverlayItem(spot.geoCoord(), res.getDrawable(spot.getMarkerImg(filter)));
+                //marker = new OverlayItem(spot.geoCoord(), res.getDrawable(R.drawable.baloon_blue));
+                marker.setOffsetY(MARKER_OFFSET);
+                // Create a balloon model for the object
+                BalloonItem balloonMarker = new BalloonItem(this.getActivity(), marker.getGeoPoint());
+                balloonMarker.setText(spot.name());
+                //balloonMarker.setText(String.valueOf(tile.name()));
+//        // Add the balloon model to the object
+                marker.setBalloonItem(balloonMarker);
+                // Add the object to the layer
+                overlay.addOverlayItem(marker);
+            }
+        }
+    }
+    void showGrpOrChildSpot(InfoTile tileInfo,InfoTile.Filters filter)
+    {
+        OverlayItem marker;
+        Spot spot;
+        List<Integer> spots = tileInfo.getChildSpots(filter);
+        if(spots.size()>1) {
+            marker = new OverlayItem(tileInfo.getAvrPoint(filter), res.getDrawable(R.drawable.baloon_blue));
             marker.setOffsetY(MARKER_OFFSET);
             // Create a balloon model for the object
             BalloonItem balloonMarker = new BalloonItem(this.getActivity(), marker.getGeoPoint());
-            balloonMarker.setText(spot.name());
+            balloonMarker.setText(tileInfo.getNumSpotToString("спот", filter));
             //balloonMarker.setText(String.valueOf(tile.name()));
 //        // Add the balloon model to the object
             marker.setBalloonItem(balloonMarker);
             // Add the object to the layer
             overlay.addOverlayItem(marker);
         }
-    }
-    void showGrpSpot(InfoTile tileInfo)
-    {
-        OverlayItem marker;
-        marker = new OverlayItem(tileInfo.averagePoint(), res.getDrawable(R.drawable.baloon_purple));
-        marker.setOffsetY(MARKER_OFFSET);
-        // Create a balloon model for the object
-        BalloonItem balloonMarker = new BalloonItem(this.getActivity(), marker.getGeoPoint());
-        balloonMarker.setText(tileInfo.getNumSpotToString("спот"));
-        //balloonMarker.setText(String.valueOf(tile.name()));
+        else if(spots.size()==1) {
+            spot = TilesInfoData.allSpots().get(spots.get(0));
+            if (InfoTile.isAppropriate(spot, filter)) {
+                marker = new OverlayItem(spot.geoCoord(), res.getDrawable(spot.getMarkerImg(filter)));
+                //marker = new OverlayItem(spot.geoCoord(), res.getDrawable(R.drawable.baloon_blue));
+                marker.setOffsetY(MARKER_OFFSET);
+                // Create a balloon model for the object
+                BalloonItem balloonMarker = new BalloonItem(this.getActivity(), marker.getGeoPoint());
+                balloonMarker.setText(spot.name());
+                //balloonMarker.setText(String.valueOf(tile.name()));
 //        // Add the balloon model to the object
-        marker.setBalloonItem(balloonMarker);
-        // Add the object to the layer
-        overlay.addOverlayItem(marker);
+                marker.setBalloonItem(balloonMarker);
+                // Add the object to the layer
+                overlay.addOverlayItem(marker);
+            }
+        }
+    }
+    private void setCurFilter()
+    {
+        if(isCourts) {
+            curFilter = InfoTile.Filters.Fxx1x;
+            return;
+        }
+        if(isPartners)
+        {
+            if(isCoaches) {
+                if(isFavorite)
+                {
+                    curFilter = InfoTile.Filters.F1101;
+                    return;
+                }
+                curFilter = InfoTile.Filters.F1100;
+                return;
+            }
+            else if(isFavorite)
+            {
+                curFilter = InfoTile.Filters.F1001;
+                return;
+            }
+            curFilter = InfoTile.Filters.F1000;
+        }
+        else if(isCoaches)
+        {
+            if(isFavorite)
+            {
+                curFilter = InfoTile.Filters.F1101;
+                return;
+            }
+            curFilter = InfoTile.Filters.F0100;
+        }
+        else if(isFavorite)
+            curFilter = InfoTile.Filters.F0001;
+        else
+            curFilter = InfoTile.Filters.F0000;
+        //
+        //filter = InfoTile.Filters.F0100;
+        //filter = InfoTile.Filters.F1100;
+        //filter = InfoTile.Filters.F0001;
+        //filter = InfoTile.Filters.F0101;
+        //curFilter = InfoTile.Filters.F1101;
     }
     public class Size
     {

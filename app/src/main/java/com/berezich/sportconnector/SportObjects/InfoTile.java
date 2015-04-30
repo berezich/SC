@@ -2,6 +2,9 @@ package com.berezich.sportconnector.SportObjects;
 
 import android.util.Log;
 
+import com.berezich.sportconnector.MainFragment;
+import com.berezich.sportconnector.YaMap.TilesInfoData;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -15,11 +18,30 @@ import ru.yandex.yandexmapkit.utils.ScreenPoint;
 public class InfoTile {
 
     private String _name="";
-    private List<Spot> _spots = new ArrayList<Spot>();
-    //private int _numChildesSpots=0;
-    private GeoPoint _averagePoint;
+    private List<Integer> _spots = new ArrayList<Integer>();
+    public static enum Filters {F0000,F1000,F0100,F0001,F1100,F1001,F0101,F1101,Fxx1x}
+    //filters order partner-coach-court-favorite
+    private GeoPoint _avrPoint_1000;
+    private GeoPoint _avrPoint_0100;
+    private GeoPoint _avrPoint_0001;
+    private GeoPoint _avrPoint_1100;
+    private GeoPoint _avrPoint_1001;
+    private GeoPoint _avrPoint_0101;
+    private GeoPoint _avrPoint_1101;
+    private GeoPoint _avrPoint_xx1x;
 
-    private List<ShotInfoSpot> _infoChildSpots = new ArrayList<ShotInfoSpot>();
+    private List<Integer> _childSpots_1000 = new ArrayList<Integer>();
+    private List<Integer> _childSpots_0100 = new ArrayList<Integer>();
+    private List<Integer> _childSpots_0001 = new ArrayList<Integer>();
+    private List<Integer> _childSpots_1100 = new ArrayList<Integer>();
+    private List<Integer> _childSpots_1001 = new ArrayList<Integer>();
+    private List<Integer> _childSpots_0101 = new ArrayList<Integer>();
+    private List<Integer> _childSpots_1101 = new ArrayList<Integer>();
+    private List<Integer> _childSpots_xx1x = new ArrayList<Integer>();
+
+    //private GeoPoint _averagePoint;
+
+    //private List<ShotInfoSpot> _infoChildSpots = new ArrayList<ShotInfoSpot>();
 
     public InfoTile(String name)
     {
@@ -43,9 +65,9 @@ public class InfoTile {
         }
         return avPoint;
     }
-    public String getNumSpotToString(String spotName)
+    public String getNumSpotToString(String spotName,Filters filter)
     {
-        int numChildSpots = _infoChildSpots.size();
+        int numChildSpots = getChildSpots(filter).size();
         String num = String.valueOf(numChildSpots)+" ";
         if(numChildSpots>=10 && numChildSpots<=19)
             return num + spotName + "ов";
@@ -62,26 +84,100 @@ public class InfoTile {
                 return num + spotName+"ов";
         }
     }
-    public  void addPoint(GeoPoint point)
+    public  void addPoint(GeoPoint point, Filters filter)
     {
-        int numSpots = _infoChildSpots.size();
-        _averagePoint = new GeoPoint( (_averagePoint.getLat()*numSpots + point.getLat())/(numSpots+1),(_averagePoint.getLon()*numSpots + point.getLon())/(numSpots+1));
+        int numSpots = getChildSpots(filter).size();
+        GeoPoint avrPoint = getAvrPoint(filter);
+        if(avrPoint!=null)
+            avrPoint = new GeoPoint( (avrPoint.getLat()*numSpots + point.getLat())/(numSpots+1),(avrPoint.getLon()*numSpots + point.getLon())/(numSpots+1));
+        else
+            avrPoint = point;
+        setAvrPoint(avrPoint, filter);
     }
-    public void addInfoChildSpots(List<Spot> spots)
+    public void addInfoChildSpots(List<Integer> spots)
     {
         for(int i=0; i<spots.size(); i++)
-            addInfoChildSpot(spots.get(i));
+            addInfoChildSpot(TilesInfoData.allSpots().get(spots.get(i)));
     }
     public void addInfoChildSpot(Spot spot)
     {
-        ShotInfoSpot shotInfo = new ShotInfoSpot(spot.id());
-        addPoint(spot.geoCoord());
-        shotInfo.setCoachExists(!spot.coaches().isEmpty());
-        shotInfo.setPartnerExists(!spot.partners().isEmpty());
-        shotInfo.setMyFavorite(spot.favorite());
-        _infoChildSpots.add(shotInfo);
+        //ShotInfoSpot shotInfo = new ShotInfoSpot(spot.id());
+        List<Filters> filters = spot.getAppropriateFilters();
+        for(Filters filter: filters) {
+            addPoint(spot.geoCoord(), filter);
+            getChildSpots(filter).add(spot.id());
+        }
     }
 
+    public  static boolean isAppropriate(Spot spot, Filters filter)
+    {
+
+        List<Filters> filters = spot.getAppropriateFilters();
+        for(Filters filterItem:filters)
+            if(filter == filterItem)
+                return true;
+        return  false;
+    }
+    public List<Integer> getChildSpots(Filters filter)
+    {
+        if(filter == Filters.F1000)
+            return _childSpots_1000;
+        if(filter == Filters.F0100)
+            return _childSpots_0100;
+        if(filter == Filters.F0001)
+            return _childSpots_0001;
+        if(filter == Filters.F1100)
+            return _childSpots_1100;
+        if(filter == Filters.F1001)
+            return _childSpots_1001;
+        if(filter == Filters.F0101)
+            return _childSpots_0101;
+        if(filter == Filters.F1101)
+            return _childSpots_1101;
+        if(filter == Filters.Fxx1x)
+            return _childSpots_xx1x;
+        return null;
+    }
+    public GeoPoint getAvrPoint(Filters filter)
+    {
+        if(filter == Filters.F1000)
+            return _avrPoint_1000;
+        if(filter == Filters.F0100)
+            return _avrPoint_0100;
+        if(filter == Filters.F0001)
+            return _avrPoint_0001;
+        if(filter == Filters.F1100)
+            return _avrPoint_1100;
+        if(filter == Filters.F1001)
+            return _avrPoint_1001;
+        if(filter == Filters.F0101)
+            return _avrPoint_0101;
+        if(filter == Filters.F1101)
+            return _avrPoint_1101;
+        if(filter == Filters.Fxx1x)
+            return _avrPoint_xx1x;
+        return null;
+    }
+    public void setAvrPoint(GeoPoint avrPoint,Filters filter)
+    {
+        if(filter == Filters.F1000) {
+            _avrPoint_1000 = avrPoint;
+        }
+        else if(filter == Filters.F0100)
+            _avrPoint_0100 = avrPoint;
+        else if(filter == Filters.F0001)
+            _avrPoint_0001 = avrPoint;
+        else if(filter == Filters.F1100)
+            _avrPoint_1100 = avrPoint;
+        else if(filter == Filters.F1001)
+            _avrPoint_1001 = avrPoint;
+        else if(filter == Filters.F0101)
+            _avrPoint_0101 = avrPoint;
+        else if(filter == Filters.F1101)
+            _avrPoint_1101 = avrPoint;
+        else if(filter == Filters.Fxx1x)
+            _avrPoint_xx1x = avrPoint;
+    }
     public String name() {
         return _name;
     }
@@ -96,22 +192,19 @@ public class InfoTile {
     }
 */
 
-    public List<Spot> spots() {
+    public List<Integer> spots() {
         return _spots;
     }
 
-    public void set_averagePoint(GeoPoint _averagePoint) {
+    /*public void set_averagePoint(GeoPoint _averagePoint) {
         this._averagePoint = _averagePoint;
     }
 
     public GeoPoint averagePoint() {
         return _averagePoint;
     }
-
-    public List<ShotInfoSpot> infoChildSpots() {
-        return _infoChildSpots;
-    }
-
+*/
+/*
     public static class ShotInfoSpot{
         int _id;
         boolean _isPartnerExists = false;
@@ -150,4 +243,5 @@ public class InfoTile {
             this._isMyFavorite = isMyFavorite;
         }
     }
+    */
 }

@@ -3,6 +3,8 @@ package com.berezich.sportconnector.SportObjects;
 import android.support.annotation.NonNull;
 
 
+import com.berezich.sportconnector.R;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -30,6 +32,109 @@ public class Spot {
         _tileName = tileName;
     }
 
+    public List<InfoTile.Filters> getAppropriateFilters()
+    {
+        List<InfoTile.Filters> filters = new ArrayList<>();
+        filters.add(InfoTile.Filters.Fxx1x);
+        //filters OR
+        boolean isPartenrs=false, isCoaches=false, isFavorite=false;
+        if(_partners.size()>0)
+        {
+            filters.add(InfoTile.Filters.F1000);
+            filters.add(InfoTile.Filters.F1100);
+            filters.add(InfoTile.Filters.F1001);
+            filters.add(InfoTile.Filters.F1101);
+            isPartenrs=true;
+        }
+        if(_coaches.size()>0)
+        {
+            filters.add(InfoTile.Filters.F0100);
+            filters.add(InfoTile.Filters.F0101);
+            if(!isPartenrs)
+            {
+                filters.add(InfoTile.Filters.F1100);
+                filters.add(InfoTile.Filters.F1101);
+            }
+            isCoaches = true;
+        }
+        if(_favorite)
+        {
+            filters.add(InfoTile.Filters.F0001);
+            if(!isPartenrs)
+            {
+                filters.add(InfoTile.Filters.F1001);
+                filters.add(InfoTile.Filters.F1101);
+            }
+            if(!isCoaches)
+            {
+                filters.add(InfoTile.Filters.F0101);
+            }
+        }
+
+        /*//filters AND
+        if(spot.partners().size()>0)
+        {
+            filters.add(Filters.F1000);
+            if(spot.coaches().size()>0) {
+                filters.add(Filters.F1100);
+                if(spot.favorite())
+                    filters.add(Filters.F1101);
+            }
+            if(spot.favorite())
+                filters.add(Filters.F1001);
+        }
+        else
+        {
+            if(spot.coaches().size()>0) {
+                filters.add(Filters.F0100);
+                if(spot.favorite())
+                    filters.add(Filters.F0101);
+            }
+            if(spot.favorite())
+                filters.add(Filters.F0001);
+        }
+        */
+        return filters;
+    }
+    public int getMarkerImg(InfoTile.Filters filter)
+    {
+        if(filter == InfoTile.Filters.F0001||
+                filter == InfoTile.Filters.F1001 && _partners.size()==0||
+                filter == InfoTile.Filters.F0101 && _coaches.size()==0||
+                filter == InfoTile.Filters.F1101 && _coaches.size()==0&&_partners.size()==0)
+            return  R.drawable.baloon_red;
+        if(filter == InfoTile.Filters.F1000||
+                filter == InfoTile.Filters.F1001 && !_favorite||
+                filter == InfoTile.Filters.F1100 && _coaches.size()==0||
+                filter == InfoTile.Filters.F1101 && _coaches.size()==0&& !_favorite)
+            return  R.drawable.baloon_purple;
+        if(filter == InfoTile.Filters.F0100||
+                filter == InfoTile.Filters.F0101 && !_favorite||
+                filter == InfoTile.Filters.F1100 && _partners.size()==0||
+                filter == InfoTile.Filters.F1101 && _partners.size()==0&& !_favorite)
+            return  R.drawable.baloon_green;
+
+        if(_partners.size()>0 && _favorite && (filter == InfoTile.Filters.F1001 || filter == InfoTile.Filters.F1101 && _coaches.size()==0))
+            return  R.drawable.baloon_red_purple;
+            //return  R.drawable.baloon_red;
+
+        if(_partners.size()>0 && _coaches.size()>0 && (filter == InfoTile.Filters.F1100 || filter == InfoTile.Filters.F1101 && !_favorite))
+            return  R.drawable.baloon_green_purple;
+            //return  R.drawable.baloon_green;
+
+        if(_coaches.size()>0 && _favorite && (filter == InfoTile.Filters.F0101 || filter == InfoTile.Filters.F1101 && _partners.size()==0))
+            return  R.drawable.baloon_red_green;
+            //return  R.drawable.baloon_green;
+
+        if(filter == InfoTile.Filters.F1101 && _partners.size()>0 && _coaches.size()>0 && _favorite )
+            return  R.drawable.baloon_green_red_purple;
+            //return  R.drawable.baloon_red;
+
+        if(filter == InfoTile.Filters.Fxx1x)
+            return  R.drawable.baloon_blue;
+
+        return  R.drawable.baloon_blue;
+    }
     public int id() {
         return _id;
     }
