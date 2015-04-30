@@ -3,6 +3,7 @@ package com.berezich.sportconnector.SportObjects;
 import android.util.Log;
 
 import com.berezich.sportconnector.MainFragment;
+import com.berezich.sportconnector.R;
 import com.berezich.sportconnector.YaMap.TilesInfoData;
 
 import java.util.ArrayList;
@@ -84,6 +85,38 @@ public class InfoTile {
                 return num + spotName+"ов";
         }
     }
+    public static String pluralPostfix(int num)
+    {
+        if(num>=10 && num<=19)
+            return "ов";
+        int mod = num%10;
+        switch (mod)
+        {
+            case 1:
+                return "";
+            case 2:
+            case 3:
+            case 4:
+                return "a";
+            default:
+                return "ов";
+        }
+    }
+    public String getDescription(Filters filter)
+    {
+        String description="";
+        int num;
+        if(filter == Filters.F1000 || filter == Filters.F1100 || filter == Filters.F1001 || filter == Filters.F1101 || filter == Filters.Fxx1x)
+            if((num=_childSpots_1000.size())>0)
+                description+= "\n "+String.valueOf(num)+" - спарринг партнер"+pluralPostfix(num);
+        if(filter == Filters.F0100 || filter == Filters.F1100 || filter == Filters.F0101 || filter == Filters.F1101 || filter == Filters.Fxx1x)
+            if((num=_childSpots_0100.size())>0)
+                description+= "\n "+String.valueOf(num)+" - тренер"+pluralPostfix(num);
+        if(filter == InfoTile.Filters.F0001 || filter == InfoTile.Filters.F1001 || filter == InfoTile.Filters.F0101 || filter == InfoTile.Filters.F1101 || filter == InfoTile.Filters.Fxx1x)
+            if((num=_childSpots_0001.size())>0)
+                description+= "\n "+String.valueOf(num)+((num==1)?" - мой спот":" - мои споты");
+        return  description;
+    }
     public  void addPoint(GeoPoint point, Filters filter)
     {
         int numSpots = getChildSpots(filter).size();
@@ -108,7 +141,43 @@ public class InfoTile {
             getChildSpots(filter).add(spot.id());
         }
     }
+    public Integer getDrawableMarker(Filters filter)
+    {
+        if(filter == InfoTile.Filters.F0001||
+                filter == InfoTile.Filters.F1001 && _childSpots_1000.size()==0||
+                filter == InfoTile.Filters.F0101 && _childSpots_0100.size()==0||
+                filter == InfoTile.Filters.F1101 && _childSpots_0100.size()==0&&_childSpots_1000.size()==0)
+            return  R.drawable.baloon_red;
+        if(filter == InfoTile.Filters.F1000||
+                filter == InfoTile.Filters.F1001 && _childSpots_0001.size()==0||
+                filter == InfoTile.Filters.F1100 && _childSpots_0100.size()==0||
+                filter == InfoTile.Filters.F1101 && _childSpots_0100.size()==0&& _childSpots_0001.size()==0)
+            return  R.drawable.baloon_purple;
+        if(filter == InfoTile.Filters.F0100||
+                filter == InfoTile.Filters.F0101 && _childSpots_0001.size()==0||
+                filter == InfoTile.Filters.F1100 && _childSpots_1000.size()==0||
+                filter == InfoTile.Filters.F1101 && _childSpots_1000.size()==0&& _childSpots_0001.size()==0)
+            return  R.drawable.baloon_green;
 
+        if(_childSpots_1000.size()>0 && _childSpots_0001.size()>0 && (filter == InfoTile.Filters.F1001 || (filter == InfoTile.Filters.F1101 || filter == InfoTile.Filters.Fxx1x) && _childSpots_0100.size()==0))
+            return  R.drawable.baloon_red_purple;
+        //return  R.drawable.baloon_red;
+
+        if(_childSpots_1000.size()>0 && _childSpots_0100.size()>0 && (filter == InfoTile.Filters.F1100 || (filter == InfoTile.Filters.F1101 || filter == InfoTile.Filters.Fxx1x) && _childSpots_0001.size()==0))
+            return  R.drawable.baloon_green_purple;
+        //return  R.drawable.baloon_green;
+
+        if(_childSpots_0100.size()>0 && _childSpots_0001.size()>0 && (filter == InfoTile.Filters.F0101 || (filter == InfoTile.Filters.F1101 || filter == InfoTile.Filters.Fxx1x) && _childSpots_1000.size()==0))
+            return  R.drawable.baloon_red_green;
+        //return  R.drawable.baloon_green;
+
+        if((filter == InfoTile.Filters.F1101 || filter == InfoTile.Filters.Fxx1x) && _childSpots_1000.size()>0 && _childSpots_0100.size()>0 && _childSpots_0001.size()>0 )
+            return  R.drawable.baloon_green_red_purple;
+        //return  R.drawable.baloon_red;
+
+
+        return  R.drawable.baloon_blue;
+    }
     public  static boolean isAppropriate(Spot spot, Filters filter)
     {
 

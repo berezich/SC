@@ -13,6 +13,8 @@ import java.util.ListIterator;
 
 import ru.yandex.yandexmapkit.utils.GeoPoint;
 
+import static com.berezich.sportconnector.SportObjects.InfoTile.pluralPostfix;
+
 /**
  * Created by berezkin on 23.04.2015.
  */
@@ -61,14 +63,11 @@ public class Spot {
         {
             filters.add(InfoTile.Filters.F0001);
             if(!isPartenrs)
-            {
                 filters.add(InfoTile.Filters.F1001);
-                filters.add(InfoTile.Filters.F1101);
-            }
             if(!isCoaches)
-            {
                 filters.add(InfoTile.Filters.F0101);
-            }
+            if(!isCoaches && !isPartenrs)
+                filters.add(InfoTile.Filters.F1101);
         }
 
         /*//filters AND
@@ -101,39 +100,52 @@ public class Spot {
         if(filter == InfoTile.Filters.F0001||
                 filter == InfoTile.Filters.F1001 && _partners.size()==0||
                 filter == InfoTile.Filters.F0101 && _coaches.size()==0||
-                filter == InfoTile.Filters.F1101 && _coaches.size()==0&&_partners.size()==0)
+                (filter == InfoTile.Filters.F1101 || (filter == InfoTile.Filters.Fxx1x && _favorite)) && _coaches.size()==0&&_partners.size()==0)
             return  R.drawable.baloon_red;
         if(filter == InfoTile.Filters.F1000||
                 filter == InfoTile.Filters.F1001 && !_favorite||
                 filter == InfoTile.Filters.F1100 && _coaches.size()==0||
-                filter == InfoTile.Filters.F1101 && _coaches.size()==0&& !_favorite)
+                (filter == InfoTile.Filters.F1101 || (filter == InfoTile.Filters.Fxx1x && _partners.size()>0)) && _coaches.size()==0&& !_favorite)
             return  R.drawable.baloon_purple;
         if(filter == InfoTile.Filters.F0100||
                 filter == InfoTile.Filters.F0101 && !_favorite||
                 filter == InfoTile.Filters.F1100 && _partners.size()==0||
-                filter == InfoTile.Filters.F1101 && _partners.size()==0&& !_favorite)
+                (filter == InfoTile.Filters.F1101 || (filter == InfoTile.Filters.Fxx1x && _coaches.size()>0)) && _partners.size()==0&& !_favorite)
             return  R.drawable.baloon_green;
 
-        if(_partners.size()>0 && _favorite && (filter == InfoTile.Filters.F1001 || filter == InfoTile.Filters.F1101 && _coaches.size()==0))
+        if(_partners.size()>0 && _favorite && (filter == InfoTile.Filters.F1001 || (filter == InfoTile.Filters.F1101 || filter == InfoTile.Filters.Fxx1x) && _coaches.size()==0))
             return  R.drawable.baloon_red_purple;
             //return  R.drawable.baloon_red;
 
-        if(_partners.size()>0 && _coaches.size()>0 && (filter == InfoTile.Filters.F1100 || filter == InfoTile.Filters.F1101 && !_favorite))
+        if(_partners.size()>0 && _coaches.size()>0 && (filter == InfoTile.Filters.F1100 || (filter == InfoTile.Filters.F1101 || filter == InfoTile.Filters.Fxx1x) && !_favorite))
             return  R.drawable.baloon_green_purple;
             //return  R.drawable.baloon_green;
 
-        if(_coaches.size()>0 && _favorite && (filter == InfoTile.Filters.F0101 || filter == InfoTile.Filters.F1101 && _partners.size()==0))
+        if(_coaches.size()>0 && _favorite && (filter == InfoTile.Filters.F0101 || (filter == InfoTile.Filters.F1101 || filter == InfoTile.Filters.Fxx1x) && _partners.size()==0))
             return  R.drawable.baloon_red_green;
             //return  R.drawable.baloon_green;
 
-        if(filter == InfoTile.Filters.F1101 && _partners.size()>0 && _coaches.size()>0 && _favorite )
+        if((filter == InfoTile.Filters.F1101 || filter == InfoTile.Filters.Fxx1x) && _partners.size()>0 && _coaches.size()>0 && _favorite )
             return  R.drawable.baloon_green_red_purple;
             //return  R.drawable.baloon_red;
 
-        if(filter == InfoTile.Filters.Fxx1x)
-            return  R.drawable.baloon_blue;
 
         return  R.drawable.baloon_blue;
+    }
+    public String getDescription(InfoTile.Filters filter)
+    {
+        String description="";
+        int num;
+        if(filter == InfoTile.Filters.F1000 || filter == InfoTile.Filters.F1100 || filter == InfoTile.Filters.F1001 || filter == InfoTile.Filters.F1101 || filter == InfoTile.Filters.Fxx1x)
+            if((num=_partners.size())>0)
+                description+= "\n "+String.valueOf(num)+" - спарринг партнер"+pluralPostfix(num);
+        if(filter == InfoTile.Filters.F0100 || filter == InfoTile.Filters.F1100 || filter == InfoTile.Filters.F0101 || filter == InfoTile.Filters.F1101 || filter == InfoTile.Filters.Fxx1x)
+            if((num=_coaches.size())>0)
+                description+= "\n "+String.valueOf(num)+" - тренер"+pluralPostfix(num);
+        if(filter == InfoTile.Filters.F0001 || filter == InfoTile.Filters.F1001 || filter == InfoTile.Filters.F0101 || filter == InfoTile.Filters.F1101 || filter == InfoTile.Filters.Fxx1x)
+            if(_favorite)
+                description+= "\n мой спот";
+        return  description;
     }
     public int id() {
         return _id;

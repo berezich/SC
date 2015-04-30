@@ -408,7 +408,7 @@ public class YaMapFragment extends Fragment implements OnMapListener {
                 marker.setOffsetY(MARKER_OFFSET);
                 // Create a balloon model for the object
                 BalloonItem balloonMarker = new BalloonItem(this.getActivity(), marker.getGeoPoint());
-                balloonMarker.setText(spot.name());
+                balloonMarker.setText(spot.name()+spot.getDescription(filter));
                 //balloonMarker.setText(String.valueOf(tile.name()));
 //        // Add the balloon model to the object
                 marker.setBalloonItem(balloonMarker);
@@ -423,11 +423,12 @@ public class YaMapFragment extends Fragment implements OnMapListener {
         Spot spot;
         List<Integer> spots = tileInfo.getChildSpots(filter);
         if(spots.size()>1) {
-            marker = new OverlayItem(tileInfo.getAvrPoint(filter), res.getDrawable(R.drawable.baloon_blue));
+            //marker = new OverlayItem(tileInfo.getAvrPoint(filter), res.getDrawable(R.drawable.baloon_blue));
+            marker = new OverlayItem(tileInfo.getAvrPoint(filter), res.getDrawable(tileInfo.getDrawableMarker(filter)));
             marker.setOffsetY(MARKER_OFFSET);
             // Create a balloon model for the object
             BalloonItem balloonMarker = new BalloonItem(this.getActivity(), marker.getGeoPoint());
-            balloonMarker.setText(tileInfo.getNumSpotToString("спот", filter));
+            balloonMarker.setText(tileInfo.getNumSpotToString("спот", filter)+tileInfo.getDescription(filter));
             //balloonMarker.setText(String.valueOf(tile.name()));
 //        // Add the balloon model to the object
             marker.setBalloonItem(balloonMarker);
@@ -442,7 +443,7 @@ public class YaMapFragment extends Fragment implements OnMapListener {
                 marker.setOffsetY(MARKER_OFFSET);
                 // Create a balloon model for the object
                 BalloonItem balloonMarker = new BalloonItem(this.getActivity(), marker.getGeoPoint());
-                balloonMarker.setText(spot.name());
+                balloonMarker.setText(spot.name()+spot.getDescription(filter));
                 //balloonMarker.setText(String.valueOf(tile.name()));
 //        // Add the balloon model to the object
                 marker.setBalloonItem(balloonMarker);
@@ -479,7 +480,7 @@ public class YaMapFragment extends Fragment implements OnMapListener {
         {
             if(isFavorite)
             {
-                curFilter = InfoTile.Filters.F1101;
+                curFilter = InfoTile.Filters.F0101;
                 return;
             }
             curFilter = InfoTile.Filters.F0100;
