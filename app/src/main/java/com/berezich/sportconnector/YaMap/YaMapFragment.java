@@ -93,6 +93,8 @@ public class YaMapFragment extends Fragment implements OnMapListener {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        View rootView = inflater.inflate(R.layout.fragment_googlemap, container, false);
+        /*
         View rootView = inflater.inflate(R.layout.fragment_yamap, container, false);
         mapView = (MapView)  rootView.findViewById(R.id.map);
         mapView.showBuiltInScreenButtons(true);
@@ -127,6 +129,7 @@ public class YaMapFragment extends Fragment implements OnMapListener {
         btn.setOnTouchListener(new btnOnTouchListener());
 
         displayNewObj();
+        */
 
         /*btn = (ImageButton) rootView.findViewById(R.id.map_btn_court_2);
         btn.setOnClickListener(new btnClickListener());
