@@ -1,4 +1,4 @@
-package com.berezich.sportconnector.YaMap;
+package com.berezich.sportconnector.GoogleMap;
 
 import com.berezich.sportconnector.SportObjects.Coach;
 import com.berezich.sportconnector.SportObjects.InfoTile;

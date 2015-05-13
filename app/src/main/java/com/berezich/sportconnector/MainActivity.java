@@ -20,6 +20,7 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 import java.util.regex.Pattern;
 
+import com.berezich.sportconnector.GoogleMap.GoogleMapFragment;
 import com.berezich.sportconnector.MainFragment.Filters;
 import com.berezich.sportconnector.YaMap.YaMapFragment;
 
@@ -76,7 +77,8 @@ public class MainActivity extends ActionBarActivity
     public void onBtnClick(Filters filter, int sectionNumber)
     {
         FragmentManager fragmentManager = getSupportFragmentManager();
-        fragmentManager.beginTransaction().replace(R.id.container, new YaMapFragment().setArgs(sectionNumber,filter)).commit();
+        //fragmentManager.beginTransaction().replace(R.id.container, new YaMapFragment().setArgs(sectionNumber,filter)).commit();
+        fragmentManager.beginTransaction().replace(R.id.container, new GoogleMapFragment().setArgs(sectionNumber,filter)).commit();
     }
 
     public void onSectionAttached(int number) {

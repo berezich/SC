@@ -1,17 +1,12 @@
 package com.berezich.sportconnector.SportObjects;
 
-import android.util.Log;
-
-import com.berezich.sportconnector.MainFragment;
 import com.berezich.sportconnector.R;
-import com.berezich.sportconnector.YaMap.TilesInfoData;
+import com.berezich.sportconnector.GoogleMap.TilesInfoData;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import ru.yandex.yandexmapkit.utils.GeoPoint;
-import ru.yandex.yandexmapkit.utils.ScreenPoint;
 
 /**
  * Created by berezkin on 29.04.2015.

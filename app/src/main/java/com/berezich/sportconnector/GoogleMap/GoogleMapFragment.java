@@ -1,9 +1,14 @@
-package com.berezich.sportconnector.YaMap;
+package com.berezich.sportconnector.GoogleMap;
+
+/**
+ * Created by berezkin on 12.05.2015.
+ */
 
 import android.app.Activity;
 import android.content.res.Resources;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -19,35 +24,34 @@ import com.berezich.sportconnector.SportObjects.Spot;
 import com.berezich.sportconnector.GoogleMap.Tile;
 import com.berezich.sportconnector.R;
 
+import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
+import com.google.android.gms.maps.CameraUpdate;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.MapView;
+import com.google.android.gms.maps.MapsInitializer;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
+
 import java.util.HashMap;
 import java.util.List;
 
-import ru.yandex.yandexmapkit.MapController;
-import ru.yandex.yandexmapkit.MapView;
-import ru.yandex.yandexmapkit.OverlayManager;
-import ru.yandex.yandexmapkit.map.MapEvent;
-import ru.yandex.yandexmapkit.map.OnMapListener;
-import ru.yandex.yandexmapkit.overlay.Overlay;
-import ru.yandex.yandexmapkit.overlay.OverlayItem;
-import ru.yandex.yandexmapkit.overlay.balloon.BalloonItem;
-import ru.yandex.yandexmapkit.utils.GeoPoint;
-import ru.yandex.yandexmapkit.utils.ScreenPoint;
+public class GoogleMapFragment extends Fragment{
 
-/**
- * Created by berezkin on 17.04.2015.
- */
-public class YaMapFragment extends Fragment implements OnMapListener {
     /**
      * The fragment argument representing the section number for this
      * fragment.
      */
     private static final String ARG_SECTION_NUMBER = "section_number";
-    private static final String TAG = "YaMapFragment";
+    private static final String TAG = "GoogleMapFragment";
     private final int MARKER_OFFSET = 50;
-    private MapView mapView;
-    private static MapController mapController;
-    private OverlayManager overlayManager;
-    private Overlay overlay;
+    private  MapView mapView;
+    private  GoogleMap map;
+    //private static MapController mapController;
+    //private OverlayManager overlayManager;
+    //private Overlay overlay;
     private Resources res;
     private boolean isCourts=false;
     private boolean isCoaches=false;
@@ -61,7 +65,7 @@ public class YaMapFragment extends Fragment implements OnMapListener {
     private HashMap<String,Tile> curTiles = new HashMap<String,Tile>();
 
 
-    public YaMapFragment setArgs(int sectionNumber, Filters filter) {
+    public GoogleMapFragment setArgs(int sectionNumber, Filters filter) {
 
         Bundle args = new Bundle();
         args.putInt(ARG_SECTION_NUMBER, sectionNumber);
@@ -76,7 +80,7 @@ public class YaMapFragment extends Fragment implements OnMapListener {
         return this;
     }
 
-    public YaMapFragment() {
+    public GoogleMapFragment() {
 
         TilesInfoData.getTilesFromCache();
     }
@@ -85,60 +89,113 @@ public class YaMapFragment extends Fragment implements OnMapListener {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_googlemap, container, false);
-        /*
-        View rootView = inflater.inflate(R.layout.fragment_yamap, container, false);
-        mapView = (MapView)  rootView.findViewById(R.id.map);
-        mapView.showBuiltInScreenButtons(true);
-        mapView.showJamsButton(false);
-        mapController = mapView.getMapController();
-        mapController.addMapListener(this);
-        //mapController.setZoomCurrent(7);
+
+        mapView = ((MapView) rootView.findViewById(R.id.mapview));
+        mapView.onCreate(savedInstanceState);
+
+        // Gets to GoogleMap from the MapView and does initialization stuff
+        map = mapView.getMap();
+        if (map == null) {
+
+        }
+        map.getUiSettings().setMyLocationButtonEnabled(true);
+        map.getUiSettings().setZoomControlsEnabled(true);
+        map.setMyLocationEnabled(true);
+
+        Marker marker = map.addMarker(new MarkerOptions()
+                .position(new LatLng(55.778234, 37.588539))
+                .title("Комета")
+                .snippet("1203101010333012"));
+
+        marker = map.addMarker(new MarkerOptions()
+                .position(new LatLng(55.796051, 37.537766))
+                .title("Теннисный клуб ЦСКА")
+                .snippet("1203101010330023"));
+        marker = map.addMarker(new MarkerOptions()
+                .position(new LatLng(55.795504, 37.541117))
+                .title("Европейская школа Тенниса")
+                .snippet("1203101010330032"));
+        marker = map.addMarker(new MarkerOptions()
+                .position(new LatLng(55.792503, 37.536984))
+                .title("Европейская школа Тенниса")
+                .snippet("1203101010330201"));
+        marker = map.addMarker(new MarkerOptions()
+                .position(new LatLng(55.804162, 37.561679))
+                .title("Теннисенок")
+                .snippet("1203101010330101"));
+        marker = map.addMarker(new MarkerOptions()
+                .position(new LatLng(55.768345, 37.693669))
+                .title("Планета тенниса")
+                .snippet("1203101011223301"));
+        marker = map.addMarker(new MarkerOptions()
+                .position(new LatLng(55.715099, 37.555023))
+                .title("TennisVIP")
+                .snippet("1203101012112302"));
+        // Needs to call MapsInitializer before doing any CameraUpdateFactory calls
+        try {
+            MapsInitializer.initialize(this.getActivity());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        // Updates the location and zoom of the MapView
+        //CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(new LatLng(43.1, -87.9), 10);
+        //map.animateCamera(cameraUpdate);
+
+    /*
+    View rootView = inflater.inflate(R.layout.fragment_yamap, container, false);
+    mapView = (MapView)  rootView.findViewById(R.id.map);
+    mapView.showBuiltInScreenButtons(true);
+    mapView.showJamsButton(false);
+    mapController = mapView.getMapController();
+    mapController.addMapListener(this);
+    //mapController.setZoomCurrent(7);
 
 
-        // Create a layer of objects for the map
-        overlay = new Overlay(mapController);
-        overlayManager = mapController.getOverlayManager();
-        overlayManager.addOverlay(overlay);
+    // Create a layer of objects for the map
+    overlay = new Overlay(mapController);
+    overlayManager = mapController.getOverlayManager();
+    overlayManager.addOverlay(overlay);
 
-        res = getResources();
+    res = getResources();
 
-        ImageButton btn;
-        btn = (ImageButton) rootView.findViewById(R.id.map_btn_coach);
-        btn.setOnClickListener(new btnClickListener());
-        btn.setOnTouchListener(new btnOnTouchListener());
-        btn.setPressed(isCoaches);
-        btn = (ImageButton) rootView.findViewById(R.id.map_btn_court);
-        btn.setOnClickListener(new btnClickListener());
-        btn.setOnTouchListener(new btnOnTouchListener());
-        btn.setPressed(isCourts);
-        btn = (ImageButton) rootView.findViewById(R.id.map_btn_partner);
-        btn.setOnClickListener(new btnClickListener());
-        btn.setOnTouchListener(new btnOnTouchListener());
-        btn.setPressed(isPartners);
-        btn = (ImageButton) rootView.findViewById(R.id.map_btn_star);
-        btn.setOnClickListener(new btnClickListener());
-        btn.setOnTouchListener(new btnOnTouchListener());
+    ImageButton btn;
+    btn = (ImageButton) rootView.findViewById(R.id.map_btn_coach);
+    btn.setOnClickListener(new btnClickListener());
+    btn.setOnTouchListener(new btnOnTouchListener());
+    btn.setPressed(isCoaches);
+    btn = (ImageButton) rootView.findViewById(R.id.map_btn_court);
+    btn.setOnClickListener(new btnClickListener());
+    btn.setOnTouchListener(new btnOnTouchListener());
+    btn.setPressed(isCourts);
+    btn = (ImageButton) rootView.findViewById(R.id.map_btn_partner);
+    btn.setOnClickListener(new btnClickListener());
+    btn.setOnTouchListener(new btnOnTouchListener());
+    btn.setPressed(isPartners);
+    btn = (ImageButton) rootView.findViewById(R.id.map_btn_star);
+    btn.setOnClickListener(new btnClickListener());
+    btn.setOnTouchListener(new btnOnTouchListener());
 
-        displayNewObj();
-        */
+    displayNewObj();
+    */
 
-        /*btn = (ImageButton) rootView.findViewById(R.id.map_btn_court_2);
-        btn.setOnClickListener(new btnClickListener());
-        btn.setOnTouchListener(new btnOnTouchListener());*/
+    /*btn = (ImageButton) rootView.findViewById(R.id.map_btn_court_2);
+    btn.setOnClickListener(new btnClickListener());
+    btn.setOnTouchListener(new btnOnTouchListener());*/
 
-        /*TextView txtView = (TextView) rootView.findViewById(R.id.map_textView);
-        switch (_filter)
-        {
-            case SPARRING_PARTNERS:
-                txtView.setText("YaMap Спарринг партнеры");
-                break;
-            case COUCH:
-                txtView.setText("YaMap Тренеры");
-                break;
-            case CORT:
-                txtView.setText("YaMap Корты");
-                break;
-        }*/
+    /*TextView txtView = (TextView) rootView.findViewById(R.id.map_textView);
+    switch (_filter)
+    {
+        case SPARRING_PARTNERS:
+            txtView.setText("YaMap Спарринг партнеры");
+            break;
+        case COUCH:
+            txtView.setText("YaMap Тренеры");
+            break;
+        case CORT:
+            txtView.setText("YaMap Корты");
+            break;
+    }*/
         return rootView;
     }
 
@@ -148,8 +205,24 @@ public class YaMapFragment extends Fragment implements OnMapListener {
         ((MainActivity) activity).onSectionAttached(
                 getArguments().getInt(ARG_SECTION_NUMBER));
     }
+    @Override
+    public void onResume() {
+        mapView.onResume();
+        super.onResume();
+    }
 
     @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mapView.onDestroy();
+    }
+
+    @Override
+    public void onLowMemory() {
+        super.onLowMemory();
+        mapView.onLowMemory();
+    }
+    /*@Override
     public void onMapActionEvent(MapEvent mapEvent) {
 
         mapView.showBuiltInScreenButtons(true);
@@ -212,13 +285,12 @@ public class YaMapFragment extends Fragment implements OnMapListener {
         int i;
 
     }
-
     //получаем таблицу видимых tiles
     private HashMap<String,Tile> buildTiles()
     {
 
 
-            HashMap<String,Tile> tiles = new HashMap<String,Tile>();
+        HashMap<String,Tile> tiles = new HashMap<String,Tile>();
         try {
             Size size = new Size(mapController.getWidth(),mapController.getHeight());
             ScreenPoint pixCenterGeo = mapController.getScreenPoint(new GeoPoint(0,0));
@@ -446,6 +518,7 @@ public class YaMapFragment extends Fragment implements OnMapListener {
             }
         }
     }
+    */
     private void setCurFilter()
     {
         if(isCourts) {
@@ -512,3 +585,4 @@ public class YaMapFragment extends Fragment implements OnMapListener {
 
 
 }
+

@@ -1,4 +1,4 @@
-package com.berezich.sportconnector.YaMap;
+package com.berezich.sportconnector.GoogleMap;
 
 import android.util.Log;
 
