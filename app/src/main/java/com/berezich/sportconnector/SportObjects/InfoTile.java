@@ -6,16 +6,14 @@ import com.berezich.sportconnector.GoogleMap.TilesInfoData;
 import java.util.ArrayList;
 import java.util.List;
 
-import ru.yandex.yandexmapkit.utils.GeoPoint;
 
 /**
  * Created by berezkin on 29.04.2015.
  */
 public class InfoTile {
-
+    /*
     private String _name="";
     private List<Integer> _spots = new ArrayList<Integer>();
-    public static enum Filters {F0000,F1000,F0100,F0001,F1100,F1001,F0101,F1101,Fxx1x}
     //filters order partner-coach-court-favorite
     private GeoPoint _avrPoint_1000;
     private GeoPoint _avrPoint_0100;
@@ -61,7 +59,7 @@ public class InfoTile {
         }
         return avPoint;
     }
-    public String getNumSpotToString(String spotName,Filters filter)
+    public String getNumSpotToString(String spotName,FiltersX filter)
     {
         int numChildSpots = getChildSpots(filter).size();
         String num = String.valueOf(numChildSpots)+" ";
@@ -97,22 +95,22 @@ public class InfoTile {
                 return "ов";
         }
     }
-    public String getDescription(Filters filter)
+    public String getDescription(FiltersX filter)
     {
         String description="";
         int num;
-        if(filter == Filters.F1000 || filter == Filters.F1100 || filter == Filters.F1001 || filter == Filters.F1101 || filter == Filters.Fxx1x)
+        if(filter == FiltersX.F1000 || filter == FiltersX.F1100 || filter == FiltersX.F1001 || filter == FiltersX.F1101 || filter == FiltersX.Fxx1x)
             if((num=_childSpots_1000.size())>0)
                 description+= "\n "+String.valueOf(num)+" - спарринг партнер"+pluralPostfix(num);
-        if(filter == Filters.F0100 || filter == Filters.F1100 || filter == Filters.F0101 || filter == Filters.F1101 || filter == Filters.Fxx1x)
+        if(filter == FiltersX.F0100 || filter == FiltersX.F1100 || filter == FiltersX.F0101 || filter == FiltersX.F1101 || filter == FiltersX.Fxx1x)
             if((num=_childSpots_0100.size())>0)
                 description+= "\n "+String.valueOf(num)+" - тренер"+pluralPostfix(num);
-        if(filter == InfoTile.Filters.F0001 || filter == InfoTile.Filters.F1001 || filter == InfoTile.Filters.F0101 || filter == InfoTile.Filters.F1101 || filter == InfoTile.Filters.Fxx1x)
+        if(filter == FiltersX.F0001 || filter == FiltersX.F1001 || filter == FiltersX.F0101 || filter == FiltersX.F1101 || filter == FiltersX.Fxx1x)
             if((num=_childSpots_0001.size())>0)
                 description+= "\n "+String.valueOf(num)+((num==1)?" - мой спот":" - мои споты");
         return  description;
     }
-    public  void addPoint(GeoPoint point, Filters filter)
+    public  void addPoint(GeoPoint point, FiltersX filter)
     {
         int numSpots = getChildSpots(filter).size();
         GeoPoint avrPoint = getAvrPoint(filter);
@@ -130,116 +128,116 @@ public class InfoTile {
     public void addInfoChildSpot(Spot spot)
     {
         //ShotInfoSpot shotInfo = new ShotInfoSpot(spot.id());
-        List<Filters> filters = spot.getAppropriateFilters();
-        for(Filters filter: filters) {
+        List<FiltersX> filters = spot.getAppropriateFilters();
+        for(FiltersX filter: filters) {
             addPoint(spot.geoCoord(), filter);
             getChildSpots(filter).add(spot.id());
         }
     }
-    public Integer getDrawableMarker(Filters filter)
+    public Integer getDrawableMarker(FiltersX filter)
     {
-        if(filter == InfoTile.Filters.F0001||
-                filter == InfoTile.Filters.F1001 && _childSpots_1000.size()==0||
-                filter == InfoTile.Filters.F0101 && _childSpots_0100.size()==0||
-                filter == InfoTile.Filters.F1101 && _childSpots_0100.size()==0&&_childSpots_1000.size()==0)
+        if(filter == FiltersX.F0001||
+                filter == FiltersX.F1001 && _childSpots_1000.size()==0||
+                filter == FiltersX.F0101 && _childSpots_0100.size()==0||
+                filter == FiltersX.F1101 && _childSpots_0100.size()==0&&_childSpots_1000.size()==0)
             return  R.drawable.baloon_red;
-        if(filter == InfoTile.Filters.F1000||
-                filter == InfoTile.Filters.F1001 && _childSpots_0001.size()==0||
-                filter == InfoTile.Filters.F1100 && _childSpots_0100.size()==0||
-                filter == InfoTile.Filters.F1101 && _childSpots_0100.size()==0&& _childSpots_0001.size()==0)
+        if(filter == FiltersX.F1000||
+                filter == FiltersX.F1001 && _childSpots_0001.size()==0||
+                filter == FiltersX.F1100 && _childSpots_0100.size()==0||
+                filter == FiltersX.F1101 && _childSpots_0100.size()==0&& _childSpots_0001.size()==0)
             return  R.drawable.baloon_purple;
-        if(filter == InfoTile.Filters.F0100||
-                filter == InfoTile.Filters.F0101 && _childSpots_0001.size()==0||
-                filter == InfoTile.Filters.F1100 && _childSpots_1000.size()==0||
-                filter == InfoTile.Filters.F1101 && _childSpots_1000.size()==0&& _childSpots_0001.size()==0)
+        if(filter == FiltersX.F0100||
+                filter == FiltersX.F0101 && _childSpots_0001.size()==0||
+                filter == FiltersX.F1100 && _childSpots_1000.size()==0||
+                filter == FiltersX.F1101 && _childSpots_1000.size()==0&& _childSpots_0001.size()==0)
             return  R.drawable.baloon_green;
 
-        if(_childSpots_1000.size()>0 && _childSpots_0001.size()>0 && (filter == InfoTile.Filters.F1001 || (filter == InfoTile.Filters.F1101 || filter == InfoTile.Filters.Fxx1x) && _childSpots_0100.size()==0))
+        if(_childSpots_1000.size()>0 && _childSpots_0001.size()>0 && (filter == FiltersX.F1001 || (filter == FiltersX.F1101 || filter == FiltersX.Fxx1x) && _childSpots_0100.size()==0))
             return  R.drawable.baloon_red_purple;
         //return  R.drawable.baloon_red;
 
-        if(_childSpots_1000.size()>0 && _childSpots_0100.size()>0 && (filter == InfoTile.Filters.F1100 || (filter == InfoTile.Filters.F1101 || filter == InfoTile.Filters.Fxx1x) && _childSpots_0001.size()==0))
+        if(_childSpots_1000.size()>0 && _childSpots_0100.size()>0 && (filter == FiltersX.F1100 || (filter == FiltersX.F1101 || filter == FiltersX.Fxx1x) && _childSpots_0001.size()==0))
             return  R.drawable.baloon_green_purple;
         //return  R.drawable.baloon_green;
 
-        if(_childSpots_0100.size()>0 && _childSpots_0001.size()>0 && (filter == InfoTile.Filters.F0101 || (filter == InfoTile.Filters.F1101 || filter == InfoTile.Filters.Fxx1x) && _childSpots_1000.size()==0))
+        if(_childSpots_0100.size()>0 && _childSpots_0001.size()>0 && (filter == FiltersX.F0101 || (filter == FiltersX.F1101 || filter == FiltersX.Fxx1x) && _childSpots_1000.size()==0))
             return  R.drawable.baloon_red_green;
         //return  R.drawable.baloon_green;
 
-        if((filter == InfoTile.Filters.F1101 || filter == InfoTile.Filters.Fxx1x) && _childSpots_1000.size()>0 && _childSpots_0100.size()>0 && _childSpots_0001.size()>0 )
+        if((filter == FiltersX.F1101 || filter == FiltersX.Fxx1x) && _childSpots_1000.size()>0 && _childSpots_0100.size()>0 && _childSpots_0001.size()>0 )
             return  R.drawable.baloon_green_red_purple;
         //return  R.drawable.baloon_red;
 
 
         return  R.drawable.baloon_blue;
     }
-    public  static boolean isAppropriate(Spot spot, Filters filter)
+    public  static boolean isAppropriate(Spot spot, FiltersX filter)
     {
 
-        List<Filters> filters = spot.getAppropriateFilters();
-        for(Filters filterItem:filters)
+        List<FiltersX> filters = spot.getAppropriateFilters();
+        for(FiltersX filterItem:filters)
             if(filter == filterItem)
                 return true;
         return  false;
     }
-    public List<Integer> getChildSpots(Filters filter)
+    public List<Integer> getChildSpots(FiltersX filter)
     {
-        if(filter == Filters.F1000)
+        if(filter == FiltersX.F1000)
             return _childSpots_1000;
-        if(filter == Filters.F0100)
+        if(filter == FiltersX.F0100)
             return _childSpots_0100;
-        if(filter == Filters.F0001)
+        if(filter == FiltersX.F0001)
             return _childSpots_0001;
-        if(filter == Filters.F1100)
+        if(filter == FiltersX.F1100)
             return _childSpots_1100;
-        if(filter == Filters.F1001)
+        if(filter == FiltersX.F1001)
             return _childSpots_1001;
-        if(filter == Filters.F0101)
+        if(filter == FiltersX.F0101)
             return _childSpots_0101;
-        if(filter == Filters.F1101)
+        if(filter == FiltersX.F1101)
             return _childSpots_1101;
-        if(filter == Filters.Fxx1x)
+        if(filter == FiltersX.Fxx1x)
             return _childSpots_xx1x;
         return null;
     }
-    public GeoPoint getAvrPoint(Filters filter)
+    public GeoPoint getAvrPoint(FiltersX filter)
     {
-        if(filter == Filters.F1000)
+        if(filter == FiltersX.F1000)
             return _avrPoint_1000;
-        if(filter == Filters.F0100)
+        if(filter == FiltersX.F0100)
             return _avrPoint_0100;
-        if(filter == Filters.F0001)
+        if(filter == FiltersX.F0001)
             return _avrPoint_0001;
-        if(filter == Filters.F1100)
+        if(filter == FiltersX.F1100)
             return _avrPoint_1100;
-        if(filter == Filters.F1001)
+        if(filter == FiltersX.F1001)
             return _avrPoint_1001;
-        if(filter == Filters.F0101)
+        if(filter == FiltersX.F0101)
             return _avrPoint_0101;
-        if(filter == Filters.F1101)
+        if(filter == FiltersX.F1101)
             return _avrPoint_1101;
-        if(filter == Filters.Fxx1x)
+        if(filter == FiltersX.Fxx1x)
             return _avrPoint_xx1x;
         return null;
     }
-    public void setAvrPoint(GeoPoint avrPoint,Filters filter)
+    public void setAvrPoint(GeoPoint avrPoint,FiltersX filter)
     {
-        if(filter == Filters.F1000) {
+        if(filter == FiltersX.F1000) {
             _avrPoint_1000 = avrPoint;
         }
-        else if(filter == Filters.F0100)
+        else if(filter == FiltersX.F0100)
             _avrPoint_0100 = avrPoint;
-        else if(filter == Filters.F0001)
+        else if(filter == FiltersX.F0001)
             _avrPoint_0001 = avrPoint;
-        else if(filter == Filters.F1100)
+        else if(filter == FiltersX.F1100)
             _avrPoint_1100 = avrPoint;
-        else if(filter == Filters.F1001)
+        else if(filter == FiltersX.F1001)
             _avrPoint_1001 = avrPoint;
-        else if(filter == Filters.F0101)
+        else if(filter == FiltersX.F0101)
             _avrPoint_0101 = avrPoint;
-        else if(filter == Filters.F1101)
+        else if(filter == FiltersX.F1101)
             _avrPoint_1101 = avrPoint;
-        else if(filter == Filters.Fxx1x)
+        else if(filter == FiltersX.Fxx1x)
             _avrPoint_xx1x = avrPoint;
     }
     public String name() {
@@ -255,11 +253,11 @@ public class InfoTile {
         this._numChildesSpots = _numChildesSpots;
     }
 */
-
+/*
     public List<Integer> spots() {
         return _spots;
     }
-
+*/
     /*public void set_averagePoint(GeoPoint _averagePoint) {
         this._averagePoint = _averagePoint;
     }

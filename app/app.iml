@@ -109,7 +109,7 @@
     <orderEntry type="library" exported="" name="play-services-plus-7.3.0" level="project" />
     <orderEntry type="library" exported="" name="play-services-7.3.0" level="project" />
     <orderEntry type="library" exported="" name="play-services-base-7.3.0" level="project" />
-    <orderEntry type="module" module-name="yandexmapkitlibrary" exported="" />
+    <orderEntry type="module" module-name="library" exported="" />
   </component>
 </module>
 

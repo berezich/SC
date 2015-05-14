@@ -9,12 +9,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import ru.yandex.yandexmapkit.utils.GeoPoint;
 
 /**
  * Created by Sashka on 29.04.2015.
  */
 public class TilesInfoData {
+    /*
     private static HashMap<String,InfoTile> _infoTiles = new HashMap<String,InfoTile>();
     private static HashMap<Integer, Spot> _allSpots = new HashMap<Integer, Spot>();
     private static final int MAX_COURT_LIMIT = 1;
@@ -54,7 +54,7 @@ public class TilesInfoData {
         tile.set_numChildesSpots(4);
         allTiles.put(tile.name(),tile);
         */
-
+        /*
         _infoTiles.clear();
         Spot spot;
         Partner partner;
@@ -110,7 +110,7 @@ public class TilesInfoData {
             }
             else
             {
-                if(tile.getChildSpots(InfoTile.Filters.Fxx1x).size()==0 && tile.spots().size()<MAX_COURT_LIMIT ||level==Tile.MAX_ZOOM){
+                if(tile.getChildSpots(InfoTile.FiltersX.Fxx1x).size()==0 && tile.spots().size()<MAX_COURT_LIMIT ||level==Tile.MAX_ZOOM){
                     spots = tile.spots();
                     spots.add(spot.id());
                     break;
@@ -155,4 +155,5 @@ public class TilesInfoData {
     public static HashMap<Integer, Spot> allSpots() {
         return _allSpots;
     }
+    */
 }

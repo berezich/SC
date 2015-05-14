@@ -1,1 +1,1 @@
-include ':app', ':yandexmapkitlibrary'
+include ':app', ':library'

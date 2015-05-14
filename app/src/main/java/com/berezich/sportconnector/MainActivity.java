@@ -22,10 +22,7 @@ import java.util.regex.Pattern;
 
 import com.berezich.sportconnector.GoogleMap.GoogleMapFragment;
 import com.berezich.sportconnector.MainFragment.Filters;
-import com.berezich.sportconnector.YaMap.YaMapFragment;
 
-import ru.yandex.yandexmapkit.map.MapEvent;
-import ru.yandex.yandexmapkit.map.OnMapListener;
 
 
 

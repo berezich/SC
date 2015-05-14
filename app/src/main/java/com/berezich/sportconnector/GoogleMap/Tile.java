@@ -7,14 +7,12 @@ import com.berezich.sportconnector.SportObjects.Spot;
 import java.util.ArrayList;
 import java.util.List;
 
-import ru.yandex.yandexmapkit.utils.ScreenPoint;
-
-import static com.berezich.sportconnector.YaMap.YaMapFragment.globalPxToPhonePx;
 
 /**
  * Created by berezkin on 23.04.2015.
  */
 public class Tile {
+    /*
     public static final int MAX_ZOOM = 16;
     final String TAB = "YaMap.Tile";
     public static class Bounds
@@ -170,4 +168,5 @@ public class Tile {
     public Bounds bounds() {
         return _bounds;
     }
+    */
 }

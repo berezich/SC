@@ -8,32 +8,24 @@ import android.app.Activity;
 import android.content.res.Resources;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
-import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 
-import com.berezich.sportconnector.GoogleMap.TilesInfoData;
 import com.berezich.sportconnector.MainActivity;
 import com.berezich.sportconnector.MainFragment.Filters;
 import com.berezich.sportconnector.SportObjects.InfoTile;
-import com.berezich.sportconnector.SportObjects.Spot;
-import com.berezich.sportconnector.GoogleMap.Tile;
 import com.berezich.sportconnector.R;
 
-import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
-import com.google.android.gms.maps.CameraUpdate;
-import com.google.android.gms.maps.CameraUpdateFactory;
+import com.berezich.sportconnector.SportObjects.Spot;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
-import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.maps.android.clustering.Cluster;
 
 import java.util.HashMap;
 import java.util.List;
@@ -44,6 +36,7 @@ public class GoogleMapFragment extends Fragment{
      * The fragment argument representing the section number for this
      * fragment.
      */
+    public static enum FiltersX {F0000,F1000,F0100,F0001,F1100,F1001,F0101,F1101,Fxx1x}
     private static final String ARG_SECTION_NUMBER = "section_number";
     private static final String TAG = "GoogleMapFragment";
     private final int MARKER_OFFSET = 50;
@@ -57,7 +50,8 @@ public class GoogleMapFragment extends Fragment{
     private boolean isCoaches=false;
     private boolean isPartners=false;
     private boolean isFavorite=false;
-    private InfoTile.Filters curFilter;
+    private FiltersX curFilter;
+    
 
     //список tiles уже отисованых на карте при данном масштабе
     private HashMap<String,Tile> loadedTiles = new HashMap<String,Tile>();
@@ -82,7 +76,7 @@ public class GoogleMapFragment extends Fragment{
 
     public GoogleMapFragment() {
 
-        TilesInfoData.getTilesFromCache();
+        SpotsData.getSpotsFromCache();
     }
 
     @Override
@@ -101,7 +95,11 @@ public class GoogleMapFragment extends Fragment{
         map.getUiSettings().setMyLocationButtonEnabled(true);
         map.getUiSettings().setZoomControlsEnabled(true);
         map.setMyLocationEnabled(true);
+        Clustering.initClusterManager(this.getActivity().getApplicationContext(),map);
+        Clustering.addAllSpots(SpotsData.get_allSpots());
+        map.setOnCameraChangeListener(Clustering.clusterManager);
 
+        /*
         Marker marker = map.addMarker(new MarkerOptions()
                 .position(new LatLng(55.778234, 37.588539))
                 .title("Комета")
@@ -131,6 +129,7 @@ public class GoogleMapFragment extends Fragment{
                 .position(new LatLng(55.715099, 37.555023))
                 .title("TennisVIP")
                 .snippet("1203101012112302"));
+        */
         // Needs to call MapsInitializer before doing any CameraUpdateFactory calls
         try {
             MapsInitializer.initialize(this.getActivity());
@@ -351,7 +350,7 @@ public class GoogleMapFragment extends Fragment{
         double zoomFactor;
         Tile.Bounds bounds,_bounds;
         boolean f1,f2;
-        if(curFilter!= InfoTile.Filters.F0000)
+        if(curFilter!= FiltersX.F0000)
         {
             curTiles = buildTiles();
             InfoTile tileInfo;
@@ -436,6 +435,7 @@ public class GoogleMapFragment extends Fragment{
             return true;
         }
     }
+    */
     static enum Buttons{ALL,COUCH,PARTNER,FAVORITE,COURT}
     private void activateButtons(Buttons buttonType,boolean b) {
         ImageButton btn;
@@ -460,11 +460,12 @@ public class GoogleMapFragment extends Fragment{
             btn.setPressed(b);
         }
     }
-
-    void showSpots(InfoTile infoTile, InfoTile.Filters filter)
+    /*
+    void showSpots(InfoTile infoTile, FiltersX filter)
     {
         List<Integer> spots = infoTile.spots();
         Spot spot;
+
         OverlayItem marker;
         for(int i=0; i<spots.size(); i++){
             spot = TilesInfoData.allSpots().get(spots.get(i));
@@ -483,7 +484,7 @@ public class GoogleMapFragment extends Fragment{
             }
         }
     }
-    void showGrpOrChildSpot(InfoTile tileInfo,InfoTile.Filters filter)
+    void showGrpOrChildSpot(InfoTile tileInfo,FiltersX filter)
     {
         OverlayItem marker;
         Spot spot;
@@ -522,7 +523,7 @@ public class GoogleMapFragment extends Fragment{
     private void setCurFilter()
     {
         if(isCourts) {
-            curFilter = InfoTile.Filters.Fxx1x;
+            curFilter = FiltersX.Fxx1x;
             return;
         }
         if(isPartners)
@@ -530,38 +531,33 @@ public class GoogleMapFragment extends Fragment{
             if(isCoaches) {
                 if(isFavorite)
                 {
-                    curFilter = InfoTile.Filters.F1101;
+                    curFilter = FiltersX.F1101;
                     return;
                 }
-                curFilter = InfoTile.Filters.F1100;
+                curFilter = FiltersX.F1100;
                 return;
             }
             else if(isFavorite)
             {
-                curFilter = InfoTile.Filters.F1001;
+                curFilter = FiltersX.F1001;
                 return;
             }
-            curFilter = InfoTile.Filters.F1000;
+            curFilter = FiltersX.F1000;
         }
         else if(isCoaches)
         {
             if(isFavorite)
             {
-                curFilter = InfoTile.Filters.F0101;
+                curFilter = FiltersX.F0101;
                 return;
             }
-            curFilter = InfoTile.Filters.F0100;
+            curFilter = FiltersX.F0100;
         }
         else if(isFavorite)
-            curFilter = InfoTile.Filters.F0001;
+            curFilter = FiltersX.F0001;
         else
-            curFilter = InfoTile.Filters.F0000;
-        //
-        //filter = InfoTile.Filters.F0100;
-        //filter = InfoTile.Filters.F1100;
-        //filter = InfoTile.Filters.F0001;
-        //filter = InfoTile.Filters.F0101;
-        //curFilter = InfoTile.Filters.F1101;
+            curFilter = FiltersX.F0000;
+
     }
     public class Size
     {

@@ -21,7 +21,7 @@ import com.berezich.sportconnector.R;
 
 import java.util.HashMap;
 import java.util.List;
-
+/*
 import ru.yandex.yandexmapkit.MapController;
 import ru.yandex.yandexmapkit.MapView;
 import ru.yandex.yandexmapkit.OverlayManager;
@@ -32,15 +32,16 @@ import ru.yandex.yandexmapkit.overlay.OverlayItem;
 import ru.yandex.yandexmapkit.overlay.balloon.BalloonItem;
 import ru.yandex.yandexmapkit.utils.GeoPoint;
 import ru.yandex.yandexmapkit.utils.ScreenPoint;
-
+*/
 /**
  * Created by berezkin on 17.04.2015.
  */
-public class YaMapFragment extends Fragment implements OnMapListener {
+public class YaMapFragment extends Fragment /*implements OnMapListener*/ {
     /**
      * The fragment argument representing the section number for this
      * fragment.
      */
+    /*
     private static final String ARG_SECTION_NUMBER = "section_number";
     private static final String TAG = "YaMapFragment";
     private final int MARKER_OFFSET = 50;
@@ -53,7 +54,7 @@ public class YaMapFragment extends Fragment implements OnMapListener {
     private boolean isCoaches=false;
     private boolean isPartners=false;
     private boolean isFavorite=false;
-    private InfoTile.Filters curFilter;
+    private InfoTile.FiltersX curFilter;
 
     //список tiles уже отисованых на карте при данном масштабе
     private HashMap<String,Tile> loadedTiles = new HashMap<String,Tile>();
@@ -84,8 +85,6 @@ public class YaMapFragment extends Fragment implements OnMapListener {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_googlemap, container, false);
-        /*
         View rootView = inflater.inflate(R.layout.fragment_yamap, container, false);
         mapView = (MapView)  rootView.findViewById(R.id.map);
         mapView.showBuiltInScreenButtons(true);
@@ -120,25 +119,8 @@ public class YaMapFragment extends Fragment implements OnMapListener {
         btn.setOnTouchListener(new btnOnTouchListener());
 
         displayNewObj();
-        */
 
-        /*btn = (ImageButton) rootView.findViewById(R.id.map_btn_court_2);
-        btn.setOnClickListener(new btnClickListener());
-        btn.setOnTouchListener(new btnOnTouchListener());*/
 
-        /*TextView txtView = (TextView) rootView.findViewById(R.id.map_textView);
-        switch (_filter)
-        {
-            case SPARRING_PARTNERS:
-                txtView.setText("YaMap Спарринг партнеры");
-                break;
-            case COUCH:
-                txtView.setText("YaMap Тренеры");
-                break;
-            case CORT:
-                txtView.setText("YaMap Корты");
-                break;
-        }*/
         return rootView;
     }
 
@@ -279,7 +261,7 @@ public class YaMapFragment extends Fragment implements OnMapListener {
         double zoomFactor;
         Tile.Bounds bounds,_bounds;
         boolean f1,f2;
-        if(curFilter!= InfoTile.Filters.F0000)
+        if(curFilter!= InfoTile.FiltersX.F0000)
         {
             curTiles = buildTiles();
             InfoTile tileInfo;
@@ -389,7 +371,7 @@ public class YaMapFragment extends Fragment implements OnMapListener {
         }
     }
 
-    void showSpots(InfoTile infoTile, InfoTile.Filters filter)
+    void showSpots(InfoTile infoTile, InfoTile.FiltersX filter)
     {
         List<Integer> spots = infoTile.spots();
         Spot spot;
@@ -411,7 +393,7 @@ public class YaMapFragment extends Fragment implements OnMapListener {
             }
         }
     }
-    void showGrpOrChildSpot(InfoTile tileInfo,InfoTile.Filters filter)
+    void showGrpOrChildSpot(InfoTile tileInfo,InfoTile.FiltersX filter)
     {
         OverlayItem marker;
         Spot spot;
@@ -449,7 +431,7 @@ public class YaMapFragment extends Fragment implements OnMapListener {
     private void setCurFilter()
     {
         if(isCourts) {
-            curFilter = InfoTile.Filters.Fxx1x;
+            curFilter = InfoTile.FiltersX.Fxx1x;
             return;
         }
         if(isPartners)
@@ -457,38 +439,38 @@ public class YaMapFragment extends Fragment implements OnMapListener {
             if(isCoaches) {
                 if(isFavorite)
                 {
-                    curFilter = InfoTile.Filters.F1101;
+                    curFilter = InfoTile.FiltersX.F1101;
                     return;
                 }
-                curFilter = InfoTile.Filters.F1100;
+                curFilter = InfoTile.FiltersX.F1100;
                 return;
             }
             else if(isFavorite)
             {
-                curFilter = InfoTile.Filters.F1001;
+                curFilter = InfoTile.FiltersX.F1001;
                 return;
             }
-            curFilter = InfoTile.Filters.F1000;
+            curFilter = InfoTile.FiltersX.F1000;
         }
         else if(isCoaches)
         {
             if(isFavorite)
             {
-                curFilter = InfoTile.Filters.F0101;
+                curFilter = InfoTile.FiltersX.F0101;
                 return;
             }
-            curFilter = InfoTile.Filters.F0100;
+            curFilter = InfoTile.FiltersX.F0100;
         }
         else if(isFavorite)
-            curFilter = InfoTile.Filters.F0001;
+            curFilter = InfoTile.FiltersX.F0001;
         else
-            curFilter = InfoTile.Filters.F0000;
+            curFilter = InfoTile.FiltersX.F0000;
         //
-        //filter = InfoTile.Filters.F0100;
-        //filter = InfoTile.Filters.F1100;
-        //filter = InfoTile.Filters.F0001;
-        //filter = InfoTile.Filters.F0101;
-        //curFilter = InfoTile.Filters.F1101;
+        //filter = InfoTile.FiltersX.F0100;
+        //filter = InfoTile.FiltersX.F1100;
+        //filter = InfoTile.FiltersX.F0001;
+        //filter = InfoTile.FiltersX.F0101;
+        //curFilter = InfoTile.FiltersX.F1101;
     }
     public class Size
     {
@@ -509,6 +491,6 @@ public class YaMapFragment extends Fragment implements OnMapListener {
         }
     }
 
-
+    */
 
 }
