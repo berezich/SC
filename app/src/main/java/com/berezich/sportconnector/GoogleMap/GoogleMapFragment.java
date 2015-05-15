@@ -95,8 +95,8 @@ public class GoogleMapFragment extends Fragment{
         map.getUiSettings().setMyLocationButtonEnabled(true);
         map.getUiSettings().setZoomControlsEnabled(true);
         map.setMyLocationEnabled(true);
-        Clustering.initClusterManager(this.getActivity().getApplicationContext(),map);
-        Clustering.addAllSpots(SpotsData.get_allSpots());
+        Clustering.initClusterManager(this.getActivity().getApplicationContext(),map,this);
+        Clustering.addAllSpots(SpotsData.get_allSpots(),curFilter());
         map.setOnCameraChangeListener(Clustering.clusterManager);
 
         /*
@@ -559,6 +559,11 @@ public class GoogleMapFragment extends Fragment{
             curFilter = FiltersX.F0000;
 
     }
+
+    public FiltersX curFilter() {
+        return curFilter;
+    }
+
     public class Size
     {
         double _width;

@@ -28,6 +28,7 @@ public class Spot {
         this._name = _name;
     }
 
+    /*
     public List<GoogleMapFragment.FiltersX> getAppropriateFilters()
     {
         List<GoogleMapFragment.FiltersX> filters = new ArrayList<>();
@@ -64,31 +65,31 @@ public class Spot {
                 filters.add(GoogleMapFragment.FiltersX.F1101);
         }
 
-        /*//filters AND
-        if(spot.partners().size()>0)
-        {
-            filters.add(FiltersX.F1000);
-            if(spot.coaches().size()>0) {
-                filters.add(FiltersX.F1100);
-                if(spot.favorite())
-                    filters.add(FiltersX.F1101);
-            }
-            if(spot.favorite())
-                filters.add(FiltersX.F1001);
-        }
-        else
-        {
-            if(spot.coaches().size()>0) {
-                filters.add(FiltersX.F0100);
-                if(spot.favorite())
-                    filters.add(FiltersX.F0101);
-            }
-            if(spot.favorite())
-                filters.add(FiltersX.F0001);
-        }
-        */
+        //filters AND
+//        if(spot.partners().size()>0)
+//        {
+//            filters.add(FiltersX.F1000);
+//            if(spot.coaches().size()>0) {
+//                filters.add(FiltersX.F1100);
+//                if(spot.favorite())
+//                    filters.add(FiltersX.F1101);
+//            }
+//            if(spot.favorite())
+//                filters.add(FiltersX.F1001);
+//        }
+//        else
+//        {
+//            if(spot.coaches().size()>0) {
+//                filters.add(FiltersX.F0100);
+//                if(spot.favorite())
+//                    filters.add(FiltersX.F0101);
+//            }
+//            if(spot.favorite())
+//                filters.add(FiltersX.F0001);
+//        }
         return filters;
     }
+
     public int getMarkerImg(GoogleMapFragment.FiltersX filter)
     {
         if(filter == GoogleMapFragment.FiltersX.F0001||
@@ -141,10 +142,10 @@ public class Spot {
                 description+= "\n мой спот";
         return  description;
     }
+    */
     public int id() {
         return _id;
     }
-
     public Coordinates geoCoord() {
         return _geoCoord;
     }

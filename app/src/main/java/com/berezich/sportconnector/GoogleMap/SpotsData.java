@@ -144,51 +144,6 @@ public class SpotsData {
                 description+= "\n "+String.valueOf(num)+((num==1)?" - мой спот":" - мои споты");
         return  description;
     }
-    public Integer getDrawableMarker(GoogleMapFragment.FiltersX filter)
-    {
-        if(filter == GoogleMapFragment.FiltersX.F0001||
-                filter == GoogleMapFragment.FiltersX.F1001 && _childSpots_1000.size()==0||
-                filter == GoogleMapFragment.FiltersX.F0101 && _childSpots_0100.size()==0||
-                filter == GoogleMapFragment.FiltersX.F1101 && _childSpots_0100.size()==0&&_childSpots_1000.size()==0)
-            return  R.drawable.baloon_red;
-        if(filter == GoogleMapFragment.FiltersX.F1000||
-                filter == GoogleMapFragment.FiltersX.F1001 && _childSpots_0001.size()==0||
-                filter == GoogleMapFragment.FiltersX.F1100 && _childSpots_0100.size()==0||
-                filter == GoogleMapFragment.FiltersX.F1101 && _childSpots_0100.size()==0&& _childSpots_0001.size()==0)
-            return  R.drawable.baloon_purple;
-        if(filter == GoogleMapFragment.FiltersX.F0100||
-                filter == GoogleMapFragment.FiltersX.F0101 && _childSpots_0001.size()==0||
-                filter == GoogleMapFragment.FiltersX.F1100 && _childSpots_1000.size()==0||
-                filter == GoogleMapFragment.FiltersX.F1101 && _childSpots_1000.size()==0&& _childSpots_0001.size()==0)
-            return  R.drawable.baloon_green;
 
-        if(_childSpots_1000.size()>0 && _childSpots_0001.size()>0 && (filter == GoogleMapFragment.FiltersX.F1001 || (filter == GoogleMapFragment.FiltersX.F1101 || filter == GoogleMapFragment.FiltersX.Fxx1x) && _childSpots_0100.size()==0))
-            return  R.drawable.baloon_red_purple;
-        //return  R.drawable.baloon_red;
-
-        if(_childSpots_1000.size()>0 && _childSpots_0100.size()>0 && (filter == GoogleMapFragment.FiltersX.F1100 || (filter == GoogleMapFragment.FiltersX.F1101 || filter == GoogleMapFragment.FiltersX.Fxx1x) && _childSpots_0001.size()==0))
-            return  R.drawable.baloon_green_purple;
-        //return  R.drawable.baloon_green;
-
-        if(_childSpots_0100.size()>0 && _childSpots_0001.size()>0 && (filter == GoogleMapFragment.FiltersX.F0101 || (filter == GoogleMapFragment.FiltersX.F1101 || filter == GoogleMapFragment.FiltersX.Fxx1x) && _childSpots_1000.size()==0))
-            return  R.drawable.baloon_red_green;
-        //return  R.drawable.baloon_green;
-
-        if((filter == GoogleMapFragment.FiltersX.F1101 || filter == GoogleMapFragment.FiltersX.Fxx1x) && _childSpots_1000.size()>0 && _childSpots_0100.size()>0 && _childSpots_0001.size()>0 )
-            return  R.drawable.baloon_green_red_purple;
-        //return  R.drawable.baloon_red;
-
-
-        return  R.drawable.baloon_blue;
-    }
     */
-    public  static boolean isAppropriate(Spot spot, GoogleMapFragment.FiltersX filter)
-    {
-
-        List<GoogleMapFragment.FiltersX> filters = spot.getAppropriateFilters();
-        for(GoogleMapFragment.FiltersX filterItem:filters)
-            if(filter == filterItem)
-                return true;
-        return  false;
-    }
 }
