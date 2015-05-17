@@ -11,6 +11,8 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.berezich.sportconnector.GoogleMap.Clustering.pluralPostfix;
+
 /**
  * Created by berezkin on 14.05.2015.
  */
@@ -19,6 +21,7 @@ public class SpotMarker extends AbstractMarker {
 
     private String _name;
     private int _id;
+    private String _description;
     private int _numPartners=0;
     private int _numCoaches=0;
     private boolean _isFavorite=false;
@@ -35,7 +38,6 @@ public class SpotMarker extends AbstractMarker {
         setMarker(new MarkerOptions()
                 .position(new LatLng(latitude(), longitude()))
                 .title(name()));
-                //.icon(spotIcon));
     }
     public List<GoogleMapFragment.FiltersX> getAppropriateFilters()
     {
@@ -106,6 +108,10 @@ public class SpotMarker extends AbstractMarker {
         return null;
 
     }
+    public void setSpotIcon(GoogleMapFragment.FiltersX filter)
+    {
+            getMarker().icon(BitmapDescriptorFactory.fromResource(getMarkerImg(filter)));
+    }
     public int getMarkerImg(GoogleMapFragment.FiltersX filter)
     {
         if(filter == GoogleMapFragment.FiltersX.F0001||
@@ -155,44 +161,45 @@ public class SpotMarker extends AbstractMarker {
                 return true;
         return  false;
     }
-    //for group of markers
-    /*
-    Integer getDrawableMarker(GoogleMapFragment.FiltersX filter)
+
+    public String description() {
+        return _description;
+    }
+
+    public void setDescription(GoogleMapFragment.FiltersX filter)
     {
-        if(filter == GoogleMapFragment.FiltersX.F0001||
-                filter == GoogleMapFragment.FiltersX.F1001 && _childSpots_1000.size()==0||
-                filter == GoogleMapFragment.FiltersX.F0101 && _childSpots_0100.size()==0||
-                filter == GoogleMapFragment.FiltersX.F1101 && _childSpots_0100.size()==0&&_childSpots_1000.size()==0)
-            return  R.drawable.baloon_red;
-        if(filter == GoogleMapFragment.FiltersX.F1000||
-                filter == GoogleMapFragment.FiltersX.F1001 && _childSpots_0001.size()==0||
-                filter == GoogleMapFragment.FiltersX.F1100 && _childSpots_0100.size()==0||
-                filter == GoogleMapFragment.FiltersX.F1101 && _childSpots_0100.size()==0&& _childSpots_0001.size()==0)
-            return  R.drawable.baloon_purple;
-        if(filter == GoogleMapFragment.FiltersX.F0100||
-                filter == GoogleMapFragment.FiltersX.F0101 && _childSpots_0001.size()==0||
-                filter == GoogleMapFragment.FiltersX.F1100 && _childSpots_1000.size()==0||
-                filter == GoogleMapFragment.FiltersX.F1101 && _childSpots_1000.size()==0&& _childSpots_0001.size()==0)
-            return  R.drawable.baloon_green;
-
-        if(_childSpots_1000.size()>0 && _childSpots_0001.size()>0 && (filter == GoogleMapFragment.FiltersX.F1001 || (filter == GoogleMapFragment.FiltersX.F1101 || filter == GoogleMapFragment.FiltersX.Fxx1x) && _childSpots_0100.size()==0))
-            return  R.drawable.baloon_red_purple;
-        //return  R.drawable.baloon_red;
-
-        if(_childSpots_1000.size()>0 && _childSpots_0100.size()>0 && (filter == GoogleMapFragment.FiltersX.F1100 || (filter == GoogleMapFragment.FiltersX.F1101 || filter == GoogleMapFragment.FiltersX.Fxx1x) && _childSpots_0001.size()==0))
-            return  R.drawable.baloon_green_purple;
-        //return  R.drawable.baloon_green;
-
-        if(_childSpots_0100.size()>0 && _childSpots_0001.size()>0 && (filter == GoogleMapFragment.FiltersX.F0101 || (filter == GoogleMapFragment.FiltersX.F1101 || filter == GoogleMapFragment.FiltersX.Fxx1x) && _childSpots_1000.size()==0))
-            return  R.drawable.baloon_red_green;
-        //return  R.drawable.baloon_green;
-
-        if((filter == GoogleMapFragment.FiltersX.F1101 || filter == GoogleMapFragment.FiltersX.Fxx1x) && _childSpots_1000.size()>0 && _childSpots_0100.size()>0 && _childSpots_0001.size()>0 )
-            return  R.drawable.baloon_green_red_purple;
-        //return  R.drawable.baloon_red;
-
-
-        return  R.drawable.baloon_blue;
+        String description=_name;
+        int num;
+        if(filter == GoogleMapFragment.FiltersX.F1000 || filter == GoogleMapFragment.FiltersX.F1100 || filter == GoogleMapFragment.FiltersX.F1001 || filter == GoogleMapFragment.FiltersX.F1101 || filter == GoogleMapFragment.FiltersX.Fxx1x)
+            if((num=_numPartners)>0)
+                description+= " \n"+String.valueOf(num)+" - спарринг партнер"+pluralPostfix(num);
+        if(filter == GoogleMapFragment.FiltersX.F0100 || filter == GoogleMapFragment.FiltersX.F1100 || filter == GoogleMapFragment.FiltersX.F0101 || filter == GoogleMapFragment.FiltersX.F1101 || filter == GoogleMapFragment.FiltersX.Fxx1x)
+            if((num=_numCoaches)>0)
+                description+= " \n"+String.valueOf(num)+" - тренер"+pluralPostfix(num);
+        if(filter == GoogleMapFragment.FiltersX.F0001 || filter == GoogleMapFragment.FiltersX.F1001 || filter == GoogleMapFragment.FiltersX.F0101 || filter == GoogleMapFragment.FiltersX.F1101 || filter == GoogleMapFragment.FiltersX.Fxx1x)
+            if(_isFavorite)
+                description+= " \nмой спот";
+        _description = description;
+    }
+    /*
+    public String getNumSpotToString(String spotName,GoogleMapFragment.FiltersX filter)
+    {
+        int numChildSpots = getChildSpots(filter).size();
+        String num = String.valueOf(numChildSpots)+" ";
+        if(numChildSpots>=10 && numChildSpots<=19)
+            return num + spotName + "ов";
+        int mod = numChildSpots%10;
+        switch (mod)
+        {
+            case 1:
+                return num + spotName;
+            case 2:
+            case 3:
+            case 4:
+                return num + spotName+"a";
+            default:
+                return num + spotName+"ов";
+        }
     }
     */
     

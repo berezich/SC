@@ -7,7 +7,6 @@ import com.berezich.sportconnector.R;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.berezich.sportconnector.GoogleMap.SpotsData.pluralPostfix;
 
 
 /**

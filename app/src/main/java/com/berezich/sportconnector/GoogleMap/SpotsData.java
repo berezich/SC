@@ -90,44 +90,7 @@ public class SpotsData {
         _allSpots.put(spot.id(), spot);
     }
 
-    /*
-    public String getNumSpotToString(String spotName,GoogleMapFragment.FiltersX filter)
-    {
-        int numChildSpots = getChildSpots(filter).size();
-        String num = String.valueOf(numChildSpots)+" ";
-        if(numChildSpots>=10 && numChildSpots<=19)
-            return num + spotName + "ов";
-        int mod = numChildSpots%10;
-        switch (mod)
-        {
-            case 1:
-                return num + spotName;
-            case 2:
-            case 3:
-            case 4:
-                return num + spotName+"a";
-            default:
-                return num + spotName+"ов";
-        }
-    }
-    */
-    public static String pluralPostfix(int num)
-    {
-        if(num>=10 && num<=19)
-            return "ов";
-        int mod = num%10;
-        switch (mod)
-        {
-            case 1:
-                return "";
-            case 2:
-            case 3:
-            case 4:
-                return "a";
-            default:
-                return "ов";
-        }
-    }
+
     /*
     public String getDescription(GoogleMapFragment.FiltersX filter)
     {
