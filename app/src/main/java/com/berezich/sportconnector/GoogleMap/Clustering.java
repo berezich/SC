@@ -21,6 +21,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.maps.android.clustering.Cluster;
 import com.google.maps.android.clustering.ClusterManager;
 import com.google.maps.android.clustering.view.DefaultClusterRenderer;
+import com.google.maps.android.ui.IconGenerator;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -39,6 +40,8 @@ public class Clustering {
         clusterManager = new ClusterManager<AbstractMarker>(context, gMap);
         clusterManager.setRenderer(new OwnIconRendered(context, gMap,clusterManager));
         Clustering.gmapFragment = gmapFragment;
+        clusterManager.setOnClusterClickListener(new CustomClusterClickListener());
+        clusterManager.setOnClusterItemClickListener(new CustomClusterItemClickListener());
     }
     public static void addAllSpots(HashMap<Integer, Spot> spots, GoogleMapFragment.FiltersX filter)
     {
@@ -60,9 +63,11 @@ public class Clustering {
     }
     public static class OwnIconRendered extends DefaultClusterRenderer<AbstractMarker> {
 
+        private IconGenerator iconFactory;
         public OwnIconRendered(Context context, GoogleMap map,
                                ClusterManager<AbstractMarker> clusterManager) {
             super(context, map, clusterManager);
+            iconFactory = new IconGenerator(context);
         }
 
         @Override
@@ -70,6 +75,9 @@ public class Clustering {
                                                    MarkerOptions markerOptions) {
 
             SpotMarker spot =  ((SpotMarker)item);
+
+
+
             markerOptions.icon(spot.getMarker().getIcon());
             markerOptions.title(spot.description());
         }
@@ -78,7 +86,14 @@ public class Clustering {
         protected void onBeforeClusterRendered(Cluster<AbstractMarker> cluster, MarkerOptions markerOptions) {
             // Draw multiple people.
             // Note: this method runs on the UI thread. Don't spend too much time in here (like in this example).
-            markerOptions.icon(BitmapDescriptorFactory.fromResource(getDrawableMarker(cluster,gmapFragment.curFilter())));
+
+
+            iconFactory.setBackground(gmapFragment.getResources().getDrawable(R.drawable.baloon_blue));
+            iconFactory.setContentPadding(40,35,0,0);
+            BitmapDescriptor descriptor = BitmapDescriptorFactory.fromBitmap(iconFactory.makeIcon(String.valueOf(cluster.getSize())));
+            markerOptions.icon(descriptor);
+
+            //markerOptions.icon(BitmapDescriptorFactory.fromResource(getDrawableMarker(cluster,gmapFragment.curFilter())));
             //markerOptions.title(String.valueOf(cluster.getItems().size()));
         }
         @Override
@@ -186,7 +201,7 @@ public class Clustering {
 
             // Getting view from the layout file info_window_layout
             View v = gmapFragment.getActivity().getLayoutInflater().inflate(R.layout.info_window, null);
-            if(chosenCluster==null) {
+            if(chosenMarker!=null) {
                 String title = arg0.getTitle();
                 String[] fields = title.split("\n");
                 TextView txtView;
@@ -213,7 +228,7 @@ public class Clustering {
             }
             else
             {
-                
+
             }
             return v;
 

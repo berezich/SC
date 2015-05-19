@@ -99,6 +99,7 @@ public class GoogleMapFragment extends Fragment{
         Clustering.addAllSpots(SpotsData.get_allSpots(),curFilter());
         map.setOnCameraChangeListener(Clustering.clusterManager);
         map.setInfoWindowAdapter(new Clustering.CustomInfoWindow());
+        map.setOnMarkerClickListener(Clustering.clusterManager);
 
         /*
         Marker marker = map.addMarker(new MarkerOptions()

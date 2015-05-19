@@ -162,7 +162,7 @@ public class DefaultClusterRenderer<T extends ClusterItem> implements ClusterRen
         mClusterManager.getClusterMarkerCollection().setOnMarkerClickListener(null);
     }
 
-    private LayerDrawable makeClusterBackground() {
+    public LayerDrawable makeClusterBackground() {
         mColoredCircleBackground = new ShapeDrawable(new OvalShape());
         ShapeDrawable outline = new ShapeDrawable(new OvalShape());
         outline.getPaint().setColor(0x80ffffff); // Transparent white.
@@ -172,7 +172,7 @@ public class DefaultClusterRenderer<T extends ClusterItem> implements ClusterRen
         return background;
     }
 
-    private SquareTextView makeSquareTextView(Context context) {
+    public SquareTextView makeSquareTextView(Context context) {
         SquareTextView squareTextView = new SquareTextView(context);
         ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         squareTextView.setLayoutParams(layoutParams);
