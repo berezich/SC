@@ -5,7 +5,11 @@ package com.berezich.sportconnector.GoogleMap;
  */
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.res.Resources;
+import android.location.Criteria;
+import android.location.Location;
+import android.location.LocationManager;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -19,9 +23,11 @@ import com.berezich.sportconnector.SportObjects.InfoTile;
 import com.berezich.sportconnector.R;
 
 import com.berezich.sportconnector.SportObjects.Spot;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -40,6 +46,7 @@ public class GoogleMapFragment extends Fragment{
     private static final String ARG_SECTION_NUMBER = "section_number";
     private static final String TAG = "GoogleMapFragment";
     private final int MARKER_OFFSET = 50;
+    private final LatLng MOSCOW_loc = new LatLng(55.754357, 37.620035);
     private  MapView mapView;
     private  GoogleMap map;
     //private static MapController mapController;
@@ -95,12 +102,13 @@ public class GoogleMapFragment extends Fragment{
         map.getUiSettings().setMyLocationButtonEnabled(true);
         map.getUiSettings().setZoomControlsEnabled(true);
         map.setMyLocationEnabled(true);
-        Clustering.initClusterManager(this.getActivity().getApplicationContext(),map,this);
-        Clustering.addAllSpots(SpotsData.get_allSpots(),curFilter());
+        Clustering.initClusterManager(this.getActivity().getApplicationContext(), map, this);
+        Clustering.addAllSpots(SpotsData.get_allSpots(), curFilter());
         map.setOnCameraChangeListener(Clustering.clusterManager);
         map.setInfoWindowAdapter(new Clustering.CustomInfoWindow());
         map.setOnMarkerClickListener(Clustering.clusterManager);
 
+        setCameraToCurLocation();
         /*
         Marker marker = map.addMarker(new MarkerOptions()
                 .position(new LatLng(55.778234, 37.588539))
@@ -562,6 +570,36 @@ public class GoogleMapFragment extends Fragment{
 
     }
 
+    private void setCameraToCurLocation() {
+        LocationManager locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+        Criteria criteria = new Criteria();
+
+        Location location = locationManager.getLastKnownLocation(locationManager.getBestProvider(criteria, false));
+        if (location != null)
+            setCameraToLocation(new LatLng(location.getLatitude(),location.getLongitude()),false);
+        else
+            setCameraToLocation(MOSCOW_loc,false);
+
+    }
+    private void setCameraToLocation(LatLng latLng, boolean isAnimate) {
+        if (latLng != null) {
+            if(isAnimate) {
+                map.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 13));
+
+                CameraPosition cameraPosition = new CameraPosition.Builder()
+                        .target(latLng)      // Sets the center of the map to location user
+                        .zoom(17)                   // Sets the zoom
+                                //.bearing(90)                // Sets the orientation of the camera to east
+                                //.tilt(40)                   // Sets the tilt of the camera to 30 degrees
+                        .build();                   // Creates a CameraPosition from the builder
+                map.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+            }
+            else
+                map.moveCamera(CameraUpdateFactory.newLatLngZoom(MOSCOW_loc, 9));
+
+        }
+
+    }
     public FiltersX curFilter() {
         return curFilter;
     }

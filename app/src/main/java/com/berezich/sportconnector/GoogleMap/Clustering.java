@@ -68,6 +68,7 @@ public class Clustering {
                                ClusterManager<AbstractMarker> clusterManager) {
             super(context, map, clusterManager);
             iconFactory = new IconGenerator(context);
+            iconFactory.setTextAppearance(R.style.ClusterIcon_TextAppearance);
         }
 
         @Override
@@ -80,6 +81,7 @@ public class Clustering {
 
             markerOptions.icon(spot.getMarker().getIcon());
             markerOptions.title(spot.description());
+            markerOptions.anchor((float)0.4,(float)17/20);
         }
 
         @Override
@@ -88,10 +90,12 @@ public class Clustering {
             // Note: this method runs on the UI thread. Don't spend too much time in here (like in this example).
 
 
-            iconFactory.setBackground(gmapFragment.getResources().getDrawable(R.drawable.baloon_blue));
-            iconFactory.setContentPadding(40,35,0,0);
+            //iconFactory.setBackground(gmapFragment.getResources().getDrawable(R.drawable.gmap_cluster_green_red_purple));
+            iconFactory.setBackground(gmapFragment.getResources().getDrawable(getDrawableClusterMarker(cluster,gmapFragment.curFilter())));
+            iconFactory.setContentPadding(20,10,0,0);
+
             BitmapDescriptor descriptor = BitmapDescriptorFactory.fromBitmap(iconFactory.makeIcon(String.valueOf(cluster.getSize())));
-            markerOptions.icon(descriptor);
+            markerOptions.icon(descriptor).anchor((float)0.5,(float)0.5);
 
             //markerOptions.icon(BitmapDescriptorFactory.fromResource(getDrawableMarker(cluster,gmapFragment.curFilter())));
             //markerOptions.title(String.valueOf(cluster.getItems().size()));
@@ -118,11 +122,11 @@ public class Clustering {
         public boolean onClusterClick(Cluster<AbstractMarker> cluster) {
             chosenCluster = cluster;
             chosenMarker = null;
-            return false;
+            return true;
         }
     }
     //for group of markers
-    private static Integer getDrawableMarker(Cluster<AbstractMarker> cluster, GoogleMapFragment.FiltersX filter)
+    private static Integer getDrawableClusterMarker(Cluster<AbstractMarker> cluster, GoogleMapFragment.FiltersX filter)
     {
         int numPartners = 0, numSpots =0 , numCoaches = 0, numFavorites=0;
         
@@ -137,32 +141,32 @@ public class Clustering {
                 filter == GoogleMapFragment.FiltersX.F1001 && numPartners==0||
                 filter == GoogleMapFragment.FiltersX.F0101 && numCoaches==0||
                 filter == GoogleMapFragment.FiltersX.F1101 && numCoaches==0&&numPartners==0)
-            return  R.drawable.baloon_red;
+            return  R.drawable.gmap_cluster_red;
         if(filter == GoogleMapFragment.FiltersX.F1000||
                 filter == GoogleMapFragment.FiltersX.F1001 && numFavorites==0||
                 filter == GoogleMapFragment.FiltersX.F1100 && numCoaches==0||
                 filter == GoogleMapFragment.FiltersX.F1101 && numCoaches==0&& numFavorites==0)
-            return  R.drawable.baloon_purple;
+            return  R.drawable.gmap_cluster_purple;
         if(filter == GoogleMapFragment.FiltersX.F0100||
                 filter == GoogleMapFragment.FiltersX.F0101 && numFavorites==0||
                 filter == GoogleMapFragment.FiltersX.F1100 && numPartners==0||
                 filter == GoogleMapFragment.FiltersX.F1101 && numPartners==0&& numFavorites==0)
-            return  R.drawable.baloon_green;
+            return  R.drawable.gmap_cluster_green;
 
         if(numPartners>0 && numFavorites>0 && (filter == GoogleMapFragment.FiltersX.F1001 || (filter == GoogleMapFragment.FiltersX.F1101 || filter == GoogleMapFragment.FiltersX.Fxx1x) && numCoaches==0))
             return  R.drawable.baloon_red_purple;
         //return  R.drawable.baloon_red;
 
         if(numPartners>0 && numCoaches>0 && (filter == GoogleMapFragment.FiltersX.F1100 || (filter == GoogleMapFragment.FiltersX.F1101 || filter == GoogleMapFragment.FiltersX.Fxx1x) && numFavorites==0))
-            return  R.drawable.baloon_green_purple;
+            return  R.drawable.gmap_cluster_green_purple;
         //return  R.drawable.baloon_green;
 
         if(numCoaches>0 && numFavorites>0 && (filter == GoogleMapFragment.FiltersX.F0101 || (filter == GoogleMapFragment.FiltersX.F1101 || filter == GoogleMapFragment.FiltersX.Fxx1x) && numPartners==0))
-            return  R.drawable.baloon_red_green;
+            return  R.drawable.gmap_cluster_green_red;
         //return  R.drawable.baloon_green;
 
         if((filter == GoogleMapFragment.FiltersX.F1101 || filter == GoogleMapFragment.FiltersX.Fxx1x) && numPartners>0 && numCoaches>0 && numFavorites>0 )
-            return  R.drawable.baloon_green_red_purple;
+            return  R.drawable.gmap_cluster_green_red_purple;
         //return  R.drawable.baloon_red;
 
 
