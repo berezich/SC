@@ -12,7 +12,9 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
@@ -75,8 +77,12 @@ public class GoogleMapFragment extends Fragment{
             isCoaches = true;
         if(filter == Filters.SPARRING_PARTNERS)
             isPartners = true;
-        if(filter == Filters.COURT)
+        if(filter == Filters.COURT) {
             isCourts = true;
+            isCoaches = true;
+            isPartners = true;
+            isFavorite = true;
+        }
         setCurFilter();
         return this;
     }
@@ -108,38 +114,26 @@ public class GoogleMapFragment extends Fragment{
         map.setInfoWindowAdapter(new Clustering.CustomInfoWindow());
         map.setOnMarkerClickListener(Clustering.clusterManager);
 
-        setCameraToCurLocation();
-        /*
-        Marker marker = map.addMarker(new MarkerOptions()
-                .position(new LatLng(55.778234, 37.588539))
-                .title("Комета")
-                .snippet("1203101010333012"));
+        ImageButton btn;
+        btn = (ImageButton) rootView.findViewById(R.id.map_btn_coach);
+        btn.setOnClickListener(new btnClickListener());
+        btn.setOnTouchListener(new btnOnTouchListener());
+        btn.setPressed(isCoaches);
+        btn = (ImageButton) rootView.findViewById(R.id.map_btn_court);
+        btn.setOnClickListener(new btnClickListener());
+        btn.setOnTouchListener(new btnOnTouchListener());
+        btn.setPressed(isCourts);
+        btn = (ImageButton) rootView.findViewById(R.id.map_btn_partner);
+        btn.setOnClickListener(new btnClickListener());
+        btn.setOnTouchListener(new btnOnTouchListener());
+        btn.setPressed(isPartners);
+        btn = (ImageButton) rootView.findViewById(R.id.map_btn_star);
+        btn.setOnClickListener(new btnClickListener());
+        btn.setOnTouchListener(new btnOnTouchListener());
+        btn.setPressed(isFavorite);
 
-        marker = map.addMarker(new MarkerOptions()
-                .position(new LatLng(55.796051, 37.537766))
-                .title("Теннисный клуб ЦСКА")
-                .snippet("1203101010330023"));
-        marker = map.addMarker(new MarkerOptions()
-                .position(new LatLng(55.795504, 37.541117))
-                .title("Европейская школа Тенниса")
-                .snippet("1203101010330032"));
-        marker = map.addMarker(new MarkerOptions()
-                .position(new LatLng(55.792503, 37.536984))
-                .title("Европейская школа Тенниса")
-                .snippet("1203101010330201"));
-        marker = map.addMarker(new MarkerOptions()
-                .position(new LatLng(55.804162, 37.561679))
-                .title("Теннисенок")
-                .snippet("1203101010330101"));
-        marker = map.addMarker(new MarkerOptions()
-                .position(new LatLng(55.768345, 37.693669))
-                .title("Планета тенниса")
-                .snippet("1203101011223301"));
-        marker = map.addMarker(new MarkerOptions()
-                .position(new LatLng(55.715099, 37.555023))
-                .title("TennisVIP")
-                .snippet("1203101012112302"));
-        */
+        setCameraToCurLocation();
+
         // Needs to call MapsInitializer before doing any CameraUpdateFactory calls
         try {
             MapsInitializer.initialize(this.getActivity());
@@ -147,64 +141,6 @@ public class GoogleMapFragment extends Fragment{
             e.printStackTrace();
         }
 
-        // Updates the location and zoom of the MapView
-        //CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(new LatLng(43.1, -87.9), 10);
-        //map.animateCamera(cameraUpdate);
-
-    /*
-    View rootView = inflater.inflate(R.layout.fragment_yamap, container, false);
-    mapView = (MapView)  rootView.findViewById(R.id.map);
-    mapView.showBuiltInScreenButtons(true);
-    mapView.showJamsButton(false);
-    mapController = mapView.getMapController();
-    mapController.addMapListener(this);
-    //mapController.setZoomCurrent(7);
-
-
-    // Create a layer of objects for the map
-    overlay = new Overlay(mapController);
-    overlayManager = mapController.getOverlayManager();
-    overlayManager.addOverlay(overlay);
-
-    res = getResources();
-
-    ImageButton btn;
-    btn = (ImageButton) rootView.findViewById(R.id.map_btn_coach);
-    btn.setOnClickListener(new btnClickListener());
-    btn.setOnTouchListener(new btnOnTouchListener());
-    btn.setPressed(isCoaches);
-    btn = (ImageButton) rootView.findViewById(R.id.map_btn_court);
-    btn.setOnClickListener(new btnClickListener());
-    btn.setOnTouchListener(new btnOnTouchListener());
-    btn.setPressed(isCourts);
-    btn = (ImageButton) rootView.findViewById(R.id.map_btn_partner);
-    btn.setOnClickListener(new btnClickListener());
-    btn.setOnTouchListener(new btnOnTouchListener());
-    btn.setPressed(isPartners);
-    btn = (ImageButton) rootView.findViewById(R.id.map_btn_star);
-    btn.setOnClickListener(new btnClickListener());
-    btn.setOnTouchListener(new btnOnTouchListener());
-
-    displayNewObj();
-    */
-
-    /*btn = (ImageButton) rootView.findViewById(R.id.map_btn_court_2);
-    btn.setOnClickListener(new btnClickListener());
-    btn.setOnTouchListener(new btnOnTouchListener());*/
-
-    /*TextView txtView = (TextView) rootView.findViewById(R.id.map_textView);
-    switch (_filter)
-    {
-        case SPARRING_PARTNERS:
-            txtView.setText("YaMap Спарринг партнеры");
-            break;
-        case COUCH:
-            txtView.setText("YaMap Тренеры");
-            break;
-        case CORT:
-            txtView.setText("YaMap Корты");
-            break;
-    }*/
         return rootView;
     }
 
@@ -231,165 +167,12 @@ public class GoogleMapFragment extends Fragment{
         super.onLowMemory();
         mapView.onLowMemory();
     }
-    /*@Override
-    public void onMapActionEvent(MapEvent mapEvent) {
 
-        mapView.showBuiltInScreenButtons(true);
-        mapView.showJamsButton(false);
-
-        switch (mapEvent.getMsg()) {
-            case MapEvent.MSG_SCALE_BEGIN:
-                //textView.setText("MSG_SCALE_BEGIN");
-                overlay.clearOverlayItems();
-                loadedTiles.clear();
-                break;
-            case MapEvent.MSG_SCALE_MOVE:
-                //textView.setText("MSG_SCALE_MOVE");
-                break;
-            case MapEvent.MSG_SCALE_END:
-                //textView.setText("MSG_SCALE_END");
-                Log.d(TAG, "mapCenter = " + mapController.getMapCenter().toString());
-                Log.d(TAG, "mapHeight = " + mapController.getHeight());
-                Log.d(TAG, "mapWidth = " + mapController.getWidth());
-                displayNewObj();
-                mapController.notifyRepaint();
-                break;
-
-            case MapEvent.MSG_ZOOM_BEGIN:
-                //textView.setText("MSG_ZOOM_BEGIN");
-                overlay.clearOverlayItems();
-                loadedTiles.clear();
-                break;
-            case MapEvent.MSG_ZOOM_MOVE:
-                //textView.setText("MSG_ZOOM_MOVE");
-                break;
-            case MapEvent.MSG_ZOOM_END:
-                Log.d(TAG, "ZOOM = " + mapController.getZoomCurrent());
-                displayNewObj();
-                mapController.notifyRepaint();
-                Log.d(TAG, "loadedTiles num = " + loadedTiles.size());
-                //textView.setText("MSG_ZOOM_END");
-                break;
-
-            case MapEvent.MSG_SCROLL_BEGIN:
-                //textView.setText("MSG_SCROLL_BEGIN");
-                break;
-            case MapEvent.MSG_SCROLL_MOVE:
-                //textView.setText("MSG_SCROLL_MOVE");
-                break;
-            case MapEvent.MSG_SCROLL_END:
-                //textView.setText("MSG_SCROLL_END");
-                Log.d(TAG, "mapCenter = " + mapController.getMapCenter().toString());
-                Log.d(TAG, "mapHeight = " + mapController.getHeight());
-                Log.d(TAG, "mapWidth = " + mapController.getWidth());
-                displayNewObj();
-                mapController.notifyRepaint();
-                Log.d(TAG, "loadedTiles num = " + loadedTiles.size());
-                //curTiles = visibleTileList();
-                break;
-            default:
-                //textView.setText("MSG_EMPTY");
-                break;
-        }
-        int i;
-
-    }
-    //получаем таблицу видимых tiles
-    private HashMap<String,Tile> buildTiles()
-    {
-
-
-        HashMap<String,Tile> tiles = new HashMap<String,Tile>();
-        try {
-            Size size = new Size(mapController.getWidth(),mapController.getHeight());
-            ScreenPoint pixCenterGeo = mapController.getScreenPoint(new GeoPoint(0,0));
-            double mapZoom = mapController.getZoomCurrent()+1;
-            double zoomFactor = Math.pow(2,-mapZoom);
-            Size pixelSize = new Size(size.getWidth()*zoomFactor,size.getHeight()*zoomFactor);
-            float tileSize = (float)(256 * zoomFactor);
-            float mapSize = (float)(256*Math.pow(2,mapZoom));
-            ScreenPoint tilePixCenter = new ScreenPoint((float)(mapSize*0.5),(float)(mapSize*0.5));
-            ScreenPoint pixelCenter = new ScreenPoint(tilePixCenter.getX()-pixCenterGeo.getX()+(float)(mapController.getWidth()*0.5),tilePixCenter.getY()-pixCenterGeo.getY()+(float)(mapController.getHeight()*0.5));
-            pixelCenter = new ScreenPoint(pixelCenter.getX()*(float)zoomFactor, (pixelCenter.getY()*(float)zoomFactor));
-            //нам нужны пиксельные границы в пространстве нулевого зума расширенная до углов тайлов
-            //Tile.Bounds pixelBounds = new Tile.Bounds(new ScreenPoint((float)Math.max(0,pixelCenter.getX() - pixelSize.getWidth() * .5), (float) Math.max(0,pixelCenter.getY() - pixelSize.getHeight() * .5)),new ScreenPoint((float) Math.min(256, pixelCenter.getX() + pixelSize.getWidth() * .5), (float)Math.min(256,pixelCenter.getY() + pixelSize.getHeight() * .5)));
-            ScreenPoint pixelStart  = new ScreenPoint((float)Math.max(0,pixelCenter.getX() - pixelSize.getWidth() * .5), (float) Math.max(0,pixelCenter.getY() - pixelSize.getHeight() * .5));
-            ScreenPoint pixelEnd  = new ScreenPoint((float) Math.min(256, pixelCenter.getX() + pixelSize.getWidth() * .5), (float)Math.min(256,pixelCenter.getY() + pixelSize.getHeight() * .5));
-            double quadZoom = mapZoom;
-            tiles.clear();
-            boolean xfill = true;
-            Tile tile;
-            //набиваем квады, пока они не выходях за пределы экрана
-            for (float x = 0; xfill; x += tileSize) {
-                for (float y = 0; ; y += tileSize) {
-                    tile = new Tile(new ScreenPoint( (float)(0 + pixelStart.getX() + x), (float)(0 + pixelStart.getY() + y)), quadZoom);
-                    tiles.put(tile.name(), tile);
-                    if (tile.bounds().p2().getY() >= pixelEnd.getY()) {
-                        if (tile.bounds().p2().getX() >= pixelEnd.getX()) {
-                            xfill = false;
-                            break;
-                        }
-                        break;
-                    }
-
-                }
-            }
-
-            return tiles;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return tiles;
-        }
-    }
-    public static ScreenPoint globalPxToPhonePx(ScreenPoint globalPix,double zoom)
-    {
-        float zoomFactor = (float)Math.pow(2,zoom);
-        int mapPixSize = (int) (256*zoomFactor);
-        ScreenPoint mapCenter = mapController.getScreenPoint(new GeoPoint(0,0));
-        ScreenPoint phonePix = new ScreenPoint((float)(globalPix.getX()-mapPixSize*.5+mapCenter.getX()),(float)(globalPix.getY()-mapPixSize*.5+mapCenter.getY()));
-        return phonePix;
-    }
-    void displayNewObj()
-    {
-        String str="";
-        OverlayItem marker;
-        ScreenPoint tileGlobalCenter;
-        ScreenPoint tilePhoneCenter;
-        List<Spot> spots;
-        Spot spot;
-        double zoomFactor;
-        Tile.Bounds bounds,_bounds;
-        boolean f1,f2;
-        if(curFilter!= FiltersX.F0000)
-        {
-            curTiles = buildTiles();
-            InfoTile tileInfo;
-            Tile tile;
-            for (String key : curTiles.keySet()) {
-                str += key.toString() + ",";
-                if (!loadedTiles.containsKey(key)) {
-                    tile = curTiles.get(key);
-                    loadedTiles.put(key, tile);
-                    //tileInfo = allTiles.get(key);
-                    tileInfo = TilesInfoData.findInfoTile(key);
-                    if (tileInfo != null) {
-
-                        if ((tileInfo.getChildSpots(curFilter).size() > 0) && tileInfo.name().equals(tile.name()))
-                            showGrpOrChildSpot(tileInfo, curFilter);
-                        else
-                            showSpots(tileInfo, curFilter);
-                    }
-                }
-            }
-        }
-        Log.d(TAG,"curTiles: "+str);
-
-    }
     class btnClickListener implements View.OnClickListener
     {
         @Override
         public void onClick(View view) {
-            Log.d(TAG,"button onClick!!!");
+            Log.d(TAG, "button onClick!!!");
 
             return;
         }
@@ -429,11 +212,11 @@ public class GoogleMapFragment extends Fragment{
                             activateButtons(Buttons.COURT,false);
                         break;
                 }
-                loadedTiles.clear();
                 setCurFilter();
-                overlay.clearOverlayItems();
-                displayNewObj();
-                mapController.notifyRepaint();
+                Clustering.addAllSpots(SpotsData.get_allSpots(), curFilter());
+
+                //map.setOnCameraChangeListener(Clustering.clusterManager);
+
                 return true;
             }
             if(event.getAction()==MotionEvent.ACTION_UP) {
@@ -445,7 +228,6 @@ public class GoogleMapFragment extends Fragment{
             return true;
         }
     }
-    */
     static enum Buttons{ALL,COUCH,PARTNER,FAVORITE,COURT}
     private void activateButtons(Buttons buttonType,boolean b) {
         ImageButton btn;
@@ -470,66 +252,7 @@ public class GoogleMapFragment extends Fragment{
             btn.setPressed(b);
         }
     }
-    /*
-    void showSpots(InfoTile infoTile, FiltersX filter)
-    {
-        List<Integer> spots = infoTile.spots();
-        Spot spot;
 
-        OverlayItem marker;
-        for(int i=0; i<spots.size(); i++){
-            spot = TilesInfoData.allSpots().get(spots.get(i));
-            if(InfoTile.isAppropriate(spot, filter)) {
-                marker = new OverlayItem(spot.geoCoord(), res.getDrawable(spot.getMarkerImg(filter)));
-                //marker = new OverlayItem(spot.geoCoord(), res.getDrawable(R.drawable.baloon_blue));
-                marker.setOffsetY(MARKER_OFFSET);
-                // Create a balloon model for the object
-                BalloonItem balloonMarker = new BalloonItem(this.getActivity(), marker.getGeoPoint());
-                balloonMarker.setText(spot.name()+spot.getDescription(filter));
-                //balloonMarker.setText(String.valueOf(tile.name()));
-//        // Add the balloon model to the object
-                marker.setBalloonItem(balloonMarker);
-                // Add the object to the layer
-                overlay.addOverlayItem(marker);
-            }
-        }
-    }
-    void showGrpOrChildSpot(InfoTile tileInfo,FiltersX filter)
-    {
-        OverlayItem marker;
-        Spot spot;
-        List<Integer> spots = tileInfo.getChildSpots(filter);
-        if(spots.size()>1) {
-            //marker = new OverlayItem(tileInfo.getAvrPoint(filter), res.getDrawable(R.drawable.baloon_blue));
-            marker = new OverlayItem(tileInfo.getAvrPoint(filter), res.getDrawable(tileInfo.getDrawableMarker(filter)));
-            marker.setOffsetY(MARKER_OFFSET);
-            // Create a balloon model for the object
-            BalloonItem balloonMarker = new BalloonItem(this.getActivity(), marker.getGeoPoint());
-            balloonMarker.setText(tileInfo.getNumSpotToString("спот", filter)+tileInfo.getDescription(filter));
-            //balloonMarker.setText(String.valueOf(tile.name()));
-//        // Add the balloon model to the object
-            marker.setBalloonItem(balloonMarker);
-            // Add the object to the layer
-            overlay.addOverlayItem(marker);
-        }
-        else if(spots.size()==1) {
-            spot = TilesInfoData.allSpots().get(spots.get(0));
-            if (InfoTile.isAppropriate(spot, filter)) {
-                marker = new OverlayItem(spot.geoCoord(), res.getDrawable(spot.getMarkerImg(filter)));
-                //marker = new OverlayItem(spot.geoCoord(), res.getDrawable(R.drawable.baloon_blue));
-                marker.setOffsetY(MARKER_OFFSET);
-                // Create a balloon model for the object
-                BalloonItem balloonMarker = new BalloonItem(this.getActivity(), marker.getGeoPoint());
-                balloonMarker.setText(spot.name()+spot.getDescription(filter));
-                //balloonMarker.setText(String.valueOf(tile.name()));
-//        // Add the balloon model to the object
-                marker.setBalloonItem(balloonMarker);
-                // Add the object to the layer
-                overlay.addOverlayItem(marker);
-            }
-        }
-    }
-    */
     private void setCurFilter()
     {
         if(isCourts) {

@@ -1,17 +1,66 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent">-->
 
-    <!--
-    <fragment xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/gmap"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:name="com.google.android.gms.maps.MapFragment"/>
-    -->
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent" android:layout_height="match_parent">
+
     <com.google.android.gms.maps.MapView android:id="@+id/mapview"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-</LinearLayout>
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:id="@+id/relativeLayout">
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/map_btn_partner"
+            android:background="@drawable/map_btn_partner"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="false"
+            android:layout_alignParentTop="true"
+            android:layout_marginLeft="10dp" />
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/map_btn_coach"
+            android:background="@drawable/map_btn_coach"
+            android:layout_alignParentLeft="false"
+            android:layout_alignParentStart="false"
+            android:layout_below="@+id/map_btn_partner"
+            android:layout_alignLeft="@+id/map_btn_partner"
+            android:layout_alignStart="@id/map_btn_partner"
+            android:layout_marginTop="1dp" />
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/map_btn_court"
+            android:background="@drawable/map_btn_court"
+            android:layout_alignWithParentIfMissing="false"
+            android:layout_below="@+id/map_btn_coach"
+            android:layout_alignLeft="@+id/map_btn_coach"
+            android:layout_alignStart="@+id/map_btn_coach"
+            android:layout_marginTop="1dp" />
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/map_btn_star"
+            android:background="@drawable/map_btn_star"
+            android:layout_alignWithParentIfMissing="false"
+            android:layout_below="@+id/map_btn_court"
+            android:layout_alignLeft="@+id/map_btn_court"
+            android:layout_alignStart="@+id/map_btn_court"
+            android:layout_marginTop="1dp" />
+
+    </RelativeLayout>
+
+</RelativeLayout>
+<!--</LinearLayout>-->

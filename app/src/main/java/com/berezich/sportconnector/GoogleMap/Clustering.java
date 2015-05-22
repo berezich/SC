@@ -48,7 +48,7 @@ public class Clustering {
         SpotMarker spotMarker;
         Set<Integer> keys = spots.keySet();
         Spot spot;
-
+        clusterManager.clearItems();
         // Loop over String keys.
         for (Integer key : keys) {
             spot = spots.get(key);
@@ -60,6 +60,8 @@ public class Clustering {
                 clusterManager.addItem(spotMarker);
             }
         }
+        clusterManager.cluster();
+
     }
     public static class OwnIconRendered extends DefaultClusterRenderer<AbstractMarker> {
 
@@ -170,7 +172,7 @@ public class Clustering {
         //return  R.drawable.baloon_red;
 
 
-        return  R.drawable.baloon_blue;
+        return  R.drawable.gmap_cluster_blue;
     }
     public static String pluralPostfix(int num)
     {
