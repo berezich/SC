@@ -6,6 +6,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.test.ActivityUnitTestCase;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -23,6 +24,7 @@ import com.google.maps.android.clustering.ClusterManager;
 import com.google.maps.android.clustering.view.DefaultClusterRenderer;
 import com.google.maps.android.ui.IconGenerator;
 
+import java.io.Console;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -32,16 +34,19 @@ import java.util.Set;
  * Created by berezkin on 14.05.2015.
  */
 public class Clustering {
+    private static final String TAG = "ClusteringGMap";
     public static ClusterManager<AbstractMarker> clusterManager;
     private static GoogleMapFragment gmapFragment;
     private static AbstractMarker chosenMarker;
     private  static Cluster<AbstractMarker> chosenCluster;
+
     public static void initClusterManager(Context context,GoogleMap gMap,GoogleMapFragment gmapFragment) {
         clusterManager = new ClusterManager<AbstractMarker>(context, gMap);
         clusterManager.setRenderer(new OwnIconRendered(context, gMap,clusterManager));
         Clustering.gmapFragment = gmapFragment;
         clusterManager.setOnClusterClickListener(new CustomClusterClickListener());
         clusterManager.setOnClusterItemClickListener(new CustomClusterItemClickListener());
+        clusterManager.setOnClusterItemInfoWindowClickListener(new CustomClusterItemInfoWindowClickListener());
     }
     public static void addAllSpots(HashMap<Integer, Spot> spots, GoogleMapFragment.FiltersX filter)
     {
@@ -52,7 +57,7 @@ public class Clustering {
         // Loop over String keys.
         for (Integer key : keys) {
             spot = spots.get(key);
-            spotMarker = new SpotMarker(spot.name(),spot.geoCoord().lat(),spot.geoCoord().longt(),
+            spotMarker = new SpotMarker(spot.id(),spot.name(),spot.geoCoord().lat(),spot.geoCoord().longt(),
                     spot.partners().size(),spot.coaches().size(),spot.favorite());
             if(spotMarker.isAppropriate(filter)) {
                 spotMarker.setSpotIcon(filter);
@@ -83,7 +88,7 @@ public class Clustering {
 
             markerOptions.icon(spot.getMarker().getIcon());
             markerOptions.title(spot.description());
-            markerOptions.anchor((float)0.4,(float)17/20);
+            markerOptions.anchor((float) 0.4, (float) 17 / 20);
         }
 
         @Override
@@ -93,11 +98,11 @@ public class Clustering {
 
 
             //iconFactory.setBackground(gmapFragment.getResources().getDrawable(R.drawable.gmap_cluster_green_red_purple));
-            iconFactory.setBackground(gmapFragment.getResources().getDrawable(getDrawableClusterMarker(cluster,gmapFragment.curFilter())));
+            iconFactory.setBackground(gmapFragment.getResources().getDrawable(getDrawableClusterMarker(cluster, gmapFragment.curFilter())));
             iconFactory.setContentPadding(20,10,0,0);
 
             BitmapDescriptor descriptor = BitmapDescriptorFactory.fromBitmap(iconFactory.makeIcon(String.valueOf(cluster.getSize())));
-            markerOptions.icon(descriptor).anchor((float)0.5,(float)0.5);
+            markerOptions.icon(descriptor).anchor((float) 0.5, (float) 0.5);
 
             //markerOptions.icon(BitmapDescriptorFactory.fromResource(getDrawableMarker(cluster,gmapFragment.curFilter())));
             //markerOptions.title(String.valueOf(cluster.getItems().size()));
@@ -156,7 +161,7 @@ public class Clustering {
             return  R.drawable.gmap_cluster_green;
 
         if(numPartners>0 && numFavorites>0 && (filter == GoogleMapFragment.FiltersX.F1001 || (filter == GoogleMapFragment.FiltersX.F1101 || filter == GoogleMapFragment.FiltersX.Fxx1x) && numCoaches==0))
-            return  R.drawable.baloon_red_purple;
+            return  R.drawable.gmap_cluster_red_purple;
         //return  R.drawable.baloon_red;
 
         if(numPartners>0 && numCoaches>0 && (filter == GoogleMapFragment.FiltersX.F1100 || (filter == GoogleMapFragment.FiltersX.F1101 || filter == GoogleMapFragment.FiltersX.Fxx1x) && numFavorites==0))
@@ -238,6 +243,16 @@ public class Clustering {
             }
             return v;
 
+        }
+    }
+    public static class CustomClusterItemInfoWindowClickListener implements ClusterManager.OnClusterItemInfoWindowClickListener<AbstractMarker>
+    {
+        @Override
+        public void onClusterItemInfoWindowClick(AbstractMarker item) {
+            SpotMarker spotMarker = (SpotMarker) item;
+            gmapFragment.setSelectMarker(spotMarker);
+            gmapFragment.setCurZoom(gmapFragment.map().getCameraPosition().zoom);
+            GoogleMapFragment.listener.onInfoWindowClickGMF(spotMarker.id());
         }
     }
 }

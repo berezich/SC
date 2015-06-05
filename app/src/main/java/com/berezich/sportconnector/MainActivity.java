@@ -1,33 +1,23 @@
 package com.berezich.sportconnector;
 
-import android.app.Activity;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBar;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.content.Context;
-import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
 import android.support.v4.widget.DrawerLayout;
-import android.widget.ArrayAdapter;
-import android.widget.TextView;
-import java.util.regex.Pattern;
 
 import com.berezich.sportconnector.GoogleMap.GoogleMapFragment;
 import com.berezich.sportconnector.MainFragment.Filters;
+import com.berezich.sportconnector.SpotInfo.SpotInfoFragment;
 
 
 
 
 public class MainActivity extends ActionBarActivity
-        implements NavigationDrawerFragment.NavigationDrawerCallbacks, MainFragment.OnActionListener{
+        implements NavigationDrawerFragment.NavigationDrawerCallbacks,
+        MainFragment.OnActionListenerMainFragment, GoogleMapFragment.OnActionListenerGMapFragment {
 
     /**
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
@@ -71,11 +61,11 @@ public class MainActivity extends ActionBarActivity
         }
     }
     @Override
-    public void onBtnClick(Filters filter, int sectionNumber)
+    public void onBtnClickMF(Filters filter, int sectionNumber)
     {
         FragmentManager fragmentManager = getSupportFragmentManager();
         //fragmentManager.beginTransaction().replace(R.id.container, new YaMapFragment().setArgs(sectionNumber,filter)).commit();
-        fragmentManager.beginTransaction().replace(R.id.container, new GoogleMapFragment().setArgs(sectionNumber,filter)).commit();
+        fragmentManager.beginTransaction().replace(R.id.container, new GoogleMapFragment().setArgs(sectionNumber,filter)).addToBackStack("tr1").commit();
     }
 
     public void onSectionAttached(int number) {
@@ -134,4 +124,12 @@ public class MainActivity extends ActionBarActivity
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void onInfoWindowClickGMF(int spotId) {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        //fragmentManager.beginTransaction().replace(R.id.container, new YaMapFragment().setArgs(sectionNumber,filter)).commit();
+        //fragmentManager.beginTransaction().replace(R.id.container, new GoogleMapFragment().setArgs(sectionNumber,filter)).commit();
+        fragmentManager.beginTransaction().replace(R.id.container, SpotInfoFragment.newInstance(spotId)).addToBackStack("tr2").commit();
+
+    }
 }

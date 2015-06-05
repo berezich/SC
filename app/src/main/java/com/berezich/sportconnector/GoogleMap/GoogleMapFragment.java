@@ -49,6 +49,8 @@ public class GoogleMapFragment extends Fragment{
     private static final String TAG = "GoogleMapFragment";
     private final int MARKER_OFFSET = 50;
     private final LatLng MOSCOW_loc = new LatLng(55.754357, 37.620035);
+    private SpotMarker selectMarker = null;
+    private float curZoom = -1;
     private  MapView mapView;
     private  GoogleMap map;
     //private static MapController mapController;
@@ -60,12 +62,13 @@ public class GoogleMapFragment extends Fragment{
     private boolean isPartners=false;
     private boolean isFavorite=false;
     private FiltersX curFilter;
-    
+
+    public static OnActionListenerGMapFragment listener;
 
     //список tiles уже отисованых на карте при данном масштабе
-    private HashMap<String,Tile> loadedTiles = new HashMap<String,Tile>();
+    //private HashMap<String,Tile> loadedTiles = new HashMap<String,Tile>();
     //список tiles в зоне видимости
-    private HashMap<String,Tile> curTiles = new HashMap<String,Tile>();
+    //private HashMap<String,Tile> curTiles = new HashMap<String,Tile>();
 
 
     public GoogleMapFragment setArgs(int sectionNumber, Filters filter) {
@@ -113,6 +116,7 @@ public class GoogleMapFragment extends Fragment{
         map.setOnCameraChangeListener(Clustering.clusterManager);
         map.setInfoWindowAdapter(new Clustering.CustomInfoWindow());
         map.setOnMarkerClickListener(Clustering.clusterManager);
+        map.setOnInfoWindowClickListener(Clustering.clusterManager);
 
         ImageButton btn;
         btn = (ImageButton) rootView.findViewById(R.id.map_btn_coach);
@@ -132,7 +136,10 @@ public class GoogleMapFragment extends Fragment{
         btn.setOnTouchListener(new btnOnTouchListener());
         btn.setPressed(isFavorite);
 
-        setCameraToCurLocation();
+        if(selectMarker!=null)
+            setCameraToLocation(selectMarker.getPosition(),false,curZoom);
+        else
+            setCameraToCurLocation();
 
         // Needs to call MapsInitializer before doing any CameraUpdateFactory calls
         try {
@@ -147,6 +154,11 @@ public class GoogleMapFragment extends Fragment{
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
+        try {
+            listener = (OnActionListenerGMapFragment) activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString() + " must implement OnActionListenerGMapFragment for GoogleMapFragment");
+        }
         ((MainActivity) activity).onSectionAttached(
                 getArguments().getInt(ARG_SECTION_NUMBER));
     }
@@ -242,7 +254,6 @@ public class GoogleMapFragment extends Fragment{
             btn.setPressed(b);
         }
         if(buttonType == Buttons.ALL || buttonType == Buttons.PARTNER) {
-            isFavorite = b;
             btn = (ImageButton) getView().findViewById(R.id.map_btn_star);
             btn.setPressed(b);
         }
@@ -299,30 +310,43 @@ public class GoogleMapFragment extends Fragment{
 
         Location location = locationManager.getLastKnownLocation(locationManager.getBestProvider(criteria, false));
         if (location != null)
-            setCameraToLocation(new LatLng(location.getLatitude(),location.getLongitude()),false);
+            setCameraToLocation(new LatLng(location.getLatitude(),location.getLongitude()),false,-1);
         else
-            setCameraToLocation(MOSCOW_loc,false);
+            setCameraToLocation(MOSCOW_loc,false,9);
 
     }
-    private void setCameraToLocation(LatLng latLng, boolean isAnimate) {
+    private void setCameraToLocation(LatLng latLng, boolean isAnimate, float zoom) {
         if (latLng != null) {
             if(isAnimate) {
                 map.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 13));
 
                 CameraPosition cameraPosition = new CameraPosition.Builder()
                         .target(latLng)      // Sets the center of the map to location user
-                        .zoom(17)                   // Sets the zoom
+                        .zoom((zoom >= 0) ? zoom : 17)                   // Sets the zoom
                                 //.bearing(90)                // Sets the orientation of the camera to east
                                 //.tilt(40)                   // Sets the tilt of the camera to 30 degrees
                         .build();                   // Creates a CameraPosition from the builder
                 map.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
             }
             else
-                map.moveCamera(CameraUpdateFactory.newLatLngZoom(MOSCOW_loc, 9));
+                map.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, (zoom>=0)?zoom:9));
 
         }
 
     }
+
+    public GoogleMap map() {
+        return map;
+    }
+
+    public void setCurZoom(float curZoom) {
+        this.curZoom = curZoom;
+    }
+
+    public void setSelectMarker(SpotMarker selectMarker) {
+        this.selectMarker = selectMarker;
+    }
+
     public FiltersX curFilter() {
         return curFilter;
     }
@@ -346,7 +370,9 @@ public class GoogleMapFragment extends Fragment{
         }
     }
 
-
+    public static interface OnActionListenerGMapFragment {
+        void onInfoWindowClickGMF(int spotId);
+    }
 
 }
 

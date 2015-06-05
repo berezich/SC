@@ -27,7 +27,20 @@
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
+    <!--spotInfo_fragment-->
+    <string name="spotinfo_tab1_title">Спарринг партнеры</string>
+    <string name="spotinfo_tab2_title">Тренеры</string>
+    <string name="spotinfo_no_partners_no_coaches">На данном корте пока нет зарегестрированных соперников и тренеров.</string>
+
+    <!-- spotInfo_fragment-->
+    <!-- spotInfo_fragment/list_person_item-->
+    <string name="person_item_age">Возраст:</string>
+    <string name="person_item_rating">Рейтинг:</string>
+    <!-- spotInfo_fragment/list_person_item-->
+
+
     <string name="action_example">Example action</string>
 
     <string name="action_settings">Settings</string>
+
 </resources>

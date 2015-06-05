@@ -17,14 +17,16 @@ public class Spot {
     //private String _tileName;
     private Coordinates _geoCoord;
     private String _name;
+    private String _adress;
     private List<Coach> _coaches = new ArrayList<Coach>();
     private List<Partner> _partners = new ArrayList<Partner>() ;
     private boolean _favorite = false;
 
-    public Spot(int _id, Coordinates geoCoord, String _name) {
+    public Spot(int _id, Coordinates geoCoord, String _name, String _adress) {
         this._id = _id;
         this._geoCoord = geoCoord;
         this._name = _name;
+        this._adress = _adress;
     }
 
     /*
@@ -177,5 +179,11 @@ public class Spot {
         this._favorite = _favorite;
     }
 
+    public String adress() {
+        return _adress;
+    }
 
+    public void set_adress(String _adress) {
+        this._adress = _adress;
+    }
 }

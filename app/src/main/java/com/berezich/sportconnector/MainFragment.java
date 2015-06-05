@@ -25,7 +25,7 @@ public class MainFragment extends Fragment {
     };
     private static final String ARG_SECTION_NUMBER = "section_number";
     int _sectionNumber;
-    OnActionListener listener;
+    OnActionListenerMainFragment listener;
 
     /**
      * Returns a new instance of this fragment for the given section
@@ -59,7 +59,7 @@ public class MainFragment extends Fragment {
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         try {
-            listener = (OnActionListener) activity;
+            listener = (OnActionListenerMainFragment) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString() + " must implement OnActionListener for MainFragment");
         }
@@ -82,21 +82,21 @@ public class MainFragment extends Fragment {
             switch (btn.getId())
             {
                 case R.id.main_frg_btn1:
-                    listener.onBtnClick(Filters.SPARRING_PARTNERS,_sectionNumber);
+                    listener.onBtnClickMF(Filters.SPARRING_PARTNERS, _sectionNumber);
                     break;
                 case R.id.main_frg_btn2:
-                    listener.onBtnClick(Filters.COUCH,_sectionNumber);
+                    listener.onBtnClickMF(Filters.COUCH, _sectionNumber);
                     break;
                 case R.id.main_frg_btn3:
-                    listener.onBtnClick(Filters.COURT,_sectionNumber);
+                    listener.onBtnClickMF(Filters.COURT, _sectionNumber);
                     break;
             }
 
         }
     }
 
-    public static interface OnActionListener{
-        void onBtnClick(Filters position, int section);
+    public static interface OnActionListenerMainFragment {
+        void onBtnClickMF(Filters position, int section);
     }
 
 }

@@ -26,10 +26,11 @@ public class SpotMarker extends AbstractMarker {
     private int _numCoaches=0;
     private boolean _isFavorite=false;
 
-    public SpotMarker(String name,
+    public SpotMarker(int id, String name,
                        double latitude, double longitude,int numPartners, int numCoaches,
                        boolean isFavorite) {
         super(latitude, longitude);
+        set_id(id);
         setName(name);
         set_numPartners(numPartners);
         set_numCoaches(numCoaches);
@@ -241,5 +242,9 @@ public class SpotMarker extends AbstractMarker {
 
     public int id() {
         return _id;
+    }
+
+    public void set_id(int id) {
+        this._id = id;
     }
 }
