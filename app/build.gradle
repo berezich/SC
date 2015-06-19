@@ -4,8 +4,8 @@ android {
     signingConfigs {
         config {
             keyPassword 'Telepuziki101'
-            //storeFile file('D:/Development/Android/Android_Studio/sportConnector_key.jks')
-            storeFile file('C:/Andorid/Android_Studio_projects/sportConnector_key.jks')
+            storeFile file('D:/Development/Android/Android_Studio/sportConnector_key.jks')
+            //storeFile file('C:/Andorid/Android_Studio_projects/sportConnector_key.jks')
             storePassword 'Telepuziki101'
             keyAlias 'SportConnector_key'
         }
@@ -32,7 +32,8 @@ android {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.android.support:appcompat-v7:22.0.0'
     compile project(':library')
+    compile 'com.android.support:appcompat-v7:22.1.1'
     compile 'com.google.android.gms:play-services:7.3.0'
+    compile project(path: ':backend', configuration: 'android-endpoints')
 }
