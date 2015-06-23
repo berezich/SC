@@ -1,9 +1,11 @@
 package com.berezich.sportconnector.SpotInfo;
 
 import android.app.Activity;
+import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -13,6 +15,7 @@ import android.widget.ListView;
 import android.widget.TabHost;
 import android.widget.TextView;
 
+import com.berezich.sportconnector.EndpointAsyncTask;
 import com.berezich.sportconnector.GoogleMap.SpotsData;
 import com.berezich.sportconnector.R;
 import com.berezich.sportconnector.SportObjects.Person;
@@ -149,6 +152,7 @@ public class SpotInfoFragment extends Fragment {
                 txtView.setVisibility(View.VISIBLE);
             }
         }
+        new EndpointAsyncTask().execute(new Pair<Context, Long>(this.getActivity().getBaseContext(), new Long(1)));
         return spotInfoView;
     }
 
