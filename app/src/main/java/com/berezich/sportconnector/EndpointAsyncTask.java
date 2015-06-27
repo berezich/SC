@@ -23,13 +23,14 @@ import java.util.List;
  */
 public class EndpointAsyncTask extends AsyncTask<Pair<Context, Long>, Void, String> {
     //private static MyApi myApiService = null;
-    private  static PersonSrvApi personSrvApi = null;
+    //private  static PersonSrvApi personSrvApi = null;
     private Context context;
 
     @Override
     protected String doInBackground(Pair<Context, Long>... params) {
-        //if(myApiService == null) {  // Only do this once
+        /*
         if(personSrvApi == null) {  // Only do this once
+        */
             /*
             MyApi.Builder builder = new MyApi.Builder(AndroidHttp.newCompatibleTransport(),
                     new AndroidJsonFactory(), null)
@@ -44,14 +45,12 @@ public class EndpointAsyncTask extends AsyncTask<Pair<Context, Long>, Void, Stri
                         }
                     });
                     */
-            //MyApi.Builder builder = new MyApi.Builder(AndroidHttp.newCompatibleTransport(), new AndroidJsonFactory(), null)
+            //PersonSrvApi.Builder builder = new PersonSrvApi.Builder(AndroidHttp.newCompatibleTransport(), new AndroidJsonFactory(), null)
                     //.setRootUrl("https://sportconnector-981.appspot.com/_ah/api/");
-            PersonSrvApi.Builder builder = new PersonSrvApi.Builder(AndroidHttp.newCompatibleTransport(), new AndroidJsonFactory(), null)
-                    .setRootUrl("https://sportconnector-981.appspot.com/_ah/api/");
             // end options for devappserver
 
-            //myApiService = builder.build();
-            personSrvApi = builder.build();
+            //personSrvApi = builder.build();
+        /*
         }
 
         context = params[0].first;
@@ -72,6 +71,8 @@ public class EndpointAsyncTask extends AsyncTask<Pair<Context, Long>, Void, Stri
         } catch (IOException e) {
             return e.getMessage();
         }
+    */
+        return "";
     }
 
     @Override

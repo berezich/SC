@@ -152,7 +152,7 @@ public class SpotInfoFragment extends Fragment {
                 txtView.setVisibility(View.VISIBLE);
             }
         }
-        new EndpointAsyncTask().execute(new Pair<Context, Long>(this.getActivity().getBaseContext(), new Long(1)));
+        //new EndpointAsyncTask().execute(new Pair<Context, Long>(this.getActivity().getBaseContext(), new Long(1)));
         return spotInfoView;
     }
 

@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- From: file:/C:/Andorid/Android_Studio_projects/SportConnector/library/res/values/ids.xml -->
+    <!-- From: file:/C:/Users/Berezkin.TM-SERV/Documents/GitHub/SportConnector/library/res/values/ids.xml -->
     <eat-comment/>
     <item name="text" type="id"/>
-    <!-- From: file:/C:/Andorid/Android_Studio_projects/SportConnector/library/res/values/styles.xml -->
+    <!-- From: file:/C:/Users/Berezkin.TM-SERV/Documents/GitHub/SportConnector/library/res/values/styles.xml -->
     <eat-comment/>
     <style name="Bubble.TextAppearance.Dark" parent="android:TextAppearance.Medium">
         <item name="android:textSize">14sp</item>
