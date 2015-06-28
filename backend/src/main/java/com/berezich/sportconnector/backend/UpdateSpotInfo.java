@@ -1,7 +1,10 @@
 package com.berezich.sportconnector.backend;
 
+import com.googlecode.objectify.Ref;
 import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
+import com.googlecode.objectify.annotation.Index;
+import com.googlecode.objectify.annotation.Load;
 
 import java.util.Date;
 
@@ -10,46 +13,48 @@ import java.util.Date;
  */
 @Entity
 public class UpdateSpotInfo {
-    @Id
-    Long _id;
-    Long _regionId;
-    Long _spotId;
-    Date _udateDate;
+    @Id Long id;   //spotId
+    @Index Long regionId;
+    @Index Date updateDate;
+    @Load Ref<Spot> spot;
 
     public UpdateSpotInfo() {}
 
-    public UpdateSpotInfo(Long regionId, Long spotId, Date udateDate) {
-        _id = null;
-        _regionId = regionId;
-        _spotId = spotId;
-        _udateDate = udateDate;
+    public UpdateSpotInfo(Long spotId ,Long regionId, Date updateDate, Spot spot) {
+        this.id = spotId;
+        this.regionId = regionId;
+        this.updateDate = updateDate;
+        setSpot(spot);
     }
 
-    public Long id() {
-        return _id;
+    public Long getId() {
+        return id;
     }
 
-    public Date udateDate() {
-        return _udateDate;
+    public Long getRegionId() {
+        return regionId;
     }
 
-    public Long spotId() {
-        return _spotId;
+    public Date getUpdateDate() {
+        return updateDate;
     }
 
-    public void setSpotId(Long spotId) {
-        this._spotId = spotId;
+    public Spot getSpot() {
+        return spot.get();
     }
 
-    public void setUdateDate(Date udateDate) {
-        this._udateDate = udateDate;
+    public void setId(Long id) {
+        this.id = id;
     }
 
-    public Long regionId() {
-        return _regionId;
+    public void setUpdateDate(Date updateDate) {
+        this.updateDate = updateDate;
     }
-
     public void setRegionId(Long regionId) {
-        this._regionId = regionId;
+        this.regionId = regionId;
+    }
+
+    public void setSpot(Spot spot) {
+        this.spot = Ref.create(spot);
     }
 }

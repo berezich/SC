@@ -2,6 +2,7 @@ package com.berezich.sportconnector.backend;
 
 import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
+import com.googlecode.objectify.annotation.Index;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,69 +12,117 @@ import java.util.List;
  */
 @Entity
 public class Spot {
-    @Id
-    Long _id;
-    Long _regionId;
-    String _name;
-    String _description;
-    List<Long> _partnerLst = new ArrayList<Long>();
-    List<Long> _couchLst = new ArrayList<Long>();
-    boolean _favorite = false;
-    public Spot(){}
-
-    public Long id() {
-        return _id;
+    @Id Long id;
+    @Index Long regionId;
+    String name;
+    String address;
+    Coordinates coords;
+    String price;
+    String workHours;
+    String contact;
+    String description;
+    List<Long> partnerLst;
+    List<Long> couchLst;
+    List<Picture> pictureLst;
+    public Spot(){
+        pictureLst = new ArrayList<Picture>();
+        couchLst = new ArrayList<Long>();
+        partnerLst = new ArrayList<Long>();
     }
 
-    public String name() {
-        return _name;
+    public Long getId() {
+        return id;
     }
 
-    public String description() {
-        return _description;
+    public Long getRegionId() {
+        return regionId;
     }
 
-    public List<Long> partnerLst() {
-        return _partnerLst;
+    public String getName() {
+        return name;
     }
 
-    public List<Long> couchLst() {
-        return _couchLst;
+    public String getAddress() {
+        return address;
     }
 
-    public boolean isFavorite() {
-        return _favorite;
+    public Coordinates getCoords() {
+        return coords;
     }
 
-    private void setId(Long id) {
-        this._id = id;
+    public String getPrice() {
+        return price;
+    }
+
+    public String getWorkHours() {
+        return workHours;
+    }
+
+    public String getContact() {
+        return contact;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public List<Long> getPartnerLst() {
+        return partnerLst;
+    }
+
+    public List<Long> getCouchLst() {
+        return couchLst;
+    }
+
+    public List<Picture> getPictureLst() {
+        return pictureLst;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public void setName(String _name) {
-        this._name = _name;
+        this.name = _name;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public void setCoords(Coordinates coords) {
+        this.coords = coords;
+    }
+
+    public void setPrice(String price) {
+        this.price = price;
+    }
+
+    public void setWorkHours(String workHours) {
+        this.workHours = workHours;
+    }
+
+    public void setContact(String contact) {
+        this.contact = contact;
     }
 
     public void setDescription(String _description) {
-        this._description = _description;
+        this.description = _description;
     }
 
     public void setPartnerLst(List<Long> _partnerLst) {
-        this._partnerLst = _partnerLst;
+        this.partnerLst = _partnerLst;
     }
 
     public void setCouchLst(List<Long> _couchLst) {
-        this._couchLst = _couchLst;
-    }
-
-    public void setFavorite(boolean _favorite) {
-        this._favorite = _favorite;
-    }
-
-    public Long regionId() {
-        return _regionId;
+        this.couchLst = _couchLst;
     }
 
     public void setRegionId(Long regionId) {
-        this._regionId = regionId;
+        this.regionId = regionId;
+    }
+
+    public void setPictureLst(List<Picture> pictureLst) {
+        this.pictureLst = pictureLst;
     }
 }

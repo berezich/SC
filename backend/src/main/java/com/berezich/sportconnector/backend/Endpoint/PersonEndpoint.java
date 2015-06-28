@@ -4,6 +4,7 @@ import com.berezich.sportconnector.backend.Person;
 import com.google.api.server.spi.config.Api;
 import com.google.api.server.spi.config.ApiMethod;
 import com.google.api.server.spi.config.ApiNamespace;
+import com.google.api.server.spi.response.BadRequestException;
 import com.google.api.server.spi.response.CollectionResponse;
 import com.google.api.server.spi.response.NotFoundException;
 import com.google.appengine.api.datastore.Cursor;
@@ -13,6 +14,7 @@ import com.googlecode.objectify.cmd.Query;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import javax.annotation.Nullable;
@@ -51,19 +53,19 @@ public class PersonEndpoint {
     /**
      * Returns the {@link Person} with the corresponding ID.
      *
-     * @param _id the ID of the entity to be retrieved
+     * @param id the ID of the entity to be retrieved
      * @return the entity with the corresponding ID
      * @throws NotFoundException if there is no {@code Person} with the provided ID.
      */
     @ApiMethod(
             name = "getPerson",
-            path = "person/{_id}",
+            path = "person/{id}",
             httpMethod = ApiMethod.HttpMethod.GET)
-    public Person get(@Named("_id") int _id) throws NotFoundException {
-        logger.info("Getting Person with ID: " + _id);
-        Person person = ofy().load().type(Person.class).id(_id).now();
+    public Person get(@Named("id") Long id) throws NotFoundException {
+        logger.info("Getting Person with ID: " + id);
+        Person person = ofy().load().type(Person.class).id(id).now();
         if (person == null) {
-            throw new NotFoundException("Could not find Person with ID: " + _id);
+            throw new NotFoundException("Could not find Person with ID: " + id);
         }
         return person;
     }
@@ -75,12 +77,14 @@ public class PersonEndpoint {
             name = "insertPerson",
             path = "person",
             httpMethod = ApiMethod.HttpMethod.POST)
-    public Person insert(Person person) {
+    public Person insert(Person person) throws BadRequestException {
         // Typically in a RESTful API a POST does not have a known ID (assuming the ID is used in the resource path).
         // You should validate that person._id has not been set. If the ID type is not supported by the
         // Objectify ID generator, e.g. long or String, then you should generate the unique ID yourself prior to saving.
         //
         // If your client provides the ID then you should probably use PUT instead.
+        person.setId(null);
+        validatePersonProperties(person);
         ofy().save().entity(person).now();
         logger.info("Created Person.");
 
@@ -90,19 +94,21 @@ public class PersonEndpoint {
     /**
      * Updates an existing {@code Person}.
      *
-     * @param _id    the ID of the entity to be updated
+     * @param id    the ID of the entity to be updated
      * @param person the desired state of the entity
      * @return the updated version of the entity
-     * @throws NotFoundException if the {@code _id} does not correspond to an existing
+     * @throws NotFoundException if the {@code getId} does not correspond to an existing
      *                           {@code Person}
      */
     @ApiMethod(
             name = "updatePerson",
-            path = "person/{_id}",
+            path = "person/{id}",
             httpMethod = ApiMethod.HttpMethod.PUT)
-    public Person update(@Named("_id") int _id, Person person) throws NotFoundException {
+    public Person update(@Named("id") Long id, Person person) throws NotFoundException, BadRequestException {
         // TODO: You should validate your ID parameter against your resource's ID here.
-        checkExists(_id);
+        checkExists(id);
+        person.setId(id);
+        validatePersonProperties(person);
         ofy().save().entity(person).now();
         logger.info("Updated Person: " + person);
         return ofy().load().entity(person).now();
@@ -111,18 +117,18 @@ public class PersonEndpoint {
     /**
      * Deletes the specified {@code Person}.
      *
-     * @param _id the ID of the entity to delete
-     * @throws NotFoundException if the {@code _id} does not correspond to an existing
+     * @param id the ID of the entity to delete
+     * @throws NotFoundException if the {@code getId} does not correspond to an existing
      *                           {@code Person}
      */
     @ApiMethod(
             name = "removePerson",
-            path = "person/{_id}",
+            path = "person/{id}",
             httpMethod = ApiMethod.HttpMethod.DELETE)
-    public void remove(@Named("_id") int _id) throws NotFoundException {
-        checkExists(_id);
-        ofy().delete().type(Person.class).id(_id).now();
-        logger.info("Deleted Person with ID: " + _id);
+    public void remove(@Named("id") Long id) throws NotFoundException {
+        checkExists(id);
+        ofy().delete().type(Person.class).id(id).now();
+        logger.info("Deleted Person with ID: " + id);
     }
 
     /**
@@ -150,11 +156,31 @@ public class PersonEndpoint {
         return CollectionResponse.<Person>builder().setItems(personList).setNextPageToken(queryIterator.getCursor().toWebSafeString()).build();
     }
 
-    private void checkExists(int _id) throws NotFoundException {
+    @ApiMethod(
+            name = "listPersonByIdLst",
+            path = "personByIdLst",
+            httpMethod = ApiMethod.HttpMethod.GET)
+    public CollectionResponse<Person> listByIdLst(@Named("idLst") ArrayList<Long>idLst) {
+        Map<Long,Person> personMap = ofy().load().type(Person.class).ids(idLst);
+        return CollectionResponse.<Person>builder().setItems(personMap.values()).build();
+    }
+
+    private void checkExists(Long id) throws NotFoundException {
         try {
-            ofy().load().type(Person.class).id(_id).safe();
+            ofy().load().type(Person.class).id(id).safe();
         } catch (com.googlecode.objectify.NotFoundException e) {
-            throw new NotFoundException("Could not find Person with ID: " + _id);
+            throw new NotFoundException("Could not find Person with ID: " + id);
         }
+    }
+    private void validatePersonProperties(Person person) throws BadRequestException
+    {
+        if(person.getName()==null || person.getName().equals(""))
+            throw new BadRequestException("Name property must be initialized");
+        if(person.getSurname()==null || person.getSurname().equals(""))
+            throw new BadRequestException("Surname property must be initialized");
+        if(person.getAge()<=0)
+            throw new BadRequestException("Age property must be more than 0 years");
+        if(person.getType()==null)
+            throw new BadRequestException("Type property must be 'PARTNER' or 'COACH'");
     }
 }

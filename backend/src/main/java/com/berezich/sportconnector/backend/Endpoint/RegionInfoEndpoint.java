@@ -1,9 +1,12 @@
 package com.berezich.sportconnector.backend.Endpoint;
 
-import com.berezich.sportconnector.backend.StoreDataInfo;
+import com.berezich.sportconnector.backend.RegionInfo;
+import com.google.api.server.spi.config.AnnotationBoolean;
 import com.google.api.server.spi.config.Api;
 import com.google.api.server.spi.config.ApiMethod;
 import com.google.api.server.spi.config.ApiNamespace;
+import com.google.api.server.spi.config.ApiResourceProperty;
+import com.google.api.server.spi.response.BadRequestException;
 import com.google.api.server.spi.response.NotFoundException;
 import com.googlecode.objectify.ObjectifyService;
 
@@ -31,93 +34,107 @@ import static com.googlecode.objectify.ObjectifyService.ofy;
                 packagePath = ""
         )
 )
-public class StoreDataInfoEndpoint {
+public class RegionInfoEndpoint {
 
-    private static final Logger logger = Logger.getLogger(StoreDataInfoEndpoint.class.getName());
+    private static final Logger logger = Logger.getLogger(RegionInfoEndpoint.class.getName());
 
     private static final int DEFAULT_LIST_LIMIT = 20;
 
     static {
         // Typically you would register this inside an OfyServive wrapper. See: https://code.google.com/p/objectify-appengine/wiki/BestPractices
-        ObjectifyService.register(StoreDataInfo.class);
+        ObjectifyService.register(RegionInfo.class);
     }
 
     /**
-     * Returns the {@link StoreDataInfo} with the corresponding ID.
+     * Returns the {@link RegionInfo} with the corresponding ID.
      *
      * @param id the ID of the entity to be retrieved
      * @return the entity with the corresponding ID
      * @throws NotFoundException if there is no {@code StoreDataInfo} with the provided ID.
      */
     @ApiMethod(
-            name = "getStoreDataInfo",
-            path = "storeDataInfo/{id}",
+            name = "getRegionInfo",
+            path = "storeDataInfo/{getId}",
             httpMethod = ApiMethod.HttpMethod.GET)
-    public StoreDataInfo get(@Named("id") Long id) throws NotFoundException {
+    public RegionInfo get(@Named("getId") Long id) throws NotFoundException {
         logger.info("Getting StoreDataInfo with ID: " + id);
-        StoreDataInfo storeDataInfo = ofy().load().type(StoreDataInfo.class).id(id).now();
-        if (storeDataInfo == null) {
-            throw new NotFoundException("Could not find StoreDataInfo with ID: " + id);
+        RegionInfo regionInfo = ofy().load().type(RegionInfo.class).id(id).now();
+        if (regionInfo == null) {
+            throw new NotFoundException("Could not find RegionInfo with ID: " + id);
         }
-        return storeDataInfo;
+        return regionInfo;
     }
 
     /**
      * Inserts a new {@code StoreDataInfo}.
      */
     @ApiMethod(
-            name = "insertStoreDataInfo",
+            name = "insertRegionInfo",
             path = "storeDataInfo",
             httpMethod = ApiMethod.HttpMethod.POST)
-    public StoreDataInfo insert(StoreDataInfo storeDataInfo) throws InstanceAlreadyExists{
+    public RegionInfo insert(RegionInfo regionInfo) throws InstanceAlreadyExists, BadRequestException {
         // Typically in a RESTful API a POST does not have a known ID (assuming the ID is used in the resource path).
-        // You should validate that storeDataInfo.id has not been set. If the ID type is not supported by the
+        // You should validate that storeDataInfo.getId has not been set. If the ID type is not supported by the
         // Objectify ID generator, e.g. long or String, then you should generate the unique ID yourself prior to saving.
         //
         // If your client provides the ID then you should probably use PUT instead.
-        storeDataInfo.set_lastSpotUpdate(new Date());
-        ofy().save().entity(storeDataInfo).now();
-        logger.info("Created StoreDataInfo.");
+        validateRegionInfoProperties(regionInfo);
+        try {
+            checkExists(regionInfo.getId());
+            throw new InstanceAlreadyExists("RegionInfo with the same getId already exists");
+        } catch (NotFoundException e) {
+            regionInfo.setLastSpotUpdate(new Date());
+            if(regionInfo.getReleaseDate()==null)
+                regionInfo.setReleaseDate(new Date());
+            ofy().save().entity(regionInfo).now();
+            logger.info("Created RegionInfo getId:"+regionInfo.getId()+" getName:"+regionInfo.getRegionName()
+                    + " version:"+regionInfo.getVersion());
 
-        return ofy().load().entity(storeDataInfo).now();
+            return ofy().load().entity(regionInfo).now();
+        }
+
     }
 
     /**
      * Updates an existing {@code StoreDataInfo}.
      *
      * @param id            the ID of the entity to be updated
-     * @param storeDataInfo the desired state of the entity
+     * @param regionInfo the desired state of the entity
      * @return the updated version of the entity
-     * @throws NotFoundException if the {@code id} does not correspond to an existing
+     * @throws NotFoundException if the {@code getId} does not correspond to an existing
      *                           {@code StoreDataInfo}
      */
-    @ApiMethod(
-            name = "update",
-            path = "storeDataInfo/{id}",
+
+    /*@ApiMethod(
+            getName = "updateRegionInfo",
+            path = "storeRegionInfo/{getId}",
             httpMethod = ApiMethod.HttpMethod.PUT)
-    public StoreDataInfo update(@Named("id") Long id, StoreDataInfo storeDataInfo) throws NotFoundException {
+    */
+    @ApiResourceProperty(ignored = AnnotationBoolean.TRUE)
+    public RegionInfo update(@Named("id") Long id, RegionInfo regionInfo) throws NotFoundException, BadRequestException {
         // TODO: You should validate your ID parameter against your resource's ID here.
         checkExists(id);
-        ofy().save().entity(storeDataInfo).now();
-        logger.info("Updated StoreDataInfo: " + storeDataInfo);
-        return ofy().load().entity(storeDataInfo).now();
+        validateRegionInfoProperties(regionInfo);
+        ofy().save().entity(regionInfo).now();
+        logger.info("Updated RegionInfo: " + regionInfo);
+        return ofy().load().entity(regionInfo).now();
     }
     /**
      * Deletes the specified {@code StoreDataInfo}.
      *
-     * @param id the ID of the entity to delete
-     * @throws NotFoundException if the {@code id} does not correspond to an existing
+     * @param getId the ID of the entity to delete
+     * @throws NotFoundException if the {@code getId} does not correspond to an existing
      *                           {@code StoreDataInfo}
      */
     /*
     @ApiMethod(
-            name = "remove",
-            path = "storeDataInfo/{id}",
+            getName = "remove",
+            path = "storeDataInfo/{getId}",
             httpMethod = ApiMethod.HttpMethod.DELETE)
-    public void remove(@Named("id") Long id) throws NotFoundException {
-        checkExists(id);
-        ofy().delete().type(StoreDataInfo.class).id(id).now();
-        logger.info("Deleted StoreDataInfo with ID: " + id);
+    public void remove(@Named("getId") Long getId) throws NotFoundException {
+        checkExists(getId);
+        ofy().delete().type(StoreDataInfo.class).getId(getId).now();
+        logger.info("Deleted StoreDataInfo with ID: " + getId);
     }
     */
 
@@ -130,7 +147,7 @@ public class StoreDataInfoEndpoint {
      */
     /*
     @ApiMethod(
-            name = "list",
+            getName = "list",
             path = "storeDataInfo",
             httpMethod = ApiMethod.HttpMethod.GET)
     public CollectionResponse<StoreDataInfo> list(@Nullable @Named("cursor") String cursor, @Nullable @Named("limit") Integer limit) {
@@ -150,9 +167,18 @@ public class StoreDataInfoEndpoint {
 
     private void checkExists(Long id) throws NotFoundException {
         try {
-            ofy().load().type(StoreDataInfo.class).id(id).safe();
+            ofy().load().type(RegionInfo.class).id(id).safe();
         } catch (com.googlecode.objectify.NotFoundException e) {
-            throw new NotFoundException("Could not find StoreDataInfo with ID: " + id);
+            throw new NotFoundException("Could not find RegionInfo getId:" + id);
         }
+    }
+    private void validateRegionInfoProperties(RegionInfo regionInfo) throws BadRequestException
+    {
+        if(regionInfo.getId()==null)
+            throw new BadRequestException("Id property must be initialized");
+        if(regionInfo.getRegionName()==null || regionInfo.getRegionName().equals(""))
+            throw new BadRequestException("RegionName property must be initialized");
+        if(regionInfo.getVersion()==null || regionInfo.getVersion().equals(""))
+            throw new BadRequestException("Version property must be initialized");
     }
 }

@@ -13,7 +13,7 @@
         <servlet-class>com.google.api.server.spi.SystemServiceServlet</servlet-class>
         <init-param>
             <param-name>services</param-name>
-            <param-value>com.berezich.sportconnector.backend.Endpoint.StoreDataInfoEndpoint,
+            <param-value>com.berezich.sportconnector.backend.Endpoint.RegionInfoEndpoint,
                 com.berezich.sportconnector.backend.Endpoint.SpotEndpoint,
                 com.berezich.sportconnector.backend.Endpoint.UpdateSpotInfoEndpoint,
                 com.berezich.sportconnector.backend.Endpoint.PersonEndpoint</param-value>
