@@ -115,6 +115,66 @@ public class PersonEndpoint {
     }
 
     /**
+     * Updates an existing {@code Person}.
+     *
+     * @param lstPersonIds    the list of IDs of the entities to be added favorite spot
+     * @param spotId    the ID of the favorite spot
+     *
+     */
+    @ApiMethod(
+            name = "addPersonsFavoriteSpot",
+            path = "addPersonsFavoriteSpot",
+            httpMethod = ApiMethod.HttpMethod.PUT)
+    public void addPersonsFavoriteSpot(@Named("lstPersonIds") List<Long> idLst,@Named("spotId") Long spotId) {
+        // TODO: You should validate your ID parameter against your resource's ID here.
+        Person person;
+        for (int i = 0; i < idLst.size(); i++) {
+            Long id = idLst.get(i);
+            try {
+                checkExists(id);
+                person = ofy().load().type(Person.class).id(id).now();
+                if(person.getFavoriteSpotIdLst().add(spotId)) {
+                    ofy().save().entity(person).now();
+                    logger.info("Person with id:" + id + " add favorite spot id:" + spotId);
+                }
+            } catch (NotFoundException e) {
+                e.printStackTrace();
+                logger.info("Person with id:" + id + " not found to add favorite spot id:"+ spotId);
+            }
+        }
+    }
+
+    /**
+     * Updates an existing {@code Person}.
+     *
+     * @param lstPersonIds    the list of IDs of the entities to be removed favorite spot
+     * @param spotId    the ID of the favorite spot
+     *
+     */
+    @ApiMethod(
+            name = "removePersonsFavoriteSpot",
+            path = "removePersonsFavoriteSpot",
+            httpMethod = ApiMethod.HttpMethod.PUT)
+    public void removePersonsFavoriteSpot(@Named("lstPersonIds") List<Long> idLst,@Named("spotId") Long spotId) {
+        // TODO: You should validate your ID parameter against your resource's ID here.
+        Person person;
+        for (int i = 0; i < idLst.size(); i++) {
+            Long id = idLst.get(i);
+            try {
+                checkExists(id);
+                person = ofy().load().type(Person.class).id(id).now();
+                if(person.getFavoriteSpotIdLst().remove(spotId)) {
+                    ofy().save().entity(person).now();
+                    logger.info("Person with id:" + id + " add favorite spot id:" + spotId);
+                }
+            } catch (NotFoundException e) {
+                e.printStackTrace();
+                logger.info("Person with id:" + id + " not found to add favorite spot id:"+ spotId);
+            }
+        }
+    }
+
+    /**
      * Deletes the specified {@code Person}.
      *
      * @param id the ID of the entity to delete

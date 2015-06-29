@@ -23,9 +23,11 @@ public class Person {
     private String description;
     private TYPE type;
     private List<Picture> pictureLst;
+    private List<Long> favoriteSpotIdLst;
 
     public Person() {
         pictureLst = new ArrayList<Picture>();
+        favoriteSpotIdLst = new ArrayList<Long>();
     }
 
     public Person(String name, String surname, int age) {
@@ -70,6 +72,10 @@ public class Person {
         return type;
     }
 
+    public List<Long> getFavoriteSpotIdLst() {
+        return favoriteSpotIdLst;
+    }
+
     public void setId(Long id) {
         this.id = id;
     }
@@ -104,5 +110,9 @@ public class Person {
 
     public void setPictureLst(List<Picture> pictureLst) {
         this.pictureLst = pictureLst;
+    }
+
+    public void setFavoriteSpotIdLst(List<Long> favoriteSpotIdLst) {
+        this.favoriteSpotIdLst = favoriteSpotIdLst;
     }
 }

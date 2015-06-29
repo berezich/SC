@@ -1,5 +1,6 @@
 package com.berezich.sportconnector.backend.Endpoint;
 
+import com.berezich.sportconnector.backend.Person;
 import com.berezich.sportconnector.backend.Spot;
 import com.berezich.sportconnector.backend.RegionInfo;
 import com.berezich.sportconnector.backend.UpdateSpotInfo;
@@ -95,6 +96,7 @@ public class SpotEndpoint {
         Spot spotRes = ofy().load().entity(spot).now();
         logger.info("Created Spot getId:" + spotRes.getId() + " getName:" + spotRes.getName());
         setSpotUpdateInstance(spotRes);
+        setFavoritePersonsSpot(spotRes,null);
         return spotRes;
     }
 
@@ -113,16 +115,15 @@ public class SpotEndpoint {
             httpMethod = ApiMethod.HttpMethod.PUT)
     public Spot update(@Named("getId") Long id, Spot spot) throws NotFoundException, BadRequestException {
         // TODO: You should validate your ID parameter against your resource's ID here.
-        checkExists(id);
+        Spot oldSpot = ofy().load().type(Spot.class).id(id).now();
         spot.setId(id);
         validateSpotProperties(spot);
         updateRegionInfoAboutSpot(spot);
         ofy().save().entity(spot).now();
-        //logger.info("Updated Spot: " + spot);
         Spot resSpot = ofy().load().entity(spot).now();
         logger.info("Updated Spot getId:" + resSpot.getId() + " getName:" + resSpot.getName());
-
         setSpotUpdateInstance(resSpot);
+        setFavoritePersonsSpot(resSpot,oldSpot);
         return resSpot;
     }
 
@@ -181,7 +182,7 @@ public class SpotEndpoint {
             httpMethod = ApiMethod.HttpMethod.GET)
     public CollectionResponse<Spot> listByRegId(@Named("regionId") Long regionId, @Nullable @Named("cursor") String cursor, @Nullable @Named("limit") Integer limit) {
         limit = limit == null ? DEFAULT_LIST_LIMIT : limit;
-        Query<Spot> query = ofy().load().type(Spot.class).filter("regionId",regionId).limit(limit);
+        Query<Spot> query = ofy().load().type(Spot.class).filter("regionId", regionId).limit(limit);
         if (cursor != null) {
             query = query.startAt(Cursor.fromWebSafeString(cursor));
         }
@@ -239,7 +240,48 @@ public class SpotEndpoint {
             e.printStackTrace();
             logger.info(e.getMessage());
         }
+    }
 
+    private void setFavoritePersonsSpot(Spot spot, Spot oldSpot)
+    {
+        List<Long> addPersonLst = new ArrayList<Long>();
+        List<Long> removePersonLst = new ArrayList<Long>();
+        List<Long> newCoaches = spot.getCouchLst();
+        List<Long> newPartners = spot.getPartnerLst();
+        List<Long> oldCoaches;
+        List<Long> oldPartners;
+
+        List<Long> oldies = new ArrayList<Long>();
+        List<Long> news = new ArrayList<Long>();
+
+        if (newCoaches != null)
+            news.addAll(newCoaches);
+        if (newPartners != null)
+            news.addAll(newPartners);
+
+        if(oldSpot!=null) {
+            oldCoaches = oldSpot.getCouchLst();
+            oldPartners = oldSpot.getPartnerLst();
+
+            if (oldCoaches != null)
+                oldies.addAll(oldCoaches);
+            if (oldPartners != null)
+                oldies.addAll(oldPartners);
+
+
+            addPersonLst = new ArrayList<Long>(news);
+            addPersonLst.removeAll(oldies);
+            removePersonLst = new ArrayList<Long>(oldies);
+            removePersonLst.removeAll(news);
+        }
+        else
+            addPersonLst = news;
+
+        if(addPersonLst.size()>0)
+            new PersonEndpoint().addPersonsFavoriteSpot(addPersonLst,spot.getId());
+
+        if(removePersonLst.size()>0)
+            new PersonEndpoint().removePersonsFavoriteSpot(removePersonLst, spot.getId());
     }
     private void validateSpotProperties(Spot spot)throws BadRequestException
     {
