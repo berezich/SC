@@ -22,8 +22,6 @@ import java.util.logging.Logger;
 
 import javax.inject.Named;
 
-import jdk.nashorn.internal.ir.annotations.Ignore;
-
 import static com.googlecode.objectify.ObjectifyService.ofy;
 
 /**

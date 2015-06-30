@@ -1,9 +1,11 @@
 package com.berezich.sportconnector.backend.Endpoint;
 
 import com.berezich.sportconnector.backend.Person;
+import com.google.api.server.spi.config.AnnotationBoolean;
 import com.google.api.server.spi.config.Api;
 import com.google.api.server.spi.config.ApiMethod;
 import com.google.api.server.spi.config.ApiNamespace;
+import com.google.api.server.spi.config.ApiResourceProperty;
 import com.google.api.server.spi.response.BadRequestException;
 import com.google.api.server.spi.response.CollectionResponse;
 import com.google.api.server.spi.response.NotFoundException;
@@ -87,8 +89,9 @@ public class PersonEndpoint {
         validatePersonProperties(person);
         ofy().save().entity(person).now();
         logger.info("Created Person.");
-
-        return ofy().load().entity(person).now();
+        Person personRes = ofy().load().entity(person).now();
+        setSpotCoachesPartners(personRes,null);
+        return personRes;
     }
 
     /**
@@ -106,25 +109,21 @@ public class PersonEndpoint {
             httpMethod = ApiMethod.HttpMethod.PUT)
     public Person update(@Named("id") Long id, Person person) throws NotFoundException, BadRequestException {
         // TODO: You should validate your ID parameter against your resource's ID here.
-        checkExists(id);
+        Person oldPerson = ofy().load().type(Person.class).id(id).now();
+        if(oldPerson==null)
+            throw  new NotFoundException("Person with id:" + id + " not found");
+        if(oldPerson.getType()!=person.getType())
+            throw new BadRequestException("Person with id:" + id + " has already another type = "+oldPerson.getType());
         person.setId(id);
         validatePersonProperties(person);
         ofy().save().entity(person).now();
         logger.info("Updated Person: " + person);
-        return ofy().load().entity(person).now();
+        Person personRes = ofy().load().entity(person).now();
+        setSpotCoachesPartners(personRes,oldPerson);
+        return personRes;
     }
 
-    /**
-     * Updates an existing {@code Person}.
-     *
-     * @param lstPersonIds    the list of IDs of the entities to be added favorite spot
-     * @param spotId    the ID of the favorite spot
-     *
-     */
-    @ApiMethod(
-            name = "addPersonsFavoriteSpot",
-            path = "addPersonsFavoriteSpot",
-            httpMethod = ApiMethod.HttpMethod.PUT)
+    @ApiResourceProperty(ignored = AnnotationBoolean.TRUE)
     public void addPersonsFavoriteSpot(@Named("lstPersonIds") List<Long> idLst,@Named("spotId") Long spotId) {
         // TODO: You should validate your ID parameter against your resource's ID here.
         Person person;
@@ -144,17 +143,8 @@ public class PersonEndpoint {
         }
     }
 
-    /**
-     * Updates an existing {@code Person}.
-     *
-     * @param lstPersonIds    the list of IDs of the entities to be removed favorite spot
-     * @param spotId    the ID of the favorite spot
-     *
-     */
-    @ApiMethod(
-            name = "removePersonsFavoriteSpot",
-            path = "removePersonsFavoriteSpot",
-            httpMethod = ApiMethod.HttpMethod.PUT)
+
+    @ApiResourceProperty(ignored = AnnotationBoolean.TRUE)
     public void removePersonsFavoriteSpot(@Named("lstPersonIds") List<Long> idLst,@Named("spotId") Long spotId) {
         // TODO: You should validate your ID parameter against your resource's ID here.
         Person person;
@@ -242,5 +232,36 @@ public class PersonEndpoint {
             throw new BadRequestException("Age property must be more than 0 years");
         if(person.getType()==null)
             throw new BadRequestException("Type property must be 'PARTNER' or 'COACH'");
+    }
+
+    private void setSpotCoachesPartners(Person person, Person oldPerson)
+    {
+        List<Long> addSpotLst = new ArrayList<Long>();
+        List<Long> removeSpotLst = new ArrayList<Long>();
+
+        List<Long> oldies = new ArrayList<Long>();
+        List<Long> news = new ArrayList<Long>();
+
+        if (person.getFavoriteSpotIdLst() != null)
+            news.addAll(person.getFavoriteSpotIdLst());
+
+
+        if(oldPerson !=null) {
+            if (oldPerson.getFavoriteSpotIdLst() != null)
+                oldies.addAll(oldPerson.getFavoriteSpotIdLst());
+
+            addSpotLst = new ArrayList<Long>(news);
+            addSpotLst.removeAll(oldies);
+            removeSpotLst = new ArrayList<Long>(oldies);
+            removeSpotLst.removeAll(news);
+        }
+        else
+            addSpotLst = news;
+
+        if(addSpotLst.size()>0)
+            new SpotEndpoint().addPersonsToSpots(addSpotLst, person.getType(), person.getId());
+
+        if(removeSpotLst.size()>0)
+            new SpotEndpoint().removePersonsFromSpots(removeSpotLst, person.getType(), person.getId());
     }
 }

@@ -4,9 +4,11 @@ import com.berezich.sportconnector.backend.Person;
 import com.berezich.sportconnector.backend.Spot;
 import com.berezich.sportconnector.backend.RegionInfo;
 import com.berezich.sportconnector.backend.UpdateSpotInfo;
+import com.google.api.server.spi.config.AnnotationBoolean;
 import com.google.api.server.spi.config.Api;
 import com.google.api.server.spi.config.ApiMethod;
 import com.google.api.server.spi.config.ApiNamespace;
+import com.google.api.server.spi.config.ApiResourceProperty;
 import com.google.api.server.spi.response.BadRequestException;
 import com.google.api.server.spi.response.CollectionResponse;
 import com.google.api.server.spi.response.NotFoundException;
@@ -113,18 +115,74 @@ public class SpotEndpoint {
             name = "updateSpot",
             path = "spot/{getId}",
             httpMethod = ApiMethod.HttpMethod.PUT)
-    public Spot update(@Named("getId") Long id, Spot spot) throws NotFoundException, BadRequestException {
+    public Spot update(@Named("id") Long id, Spot spot) throws NotFoundException, BadRequestException {
         // TODO: You should validate your ID parameter against your resource's ID here.
         Spot oldSpot = ofy().load().type(Spot.class).id(id).now();
+        if(oldSpot==null)
+            throw new NotFoundException("Spot with id:"+id+" not found");
         spot.setId(id);
         validateSpotProperties(spot);
         updateRegionInfoAboutSpot(spot);
         ofy().save().entity(spot).now();
         Spot resSpot = ofy().load().entity(spot).now();
-        logger.info("Updated Spot getId:" + resSpot.getId() + " getName:" + resSpot.getName());
+        logger.info("Updated Spot id:" + resSpot.getId() + " getName:" + resSpot.getName());
         setSpotUpdateInstance(resSpot);
         setFavoritePersonsSpot(resSpot,oldSpot);
         return resSpot;
+    }
+
+
+    @ApiResourceProperty(ignored = AnnotationBoolean.TRUE)
+    public void removePersonsFromSpots(@Named("lstSpotIds") List<Long> idLst, @Named("personType")Person.TYPE type,@Named("personId") Long personId) {
+        // TODO: You should validate your ID parameter against your resource's ID here.
+        Spot spot;
+        List<Long> personLst;
+        for (int i = 0; i < idLst.size(); i++) {
+            Long id = idLst.get(i);
+            try {
+                checkExists(id);
+                spot = ofy().load().type(Spot.class).id(id).now();
+                if(type == Person.TYPE.COACH)
+                    personLst = spot.getCouchLst();
+                else
+                    personLst = spot.getPartnerLst();
+                if(personLst.remove(personId)) {
+                    ofy().save().entity(spot).now();
+                    updateRegionInfoAboutSpot(spot);
+                    setSpotUpdateInstance(spot);
+                    logger.info("Person(id:" + id +" type:"+ type + ") was removed from spot(id:" + personId+")");
+                }
+            } catch (NotFoundException e) {
+                e.printStackTrace();
+                logger.info("Person(id:" + id + ") not found to add favorite spot(id:"+ personId+")");
+            }
+        }
+    }
+    @ApiResourceProperty(ignored = AnnotationBoolean.TRUE)
+    public void addPersonsToSpots(@Named("lstSpotIds") List<Long> idLst, @Named("personType")Person.TYPE type,@Named("personId") Long personId) {
+        // TODO: You should validate your ID parameter against your resource's ID here.
+        Spot spot;
+        List<Long> personLst;
+        for (int i = 0; i < idLst.size(); i++) {
+            Long id = idLst.get(i);
+            try {
+                checkExists(id);
+                spot = ofy().load().type(Spot.class).id(id).now();
+                if(type == Person.TYPE.COACH)
+                    personLst = spot.getCouchLst();
+                else
+                    personLst = spot.getPartnerLst();
+                if(personLst.add(personId)) {
+                    ofy().save().entity(spot).now();
+                    updateRegionInfoAboutSpot(spot);
+                    setSpotUpdateInstance(spot);
+                    logger.info("Person(id:" + id +" type:"+ type + ") was added to spot(id:" + personId+")");
+                }
+            } catch (NotFoundException e) {
+                e.printStackTrace();
+                logger.info("Person(id:" + id + ") not found to added favorite spot(id:"+ personId+")");
+            }
+        }
     }
 
     /**
