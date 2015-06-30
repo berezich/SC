@@ -143,7 +143,7 @@ public class SpotEndpoint {
                 checkExists(id);
                 spot = ofy().load().type(Spot.class).id(id).now();
                 if(type == Person.TYPE.COACH)
-                    personLst = spot.getCouchLst();
+                    personLst = spot.getCoachLst();
                 else
                     personLst = spot.getPartnerLst();
                 if(personLst.remove(personId)) {
@@ -169,7 +169,7 @@ public class SpotEndpoint {
                 checkExists(id);
                 spot = ofy().load().type(Spot.class).id(id).now();
                 if(type == Person.TYPE.COACH)
-                    personLst = spot.getCouchLst();
+                    personLst = spot.getCoachLst();
                 else
                     personLst = spot.getPartnerLst();
                 if(personLst.add(personId)) {
@@ -304,7 +304,7 @@ public class SpotEndpoint {
     {
         List<Long> addPersonLst = new ArrayList<Long>();
         List<Long> removePersonLst = new ArrayList<Long>();
-        List<Long> newCoaches = spot.getCouchLst();
+        List<Long> newCoaches = spot.getCoachLst();
         List<Long> newPartners = spot.getPartnerLst();
         List<Long> oldCoaches;
         List<Long> oldPartners;
@@ -318,7 +318,7 @@ public class SpotEndpoint {
             news.addAll(newPartners);
 
         if(oldSpot!=null) {
-            oldCoaches = oldSpot.getCouchLst();
+            oldCoaches = oldSpot.getCoachLst();
             oldPartners = oldSpot.getPartnerLst();
 
             if (oldCoaches != null)

@@ -15,7 +15,7 @@ import android.widget.ListView;
 import android.widget.TabHost;
 import android.widget.TextView;
 
-import com.berezich.sportconnector.EndpointAsyncTask;
+import com.berezich.sportconnector.EndpointApi;
 import com.berezich.sportconnector.GoogleMap.SpotsData;
 import com.berezich.sportconnector.R;
 import com.berezich.sportconnector.SportObjects.Person;
@@ -152,7 +152,7 @@ public class SpotInfoFragment extends Fragment {
                 txtView.setVisibility(View.VISIBLE);
             }
         }
-        //new EndpointAsyncTask().execute(new Pair<Context, Long>(this.getActivity().getBaseContext(), new Long(1)));
+        new EndpointApi.GetRegionAsyncTask().execute(new Pair<Context, Long>(this.getActivity().getBaseContext(), new Long(1)));
         return spotInfoView;
     }
 

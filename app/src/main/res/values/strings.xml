@@ -42,5 +42,8 @@
     <string name="action_example">Example action</string>
 
     <string name="action_settings">Settings</string>
+    
+    <!-- srvApi-->
+    <string name="srvApi_url">https://sportconnector-981.appspot.com/_ah/api/</string>
 
 </resources>

@@ -22,11 +22,11 @@ public class Spot {
     String contact;
     String description;
     List<Long> partnerLst;
-    List<Long> couchLst;
+    List<Long> coachLst;
     List<Picture> pictureLst;
     public Spot(){
         pictureLst = new ArrayList<Picture>();
-        couchLst = new ArrayList<Long>();
+        coachLst = new ArrayList<Long>();
         partnerLst = new ArrayList<Long>();
     }
 
@@ -70,8 +70,8 @@ public class Spot {
         return partnerLst;
     }
 
-    public List<Long> getCouchLst() {
-        return couchLst;
+    public List<Long> getCoachLst() {
+        return coachLst;
     }
 
     public List<Picture> getPictureLst() {
@@ -114,8 +114,8 @@ public class Spot {
         this.partnerLst = _partnerLst;
     }
 
-    public void setCouchLst(List<Long> _couchLst) {
-        this.couchLst = _couchLst;
+    public void setCoachLst(List<Long> _couchLst) {
+        this.coachLst = _couchLst;
     }
 
     public void setRegionId(Long regionId) {
