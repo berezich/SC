@@ -5,6 +5,7 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -14,15 +15,22 @@ import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TabHost;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.berezich.sportconnector.EndpointApi;
 import com.berezich.sportconnector.GoogleMap.SpotsData;
 import com.berezich.sportconnector.R;
 import com.berezich.sportconnector.SportObjects.Person;
 import com.berezich.sportconnector.SportObjects.Spot;
+import com.berezich.sportconnector.backend.sportConnectorApi.model.RegionInfo;
+import com.berezich.sportconnector.backend.sportConnectorApi.model.UpdateSpotInfo;
+import com.google.api.client.util.DateTime;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
+import java.util.TimeZone;
 
 
 /**
@@ -33,12 +41,16 @@ import java.util.HashMap;
  * Use the {@link SpotInfoFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class SpotInfoFragment extends Fragment {
+public class SpotInfoFragment extends Fragment implements EndpointApi.GetRegionAsyncTask.OnGetRegionAsyncTaskAction,
+                                                          EndpointApi.GetSpotListAsyncTask.OnAction,
+                                                          EndpointApi.GetUpdatedSpotListAsyncTask.OnAction
+{
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_SPOT_ID = "spotId";
     private static final  String TAB_PARTNERS = "partners";
     private static final  String TAB_COACHES = "coaches";
+    private static final String TAG = "SpotInfoFragment";
     // TODO: Rename and change types of parameters
     private int spotId;
     private boolean isFavoriteChanged=false;
@@ -152,7 +164,9 @@ public class SpotInfoFragment extends Fragment {
                 txtView.setVisibility(View.VISIBLE);
             }
         }
-        new EndpointApi.GetRegionAsyncTask().execute(new Pair<Context, Long>(this.getActivity().getBaseContext(), new Long(1)));
+        //new EndpointApi.GetRegionAsyncTask(this).execute(new Long(1));
+        //new EndpointApi.GetSpotListAsyncTask(this).execute(new Long(1));
+        new EndpointApi.GetUpdatedSpotListAsyncTask(this).execute(new Pair<Long, DateTime>(new Long(1), new DateTime(new Date(new Date().getTime()-10*24*60*60*1000), TimeZone.getDefault())));
         return spotInfoView;
     }
 
@@ -216,5 +230,52 @@ public class SpotInfoFragment extends Fragment {
             }
             return true;
         }
+    }
+
+    @Override
+    public void onGetRegionAsyncTaskFinish(Pair<RegionInfo,Exception> result) {
+        String resText="";
+        if(result.second!=null)
+            resText = result.second.getMessage();
+        else if(result.first!=null)
+            resText = result.first.toString();
+
+        Toast.makeText(this.getActivity().getBaseContext(), resText, Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void onGetSpotListFinish(Pair<List<com.berezich.sportconnector.backend.sportConnectorApi.model.Spot>, Exception> result) {
+        List<com.berezich.sportconnector.backend.sportConnectorApi.model.Spot> spotLst;
+        String resText="";
+        if(result.second!=null)
+            resText = result.second.getMessage();
+        else if(result.first!=null) {
+            spotLst = result.first;
+            com.berezich.sportconnector.backend.sportConnectorApi.model.Spot spot;
+            for(int i=0; i<spotLst.size(); i++) {
+                spot = spotLst.get(i);
+                resText+= spot.toString()+"\n";
+            }
+        }
+
+        Toast.makeText(this.getActivity().getBaseContext(), resText, Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void onGetUpdateSpotListFinish(Pair<List<UpdateSpotInfo>, Exception> result) {
+        List<UpdateSpotInfo> updateSpotInfoList;
+        String resText="";
+        if(result.second!=null)
+            resText = result.second.getMessage();
+        else if(result.first!=null) {
+            updateSpotInfoList = result.first;
+            UpdateSpotInfo updateSpotInfo;
+            for(int i=0; i<updateSpotInfoList.size(); i++) {
+                updateSpotInfo = updateSpotInfoList.get(i);
+                resText+= updateSpotInfo.toString()+"\n";
+            }
+        }
+        Toast.makeText(this.getActivity().getBaseContext(), resText, Toast.LENGTH_LONG).show();
+        Log.d(TAG,resText);
     }
 }

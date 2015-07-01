@@ -125,4 +125,9 @@ public class Spot {
     public void setPictureLst(List<Picture> pictureLst) {
         this.pictureLst = pictureLst;
     }
+
+    @Override
+    public String toString() {
+        return String.format("id:%d name:%s",id,name);
+    }
 }
