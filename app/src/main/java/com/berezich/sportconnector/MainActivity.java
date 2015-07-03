@@ -4,6 +4,7 @@ import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBar;
 import android.support.v4.app.FragmentManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.support.v4.widget.DrawerLayout;
@@ -12,7 +13,7 @@ import com.berezich.sportconnector.GoogleMap.GoogleMapFragment;
 import com.berezich.sportconnector.MainFragment.Filters;
 import com.berezich.sportconnector.SpotInfo.SpotInfoFragment;
 
-
+import java.io.IOException;
 
 
 public class MainActivity extends ActionBarActivity
@@ -35,7 +36,12 @@ public class MainActivity extends ActionBarActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        LocalDataManager.loadRegionInfoFromStorage();
+        try {
+            LocalDataManager.loadRegionInfoFromStorage();
+        } catch (IOException e) {
+            e.printStackTrace();
+            Log.e(TAG,"ERROR Loading loadRegionInfoFromStorage" );
+        }
 
         mNavigationDrawerFragment = (NavigationDrawerFragment)
                 getSupportFragmentManager().findFragmentById(R.id.navigation_drawer);
