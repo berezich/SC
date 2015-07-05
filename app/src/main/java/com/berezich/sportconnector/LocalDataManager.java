@@ -1,13 +1,14 @@
 package com.berezich.sportconnector;
 
+import android.app.Activity;
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
 import com.berezich.sportconnector.backend.sportConnectorApi.model.RegionInfo;
-import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.gson.GsonFactory;
-import com.google.api.client.util.DateTime;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 
 import java.io.IOException;
 
@@ -15,82 +16,89 @@ import java.io.IOException;
  * Created by berezkin on 01.07.2015.
  */
 public class LocalDataManager {
+    public enum DB_TYPE{READ, WRITE}
     private static final String TAG = "LocalDataManager";
     private static RegionInfo regionInfo;
-    private static RegInf regInf;
-    private static GsonBuilder builder = null;
-    private static Gson gson = null;
-    public static void loadRegionInfoFromStorage()throws IOException
+    private static final String RINFO_KEY = "REGION_INFO";
+    private static final String SPOT_TABLE_NAME = "spotTable";
+    private static final String DB_NAME = "sportConnectorDB";
+    private static DBHelper dbHelper = null;
+
+    //private static GsonBuilder builder = null;
+    private static GsonFactory gsonFactory = new GsonFactory();;
+    public static boolean loadRegionInfoFromPref(Activity activity)throws IOException
     {
         String urlRegionInfo="";
-        if(builder==null) {
-            builder = new GsonBuilder();
-            builder.setPrettyPrinting().serializeNulls();
-            gson = builder.create();
-        }
         regionInfo = new RegionInfo();
         regionInfo.setId(new Long(1));
         regionInfo.setRegionName("moscow");
 
-        //urlRegionInfo = gson.toJson(regionInfo);
+        /*if(gsonFactory!=null)
+            gsonFactory = new GsonFactory();*/
 
-        GsonFactory factory= new GsonFactory();
-        urlRegionInfo = factory.toString(regionInfo);
+        SharedPreferences sp = activity.getPreferences(Context.MODE_PRIVATE);
+        String regionInfoStr = sp.getString(RINFO_KEY, "");
+        if(regionInfoStr.equals(""))
+            return false;
+        regionInfo = gsonFactory.fromString(regionInfoStr,RegionInfo.class);
+        Log.d(TAG, "fromJson:" + regionInfo.toString());
+        return true;
 
-        Log.d(TAG,"toJson:"+urlRegionInfo);
-
-        //regionInfo = gson.fromJson(urlRegionInfo, RegionInfo.class);
-        regionInfo = factory.fromString(urlRegionInfo,RegionInfo.class);
-        Log.d(TAG,"fromJson:"+regionInfo.toString());
-
-        /*regInf = new RegInf();
-        regInf.setId(new Long(1));
-        regInf.setName("moscow");
-        urlRegionInfo = gson.toJson(regInf);
-        Log.d(TAG,"toJson:"+urlRegionInfo);
-
-        regInf = gson.fromJson(urlRegionInfo, RegInf.class);
-        Log.d(TAG, "fromJson:" + regInf.toString());*/
     }
-    static class RegInf{
-        Long id;
-        DateTime update;
-        String name;
-        String version;
 
-        public RegInf() {
+    public static void saveRegionInfoToPref(Activity activity)throws IOException {
+        saveRegionInfoToPref(regionInfo,activity );
+    }
+    public static void saveRegionInfoToPref(RegionInfo regionInfo,Activity activity)throws IOException
+    {
+        /*if(gsonFactory!=null)
+            gsonFactory = new GsonFactory();*/
+
+        SharedPreferences sp = activity.getPreferences(Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sp.edit();
+        editor.putString(RINFO_KEY, gsonFactory.toString(regionInfo));
+        editor.commit();
+    }
+
+    public static RegionInfo getRegionInfo() {
+        return regionInfo;
+    }
+
+    private static class DBHelper extends SQLiteOpenHelper
+    {
+        public DBHelper(Context context) {
+            // конструктор суперкласса
+            super(context,DB_NAME , null, 1);
         }
 
-        public Long getId() {
-            return id;
+        @Override
+        public void onCreate(SQLiteDatabase db) {
+            Log.d(TAG, "--- onCreate database ---");
+            // создаем таблицу с полями
+            db.execSQL("create table "+SPOT_TABLE_NAME+" ("
+                    + "id integer primary key,"
+                    + "spotId integer,"
+                    + "regionId integer);");
         }
 
-        public DateTime getUpdate() {
-            return update;
-        }
+        @Override
+        public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 
-        public String getName() {
-            return name;
         }
+    }
 
-        public String getVersion() {
-            return version;
-        }
+    private static DBHelper getDbHelper(Context context) {
+        if(dbHelper==null)
+            dbHelper = new DBHelper(context);
+        return dbHelper;
+    }
 
-        public void setId(Long id) {
-            this.id = id;
-        }
-
-        public void setUpdate(DateTime update) {
-            this.update = update;
-        }
-
-        public void setName(String name) {
-            this.name = name;
-        }
-
-        public void setVersion(String version) {
-            this.version = version;
-        }
+    public static SQLiteDatabase getDB(Context context,DB_TYPE type)
+    {
+        if(type==DB_TYPE.READ)
+            return getDbHelper(context).getReadableDatabase();
+        else if(type==DB_TYPE.WRITE)
+            return getDbHelper(context).getWritableDatabase();
+        return null;
     }
 }

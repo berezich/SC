@@ -5,20 +5,26 @@ import android.support.v7.app.ActionBar;
 import android.support.v4.app.FragmentManager;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.Pair;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.support.v4.widget.DrawerLayout;
+import android.widget.Toast;
 
 import com.berezich.sportconnector.GoogleMap.GoogleMapFragment;
 import com.berezich.sportconnector.MainFragment.Filters;
 import com.berezich.sportconnector.SpotInfo.SpotInfoFragment;
+import com.berezich.sportconnector.backend.sportConnectorApi.model.RegionInfo;
+import com.google.api.client.util.DateTime;
 
 import java.io.IOException;
+import java.util.Date;
 
 
 public class MainActivity extends ActionBarActivity
         implements NavigationDrawerFragment.NavigationDrawerCallbacks,
-        MainFragment.OnActionListenerMainFragment, GoogleMapFragment.OnActionListenerGMapFragment {
+        MainFragment.OnActionListenerMainFragment, GoogleMapFragment.OnActionListenerGMapFragment,
+        EndpointApi.GetRegionAsyncTask.OnGetRegionAsyncTaskAction{
 
     /**
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
@@ -30,18 +36,27 @@ public class MainActivity extends ActionBarActivity
      */
     private CharSequence mTitle;
     private static final String TAG = "YaMapFragment";
+    private static Long regionId = new Long(1);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        /*
+        RegionInfo regionInfo = new RegionInfo();
+        regionInfo.setId(regionId);
+        regionInfo.setVersion("1.0.0.1");
+        regionInfo.setLastSpotUpdate(new DateTime(new Date().getTime()-24*6*60*60*1000));
+        regionInfo.setRegionName("moscow");
         try {
-            LocalDataManager.loadRegionInfoFromStorage();
+            LocalDataManager.saveRegionInfoToPref(regionInfo,this);
         } catch (IOException e) {
             e.printStackTrace();
-            Log.e(TAG,"ERROR Loading loadRegionInfoFromStorage" );
         }
+        */
+
+        new EndpointApi.GetRegionAsyncTask(this).execute(regionId);
 
         mNavigationDrawerFragment = (NavigationDrawerFragment)
                 getSupportFragmentManager().findFragmentById(R.id.navigation_drawer);
@@ -139,6 +154,47 @@ public class MainActivity extends ActionBarActivity
         //fragmentManager.beginTransaction().replace(R.id.container, new YaMapFragment().setArgs(sectionNumber,filter)).commit();
         //fragmentManager.beginTransaction().replace(R.id.container, new GoogleMapFragment().setArgs(sectionNumber,filter)).commit();
         fragmentManager.beginTransaction().replace(R.id.container, SpotInfoFragment.newInstance(spotId)).addToBackStack("tr2").commit();
+
+    }
+
+    @Override
+    public void onGetRegionAsyncTaskFinish(Pair<RegionInfo, Exception> result) {
+        String resText="";
+        Exception error = result.second;
+        RegionInfo regionInfo=result.first, localRegionInfo = null;
+        if(error!=null)
+            resText = result.second.getMessage();
+        else if(regionInfo!=null)
+            resText = result.first.toString();
+
+        Toast.makeText(getBaseContext(), resText, Toast.LENGTH_LONG).show();
+
+        if(error==null && regionInfo!=null)
+        {
+            try {
+                if(LocalDataManager.loadRegionInfoFromPref(this))
+                    if ((localRegionInfo = LocalDataManager.getRegionInfo()) != null)
+                        if (localRegionInfo.getVersion().equals(regionInfo.getVersion()))
+                            if (localRegionInfo.getLastSpotUpdate().getValue() - regionInfo.getLastSpotUpdate().getValue()<0) {
+                                //get list of updated spots and update existed
+                                Toast.makeText(getBaseContext(),"get list of updated spots and update existed",
+                                        Toast.LENGTH_LONG).show();
+                                return;
+                            }
+                            else {
+                                //we have actual spot information
+                                Toast.makeText(getBaseContext(),"we have actual spot information",
+                                        Toast.LENGTH_LONG).show();
+                                return;
+                            }
+                //get all spots from server
+                Toast.makeText(getBaseContext(),"get all spots from server",Toast.LENGTH_LONG).show();
+            } catch (IOException e) {
+                e.printStackTrace();
+                Log.e(TAG,"Error loading regionInfo from Preferences");
+            }
+        }
+
 
     }
 }

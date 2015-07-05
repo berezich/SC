@@ -21,22 +21,14 @@ import android.widget.ImageButton;
 
 import com.berezich.sportconnector.MainActivity;
 import com.berezich.sportconnector.MainFragment.Filters;
-import com.berezich.sportconnector.SportObjects.InfoTile;
 import com.berezich.sportconnector.R;
 
-import com.berezich.sportconnector.SportObjects.Spot;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.maps.android.clustering.Cluster;
-
-import java.util.HashMap;
-import java.util.List;
 
 public class GoogleMapFragment extends Fragment{
 
@@ -92,7 +84,7 @@ public class GoogleMapFragment extends Fragment{
 
     public GoogleMapFragment() {
 
-        SpotsData.getSpotsFromCache();
+        SpotsData.getSpotsFromCache1();
     }
 
     @Override
@@ -112,7 +104,7 @@ public class GoogleMapFragment extends Fragment{
         map.getUiSettings().setZoomControlsEnabled(true);
         map.setMyLocationEnabled(true);
         Clustering.initClusterManager(this.getActivity().getApplicationContext(), map, this);
-        Clustering.addAllSpots(SpotsData.get_allSpots(), curFilter());
+        Clustering.addAllSpots(SpotsData.get_allSpots1(), curFilter());
         map.setOnCameraChangeListener(Clustering.clusterManager);
         map.setInfoWindowAdapter(new Clustering.CustomInfoWindow());
         map.setOnMarkerClickListener(Clustering.clusterManager);
@@ -225,7 +217,7 @@ public class GoogleMapFragment extends Fragment{
                         break;
                 }
                 setCurFilter();
-                Clustering.addAllSpots(SpotsData.get_allSpots(), curFilter());
+                Clustering.addAllSpots(SpotsData.get_allSpots1(), curFilter());
 
                 //map.setOnCameraChangeListener(Clustering.clusterManager);
 

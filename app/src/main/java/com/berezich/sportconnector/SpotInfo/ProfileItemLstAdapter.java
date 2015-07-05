@@ -5,12 +5,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.berezich.sportconnector.R;
 import com.berezich.sportconnector.SportObjects.Person;
-import com.berezich.sportconnector.SportObjects.Spot;
 
 import java.util.ArrayList;
 

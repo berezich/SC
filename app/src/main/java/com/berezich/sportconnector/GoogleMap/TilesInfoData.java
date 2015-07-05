@@ -1,14 +1,5 @@
 package com.berezich.sportconnector.GoogleMap;
 
-import com.berezich.sportconnector.SportObjects.Coach;
-import com.berezich.sportconnector.SportObjects.InfoTile;
-import com.berezich.sportconnector.SportObjects.Partner;
-import com.berezich.sportconnector.SportObjects.Spot;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
 
 /**
  * Created by Sashka on 29.04.2015.

@@ -1,22 +1,14 @@
 package com.berezich.sportconnector.GoogleMap;
 
-import android.app.Activity;
-import android.app.Fragment;
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
-import android.test.ActivityUnitTestCase;
-import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
 import com.berezich.sportconnector.R;
-import com.berezich.sportconnector.SportObjects.InfoTile;
-import com.berezich.sportconnector.SportObjects.Spot;
+import com.berezich.sportconnector.SportObjects.Spot1;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.maps.android.clustering.Cluster;
@@ -24,10 +16,7 @@ import com.google.maps.android.clustering.ClusterManager;
 import com.google.maps.android.clustering.view.DefaultClusterRenderer;
 import com.google.maps.android.ui.IconGenerator;
 
-import java.io.Console;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -48,11 +37,11 @@ public class Clustering {
         clusterManager.setOnClusterItemClickListener(new CustomClusterItemClickListener());
         clusterManager.setOnClusterItemInfoWindowClickListener(new CustomClusterItemInfoWindowClickListener());
     }
-    public static void addAllSpots(HashMap<Integer, Spot> spots, GoogleMapFragment.FiltersX filter)
+    public static void addAllSpots(HashMap<Integer, Spot1> spots, GoogleMapFragment.FiltersX filter)
     {
         SpotMarker spotMarker;
         Set<Integer> keys = spots.keySet();
-        Spot spot;
+        Spot1 spot;
         clusterManager.clearItems();
         // Loop over String keys.
         for (Integer key : keys) {

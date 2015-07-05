@@ -1,12 +1,5 @@
 package com.berezich.sportconnector.GoogleMap;
 
-import android.util.Log;
-
-import com.berezich.sportconnector.SportObjects.Spot;
-
-import java.util.ArrayList;
-import java.util.List;
-
 
 /**
  * Created by berezkin on 23.04.2015.

@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * Created by berezkin on 23.04.2015.
  */
-public class Spot {
+public class Spot1 {
     private int _id;
     //private String _tileName;
     private Coordinates _geoCoord;
@@ -22,7 +22,7 @@ public class Spot {
     private List<Partner> _partners = new ArrayList<Partner>() ;
     private boolean _favorite = false;
 
-    public Spot(int _id, Coordinates geoCoord, String _name, String _adress) {
+    public Spot1(int _id, Coordinates geoCoord, String _name, String _adress) {
         this._id = _id;
         this._geoCoord = geoCoord;
         this._name = _name;

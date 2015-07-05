@@ -1,7 +1,6 @@
 package com.berezich.sportconnector.SpotInfo;
 
 import android.app.Activity;
-import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -21,16 +20,13 @@ import com.berezich.sportconnector.EndpointApi;
 import com.berezich.sportconnector.GoogleMap.SpotsData;
 import com.berezich.sportconnector.R;
 import com.berezich.sportconnector.SportObjects.Person;
-import com.berezich.sportconnector.SportObjects.Spot;
+import com.berezich.sportconnector.SportObjects.Spot1;
 import com.berezich.sportconnector.backend.sportConnectorApi.model.RegionInfo;
 import com.berezich.sportconnector.backend.sportConnectorApi.model.UpdateSpotInfo;
-import com.google.api.client.util.DateTime;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.TimeZone;
 
 
 /**
@@ -55,8 +51,8 @@ public class SpotInfoFragment extends Fragment implements EndpointApi.GetRegionA
     private int spotId;
     private boolean isFavoriteChanged=false;
     private String mParam2;
-    private HashMap<Integer,Spot> spotHashMap;
-    private Spot curSpot;
+    private HashMap<Integer,Spot1> spotHashMap;
+    private Spot1 curSpot;
     private View spotInfoView;
     private ProfileItemLstAdapter partnersAdapter;
     private ProfileItemLstAdapter coachesAdapter;
@@ -102,7 +98,7 @@ public class SpotInfoFragment extends Fragment implements EndpointApi.GetRegionA
         ListView lstView;
         ImageButton imgButton;
         spotInfoView = inflater.inflate(R.layout.fragment_spot_info, container, false);
-        spotHashMap = SpotsData.get_allSpots();
+        spotHashMap = SpotsData.get_allSpots1();
         curSpot = spotHashMap.get(spotId);
         if(curSpot!=null)
         {
@@ -166,7 +162,7 @@ public class SpotInfoFragment extends Fragment implements EndpointApi.GetRegionA
         }
         //new EndpointApi.GetRegionAsyncTask(this).execute(new Long(1));
         //new EndpointApi.GetSpotListAsyncTask(this).execute(new Long(1));
-        new EndpointApi.GetUpdatedSpotListAsyncTask(this).execute(new Pair<Long, DateTime>(new Long(1), new DateTime(new Date(new Date().getTime()-10*24*60*60*1000), TimeZone.getDefault())));
+        //new EndpointApi.GetUpdatedSpotListAsyncTask(this).execute(new Pair<Long, DateTime>(new Long(1), new DateTime(new Date(new Date().getTime()-10*24*60*60*1000), TimeZone.getDefault())));
         return spotInfoView;
     }
 

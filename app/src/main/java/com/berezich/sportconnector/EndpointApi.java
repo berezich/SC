@@ -1,5 +1,6 @@
 package com.berezich.sportconnector;
 
+import android.app.Activity;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.support.v4.app.Fragment;
@@ -70,6 +71,16 @@ public class EndpointApi {
                 listener = (OnGetRegionAsyncTaskAction) fragment;
             } catch (ClassCastException e) {
                 throw new ClassCastException(fragment.toString() + " must implement OnGetRegionAsyncTaskAction for GetRegionAsyncTask");
+            }
+        }
+        public GetRegionAsyncTask(Activity activity)
+        {
+            context = activity.getBaseContext();
+            setSrvApi(context);
+            try {
+                listener = (OnGetRegionAsyncTaskAction) activity;
+            } catch (ClassCastException e) {
+                throw new ClassCastException(activity.toString() + " must implement OnGetRegionAsyncTaskAction for GetRegionAsyncTask");
             }
         }
         @Override

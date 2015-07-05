@@ -1,37 +1,72 @@
 package com.berezich.sportconnector.GoogleMap;
 
-import com.berezich.sportconnector.R;
+import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
+
+import com.berezich.sportconnector.LocalDataManager;
 import com.berezich.sportconnector.SportObjects.Coach;
 import com.berezich.sportconnector.SportObjects.Coordinates;
 import com.berezich.sportconnector.SportObjects.Partner;
-import com.berezich.sportconnector.SportObjects.Spot;
+import com.berezich.sportconnector.SportObjects.Spot1;
+import com.berezich.sportconnector.backend.sportConnectorApi.model.Spot;
 
 import java.util.HashMap;
-import java.util.List;
-
-import static com.berezich.sportconnector.SportObjects.Spot.*;
 
 /**
  * Created by berezkin on 14.05.2015.
  */
 public class SpotsData {
-    private static HashMap<Integer, Spot> _allSpots = new HashMap<Integer, Spot>();
+    private static HashMap<Integer, Spot1> _allSpots1 = new HashMap<Integer, Spot1>();
 
-    public static HashMap<Integer, Spot> get_allSpots() {
-        return _allSpots;
+    private static HashMap<Integer, Spot> _allSpots =
+            new HashMap<Integer, Spot>();
+
+    public static HashMap<Integer, Spot1> get_allSpots1() {
+        return _allSpots1;
     }
-    public static void getSpotsFromCache()
+    public static void getSpotsFromCache(Context context)
     {
-        Spot spot;
+
+        SQLiteDatabase db = LocalDataManager.getDB(context, LocalDataManager.DB_TYPE.READ);
+        // делаем запрос всех данных из таблицы mytable, получаем Cursor
+        Cursor c = db.query("mytable", null, null, null, null, null, null);
+
+        // ставим позицию курсора на первую строку выборки
+        // если в выборке нет строк, вернется false
+        if (c.moveToFirst()) {
+
+            // определяем номера столбцов по имени в выборке
+            int idColIndex = c.getColumnIndex("id");
+            int nameColIndex = c.getColumnIndex("name");
+            int emailColIndex = c.getColumnIndex("email");
+
+            do {
+                // получаем значения по номерам столбцов и пишем все в лог
+                Log.d(LOG_TAG,
+                        "ID = " + c.getInt(idColIndex) +
+                                ", name = " + c.getString(nameColIndex) +
+                                ", email = " + c.getString(emailColIndex));
+                // переход на следующую строку
+                // а если следующей нет (текущая - последняя), то false - выходим из цикла
+            } while (c.moveToNext());
+        } else
+            Log.d(LOG_TAG, "0 rows");
+        c.close();
+    }
+    public static void getSpotsFromCache1()
+    {
+        Spot1 spot;
         Partner partner;
         Coach coach;
-        spot = new Spot(0,new Coordinates(55.778234, 37.588539),"Комета","Адрес");
+        spot = new Spot1(0,new Coordinates(55.778234, 37.588539),"Комета","Адрес");
         coach = new Coach(0,"Петя","Иванов",33);
         spot.set_favorite(true);
         spot.coaches().add(coach);
-        _allSpots.put(spot.id(), spot);
+        _allSpots1.put(spot.id(), spot);
 
-        spot = new Spot(1,new Coordinates(55.796051, 37.537766),"Теннисный клуб ЦСКА","Адрес");
+        spot = new Spot1(1,new Coordinates(55.796051, 37.537766),"Теннисный клуб ЦСКА","Адрес");
         partner = new Partner(0,"Вася","Клюев",44);
         spot.partners().add(partner);
         partner = new Partner(2,"Петя","Клюев",42);
@@ -39,27 +74,27 @@ public class SpotsData {
         coach = new Coach(1,"Иван","Мартирасян",30);
         spot.coaches().add(coach);
         spot.set_favorite(true);
-        _allSpots.put(spot.id(), spot);
+        _allSpots1.put(spot.id(), spot);
 
-        spot = new Spot(2,new Coordinates(55.795504, 37.541117),"Европейская школа Тенниса","Адрес");
+        spot = new Spot1(2,new Coordinates(55.795504, 37.541117),"Европейская школа Тенниса","Адрес");
         spot.set_favorite(true);
-        _allSpots.put(spot.id(), spot);
+        _allSpots1.put(spot.id(), spot);
 
-        spot = new Spot(3,new Coordinates(55.792503, 37.536984),"Европейская школа Тенниса","Адрес");
-        _allSpots.put(spot.id(), spot);
+        spot = new Spot1(3,new Coordinates(55.792503, 37.536984),"Европейская школа Тенниса","Адрес");
+        _allSpots1.put(spot.id(), spot);
 
-        spot = new Spot(4,new Coordinates(55.804162, 37.561679),"Теннисенок","Адрес");
-        _allSpots.put(spot.id(), spot);
+        spot = new Spot1(4,new Coordinates(55.804162, 37.561679),"Теннисенок","Адрес");
+        _allSpots1.put(spot.id(), spot);
 
-        spot = new Spot(5,new Coordinates(55.768345, 37.693669),"Планета тенниса","Адрес");
-        _allSpots.put(spot.id(), spot);
+        spot = new Spot1(5,new Coordinates(55.768345, 37.693669),"Планета тенниса","Адрес");
+        _allSpots1.put(spot.id(), spot);
 
-        spot = new Spot(6,new Coordinates(55.715099, 37.555023),"TennisVIP","Адрес");
-        _allSpots.put(spot.id(), spot);
+        spot = new Spot1(6,new Coordinates(55.715099, 37.555023),"TennisVIP","Адрес");
+        _allSpots1.put(spot.id(), spot);
     }
     public static void setSpotFavorite(int idSpot, boolean isFavorite)
     {
-        Spot spot = _allSpots.get(idSpot);
+        Spot1 spot = _allSpots1.get(idSpot);
         if(spot!=null)
             spot.set_favorite(isFavorite);
     }
