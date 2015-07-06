@@ -29,31 +29,8 @@ public class SpotsData {
     public static void getSpotsFromCache(Context context)
     {
 
-        SQLiteDatabase db = LocalDataManager.getDB(context, LocalDataManager.DB_TYPE.READ);
-        // делаем запрос всех данных из таблицы mytable, получаем Cursor
-        Cursor c = db.query("mytable", null, null, null, null, null, null);
 
-        // ставим позицию курсора на первую строку выборки
-        // если в выборке нет строк, вернется false
-        if (c.moveToFirst()) {
 
-            // определяем номера столбцов по имени в выборке
-            int idColIndex = c.getColumnIndex("id");
-            int nameColIndex = c.getColumnIndex("name");
-            int emailColIndex = c.getColumnIndex("email");
-
-            do {
-                // получаем значения по номерам столбцов и пишем все в лог
-                Log.d(LOG_TAG,
-                        "ID = " + c.getInt(idColIndex) +
-                                ", name = " + c.getString(nameColIndex) +
-                                ", email = " + c.getString(emailColIndex));
-                // переход на следующую строку
-                // а если следующей нет (текущая - последняя), то false - выходим из цикла
-            } while (c.moveToNext());
-        } else
-            Log.d(LOG_TAG, "0 rows");
-        c.close();
     }
     public static void getSpotsFromCache1()
     {
