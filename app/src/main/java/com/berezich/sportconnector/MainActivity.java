@@ -12,19 +12,23 @@ import android.support.v4.widget.DrawerLayout;
 import android.widget.Toast;
 
 import com.berezich.sportconnector.GoogleMap.GoogleMapFragment;
+import com.berezich.sportconnector.GoogleMap.SpotsData;
 import com.berezich.sportconnector.MainFragment.Filters;
 import com.berezich.sportconnector.SpotInfo.SpotInfoFragment;
 import com.berezich.sportconnector.backend.sportConnectorApi.model.RegionInfo;
+import com.berezich.sportconnector.backend.sportConnectorApi.model.Spot;
 import com.google.api.client.util.DateTime;
 
 import java.io.IOException;
 import java.util.Date;
+import java.util.List;
 
 
 public class MainActivity extends ActionBarActivity
         implements NavigationDrawerFragment.NavigationDrawerCallbacks,
         MainFragment.OnActionListenerMainFragment, GoogleMapFragment.OnActionListenerGMapFragment,
-        EndpointApi.GetRegionAsyncTask.OnGetRegionAsyncTaskAction{
+        EndpointApi.GetRegionAsyncTask.OnGetRegionAsyncTaskAction,
+        EndpointApi.GetSpotListAsyncTask.OnAction{
 
     /**
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
@@ -43,8 +47,7 @@ public class MainActivity extends ActionBarActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        /*
-        RegionInfo regionInfo = new RegionInfo();
+        /*RegionInfo regionInfo = new RegionInfo();
         regionInfo.setId(regionId);
         regionInfo.setVersion("1.0.0.1");
         regionInfo.setLastSpotUpdate(new DateTime(new Date().getTime()-24*6*60*60*1000));
@@ -53,9 +56,8 @@ public class MainActivity extends ActionBarActivity
             LocalDataManager.saveRegionInfoToPref(regionInfo,this);
         } catch (IOException e) {
             e.printStackTrace();
-        }
-        */
-
+        }*/
+        LocalDataManager.init(this.getBaseContext());
         new EndpointApi.GetRegionAsyncTask(this).execute(regionId);
 
         mNavigationDrawerFragment = (NavigationDrawerFragment)
@@ -183,18 +185,55 @@ public class MainActivity extends ActionBarActivity
                             }
                             else {
                                 //we have actual spot information
-                                Toast.makeText(getBaseContext(),"we have actual spot information",
-                                        Toast.LENGTH_LONG).show();
+                                Toast.makeText(getBaseContext(),"we have actual spot information",Toast.LENGTH_LONG).show();
+                                SpotsData.loadSpotsFromCache();
+                                Toast.makeText(getBaseContext(), SpotsData.get_allSpots().toString(), Toast.LENGTH_LONG).show();
                                 return;
                             }
                 //get all spots from server
-                Toast.makeText(getBaseContext(),"get all spots from server",Toast.LENGTH_LONG).show();
+                LocalDataManager.setRegionInfo(regionInfo);
+                new EndpointApi.GetSpotListAsyncTask(this).execute(regionId);
+                //Toast.makeText(getBaseContext(),"get all spots from server",Toast.LENGTH_LONG).show();
+                return;
             } catch (IOException e) {
                 e.printStackTrace();
                 Log.e(TAG,"Error loading regionInfo from Preferences");
             }
         }
 
+        Log.e(TAG,"Error get regionInfo from server");
+        if(error!=null)
+        {
+            Log.e(TAG,error.getMessage());
+            error.printStackTrace();
+        }
+        else
+            Log.e(TAG,"regionInfo = null");
+    }
 
+    @Override
+    public void onGetSpotListFinish(Pair<List<Spot>, Exception> result) {
+        Exception error = result.second;
+        List<Spot> spotLst = result.first;
+
+        if(error == null && spotLst!=null)
+        {
+            try {
+                LocalDataManager.saveRegionInfoToPref(this);
+                SpotsData.saveSpotsToCache(spotLst);
+                Toast.makeText(getBaseContext(),"got all spots from server and saveRegionInfo to pref",Toast.LENGTH_LONG).show();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return;
+        }
+        Log.e(TAG,"Error get ListSpot from server");
+        if(error!=null)
+        {
+            Log.e(TAG,error.getMessage());
+            error.printStackTrace();
+        }
+        else
+            Log.e(TAG,"ListSpot = null");
     }
 }

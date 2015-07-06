@@ -13,6 +13,7 @@ import com.berezich.sportconnector.SportObjects.Spot1;
 import com.berezich.sportconnector.backend.sportConnectorApi.model.Spot;
 
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * Created by berezkin on 14.05.2015.
@@ -20,17 +21,32 @@ import java.util.HashMap;
 public class SpotsData {
     private static HashMap<Integer, Spot1> _allSpots1 = new HashMap<Integer, Spot1>();
 
-    private static HashMap<Integer, Spot> _allSpots =
-            new HashMap<Integer, Spot>();
-
+    private static HashMap<Long, Spot> _allSpots = new HashMap<Long, Spot>();
     public static HashMap<Integer, Spot1> get_allSpots1() {
         return _allSpots1;
     }
-    public static void getSpotsFromCache(Context context)
+
+    public static HashMap<Long, Spot> get_allSpots() {
+        return _allSpots;
+    }
+
+    public static void loadSpotsFromCache()
     {
-
-
-
+        _allSpots = LocalDataManager.getAllSpots();
+    }
+    public static void saveSpotsToCache(List<Spot> spotLst)
+    {
+        Spot spot;
+        _allSpots.clear();
+        for (int i = 0; i <spotLst.size() ; i++) {
+            spot = spotLst.get(i);
+            _allSpots.put(spot.getId(),spot);
+        }
+        saveSpotsToCache();
+    }
+    public static void saveSpotsToCache()
+    {
+        LocalDataManager.saveAllSpots(_allSpots);
     }
     public static void getSpotsFromCache1()
     {

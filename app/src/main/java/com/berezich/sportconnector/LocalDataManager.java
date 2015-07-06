@@ -16,6 +16,8 @@ import com.google.api.client.json.gson.GsonFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -75,6 +77,10 @@ public class LocalDataManager {
         return regionInfo;
     }
 
+    public static void setRegionInfo(RegionInfo regionInfo) {
+        LocalDataManager.regionInfo = regionInfo;
+    }
+
     private static class DBHelper extends SQLiteOpenHelper
     {
         public DBHelper(Context context) {
@@ -113,9 +119,9 @@ public class LocalDataManager {
             return getDbHelper(context).getWritableDatabase();
         return null;
     }
-    public static List<Spot> getAllSpots()
+    public static HashMap<Long, Spot> getAllSpots()
     {
-        List<Spot> spots = new ArrayList<Spot>();
+        HashMap<Long, Spot> spots = new HashMap<Long, Spot>();
         String spotVal;
         Spot spot;
         SQLiteDatabase db = getDB(DB_TYPE.READ);
@@ -135,7 +141,7 @@ public class LocalDataManager {
                     spotVal = c.getString(valColIndex);
                     try {
                         spot = gsonFactory.fromString(spotVal,Spot.class);
-                        spots.add(spot);
+                        spots.put(spot.getId(), spot);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -144,13 +150,20 @@ public class LocalDataManager {
                 Log.d(TAG, "0 spots in "+SPOT_TABLE_NAME+" table");
             c.close();
         }
+        dbHelper.close();
         return spots;
     }
 
     //delete old spots and save new
+    public static void saveAllSpots(HashMap<Long, Spot> spotHsh)
+    {
+        List<Spot> spotLst = new ArrayList<Spot>(spotHsh.values());
+        saveAllSpots(spotLst);
+    }
     public static void saveAllSpots(List<Spot> spotLst)
     {
         ContentValues cv;
+
         Spot spot;
         SQLiteDatabase db = getDB(DB_TYPE.WRITE);
         if(db!=null)
@@ -165,6 +178,7 @@ public class LocalDataManager {
                 cv.put("regionId", spot.getRegionId());
                 try {
                     cv.put("value", gsonFactory.toString(spot));
+                    db.insert(SPOT_TABLE_NAME, null, cv);
                 } catch (IOException e) {
                     e.printStackTrace();
                     Log.e(TAG,"error save Spot(id:"+spot.getId()+" name:"+spot.getName()+") to "+SPOT_TABLE_NAME +" table");
@@ -173,5 +187,7 @@ public class LocalDataManager {
             }
 
         }
+        dbHelper.close();
     }
+
 }
