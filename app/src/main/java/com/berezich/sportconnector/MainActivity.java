@@ -17,9 +17,11 @@ import com.berezich.sportconnector.MainFragment.Filters;
 import com.berezich.sportconnector.SpotInfo.SpotInfoFragment;
 import com.berezich.sportconnector.backend.sportConnectorApi.model.RegionInfo;
 import com.berezich.sportconnector.backend.sportConnectorApi.model.Spot;
+import com.berezich.sportconnector.backend.sportConnectorApi.model.UpdateSpotInfo;
 import com.google.api.client.util.DateTime;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -28,7 +30,8 @@ public class MainActivity extends ActionBarActivity
         implements NavigationDrawerFragment.NavigationDrawerCallbacks,
         MainFragment.OnActionListenerMainFragment, GoogleMapFragment.OnActionListenerGMapFragment,
         EndpointApi.GetRegionAsyncTask.OnGetRegionAsyncTaskAction,
-        EndpointApi.GetSpotListAsyncTask.OnAction{
+        EndpointApi.GetSpotListAsyncTask.OnAction,
+        EndpointApi.GetUpdatedSpotListAsyncTask.OnAction {
 
     /**
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
@@ -181,6 +184,10 @@ public class MainActivity extends ActionBarActivity
                                 //get list of updated spots and update existed
                                 Toast.makeText(getBaseContext(),"get list of updated spots and update existed",
                                         Toast.LENGTH_LONG).show();
+                                LocalDataManager.setRegionInfo(regionInfo);
+                                SpotsData.loadSpotsFromCache();
+                                new EndpointApi.GetUpdatedSpotListAsyncTask(this).execute(
+                                        new Pair<Long, DateTime>(regionInfo.getId(), regionInfo.getLastSpotUpdate()));
                                 return;
                             }
                             else {
@@ -235,5 +242,32 @@ public class MainActivity extends ActionBarActivity
         }
         else
             Log.e(TAG,"ListSpot = null");
+    }
+
+    @Override
+    public void onGetUpdateSpotListFinish(Pair<List<UpdateSpotInfo>, Exception> result) {
+        Exception error = result.second;
+        List<Spot> spotLst = new ArrayList<Spot>();
+        List<UpdateSpotInfo> updateSpotInfoLst = result.first;
+
+        if(error == null && updateSpotInfoLst!=null)
+        {
+            try {
+                LocalDataManager.saveRegionInfoToPref(this);
+                SpotsData.setSpotUpdatesToCache(updateSpotInfoLst);
+                Toast.makeText(getBaseContext(),"got updated spots from server and saveRegionInfo to pref",Toast.LENGTH_LONG).show();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return;
+        }
+        Log.e(TAG,"Error get updated ListSpot from server");
+        if(error!=null)
+        {
+            Log.e(TAG,error.getMessage());
+            error.printStackTrace();
+        }
+        else
+            Log.e(TAG,"ListUpdatedSpot = null");
     }
 }

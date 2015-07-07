@@ -146,14 +146,14 @@ public class EndpointApi {
     public static class GetUpdatedSpotListAsyncTask extends AsyncTask<Pair<Long,DateTime>, Void, Pair<List<UpdateSpotInfo>,Exception> >{
         private OnAction listener=null;
         private Context context = null;
-        public GetUpdatedSpotListAsyncTask(Fragment fragment)
+        public GetUpdatedSpotListAsyncTask(Activity activity)
         {
-            context = fragment.getActivity().getBaseContext();
+            context = activity.getBaseContext();
             setSrvApi(context);
             try {
-                listener = (OnAction) fragment;
+                listener = (OnAction) activity;
             } catch (ClassCastException e) {
-                throw new ClassCastException(fragment.toString() + " must implement OnAction for GetUpdatedSpotListAsyncTask");
+                throw new ClassCastException(activity.toString() + " must implement OnAction for GetUpdatedSpotListAsyncTask");
             }
         }
         @Override

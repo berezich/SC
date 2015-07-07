@@ -11,6 +11,7 @@ import com.berezich.sportconnector.SportObjects.Coordinates;
 import com.berezich.sportconnector.SportObjects.Partner;
 import com.berezich.sportconnector.SportObjects.Spot1;
 import com.berezich.sportconnector.backend.sportConnectorApi.model.Spot;
+import com.berezich.sportconnector.backend.sportConnectorApi.model.UpdateSpotInfo;
 
 import java.util.HashMap;
 import java.util.List;
@@ -47,6 +48,21 @@ public class SpotsData {
     public static void saveSpotsToCache()
     {
         LocalDataManager.saveAllSpots(_allSpots);
+    }
+    public static void setSpotUpdatesToCache(List<UpdateSpotInfo> spotUpdates)
+    {
+        Spot spot;
+        Long spotId;
+        _allSpots.clear();
+        for (int i = 0; i <spotUpdates.size() ; i++) {
+            spotId = spotUpdates.get(i).getId();
+            spot = spotUpdates.get(i).getSpot();
+            if(spot!=null)
+                _allSpots.put(spotId,spot);
+            else
+                _allSpots.remove(spotId);
+        }
+        LocalDataManager.setUpdateSpots(spotUpdates);
     }
     public static void getSpotsFromCache1()
     {

@@ -12,6 +12,7 @@ import android.util.Log;
 import com.berezich.sportconnector.backend.sportConnectorApi.SportConnectorApi;
 import com.berezich.sportconnector.backend.sportConnectorApi.model.RegionInfo;
 import com.berezich.sportconnector.backend.sportConnectorApi.model.Spot;
+import com.berezich.sportconnector.backend.sportConnectorApi.model.UpdateSpotInfo;
 import com.google.api.client.json.gson.GsonFactory;
 
 import java.io.IOException;
@@ -72,7 +73,6 @@ public class LocalDataManager {
         editor.putString(RINFO_KEY, gsonFactory.toString(regionInfo));
         editor.commit();
     }
-
     public static RegionInfo getRegionInfo() {
         return regionInfo;
     }
@@ -188,6 +188,41 @@ public class LocalDataManager {
 
         }
         dbHelper.close();
+    }
+    public  static void setUpdateSpots(List<UpdateSpotInfo> updateSpotsLst)
+    {
+        Spot spot;
+        Long spotId;
+        ContentValues cv;
+        SQLiteDatabase db = getDB(DB_TYPE.WRITE);
+        if(db!=null)
+            Log.d(TAG, "--- Update "+SPOT_TABLE_NAME+" ---");
+            for (int i = 0; i <updateSpotsLst.size() ; i++) {
+                spotId = updateSpotsLst.get(i).getId();
+                spot = updateSpotsLst.get(i).getSpot();
+                if(spot!=null) {
+                    spotId = spot.getId();
+
+                    // подготовим значения для обновления
+                    cv = new ContentValues();
+                    cv.put("spotId", spotId);
+                    cv.put("regionId", spot.getRegionId());
+                    try {
+                        cv.put("value", gsonFactory.toString(spot));
+                        // обновляем по id
+                        int updCount = db.update(SPOT_TABLE_NAME, cv, "spotId = ?", new String[]{spotId.toString()});
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        Log.e(TAG,"error update Spot(id:"+spotId+" name:"+spot.getName()+") to "+SPOT_TABLE_NAME +" table");
+                    }
+
+                }
+                else {
+                    Log.d(TAG, "--- Delete from"+SPOT_TABLE_NAME+" : ---");
+                    // удаляем по id
+                    int delCount = db.delete(SPOT_TABLE_NAME, "spotId = " + spotId, null);
+                }
+            }
     }
 
 }
