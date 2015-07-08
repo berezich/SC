@@ -26,6 +26,8 @@ import com.berezich.sportconnector.backend.sportConnectorApi.model.RegionInfo;
 import com.berezich.sportconnector.backend.sportConnectorApi.model.Spot;
 import com.berezich.sportconnector.backend.sportConnectorApi.model.UpdateSpotInfo;
 
+import java.io.IOException;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -39,9 +41,10 @@ import java.util.List;
  * Use the {@link SpotInfoFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class SpotInfoFragment extends Fragment implements EndpointApi.GetRegionAsyncTask.OnGetRegionAsyncTaskAction,
+public class SpotInfoFragment extends Fragment implements /*EndpointApi.GetRegionAsyncTask.OnGetRegionAsyncTaskAction,
                                                           EndpointApi.GetSpotListAsyncTask.OnAction,
-                                                          EndpointApi.GetUpdatedSpotListAsyncTask.OnAction
+                                                          EndpointApi.GetUpdatedSpotListAsyncTask.OnAction,*/
+                                                          EndpointApi.GetListPersonByIdLstAsyncTask.OnAction
 {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -138,8 +141,9 @@ public class SpotInfoFragment extends Fragment implements EndpointApi.GetRegionA
                 if(curSpot.getCoachLst().size()>0 ) {
                     tabSpec = tabHost.newTabSpec(TAB_COACHES);
                     tabSpec.setIndicator(getString(R.string.spotinfo_tab2_title));
+                    /*
                     lstView = (ListView) spotInfoView.findViewById(R.id.spotInfo_list_tab_coaches);
-                    /*coachesAdapter = new ProfileItemLstAdapter(getActivity().getApplicationContext(),
+                    coachesAdapter = new ProfileItemLstAdapter(getActivity().getApplicationContext(),
                             new ArrayList<Person>(curSpot.getCoachLst()));
                     lstView.setAdapter(coachesAdapter);*/
                     tabSpec.setContent(R.id.spotInfo_list_tab_coaches);
@@ -165,6 +169,15 @@ public class SpotInfoFragment extends Fragment implements EndpointApi.GetRegionA
         //new EndpointApi.GetRegionAsyncTask(this).execute(new Long(1));
         //new EndpointApi.GetSpotListAsyncTask(this).execute(new Long(1));
         //new EndpointApi.GetUpdatedSpotListAsyncTask(this).execute(new Pair<Long, DateTime>(new Long(1), new DateTime(new Date(new Date().getTime()-10*24*60*60*1000), TimeZone.getDefault())));
+
+        ArrayList<Long> personIdLst = new ArrayList<Long>();
+        if(curSpot.getCoachLst()!=null)
+            personIdLst.addAll(curSpot.getCoachLst());
+        if(curSpot.getPartnerLst()!=null)
+            personIdLst.addAll(curSpot.getPartnerLst());
+        if(personIdLst.size()>0)
+        new EndpointApi.GetListPersonByIdLstAsyncTask(this).execute(personIdLst);
+
         return spotInfoView;
     }
 
@@ -229,7 +242,7 @@ public class SpotInfoFragment extends Fragment implements EndpointApi.GetRegionA
             return true;
         }
     }
-
+    /*
     @Override
     public void onGetRegionAsyncTaskFinish(Pair<RegionInfo,Exception> result) {
         String resText="";
@@ -275,5 +288,42 @@ public class SpotInfoFragment extends Fragment implements EndpointApi.GetRegionA
         }
         Toast.makeText(this.getActivity().getBaseContext(), resText, Toast.LENGTH_LONG).show();
         Log.d(TAG,resText);
+    }
+    */
+    @Override
+    public void onGetListPersonByIdLstFinish(Pair<List<Person>, Exception> result) {
+        List<Person> personLst = result.first;
+        Exception error = result.second;
+        ListView lstView;
+        Person person;
+        List<Person> coachLst = new ArrayList<>();
+        List<Person> partnerLst = new ArrayList<>();
+        if(error == null && personLst!=null)
+        {
+            for (int i = 0; i <personLst.size() ; i++) {
+                person = personLst.get(i);
+                if(person.getType().equals("COACH"))
+                    coachLst.add(person);
+                if(person.getType().equals("PARTNER"))
+                    partnerLst.add(person);
+            }
+            lstView = (ListView) spotInfoView.findViewById(R.id.spotInfo_list_tab_coaches);
+            coachesAdapter = new ProfileItemLstAdapter(getActivity().getApplicationContext(),
+                    new ArrayList<Person>(coachLst));
+            lstView.setAdapter(coachesAdapter);
+            lstView = (ListView) spotInfoView.findViewById(R.id.spotInfo_list_tab_partners);
+            partnersAdapter = new ProfileItemLstAdapter(getActivity().getApplicationContext(),
+                    new ArrayList<Person>(partnerLst));
+            lstView.setAdapter(partnersAdapter);
+            return;
+        }
+        Log.e(TAG, "Error get updated ListSpot from server");
+        if(error!=null)
+        {
+            Log.e(TAG,error.getMessage());
+            error.printStackTrace();
+        }
+        else
+            Log.d(TAG,"ListUpdatedSpot = null");
     }
 }

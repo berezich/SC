@@ -8,6 +8,7 @@ import android.util.Pair;
 import android.widget.Toast;
 
 import com.berezich.sportconnector.backend.sportConnectorApi.SportConnectorApi;
+import com.berezich.sportconnector.backend.sportConnectorApi.model.Person;
 import com.berezich.sportconnector.backend.sportConnectorApi.model.RegionInfo;
 import com.berezich.sportconnector.backend.sportConnectorApi.model.Spot;
 import com.berezich.sportconnector.backend.sportConnectorApi.model.UpdateSpotInfo;
@@ -18,6 +19,9 @@ import com.google.api.client.googleapis.services.GoogleClientRequestInitializer;
 import com.google.api.client.util.DateTime;
 
 import java.io.IOException;
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -164,7 +168,7 @@ public class EndpointApi {
             regionId = params[0].first;
             lastUpdate = params[0].second;
             try {
-                return new Pair<List<UpdateSpotInfo>,Exception>(srvApi.listUpdateSpotInfoByRegIdDate(lastUpdate,regionId).execute().getItems(),null);
+                return new Pair<List<UpdateSpotInfo>,Exception>(srvApi.listUpdateSpotInfoByRegIdDate(lastUpdate, regionId).execute().getItems(),null);
             } catch (IOException e) {
                 return new Pair<List<UpdateSpotInfo>,Exception>(null,e);
             }
@@ -178,6 +182,40 @@ public class EndpointApi {
         public static interface OnAction
         {
             void onGetUpdateSpotListFinish(Pair<List<UpdateSpotInfo>,Exception> result);
+        }
+    }
+
+    public static class GetListPersonByIdLstAsyncTask extends AsyncTask< List<Long>, Void, Pair<List<Person>,Exception> >{
+        private OnAction listener=null;
+        private Context context = null;
+        public GetListPersonByIdLstAsyncTask(Fragment fragment)
+        {
+            context = fragment.getActivity().getBaseContext();
+            setSrvApi(context);
+            try {
+                listener = (OnAction) fragment;
+            } catch (ClassCastException e) {
+                throw new ClassCastException(fragment.toString() + " must implement OnAction for GetListPersonByIdLstAsyncTask");
+            }
+        }
+        @Override
+        protected Pair<List<Person>,Exception> doInBackground(List<Long>... params) {
+            List<Long> idLst = new ArrayList<Long>(params[0]) ;
+            try {
+                return new Pair<List<Person>,Exception>(srvApi.listPersonByIdLst(new ArrayList<Long>(idLst)).execute().getItems(),null);
+            } catch (IOException e) {
+                return new Pair<List<Person>,Exception>(null,e);
+            }
+        }
+
+        @Override
+        protected void onPostExecute(Pair<List<Person>,Exception> result) {
+            listener.onGetListPersonByIdLstFinish(result);
+        }
+
+        public static interface OnAction
+        {
+            void onGetListPersonByIdLstFinish(Pair<List<Person>,Exception> result);
         }
     }
 }
