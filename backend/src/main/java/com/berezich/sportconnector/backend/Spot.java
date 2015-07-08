@@ -67,14 +67,22 @@ public class Spot {
     }
 
     public List<Long> getPartnerLst() {
+
+        if(partnerLst==null)
+            partnerLst = new ArrayList<Long>();
         return partnerLst;
     }
 
     public List<Long> getCoachLst() {
+
+        if(coachLst==null)
+            coachLst = new ArrayList<Long>();
         return coachLst;
     }
 
     public List<Picture> getPictureLst() {
+        if(pictureLst==null)
+            pictureLst = new ArrayList<Picture>();
         return pictureLst;
     }
 

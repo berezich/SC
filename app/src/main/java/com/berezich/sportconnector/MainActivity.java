@@ -60,7 +60,14 @@ public class MainActivity extends ActionBarActivity
         } catch (IOException e) {
             e.printStackTrace();
         }*/
+
         LocalDataManager.init(this.getBaseContext());
+
+        try {
+            LocalDataManager.loadMyPersonInfoFromPref(this);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         new EndpointApi.GetRegionAsyncTask(this).execute(regionId);
 
         mNavigationDrawerFragment = (NavigationDrawerFragment)
@@ -154,7 +161,7 @@ public class MainActivity extends ActionBarActivity
     }
 
     @Override
-    public void onInfoWindowClickGMF(int spotId) {
+    public void onInfoWindowClickGMF(Long spotId) {
         FragmentManager fragmentManager = getSupportFragmentManager();
         //fragmentManager.beginTransaction().replace(R.id.container, new YaMapFragment().setArgs(sectionNumber,filter)).commit();
         //fragmentManager.beginTransaction().replace(R.id.container, new GoogleMapFragment().setArgs(sectionNumber,filter)).commit();
@@ -187,7 +194,7 @@ public class MainActivity extends ActionBarActivity
                                 LocalDataManager.setRegionInfo(regionInfo);
                                 SpotsData.loadSpotsFromCache();
                                 new EndpointApi.GetUpdatedSpotListAsyncTask(this).execute(
-                                        new Pair<Long, DateTime>(regionInfo.getId(), regionInfo.getLastSpotUpdate()));
+                                        new Pair<Long, DateTime>(regionInfo.getId(), localRegionInfo.getLastSpotUpdate()));
                                 return;
                             }
                             else {
@@ -222,7 +229,8 @@ public class MainActivity extends ActionBarActivity
     public void onGetSpotListFinish(Pair<List<Spot>, Exception> result) {
         Exception error = result.second;
         List<Spot> spotLst = result.first;
-
+        if(spotLst==null)
+            spotLst = new ArrayList<Spot>();
         if(error == null && spotLst!=null)
         {
             try {
@@ -234,7 +242,7 @@ public class MainActivity extends ActionBarActivity
             }
             return;
         }
-        Log.e(TAG,"Error get ListSpot from server");
+        Log.e(TAG, "Error get ListSpot from server");
         if(error!=null)
         {
             Log.e(TAG,error.getMessage());
@@ -255,13 +263,13 @@ public class MainActivity extends ActionBarActivity
             try {
                 LocalDataManager.saveRegionInfoToPref(this);
                 SpotsData.setSpotUpdatesToCache(updateSpotInfoLst);
-                Toast.makeText(getBaseContext(),"got updated spots from server and saveRegionInfo to pref",Toast.LENGTH_LONG).show();
+                Toast.makeText(getBaseContext(),"got updated spots num="+updateSpotInfoLst.size()+" from server and saveRegionInfo to pref",Toast.LENGTH_LONG).show();
             } catch (IOException e) {
                 e.printStackTrace();
             }
             return;
         }
-        Log.e(TAG,"Error get updated ListSpot from server");
+        Log.e(TAG, "Error get updated ListSpot from server");
         if(error!=null)
         {
             Log.e(TAG,error.getMessage());

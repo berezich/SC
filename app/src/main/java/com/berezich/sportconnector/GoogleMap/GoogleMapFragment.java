@@ -84,7 +84,7 @@ public class GoogleMapFragment extends Fragment{
 
     public GoogleMapFragment() {
 
-        SpotsData.getSpotsFromCache1();
+        //SpotsData.loadSpotsFromCache();
     }
 
     @Override
@@ -104,7 +104,7 @@ public class GoogleMapFragment extends Fragment{
         map.getUiSettings().setZoomControlsEnabled(true);
         map.setMyLocationEnabled(true);
         Clustering.initClusterManager(this.getActivity().getApplicationContext(), map, this);
-        Clustering.addAllSpots(SpotsData.get_allSpots1(), curFilter());
+        Clustering.addAllSpots(SpotsData.get_allSpots(), curFilter());
         map.setOnCameraChangeListener(Clustering.clusterManager);
         map.setInfoWindowAdapter(new Clustering.CustomInfoWindow());
         map.setOnMarkerClickListener(Clustering.clusterManager);
@@ -217,7 +217,7 @@ public class GoogleMapFragment extends Fragment{
                         break;
                 }
                 setCurFilter();
-                Clustering.addAllSpots(SpotsData.get_allSpots1(), curFilter());
+                Clustering.addAllSpots(SpotsData.get_allSpots(), curFilter());
 
                 //map.setOnCameraChangeListener(Clustering.clusterManager);
 
@@ -363,7 +363,7 @@ public class GoogleMapFragment extends Fragment{
     }
 
     public static interface OnActionListenerGMapFragment {
-        void onInfoWindowClickGMF(int spotId);
+        void onInfoWindowClickGMF(Long spotId);
     }
 
 }

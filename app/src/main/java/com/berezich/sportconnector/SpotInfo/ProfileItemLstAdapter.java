@@ -8,7 +8,8 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.berezich.sportconnector.R;
-import com.berezich.sportconnector.SportObjects.Person;
+import com.berezich.sportconnector.SportObjects.Person1;
+import com.berezich.sportconnector.backend.sportConnectorApi.model.Person;
 
 import java.util.ArrayList;
 
@@ -41,7 +42,7 @@ public class ProfileItemLstAdapter extends BaseAdapter {
     @Override
     public long getItemId(int position) {
         if(position>=0 && position<getCount())
-            return ((Person)objects.get(position)).id();
+            return ((Person)objects.get(position)).getId();
         return -1;
     }
 
@@ -57,9 +58,9 @@ public class ProfileItemLstAdapter extends BaseAdapter {
         if(person!=null) {
             // заполняем View в пункте списка данными из товаров: наименование, цена
             // и картинка
-            ((TextView) view.findViewById(R.id.lstProfileItem_name)).setText(person.name() + " " + person.surname());
-            ((TextView) view.findViewById(R.id.lstProfileItem_desc1)).setText(ctx.getString(R.string.person_item_age) + " " +person.age());
-            ((TextView) view.findViewById(R.id.lstProfileItem_desc2)).setText(ctx.getString(R.string.person_item_rating)+ " " + person.rating());
+            ((TextView) view.findViewById(R.id.lstProfileItem_name)).setText(person.getName() + " " + person.getSurname());
+            ((TextView) view.findViewById(R.id.lstProfileItem_desc1)).setText(ctx.getString(R.string.person_item_age) + " " +person.getAge());
+            ((TextView) view.findViewById(R.id.lstProfileItem_desc2)).setText(ctx.getString(R.string.person_item_rating)+ " " + person.getRating());
             //((ImageView) view.findViewById(R.id.lstProfileItem_img_photo)).setImageResource(person.image());
         }
 

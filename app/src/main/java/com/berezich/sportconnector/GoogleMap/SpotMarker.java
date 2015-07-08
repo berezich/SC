@@ -20,13 +20,13 @@ public class SpotMarker extends AbstractMarker {
     private static BitmapDescriptor spotIcon = null;
 
     private String _name;
-    private int _id;
+    private Long _id;
     private String _description;
     private int _numPartners=0;
     private int _numCoaches=0;
     private boolean _isFavorite=false;
 
-    public SpotMarker(int id, String name,
+    public SpotMarker(Long id, String name,
                        double latitude, double longitude,int numPartners, int numCoaches,
                        boolean isFavorite) {
         super(latitude, longitude);
@@ -240,11 +240,11 @@ public class SpotMarker extends AbstractMarker {
         return _isFavorite;
     }
 
-    public int id() {
+    public Long id() {
         return _id;
     }
 
-    public void set_id(int id) {
+    public void set_id(Long id) {
         this._id = id;
     }
 }

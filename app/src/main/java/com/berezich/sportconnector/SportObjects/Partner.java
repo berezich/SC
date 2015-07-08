@@ -3,7 +3,7 @@ package com.berezich.sportconnector.SportObjects;
 /**
  * Created by berezkin on 23.04.2015.
  */
-public class Partner extends  Person {
+public class Partner extends Person1 {
     public Partner(int id, String name, String surname, int age)
     {
         super(id, name, surname, age);

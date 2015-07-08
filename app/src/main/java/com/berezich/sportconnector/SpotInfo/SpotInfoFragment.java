@@ -18,10 +18,12 @@ import android.widget.Toast;
 
 import com.berezich.sportconnector.EndpointApi;
 import com.berezich.sportconnector.GoogleMap.SpotsData;
+import com.berezich.sportconnector.LocalDataManager;
 import com.berezich.sportconnector.R;
-import com.berezich.sportconnector.SportObjects.Person;
-import com.berezich.sportconnector.SportObjects.Spot1;
+import com.berezich.sportconnector.SportObjects.Person1;
+import com.berezich.sportconnector.backend.sportConnectorApi.model.Person;
 import com.berezich.sportconnector.backend.sportConnectorApi.model.RegionInfo;
+import com.berezich.sportconnector.backend.sportConnectorApi.model.Spot;
 import com.berezich.sportconnector.backend.sportConnectorApi.model.UpdateSpotInfo;
 
 import java.util.ArrayList;
@@ -48,11 +50,11 @@ public class SpotInfoFragment extends Fragment implements EndpointApi.GetRegionA
     private static final  String TAB_COACHES = "coaches";
     private static final String TAG = "SpotInfoFragment";
     // TODO: Rename and change types of parameters
-    private int spotId;
+    private Long spotId;
     private boolean isFavoriteChanged=false;
     private String mParam2;
-    private HashMap<Integer,Spot1> spotHashMap;
-    private Spot1 curSpot;
+    private HashMap<Long,Spot> spotHashMap;
+    private Spot curSpot;
     private View spotInfoView;
     private ProfileItemLstAdapter partnersAdapter;
     private ProfileItemLstAdapter coachesAdapter;
@@ -68,7 +70,7 @@ public class SpotInfoFragment extends Fragment implements EndpointApi.GetRegionA
      * @return A new instance of fragment BlankFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static SpotInfoFragment newInstance(int spotId) {
+    public static SpotInfoFragment newInstance(Long spotId) {
         SpotInfoFragment fragment = new SpotInfoFragment();
         Bundle args = new Bundle();
         args.putString(ARG_SPOT_ID, String.valueOf(spotId));
@@ -85,7 +87,7 @@ public class SpotInfoFragment extends Fragment implements EndpointApi.GetRegionA
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            spotId = Integer.valueOf(getArguments().getString(ARG_SPOT_ID));
+            spotId = Long.valueOf(getArguments().getString(ARG_SPOT_ID));
             //mParam2 = getArguments().getString(ARG_PARAM2);
         }
     }
@@ -98,48 +100,48 @@ public class SpotInfoFragment extends Fragment implements EndpointApi.GetRegionA
         ListView lstView;
         ImageButton imgButton;
         spotInfoView = inflater.inflate(R.layout.fragment_spot_info, container, false);
-        spotHashMap = SpotsData.get_allSpots1();
+        spotHashMap = SpotsData.get_allSpots();
         curSpot = spotHashMap.get(spotId);
         if(curSpot!=null)
         {
             if((txtView =(TextView) spotInfoView.findViewById(R.id.spotInfo_txt_name))!=null)
-                txtView.setText(curSpot.name());
+                txtView.setText(curSpot.getName());
             if((txtView =(TextView) spotInfoView.findViewById(R.id.spotInfo_txt_adress))!=null)
-                txtView.setText(curSpot.adress());
+                txtView.setText(curSpot.getAddress());
             if((imgButton=(ImageButton) spotInfoView.findViewById(R.id.spotInfo_btnImg_favorite))!=null) {
-                imgButton.setPressed(curSpot.favorite());
+                imgButton.setPressed(LocalDataManager.isMyFavoriteSpot(curSpot));
                 imgButton.setOnTouchListener(new StarBtnOnTouchListener());
             }
 
-            if((curSpot.coaches().size()>0 || curSpot.partners().size()>0)&&(tabHost = (TabHost) spotInfoView.findViewById(R.id.spotInfo_tabHost))!=null)
+            if((curSpot.getCoachLst().size()>0 || curSpot.getPartnerLst().size()>0)&&(tabHost = (TabHost) spotInfoView.findViewById(R.id.spotInfo_tabHost))!=null)
             {
                 // инициализация
                 tabHost.setup();
 
                 TabHost.TabSpec tabSpec;
-                if(curSpot.partners().size()>0) {
+                if(curSpot.getPartnerLst().size()>0) {
                     // создаем вкладку и указываем тег
                     tabSpec = tabHost.newTabSpec(TAB_PARTNERS);
                     // название вкладки
                     tabSpec.setIndicator(getString(R.string.spotinfo_tab1_title));
 
                     lstView = (ListView) spotInfoView.findViewById(R.id.spotInfo_list_tab_partners);
-                    partnersAdapter = new ProfileItemLstAdapter(getActivity().getApplicationContext(),
-                            new ArrayList<Person>(curSpot.partners()));
-                    lstView.setAdapter(partnersAdapter);
+                    /*partnersAdapter = new ProfileItemLstAdapter(getActivity().getApplicationContext(),
+                            new ArrayList<Person>(curSpot.getPartnerLst()));
+                    lstView.setAdapter(partnersAdapter);*/
 
                     // указываем id компонента из FrameLayout, он и станет содержимым
                     tabSpec.setContent(R.id.spotInfo_list_tab_partners);
                     // добавляем в корневой элемент
                     tabHost.addTab(tabSpec);
                 }
-                if(curSpot.coaches().size()>0 ) {
+                if(curSpot.getCoachLst().size()>0 ) {
                     tabSpec = tabHost.newTabSpec(TAB_COACHES);
                     tabSpec.setIndicator(getString(R.string.spotinfo_tab2_title));
                     lstView = (ListView) spotInfoView.findViewById(R.id.spotInfo_list_tab_coaches);
-                    coachesAdapter = new ProfileItemLstAdapter(getActivity().getApplicationContext(),
-                            new ArrayList<Person>(curSpot.coaches()));
-                    lstView.setAdapter(coachesAdapter);
+                    /*coachesAdapter = new ProfileItemLstAdapter(getActivity().getApplicationContext(),
+                            new ArrayList<Person>(curSpot.getCoachLst()));
+                    lstView.setAdapter(coachesAdapter);*/
                     tabSpec.setContent(R.id.spotInfo_list_tab_coaches);
                     tabHost.addTab(tabSpec);
                 }
@@ -195,7 +197,7 @@ public class SpotInfoFragment extends Fragment implements EndpointApi.GetRegionA
     public void onStop() {
         super.onStop();
         if(isFavoriteChanged)
-            SpotsData.setSpotFavorite(curSpot.id(),!curSpot.favorite());
+            SpotsData.setSpotFavorite(curSpot.getId(),!(LocalDataManager.isMyFavoriteSpot(curSpot)));
     }
 
     /**

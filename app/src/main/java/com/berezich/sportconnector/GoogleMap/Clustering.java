@@ -4,8 +4,9 @@ import android.content.Context;
 import android.view.View;
 import android.widget.TextView;
 
+import com.berezich.sportconnector.LocalDataManager;
 import com.berezich.sportconnector.R;
-import com.berezich.sportconnector.SportObjects.Spot1;
+import com.berezich.sportconnector.backend.sportConnectorApi.model.Spot;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
@@ -37,17 +38,17 @@ public class Clustering {
         clusterManager.setOnClusterItemClickListener(new CustomClusterItemClickListener());
         clusterManager.setOnClusterItemInfoWindowClickListener(new CustomClusterItemInfoWindowClickListener());
     }
-    public static void addAllSpots(HashMap<Integer, Spot1> spots, GoogleMapFragment.FiltersX filter)
+    public static void addAllSpots(HashMap<Long, Spot> spots, GoogleMapFragment.FiltersX filter)
     {
         SpotMarker spotMarker;
-        Set<Integer> keys = spots.keySet();
-        Spot1 spot;
+        Set<Long> keys = spots.keySet();
+        Spot spot;
         clusterManager.clearItems();
         // Loop over String keys.
-        for (Integer key : keys) {
+        for (Long key : keys) {
             spot = spots.get(key);
-            spotMarker = new SpotMarker(spot.id(),spot.name(),spot.geoCoord().lat(),spot.geoCoord().longt(),
-                    spot.partners().size(),spot.coaches().size(),spot.favorite());
+            spotMarker = new SpotMarker(spot.getId(),spot.getName(),spot.getCoords().getLat(),spot.getCoords().getLongt(),
+                    spot.getPartnerLst().size(),spot.getCoachLst().size(), LocalDataManager.isMyFavoriteSpot(spot));
             if(spotMarker.isAppropriate(filter)) {
                 spotMarker.setSpotIcon(filter);
                 spotMarker.setDescription(filter);

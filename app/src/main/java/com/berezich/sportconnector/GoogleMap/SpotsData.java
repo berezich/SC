@@ -9,7 +9,7 @@ import com.berezich.sportconnector.LocalDataManager;
 import com.berezich.sportconnector.SportObjects.Coach;
 import com.berezich.sportconnector.SportObjects.Coordinates;
 import com.berezich.sportconnector.SportObjects.Partner;
-import com.berezich.sportconnector.SportObjects.Spot1;
+import com.berezich.sportconnector.backend.sportConnectorApi.model.Person;
 import com.berezich.sportconnector.backend.sportConnectorApi.model.Spot;
 import com.berezich.sportconnector.backend.sportConnectorApi.model.UpdateSpotInfo;
 
@@ -20,12 +20,12 @@ import java.util.List;
  * Created by berezkin on 14.05.2015.
  */
 public class SpotsData {
-    private static HashMap<Integer, Spot1> _allSpots1 = new HashMap<Integer, Spot1>();
+    //private static HashMap<Integer, Spot1> _allSpots1 = new HashMap<Integer, Spot1>();
 
     private static HashMap<Long, Spot> _allSpots = new HashMap<Long, Spot>();
-    public static HashMap<Integer, Spot1> get_allSpots1() {
+    /*public static HashMap<Integer, Spot1> get_allSpots1() {
         return _allSpots1;
-    }
+    }*/
 
     public static HashMap<Long, Spot> get_allSpots() {
         return _allSpots;
@@ -53,7 +53,6 @@ public class SpotsData {
     {
         Spot spot;
         Long spotId;
-        _allSpots.clear();
         for (int i = 0; i <spotUpdates.size() ; i++) {
             spotId = spotUpdates.get(i).getId();
             spot = spotUpdates.get(i).getSpot();
@@ -64,7 +63,7 @@ public class SpotsData {
         }
         LocalDataManager.setUpdateSpots(spotUpdates);
     }
-    public static void getSpotsFromCache1()
+    /*public static void getSpotsFromCache1()
     {
         Spot1 spot;
         Partner partner;
@@ -101,10 +100,34 @@ public class SpotsData {
         spot = new Spot1(6,new Coordinates(55.715099, 37.555023),"TennisVIP","Адрес");
         _allSpots1.put(spot.id(), spot);
     }
-    public static void setSpotFavorite(int idSpot, boolean isFavorite)
+    */
+    public static void setSpotFavorite(Long idSpot, boolean isFavorite)
     {
-        Spot1 spot = _allSpots1.get(idSpot);
-        if(spot!=null)
-            spot.set_favorite(isFavorite);
+        Spot spot = _allSpots.get(idSpot);
+        Person myPersonInfo = LocalDataManager.getMyPersonInfo();
+        Long personId = myPersonInfo.getId();
+        List<Long> favoriteSpotLst = null;
+        List<Long> personLst = null;
+
+        if(spot!=null && myPersonInfo!=null) {
+
+            favoriteSpotLst = myPersonInfo.getFavoriteSpotIdLst();
+            if(favoriteSpotLst!=null)
+                if(isFavorite && !favoriteSpotLst.contains(idSpot))
+                    favoriteSpotLst.add(idSpot);
+                else if(!isFavorite && favoriteSpotLst.contains(idSpot))
+                    favoriteSpotLst.remove(idSpot);
+
+            if(myPersonInfo.getType().equals("COACH"))
+                personLst = spot.getCoachLst();
+            else if(myPersonInfo.getType().equals("PARTNER"))
+                personLst = spot.getPartnerLst();
+
+            if(personLst!=null)
+                if(isFavorite && !personLst.contains(personId))
+                    spot.getCoachLst().add(personId);
+                else if(!isFavorite && personLst.contains(personId))
+                    spot.getCoachLst().remove(personId);
+        }
     }
 }

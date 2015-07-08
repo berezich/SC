@@ -3,7 +3,7 @@ package com.berezich.sportconnector.SportObjects;
 /**
  * Created by berezkin on 23.04.2015.
  */
-public class Person {
+public class Person1 {
     public enum TYPE{COACH,PARTNER};
 
     private int _id;
@@ -13,7 +13,7 @@ public class Person {
     private int _rating;
     private TYPE _type;
 
-    public Person(int id, String name, String surname, int age) {
+    public Person1(int id, String name, String surname, int age) {
         _id = id;
         _name = name;
         _surname = surname;
