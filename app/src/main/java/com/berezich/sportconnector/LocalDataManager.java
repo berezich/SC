@@ -231,6 +231,7 @@ public class LocalDataManager {
             }
 
         }
+
         dbHelper.close();
     }
     public  static void setUpdateSpots(List<UpdateSpotInfo> updateSpotsLst)
@@ -244,32 +245,11 @@ public class LocalDataManager {
             for (int i = 0; i < updateSpotsLst.size(); i++) {
                 spotId = updateSpotsLst.get(i).getId();
                 spot = updateSpotsLst.get(i).getSpot();
-                if (spot != null) {
-                    spotId = spot.getId();
-
-                    // подготовим значения для обновления
-                    cv = new ContentValues();
-                    cv.put("id", spotId);
-                    cv.put("regionId", spot.getRegionId());
-                    try {
-                        cv.put("value", gsonFactory.toString(spot));
-                        // обновляем по id
-                        int updCount = db.update(SPOT_TABLE_NAME, cv, "id = ?", new String[]{spotId.toString()});
-                        if(updCount==0)
-                            db.insert(SPOT_TABLE_NAME, null, cv);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                        Log.e(TAG, "error update Spot(id:" + spotId + " name:" + spot.getName() + ") to " + SPOT_TABLE_NAME + " table");
-                    }
-
-                } else {
-                    Log.d(TAG, "--- Delete from" + SPOT_TABLE_NAME + " : ---");
-                    // удаляем по id
-                    int delCount = db.delete(SPOT_TABLE_NAME, "spotId = " + spotId, null);
-                }
+                updateSpot(spotId,spot,db);
             }
-            dbHelper.close();
         }
+        dbHelper.close();
+
     }
     public static void initListsOfSpot(Spot spot)
     {
@@ -279,5 +259,40 @@ public class LocalDataManager {
             spot.setPartnerLst(new ArrayList<Long>());
         if(spot.getPictureLst()==null)
             spot.setPictureLst(new ArrayList<Picture>());
+    }
+    public static void updateSpot(Long spotId, Spot spot,SQLiteDatabase db)
+    {
+        boolean needCloseDB = false;
+        ContentValues cv;
+        if(db==null)
+        {
+            db = getDB(DB_TYPE.WRITE);
+            needCloseDB = true;
+        }
+        if(db!=null) {
+            if (spot != null) {
+                // подготовим значения для обновления
+                cv = new ContentValues();
+                cv.put("id", spotId);
+                cv.put("regionId", spot.getRegionId());
+                try {
+                    cv.put("value", gsonFactory.toString(spot));
+                    // обновляем по id
+                    int updCount = db.update(SPOT_TABLE_NAME, cv, "id = ?", new String[]{spotId.toString()});
+                    if (updCount == 0)
+                        db.insert(SPOT_TABLE_NAME, null, cv);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    Log.e(TAG, "error update Spot(id:" + spotId + " name:" + spot.getName() + ") to " + SPOT_TABLE_NAME + " table");
+                }
+
+            } else {
+                Log.d(TAG, "--- Delete from" + SPOT_TABLE_NAME + " : ---");
+                // удаляем по id
+                int delCount = db.delete(SPOT_TABLE_NAME, "spotId = " + spotId, null);
+            }
+        }
+        if(needCloseDB)
+            dbHelper.close();
     }
 }

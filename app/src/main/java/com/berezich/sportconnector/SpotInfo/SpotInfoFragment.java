@@ -116,13 +116,14 @@ public class SpotInfoFragment extends Fragment implements /*EndpointApi.GetRegio
                 imgButton.setOnTouchListener(new StarBtnOnTouchListener());
             }
 
-            if((curSpot.getCoachLst().size()>0 || curSpot.getPartnerLst().size()>0)&&(tabHost = (TabHost) spotInfoView.findViewById(R.id.spotInfo_tabHost))!=null)
+            int coachesNum = SpotsData.getCoachIdsWithoutMe(curSpot).size(), partnersNum = SpotsData.getPartnerIdsWithoutMe(curSpot).size();
+            if((partnersNum>0 || coachesNum>0)&&(tabHost = (TabHost) spotInfoView.findViewById(R.id.spotInfo_tabHost))!=null)
             {
                 // инициализация
                 tabHost.setup();
 
                 TabHost.TabSpec tabSpec;
-                if(curSpot.getPartnerLst().size()>0) {
+                if(partnersNum>0) {
                     // создаем вкладку и указываем тег
                     tabSpec = tabHost.newTabSpec(TAB_PARTNERS);
                     // название вкладки
@@ -138,7 +139,7 @@ public class SpotInfoFragment extends Fragment implements /*EndpointApi.GetRegio
                     // добавляем в корневой элемент
                     tabHost.addTab(tabSpec);
                 }
-                if(curSpot.getCoachLst().size()>0 ) {
+                if(coachesNum>0 ) {
                     tabSpec = tabHost.newTabSpec(TAB_COACHES);
                     tabSpec.setIndicator(getString(R.string.spotinfo_tab2_title));
                     /*
@@ -172,9 +173,9 @@ public class SpotInfoFragment extends Fragment implements /*EndpointApi.GetRegio
 
         ArrayList<Long> personIdLst = new ArrayList<Long>();
         if(curSpot.getCoachLst()!=null)
-            personIdLst.addAll(curSpot.getCoachLst());
+            personIdLst.addAll(SpotsData.getCoachIdsWithoutMe(curSpot));
         if(curSpot.getPartnerLst()!=null)
-            personIdLst.addAll(curSpot.getPartnerLst());
+            personIdLst.addAll(SpotsData.getPartnerIdsWithoutMe(curSpot));
         if(personIdLst.size()>0)
         new EndpointApi.GetListPersonByIdLstAsyncTask(this).execute(personIdLst);
 

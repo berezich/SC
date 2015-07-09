@@ -6,6 +6,7 @@ import android.widget.TextView;
 
 import com.berezich.sportconnector.LocalDataManager;
 import com.berezich.sportconnector.R;
+import com.berezich.sportconnector.backend.sportConnectorApi.model.Person;
 import com.berezich.sportconnector.backend.sportConnectorApi.model.Spot;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.BitmapDescriptor;
@@ -43,12 +44,14 @@ public class Clustering {
         SpotMarker spotMarker;
         Set<Long> keys = spots.keySet();
         Spot spot;
+        Person myPersonInfo = LocalDataManager.getMyPersonInfo();
         clusterManager.clearItems();
         // Loop over String keys.
         for (Long key : keys) {
             spot = spots.get(key);
+
             spotMarker = new SpotMarker(spot.getId(),spot.getName(),spot.getCoords().getLat(),spot.getCoords().getLongt(),
-                    spot.getPartnerLst().size(),spot.getCoachLst().size(), LocalDataManager.isMyFavoriteSpot(spot));
+                    SpotsData.getPartnerIdsWithoutMe(spot).size(),SpotsData.getCoachIdsWithoutMe(spot).size(), LocalDataManager.isMyFavoriteSpot(spot));
             if(spotMarker.isAppropriate(filter)) {
                 spotMarker.setSpotIcon(filter);
                 spotMarker.setDescription(filter);
@@ -137,17 +140,17 @@ public class Clustering {
         if(filter == GoogleMapFragment.FiltersX.F0001||
                 filter == GoogleMapFragment.FiltersX.F1001 && numPartners==0||
                 filter == GoogleMapFragment.FiltersX.F0101 && numCoaches==0||
-                filter == GoogleMapFragment.FiltersX.F1101 && numCoaches==0&&numPartners==0)
+                (filter == GoogleMapFragment.FiltersX.F1101|| filter == GoogleMapFragment.FiltersX.Fxx1x) && numCoaches==0&&numPartners==0)
             return  R.drawable.gmap_cluster_red;
         if(filter == GoogleMapFragment.FiltersX.F1000||
                 filter == GoogleMapFragment.FiltersX.F1001 && numFavorites==0||
                 filter == GoogleMapFragment.FiltersX.F1100 && numCoaches==0||
-                filter == GoogleMapFragment.FiltersX.F1101 && numCoaches==0&& numFavorites==0)
+                (filter == GoogleMapFragment.FiltersX.F1101|| filter == GoogleMapFragment.FiltersX.Fxx1x) && numCoaches==0&& numFavorites==0)
             return  R.drawable.gmap_cluster_purple;
         if(filter == GoogleMapFragment.FiltersX.F0100||
                 filter == GoogleMapFragment.FiltersX.F0101 && numFavorites==0||
                 filter == GoogleMapFragment.FiltersX.F1100 && numPartners==0||
-                filter == GoogleMapFragment.FiltersX.F1101 && numPartners==0&& numFavorites==0)
+                (filter == GoogleMapFragment.FiltersX.F1101 || filter == GoogleMapFragment.FiltersX.Fxx1x)&& numPartners==0&& numFavorites==0)
             return  R.drawable.gmap_cluster_green;
 
         if(numPartners>0 && numFavorites>0 && (filter == GoogleMapFragment.FiltersX.F1001 || (filter == GoogleMapFragment.FiltersX.F1101 || filter == GoogleMapFragment.FiltersX.Fxx1x) && numCoaches==0))

@@ -1,18 +1,11 @@
 package com.berezich.sportconnector.GoogleMap;
 
-import android.content.Context;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-import android.util.Log;
-
 import com.berezich.sportconnector.LocalDataManager;
-import com.berezich.sportconnector.SportObjects.Coach;
-import com.berezich.sportconnector.SportObjects.Coordinates;
-import com.berezich.sportconnector.SportObjects.Partner;
 import com.berezich.sportconnector.backend.sportConnectorApi.model.Person;
 import com.berezich.sportconnector.backend.sportConnectorApi.model.Spot;
 import com.berezich.sportconnector.backend.sportConnectorApi.model.UpdateSpotInfo;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -56,8 +49,10 @@ public class SpotsData {
         for (int i = 0; i <spotUpdates.size() ; i++) {
             spotId = spotUpdates.get(i).getId();
             spot = spotUpdates.get(i).getSpot();
-            if(spot!=null)
-                _allSpots.put(spotId,spot);
+            if(spot!=null) {
+                LocalDataManager.initListsOfSpot(spot);
+                _allSpots.put(spotId, spot);
+            }
             else
                 _allSpots.remove(spotId);
         }
@@ -125,9 +120,38 @@ public class SpotsData {
 
             if(personLst!=null)
                 if(isFavorite && !personLst.contains(personId))
-                    spot.getCoachLst().add(personId);
+                    personLst.add(personId);
                 else if(!isFavorite && personLst.contains(personId))
-                    spot.getCoachLst().remove(personId);
+                    personLst.remove(personId);
+            updateSpot_map_DB(spot);
         }
+    }
+    public static void updateSpot_map_DB(Spot spot)
+    {
+        Long id = spot.getId();
+        _allSpots.put(id,spot);
+        LocalDataManager.updateSpot(id, spot, null);
+    }
+    public static List<Long> getCoachIdsWithoutMe(Spot spot)
+    {
+        List<Long> personIds = new ArrayList<Long>(),coachLst;
+        Person myPersonInfo;
+        if((coachLst = spot.getCoachLst())!=null) {
+            personIds.addAll(coachLst);
+            if ((myPersonInfo = LocalDataManager.getMyPersonInfo()).getType().equals("COACH"))
+                personIds.remove(myPersonInfo.getId());
+        }
+        return personIds;
+    }
+    public static List<Long> getPartnerIdsWithoutMe(Spot spot)
+    {
+        List<Long> personIds = new ArrayList<Long>(), partnerLst;
+        Person myPersonInfo;
+        if((partnerLst = spot.getPartnerLst())!=null) {
+            personIds.addAll(partnerLst);
+            if ((myPersonInfo = LocalDataManager.getMyPersonInfo()).getType().equals("PARTNER"))
+                personIds.remove(myPersonInfo.getId());
+        }
+        return personIds;
     }
 }
