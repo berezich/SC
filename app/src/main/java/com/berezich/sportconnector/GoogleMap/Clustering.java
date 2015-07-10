@@ -137,20 +137,20 @@ public class Clustering {
             if(((SpotMarker) p).isFavorite())
                 numFavorites++;
         }
-        if(filter == GoogleMapFragment.FiltersX.F0001||
+        if(numFavorites>0 && (filter == GoogleMapFragment.FiltersX.F0001||
                 filter == GoogleMapFragment.FiltersX.F1001 && numPartners==0||
                 filter == GoogleMapFragment.FiltersX.F0101 && numCoaches==0||
-                (filter == GoogleMapFragment.FiltersX.F1101|| filter == GoogleMapFragment.FiltersX.Fxx1x) && numCoaches==0&&numPartners==0)
+                (filter == GoogleMapFragment.FiltersX.F1101|| filter == GoogleMapFragment.FiltersX.Fxx1x) && numCoaches==0&&numPartners==0))
             return  R.drawable.gmap_cluster_red;
-        if(filter == GoogleMapFragment.FiltersX.F1000||
+        if(numPartners>0 && (filter == GoogleMapFragment.FiltersX.F1000||
                 filter == GoogleMapFragment.FiltersX.F1001 && numFavorites==0||
                 filter == GoogleMapFragment.FiltersX.F1100 && numCoaches==0||
-                (filter == GoogleMapFragment.FiltersX.F1101|| filter == GoogleMapFragment.FiltersX.Fxx1x) && numCoaches==0&& numFavorites==0)
+                (filter == GoogleMapFragment.FiltersX.F1101|| filter == GoogleMapFragment.FiltersX.Fxx1x) && numCoaches==0&& numFavorites==0))
             return  R.drawable.gmap_cluster_purple;
-        if(filter == GoogleMapFragment.FiltersX.F0100||
+        if(numCoaches>0 && (filter == GoogleMapFragment.FiltersX.F0100||
                 filter == GoogleMapFragment.FiltersX.F0101 && numFavorites==0||
                 filter == GoogleMapFragment.FiltersX.F1100 && numPartners==0||
-                (filter == GoogleMapFragment.FiltersX.F1101 || filter == GoogleMapFragment.FiltersX.Fxx1x)&& numPartners==0&& numFavorites==0)
+                (filter == GoogleMapFragment.FiltersX.F1101 || filter == GoogleMapFragment.FiltersX.Fxx1x)&& numPartners==0&& numFavorites==0))
             return  R.drawable.gmap_cluster_green;
 
         if(numPartners>0 && numFavorites>0 && (filter == GoogleMapFragment.FiltersX.F1001 || (filter == GoogleMapFragment.FiltersX.F1101 || filter == GoogleMapFragment.FiltersX.Fxx1x) && numCoaches==0))

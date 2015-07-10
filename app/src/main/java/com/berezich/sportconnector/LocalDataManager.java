@@ -70,7 +70,7 @@ public class LocalDataManager {
         */
         myPersonInfo = new Person();
         myPersonInfo.setType("PARTNER");
-        myPersonInfo.setId(new Long(23));
+        myPersonInfo.setId(new Long("5705241014042624"));
         return true;
     }
     public static void saveRegionInfoToPref(Activity activity)throws IOException {

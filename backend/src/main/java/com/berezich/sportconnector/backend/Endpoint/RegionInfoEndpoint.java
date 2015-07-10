@@ -54,9 +54,9 @@ public class RegionInfoEndpoint {
      */
     @ApiMethod(
             name = "getRegionInfo",
-            path = "storeDataInfo/{getId}",
+            path = "storeDataInfo/{id}",
             httpMethod = ApiMethod.HttpMethod.GET)
-    public RegionInfo get(@Named("getId") Long id) throws NotFoundException {
+    public RegionInfo get(@Named("id") Long id) throws NotFoundException {
         logger.info("Getting StoreDataInfo with ID: " + id);
         RegionInfo regionInfo = ofy().load().type(RegionInfo.class).id(id).now();
         if (regionInfo == null) {

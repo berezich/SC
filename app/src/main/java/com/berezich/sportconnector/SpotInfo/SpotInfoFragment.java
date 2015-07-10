@@ -41,10 +41,8 @@ import java.util.List;
  * Use the {@link SpotInfoFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class SpotInfoFragment extends Fragment implements /*EndpointApi.GetRegionAsyncTask.OnGetRegionAsyncTaskAction,
-                                                          EndpointApi.GetSpotListAsyncTask.OnAction,
-                                                          EndpointApi.GetUpdatedSpotListAsyncTask.OnAction,*/
-                                                          EndpointApi.GetListPersonByIdLstAsyncTask.OnAction
+public class SpotInfoFragment extends Fragment implements EndpointApi.GetListPersonByIdLstAsyncTask.OnAction,
+                                                          EndpointApi.UpdateSpotAsyncTask.OnAction
 {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -167,9 +165,6 @@ public class SpotInfoFragment extends Fragment implements /*EndpointApi.GetRegio
                 txtView.setVisibility(View.VISIBLE);
             }
         }
-        //new EndpointApi.GetRegionAsyncTask(this).execute(new Long(1));
-        //new EndpointApi.GetSpotListAsyncTask(this).execute(new Long(1));
-        //new EndpointApi.GetUpdatedSpotListAsyncTask(this).execute(new Pair<Long, DateTime>(new Long(1), new DateTime(new Date(new Date().getTime()-10*24*60*60*1000), TimeZone.getDefault())));
 
         ArrayList<Long> personIdLst = new ArrayList<Long>();
         if(curSpot.getCoachLst()!=null)
@@ -177,7 +172,7 @@ public class SpotInfoFragment extends Fragment implements /*EndpointApi.GetRegio
         if(curSpot.getPartnerLst()!=null)
             personIdLst.addAll(SpotsData.getPartnerIdsWithoutMe(curSpot));
         if(personIdLst.size()>0)
-        new EndpointApi.GetListPersonByIdLstAsyncTask(this).execute(personIdLst);
+            new EndpointApi.GetListPersonByIdLstAsyncTask(this).execute(personIdLst);
 
         return spotInfoView;
     }
@@ -210,8 +205,11 @@ public class SpotInfoFragment extends Fragment implements /*EndpointApi.GetRegio
     @Override
     public void onStop() {
         super.onStop();
-        if(isFavoriteChanged)
-            SpotsData.setSpotFavorite(curSpot.getId(),!(LocalDataManager.isMyFavoriteSpot(curSpot)));
+        if(isFavoriteChanged) {
+            SpotsData.setSpotFavorite(curSpot.getId(), !(LocalDataManager.isMyFavoriteSpot(curSpot)));
+            new EndpointApi.UpdateSpotAsyncTask(this).execute(spotHashMap.get(curSpot.getId()));
+
+        }
     }
 
     /**
@@ -243,54 +241,7 @@ public class SpotInfoFragment extends Fragment implements /*EndpointApi.GetRegio
             return true;
         }
     }
-    /*
-    @Override
-    public void onGetRegionAsyncTaskFinish(Pair<RegionInfo,Exception> result) {
-        String resText="";
-        if(result.second!=null)
-            resText = result.second.getMessage();
-        else if(result.first!=null)
-            resText = result.first.toString();
 
-        Toast.makeText(this.getActivity().getBaseContext(), resText, Toast.LENGTH_LONG).show();
-    }
-
-    @Override
-    public void onGetSpotListFinish(Pair<List<com.berezich.sportconnector.backend.sportConnectorApi.model.Spot>, Exception> result) {
-        List<com.berezich.sportconnector.backend.sportConnectorApi.model.Spot> spotLst;
-        String resText="";
-        if(result.second!=null)
-            resText = result.second.getMessage();
-        else if(result.first!=null) {
-            spotLst = result.first;
-            com.berezich.sportconnector.backend.sportConnectorApi.model.Spot spot;
-            for(int i=0; i<spotLst.size(); i++) {
-                spot = spotLst.get(i);
-                resText+= spot.toString()+"\n";
-            }
-        }
-
-        Toast.makeText(this.getActivity().getBaseContext(), resText, Toast.LENGTH_LONG).show();
-    }
-
-    @Override
-    public void onGetUpdateSpotListFinish(Pair<List<UpdateSpotInfo>, Exception> result) {
-        List<UpdateSpotInfo> updateSpotInfoList;
-        String resText="";
-        if(result.second!=null)
-            resText = result.second.getMessage();
-        else if(result.first!=null) {
-            updateSpotInfoList = result.first;
-            UpdateSpotInfo updateSpotInfo;
-            for(int i=0; i<updateSpotInfoList.size(); i++) {
-                updateSpotInfo = updateSpotInfoList.get(i);
-                resText+= updateSpotInfo.toString()+"\n";
-            }
-        }
-        Toast.makeText(this.getActivity().getBaseContext(), resText, Toast.LENGTH_LONG).show();
-        Log.d(TAG,resText);
-    }
-    */
     @Override
     public void onGetListPersonByIdLstFinish(Pair<List<Person>, Exception> result) {
         List<Person> personLst = result.first;
@@ -318,13 +269,31 @@ public class SpotInfoFragment extends Fragment implements /*EndpointApi.GetRegio
             lstView.setAdapter(partnersAdapter);
             return;
         }
-        Log.e(TAG, "Error get updated ListSpot from server");
+        Log.e(TAG, "Error GetListPersonByIdLst");
         if(error!=null)
         {
             Log.e(TAG,error.getMessage());
             error.printStackTrace();
         }
         else
-            Log.d(TAG,"ListUpdatedSpot = null");
+            Log.d(TAG,"personLst = null");
+    }
+
+    @Override
+    public void onUpdateSpotFinish(Pair<Spot, Exception> result) {
+        Spot spot = result.first;
+        Exception error = result.second;
+        if(error == null && spot!=null) {
+            Log.d(TAG, "Spot updated success");
+            return;
+        }
+            Log.e(TAG, "Error UpdateSpot");
+        if(error!=null)
+        {
+            Log.e(TAG, error.getMessage());
+            error.printStackTrace();
+        }
+        else
+            Log.d(TAG,"UpdatedSpot = null");
     }
 }

@@ -34,6 +34,7 @@ public class SpotsData {
         _allSpots.clear();
         for (int i = 0; i <spotLst.size() ; i++) {
             spot = spotLst.get(i);
+            LocalDataManager.initListsOfSpot(spot);
             _allSpots.put(spot.getId(),spot);
         }
         saveSpotsToCache();

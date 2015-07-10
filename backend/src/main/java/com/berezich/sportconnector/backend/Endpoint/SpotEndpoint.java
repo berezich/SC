@@ -66,9 +66,9 @@ public class SpotEndpoint {
      */
     @ApiMethod(
             name = "getSpot",
-            path = "spot/{getId}",
+            path = "spot/{id}",
             httpMethod = ApiMethod.HttpMethod.GET)
-    public Spot get(@Named("getId") Long id) throws NotFoundException {
+    public Spot get(@Named("id") Long id) throws NotFoundException {
         logger.info("Getting Spot with ID: " + id);
         Spot spot = ofy().load().type(Spot.class).id(id).now();
         if (spot == null) {
@@ -113,7 +113,7 @@ public class SpotEndpoint {
      */
     @ApiMethod(
             name = "updateSpot",
-            path = "spot/{getId}",
+            path = "spot/{id}",
             httpMethod = ApiMethod.HttpMethod.PUT)
     public Spot update(@Named("id") Long id, Spot spot) throws NotFoundException, BadRequestException {
         // TODO: You should validate your ID parameter against your resource's ID here.
@@ -194,9 +194,9 @@ public class SpotEndpoint {
      */
     @ApiMethod(
             name = "removeSpot",
-            path = "spot/{getId}",
+            path = "spot/{id}",
             httpMethod = ApiMethod.HttpMethod.DELETE)
-    public void remove(@Named("getId") Long id) throws NotFoundException {
+    public void remove(@Named("id") Long id) throws NotFoundException {
         checkExists(id);
         ofy().delete().type(Spot.class).id(id).now();
         logger.info("Deleted Spot with ID: " + id);
@@ -268,10 +268,10 @@ public class SpotEndpoint {
             regionInfo =  regionInfoEndpoint.get(spot.getRegionId());
             regionInfo.setLastSpotUpdate(new Date());
             regionInfoEndpoint.update(regionInfo.getId(), regionInfo);
-            logger.info("RegionInfo with getId=" + regionInfo.getId() + " is updated");
+            logger.info("RegionInfo with id=" + regionInfo.getId() + " is updated");
         } catch (NotFoundException e) {
             e.printStackTrace();
-            logger.info("RegionInfo with getId=" + spot.getRegionId() + " not found");
+            logger.info("RegionInfo with id=" + spot.getRegionId() + " not found");
             throw e;
         } catch (BadRequestException e)
         {

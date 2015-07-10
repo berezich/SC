@@ -218,5 +218,41 @@ public class EndpointApi {
             void onGetListPersonByIdLstFinish(Pair<List<Person>,Exception> result);
         }
     }
+
+    public static class UpdateSpotAsyncTask extends AsyncTask< Spot, Void, Pair<Spot,Exception> >{
+        private OnAction listener=null;
+        private Context context = null;
+        public UpdateSpotAsyncTask(Fragment fragment)
+        {
+            context = fragment.getActivity().getBaseContext();
+            setSrvApi(context);
+            try {
+                listener = (OnAction) fragment;
+            } catch (ClassCastException e) {
+                throw new ClassCastException(fragment.toString() + " must implement OnAction for UpdateSpotAsyncTask");
+            }
+        }
+        @Override
+        protected Pair<Spot,Exception> doInBackground(Spot... params) {
+            Spot spot = params[0];
+            Spot updatedSpot;
+            try {
+                updatedSpot = srvApi.updateSpot(spot.getId(),spot).execute();
+                return new Pair<Spot,Exception>(updatedSpot,null);
+            } catch (IOException e) {
+                return new Pair<Spot,Exception>(null,e);
+            }
+        }
+
+        @Override
+        protected void onPostExecute(Pair<Spot,Exception> result) {
+            listener.onUpdateSpotFinish(result);
+        }
+
+        public static interface OnAction
+        {
+            void onUpdateSpotFinish(Pair<Spot,Exception> result);
+        }
+    }
 }
 
