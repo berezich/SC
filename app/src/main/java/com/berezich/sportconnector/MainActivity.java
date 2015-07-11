@@ -9,6 +9,7 @@ import android.util.Pair;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.support.v4.widget.DrawerLayout;
+import android.view.View;
 import android.widget.Toast;
 
 import com.berezich.sportconnector.GoogleMap.GoogleMapFragment;
@@ -44,11 +45,13 @@ public class MainActivity extends ActionBarActivity
     private CharSequence mTitle;
     private static final String TAG = "YaMapFragment";
     private static Long regionId = new Long(1);
+    private boolean isSpotsLoaded = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
 
         /*RegionInfo regionInfo = new RegionInfo();
         regionInfo.setId(regionId);
@@ -68,7 +71,6 @@ public class MainActivity extends ActionBarActivity
         } catch (IOException e) {
             e.printStackTrace();
         }
-        new EndpointApi.GetRegionAsyncTask(this).execute(regionId);
 
         mNavigationDrawerFragment = (NavigationDrawerFragment)
                 getSupportFragmentManager().findFragmentById(R.id.navigation_drawer);
@@ -78,8 +80,20 @@ public class MainActivity extends ActionBarActivity
         mNavigationDrawerFragment.setUp(
                 R.id.navigation_drawer,
                 (DrawerLayout) findViewById(R.id.drawer_layout));
-    }
 
+        new EndpointApi.GetRegionAsyncTask(this).execute(regionId);
+
+    }
+    @Override
+    protected void onResume()
+    {
+        super.onResume();
+        if(isSpotsLoaded)
+            setVisibleLayouts(true,false);
+        else
+            setVisibleLayouts(false,true);
+        isSpotsLoaded = true;
+    }
     @Override
     public void onNavigationDrawerItemSelected(int position) {
         // update the main content by replacing fragments
@@ -179,7 +193,7 @@ public class MainActivity extends ActionBarActivity
         else if(regionInfo!=null)
             resText = result.first.toString();
 
-        Toast.makeText(getBaseContext(), resText, Toast.LENGTH_LONG).show();
+        //Toast.makeText(getBaseContext(), resText, Toast.LENGTH_LONG).show();
 
         if(error==null && regionInfo!=null)
         {
@@ -189,8 +203,8 @@ public class MainActivity extends ActionBarActivity
                         if (localRegionInfo.getVersion().equals(regionInfo.getVersion()))
                             if (localRegionInfo.getLastSpotUpdate().getValue() - regionInfo.getLastSpotUpdate().getValue()<0) {
                                 //get list of updated spots and update existed
-                                Toast.makeText(getBaseContext(),"get list of updated spots and update existed",
-                                        Toast.LENGTH_LONG).show();
+                                /*Toast.makeText(getBaseContext(),"get list of updated spots and update existed",
+                                        Toast.LENGTH_LONG).show();*/
                                 LocalDataManager.setRegionInfo(regionInfo);
                                 SpotsData.loadSpotsFromCache();
                                 new EndpointApi.GetUpdatedSpotListAsyncTask(this).execute(
@@ -199,9 +213,10 @@ public class MainActivity extends ActionBarActivity
                             }
                             else {
                                 //we have actual spot information
-                                Toast.makeText(getBaseContext(),"we have actual spot information",Toast.LENGTH_LONG).show();
+                                //Toast.makeText(getBaseContext(),"we have actual spot information",Toast.LENGTH_LONG).show();
                                 SpotsData.loadSpotsFromCache();
-                                Toast.makeText(getBaseContext(), SpotsData.get_allSpots().toString(), Toast.LENGTH_LONG).show();
+                                //Toast.makeText(getBaseContext(), SpotsData.get_allSpots().toString(), Toast.LENGTH_LONG).show();
+                                setVisibleLayouts(true,false);
                                 return;
                             }
                 //get all spots from server
@@ -236,7 +251,8 @@ public class MainActivity extends ActionBarActivity
             try {
                 LocalDataManager.saveRegionInfoToPref(this);
                 SpotsData.saveSpotsToCache(spotLst);
-                Toast.makeText(getBaseContext(),"got all spots from server and saveRegionInfo to pref",Toast.LENGTH_LONG).show();
+                //Toast.makeText(getBaseContext(),"got all spots from server and saveRegionInfo to pref",Toast.LENGTH_LONG).show();
+                setVisibleLayouts(true,false);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -263,7 +279,8 @@ public class MainActivity extends ActionBarActivity
             try {
                 LocalDataManager.saveRegionInfoToPref(this);
                 SpotsData.setSpotUpdatesToCache(updateSpotInfoLst);
-                Toast.makeText(getBaseContext(),"got updated spots num="+updateSpotInfoLst.size()+" from server and saveRegionInfo to pref",Toast.LENGTH_LONG).show();
+                //Toast.makeText(getBaseContext(), "got updated spots num=" + updateSpotInfoLst.size() + " from server and saveRegionInfo to pref", Toast.LENGTH_LONG).show();
+                setVisibleLayouts(true,false);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -277,5 +294,16 @@ public class MainActivity extends ActionBarActivity
         }
         else
             Log.e(TAG,"ListUpdatedSpot = null");
+    }
+    private void setVisibleLayouts(boolean relativeLayout, boolean frameLayout)
+    {
+        if(relativeLayout)
+            findViewById(R.id.main_frg_relativeLayout).setVisibility(View.VISIBLE);
+        else
+            findViewById(R.id.main_frg_relativeLayout).setVisibility(View.GONE);
+        if(frameLayout)
+            findViewById(R.id.main_frg_frameLayout).setVisibility(View.VISIBLE);
+        else
+            findViewById(R.id.main_frg_frameLayout).setVisibility(View.GONE);
     }
 }
