@@ -29,6 +29,39 @@ public class Spot {
         coachLst = new ArrayList<Long>();
         partnerLst = new ArrayList<Long>();
     }
+    public Spot(Spot anotherSpot)
+    {
+        id = anotherSpot.getId();
+        regionId = anotherSpot.getId();
+        name = anotherSpot.getName();
+        address = anotherSpot.getAddress();
+        Coordinates coords1;
+        if((coords1 = anotherSpot.getCoords())!=null)
+            coords = new Coordinates(coords1.getLat(),coords1.getLongt());
+        else
+            coords = null;
+        price = anotherSpot.getPrice();
+        workHours = anotherSpot.getWorkHours();
+        contact = anotherSpot.getContact();
+        description = anotherSpot.getDescription();
+        List<Long> longList;
+        if((longList = anotherSpot.getPartnerLst())!=null)
+            partnerLst = new ArrayList<Long>(longList);
+        else
+            partnerLst = new ArrayList<Long>();
+
+        if((longList = anotherSpot.getCoachLst())!=null)
+            coachLst = new ArrayList<Long>(longList);
+        else
+            coachLst = new ArrayList<Long>();
+        List<Picture> pictureLst1;
+
+        if((pictureLst1 = anotherSpot.getPictureLst())!=null)
+            pictureLst = new ArrayList<Picture>(pictureLst1);
+        else
+            pictureLst = new ArrayList<Picture>();
+    }
+
 
     public Long getId() {
         return id;

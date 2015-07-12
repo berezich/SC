@@ -96,7 +96,7 @@ public class SpotEndpoint {
         spot.setId(null);
         ofy().save().entity(spot).now();
         Spot spotRes = ofy().load().entity(spot).now();
-        logger.info("Created Spot getId:" + spotRes.getId() + " getName:" + spotRes.getName());
+        logger.info("Created Spot getId:" + spotRes.getId() + " name:" + spotRes.getName());
         setSpotUpdateInstance(spotRes);
         setFavoritePersonsSpot(spotRes,null);
         return spotRes;
@@ -108,7 +108,7 @@ public class SpotEndpoint {
      * @param id   the ID of the entity to be updated
      * @param spot the desired state of the entity
      * @return the updated version of the entity
-     * @throws NotFoundException if the {@code getId} does not correspond to an existing
+     * @throws NotFoundException if the {@code id} does not correspond to an existing
      *                           {@code Spot}
      */
     @ApiMethod(
@@ -131,6 +131,46 @@ public class SpotEndpoint {
         return resSpot;
     }
 
+    @ApiMethod(
+            name = "setSpotAsFavorite",
+            path = "spotSetAsFavorite",
+            httpMethod = ApiMethod.HttpMethod.PUT)
+    public void setAsFavorite(@Named("idSpot") Long idSpot,
+                              @Named("idPerson") Long idPerson,
+                              @Named("isFavorite") boolean isFavorite,
+                              @Named("typePerson")Person.TYPE type) throws NotFoundException, BadRequestException {
+        Spot oldSpot;
+        Spot spot = ofy().load().type(Spot.class).id(idSpot).now();
+        if(spot==null) {
+            throw new NotFoundException("Spot with id:" + idSpot + " not found");
+        }
+        oldSpot = new Spot(spot);
+        List<Long> personLst = null;
+        if(type == Person.TYPE.PARTNER)
+            personLst = spot.getPartnerLst();
+        else if(type == Person.TYPE.COACH)
+            personLst = spot.getCoachLst();
+
+        boolean isContain = personLst.contains(idPerson);
+        boolean isChanged = false;
+        if(!isContain && isFavorite) {
+            personLst.add(idPerson);
+            isChanged = true;
+        }
+        else if(isContain && !isFavorite){
+            personLst.remove(idPerson);
+            isChanged = true;
+        }
+        if(isChanged) {
+            updateRegionInfoAboutSpot(spot);
+            ofy().save().entity(spot).now();
+            Spot resSpot = ofy().load().entity(spot).now();
+            logger.info("Updated as favorite Spot id:" + resSpot.getId() + " name:" + resSpot.getName());
+            setSpotUpdateInstance(resSpot);
+            setFavoritePersonsSpot(resSpot, oldSpot);
+        }
+        return;
+    }
 
     @ApiResourceProperty(ignored = AnnotationBoolean.TRUE)
     public void removePersonsFromSpots(@Named("lstSpotIds") List<Long> idLst, @Named("personType")Person.TYPE type,@Named("personId") Long personId) {
@@ -347,5 +387,7 @@ public class SpotEndpoint {
             throw  new BadRequestException("RegionId property must be initialized");
         if(spot.getName()==null || spot.getName().equals(""))
             throw  new BadRequestException("Name property must be initialized");
+        if(spot.getCoords()==null)
+            throw  new BadRequestException("Coordinates property must be initialized");
     }
 }

@@ -1,49 +1,56 @@
 <resources>
     <string name="app_name">SportConnector</string>
 
-    <!-- main/search frame-->
-    <string name="frame_main_title">Поиск</string>
-    <string name="btn_main_1">СПАРРИНГ ПАРТНЕРЫ</string>
-    <string name="btn_main_2">ТРЕНЕРЫ</string>
-    <string name="btn_main_3">КОРТЫ</string>
-    <!-- main/search frame-->
+    <!-- main begin -->
+        <!-- main/search frame-->
+        <string name="frame_main_title">Поиск</string>
+        <string name="btn_main_1">СПАРРИНГ ПАРТНЕРЫ</string>
+        <string name="btn_main_2">ТРЕНЕРЫ</string>
+        <string name="btn_main_3">КОРТЫ</string>
+        <!-- main/search frame-->
 
-    <!-- main/portfolio frame-->
-    <string name="frame_profile_title">Моя страница</string>
-    <!-- main/portfolio frame-->
+        <!-- main/portfolio frame-->
+        <string name="frame_profile_title">Моя страница</string>
+        <!-- main/portfolio frame-->
 
-    <!-- main/msg frame-->
-    <string name="frame_msg_title">Мои сообщения</string>
-    <!-- main/msg frame-->
+        <!-- main/msg frame-->
+        <string name="frame_msg_title">Мои сообщения</string>
+        <!-- main/msg frame-->
 
-    <!-- main/photo frame-->
-    <string name="frame_photo_title">Мои фотографии</string>
-    <!-- main/photo frame-->
+        <!-- main/photo frame-->
+        <string name="frame_photo_title">Мои фотографии</string>
+        <!-- main/photo frame end-->
 
-    <!-- main/fiends frame-->
-    <string name="frame_friends_title">Мои друзья</string>
-    <!-- main/fiends frame-->
+        <!-- main/fiends frame begin-->
+        <string name="frame_friends_title">Мои друзья</string>
+        <!-- main/fiends frame end-->
+    <!-- main end -->
+
+
+    <!--spotInfo_fragment begin-->
+        <string name="spotinfo_tab1_title">Спарринг партнеры</string>
+        <string name="spotinfo_tab2_title">Тренеры</string>
+        <string name="spotinfo_no_partners_no_coaches">На данном корте пока нет зарегестрированных соперников и тренеров.</string>
+        <string name="spotinfo_req_error_msg">Ошибка</string>
+        <!-- spotInfo_fragment/list_person_item-->
+            <string name="person_item_age">Возраст:</string>
+            <string name="person_item_rating">Рейтинг:</string>
+        <!-- spotInfo_fragment/list_person_item-->
+
+    <!-- spotInfo_fragment end-->
+
+    <!-- srvApi begin-->
+        <string name="srvApi_url">https://sportconnector-981.appspot.com/_ah/api/</string>
+    <!-- srvApi end-->
+
+    <!-- errorVisualizer begin-->
+        <string name="host_unreacheble_err">Невозможно загрузить данные.\nПроверьте ваше интернет соединение.</string>
+        <string name="try_again">Try again</string>
+    <!-- errorVisualizer end-->
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
-
-    <!--spotInfo_fragment-->
-    <string name="spotinfo_tab1_title">Спарринг партнеры</string>
-    <string name="spotinfo_tab2_title">Тренеры</string>
-    <string name="spotinfo_no_partners_no_coaches">На данном корте пока нет зарегестрированных соперников и тренеров.</string>
-
-    <!-- spotInfo_fragment-->
-    <!-- spotInfo_fragment/list_person_item-->
-    <string name="person_item_age">Возраст:</string>
-    <string name="person_item_rating">Рейтинг:</string>
-    <!-- spotInfo_fragment/list_person_item-->
-
-
     <string name="action_example">Example action</string>
-
     <string name="action_settings">Settings</string>
-    
-    <!-- srvApi-->
-    <string name="srvApi_url">https://sportconnector-981.appspot.com/_ah/api/</string>
 
 </resources>

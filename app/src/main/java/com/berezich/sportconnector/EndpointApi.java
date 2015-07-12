@@ -17,6 +17,7 @@ import com.google.api.client.extensions.android.json.AndroidJsonFactory;
 import com.google.api.client.googleapis.services.AbstractGoogleClientRequest;
 import com.google.api.client.googleapis.services.GoogleClientRequestInitializer;
 import com.google.api.client.util.DateTime;
+import com.google.maps.android.geometry.Bounds;
 
 import java.io.IOException;
 import java.lang.reflect.Array;
@@ -113,14 +114,14 @@ public class EndpointApi {
     public static class GetSpotListAsyncTask extends AsyncTask<Long, Void, Pair<List<Spot>,Exception> >{
         private OnAction listener=null;
         private Context context = null;
-        public GetSpotListAsyncTask(Activity activity)
+        public GetSpotListAsyncTask(Fragment fragment)
         {
-            context = activity.getBaseContext();
+            context = fragment.getActivity().getBaseContext();
             setSrvApi(context);
             try {
-                listener = (OnAction) activity;
+                listener = (OnAction) fragment;
             } catch (ClassCastException e) {
-                throw new ClassCastException(activity.toString() + " must implement OnAction for GetSpotListAsyncTask");
+                throw new ClassCastException(fragment.toString() + " must implement OnAction for GetSpotListAsyncTask");
             }
         }
         @Override
@@ -150,14 +151,14 @@ public class EndpointApi {
     public static class GetUpdatedSpotListAsyncTask extends AsyncTask<Pair<Long,DateTime>, Void, Pair<List<UpdateSpotInfo>,Exception> >{
         private OnAction listener=null;
         private Context context = null;
-        public GetUpdatedSpotListAsyncTask(Activity activity)
+        public GetUpdatedSpotListAsyncTask(Fragment fragment)
         {
-            context = activity.getBaseContext();
+            context = fragment.getActivity().getBaseContext();
             setSrvApi(context);
             try {
-                listener = (OnAction) activity;
+                listener = (OnAction) fragment;
             } catch (ClassCastException e) {
-                throw new ClassCastException(activity.toString() + " must implement OnAction for GetUpdatedSpotListAsyncTask");
+                throw new ClassCastException(fragment.toString() + " must implement OnAction for GetUpdatedSpotListAsyncTask");
             }
         }
         @Override
@@ -252,6 +253,45 @@ public class EndpointApi {
         public static interface OnAction
         {
             void onUpdateSpotFinish(Pair<Spot,Exception> result);
+        }
+    }
+
+    public static class SetSpotAsFavoriteAsyncTask extends AsyncTask< Long, Void, Pair<Boolean ,Exception> >{
+        private OnAction listener=null;
+        private Context context = null;
+        public SetSpotAsFavoriteAsyncTask(Fragment fragment)
+        {
+            context = fragment.getActivity().getBaseContext();
+            setSrvApi(context);
+            try {
+                listener = (OnAction) fragment;
+            } catch (ClassCastException e) {
+                throw new ClassCastException(fragment.toString() + " must implement OnAction for SetSpotAsFavoriteAsyncTask");
+            }
+        }
+        @Override
+        protected Pair<Boolean,Exception> doInBackground(Long... params) {
+            Long spot = params[0];
+            Long person = params[1];
+            boolean isFavorite = (params[2]==0) ? false : true ;
+            String personType = (params[3]==1) ? "PARTNER":"COACH";
+            if(spot!=null && person!=null)
+            try {
+                srvApi.setSpotAsFavorite(person,spot,isFavorite,personType).execute();
+            } catch (IOException e) {
+                return new Pair<Boolean,Exception>(isFavorite,e);
+            }
+            return new Pair<Boolean,Exception>(isFavorite,null);
+        }
+
+        @Override
+        protected void onPostExecute(Pair<Boolean,Exception> result) {
+            listener.onSetSpotAsFavoriteFinish(result);
+        }
+
+        public static interface OnAction
+        {
+            void onSetSpotAsFavoriteFinish(Pair<Boolean,Exception> result);
         }
     }
 }

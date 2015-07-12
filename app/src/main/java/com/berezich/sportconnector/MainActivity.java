@@ -10,7 +10,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.support.v4.widget.DrawerLayout;
 import android.view.View;
-import android.widget.Toast;
+import android.widget.FrameLayout;
 
 import com.berezich.sportconnector.GoogleMap.GoogleMapFragment;
 import com.berezich.sportconnector.GoogleMap.SpotsData;
@@ -23,16 +23,13 @@ import com.google.api.client.util.DateTime;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 
 public class MainActivity extends ActionBarActivity
         implements NavigationDrawerFragment.NavigationDrawerCallbacks,
-        MainFragment.OnActionListenerMainFragment, GoogleMapFragment.OnActionListenerGMapFragment,
-        EndpointApi.GetRegionAsyncTask.OnGetRegionAsyncTaskAction,
-        EndpointApi.GetSpotListAsyncTask.OnAction,
-        EndpointApi.GetUpdatedSpotListAsyncTask.OnAction {
+        GoogleMapFragment.OnActionListenerGMapFragment,
+        MainFragment.OnActionListenerMainFragment {
 
     /**
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
@@ -43,9 +40,8 @@ public class MainActivity extends ActionBarActivity
      * Used to store the last screen title. For use in {@link #restoreActionBar()}.
      */
     private CharSequence mTitle;
-    private static final String TAG = "YaMapFragment";
-    private static Long regionId = new Long(1);
-    private boolean isSpotsLoaded = false;
+    private static final String TAG = "MainActivity";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,18 +77,14 @@ public class MainActivity extends ActionBarActivity
                 R.id.navigation_drawer,
                 (DrawerLayout) findViewById(R.id.drawer_layout));
 
-        new EndpointApi.GetRegionAsyncTask(this).execute(regionId);
+
 
     }
     @Override
     protected void onResume()
     {
         super.onResume();
-        if(isSpotsLoaded)
-            setVisibleLayouts(true,false);
-        else
-            setVisibleLayouts(false,true);
-        isSpotsLoaded = true;
+
     }
     @Override
     public void onNavigationDrawerItemSelected(int position) {
@@ -183,127 +175,6 @@ public class MainActivity extends ActionBarActivity
 
     }
 
-    @Override
-    public void onGetRegionAsyncTaskFinish(Pair<RegionInfo, Exception> result) {
-        String resText="";
-        Exception error = result.second;
-        RegionInfo regionInfo=result.first, localRegionInfo = null;
-        if(error!=null)
-            resText = result.second.getMessage();
-        else if(regionInfo!=null)
-            resText = result.first.toString();
 
-        //Toast.makeText(getBaseContext(), resText, Toast.LENGTH_LONG).show();
 
-        if(error==null && regionInfo!=null)
-        {
-            try {
-                if(LocalDataManager.loadRegionInfoFromPref(this))
-                    if ((localRegionInfo = LocalDataManager.getRegionInfo()) != null)
-                        if (localRegionInfo.getVersion().equals(regionInfo.getVersion()))
-                            if (localRegionInfo.getLastSpotUpdate().getValue() - regionInfo.getLastSpotUpdate().getValue()<0) {
-                                //get list of updated spots and update existed
-                                /*Toast.makeText(getBaseContext(),"get list of updated spots and update existed",
-                                        Toast.LENGTH_LONG).show();*/
-                                LocalDataManager.setRegionInfo(regionInfo);
-                                SpotsData.loadSpotsFromCache();
-                                new EndpointApi.GetUpdatedSpotListAsyncTask(this).execute(
-                                        new Pair<Long, DateTime>(regionInfo.getId(), localRegionInfo.getLastSpotUpdate()));
-                                return;
-                            }
-                            else {
-                                //we have actual spot information
-                                //Toast.makeText(getBaseContext(),"we have actual spot information",Toast.LENGTH_LONG).show();
-                                SpotsData.loadSpotsFromCache();
-                                //Toast.makeText(getBaseContext(), SpotsData.get_allSpots().toString(), Toast.LENGTH_LONG).show();
-                                setVisibleLayouts(true,false);
-                                return;
-                            }
-                //get all spots from server
-                LocalDataManager.setRegionInfo(regionInfo);
-                new EndpointApi.GetSpotListAsyncTask(this).execute(regionId);
-                //Toast.makeText(getBaseContext(),"get all spots from server",Toast.LENGTH_LONG).show();
-                return;
-            } catch (IOException e) {
-                e.printStackTrace();
-                Log.e(TAG,"Error loading regionInfo from Preferences");
-            }
-        }
-
-        Log.e(TAG,"Error get regionInfo from server");
-        if(error!=null)
-        {
-            Log.e(TAG,error.getMessage());
-            error.printStackTrace();
-        }
-        else
-            Log.e(TAG,"regionInfo = null");
-    }
-
-    @Override
-    public void onGetSpotListFinish(Pair<List<Spot>, Exception> result) {
-        Exception error = result.second;
-        List<Spot> spotLst = result.first;
-        if(spotLst==null)
-            spotLst = new ArrayList<Spot>();
-        if(error == null && spotLst!=null)
-        {
-            try {
-                LocalDataManager.saveRegionInfoToPref(this);
-                SpotsData.saveSpotsToCache(spotLst);
-                //Toast.makeText(getBaseContext(),"got all spots from server and saveRegionInfo to pref",Toast.LENGTH_LONG).show();
-                setVisibleLayouts(true,false);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            return;
-        }
-        Log.e(TAG, "Error get ListSpot from server");
-        if(error!=null)
-        {
-            Log.e(TAG,error.getMessage());
-            error.printStackTrace();
-        }
-        else
-            Log.e(TAG,"ListSpot = null");
-    }
-
-    @Override
-    public void onGetUpdateSpotListFinish(Pair<List<UpdateSpotInfo>, Exception> result) {
-        Exception error = result.second;
-        List<Spot> spotLst = new ArrayList<Spot>();
-        List<UpdateSpotInfo> updateSpotInfoLst = result.first;
-
-        if(error == null && updateSpotInfoLst!=null)
-        {
-            try {
-                LocalDataManager.saveRegionInfoToPref(this);
-                SpotsData.setSpotUpdatesToCache(updateSpotInfoLst);
-                //Toast.makeText(getBaseContext(), "got updated spots num=" + updateSpotInfoLst.size() + " from server and saveRegionInfo to pref", Toast.LENGTH_LONG).show();
-                setVisibleLayouts(true,false);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            return;
-        }
-        Log.e(TAG, "Error get updated ListSpot from server");
-        if(error!=null)
-        {
-            Log.e(TAG,error.getMessage());
-            error.printStackTrace();
-        }
-        else
-            Log.e(TAG,"ListUpdatedSpot = null");
-    }
-    private void setVisibleLayouts(boolean relativeLayout, boolean frameLayout)
-    {
-        if(relativeLayout)
-            findViewById(R.id.main_frg_relativeLayout).setVisibility(View.VISIBLE);
-        else
-            findViewById(R.id.main_frg_relativeLayout).setVisibility(View.GONE);
-        if(frameLayout)
-            findViewById(R.id.main_frg_frameLayout).setVisibility(View.VISIBLE);
-        else
-            findViewById(R.id.main_frg_frameLayout).setVisibility(View.GONE);
-    }
 }

@@ -10,13 +10,16 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TabHost;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.berezich.sportconnector.EndpointApi;
+import com.berezich.sportconnector.ErrorVisualizer;
 import com.berezich.sportconnector.GoogleMap.SpotsData;
 import com.berezich.sportconnector.LocalDataManager;
 import com.berezich.sportconnector.R;
@@ -42,7 +45,8 @@ import java.util.List;
  * create an instance of this fragment.
  */
 public class SpotInfoFragment extends Fragment implements EndpointApi.GetListPersonByIdLstAsyncTask.OnAction,
-                                                          EndpointApi.UpdateSpotAsyncTask.OnAction
+                                                          /*EndpointApi.UpdateSpotAsyncTask.OnAction,*/
+                                                          EndpointApi.SetSpotAsFavoriteAsyncTask.OnAction
 {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -59,6 +63,7 @@ public class SpotInfoFragment extends Fragment implements EndpointApi.GetListPer
     private View spotInfoView;
     private ProfileItemLstAdapter partnersAdapter;
     private ProfileItemLstAdapter coachesAdapter;
+    private ArrayList<Long> personIdLst;
 
     private OnFragmentInteractionListener mListener;
 
@@ -102,6 +107,8 @@ public class SpotInfoFragment extends Fragment implements EndpointApi.GetListPer
         ImageButton imgButton;
         spotInfoView = inflater.inflate(R.layout.fragment_spot_info, container, false);
         spotHashMap = SpotsData.get_allSpots();
+        if((txtView = (TextView) spotInfoView.findViewById(R.id.spotinfo_frg_tryAgain_txtView))!=null)
+            txtView.setOnClickListener(new TryAgainClickListener());
         curSpot = spotHashMap.get(spotId);
         if(curSpot!=null)
         {
@@ -159,21 +166,28 @@ public class SpotInfoFragment extends Fragment implements EndpointApi.GetListPer
                 });
     */
             }
-            else if((txtView =(TextView) spotInfoView.findViewById(R.id.spotInfo_txt_noPartersCoaches))!=null) {
+            else {
+                setVisible(View.GONE, View.GONE, View.VISIBLE);
+                return spotInfoView;
+            }
+            /*else if((txtView =(TextView) spotInfoView.findViewById(R.id.spotInfo_txt_noPartersCoaches))!=null) {
                 if((tabHost = (TabHost) spotInfoView.findViewById(R.id.spotInfo_tabHost))!=null)
                     tabHost.setVisibility(View.GONE);
                 txtView.setVisibility(View.VISIBLE);
+            }*/
+
+
+            personIdLst = new ArrayList<Long>();
+            if(curSpot.getCoachLst()!=null)
+                personIdLst.addAll(SpotsData.getCoachIdsWithoutMe(curSpot));
+            if(curSpot.getPartnerLst()!=null)
+                personIdLst.addAll(SpotsData.getPartnerIdsWithoutMe(curSpot));
+            if(personIdLst.size()>0) {
+                setVisibleProgressBar();
+                new EndpointApi.GetListPersonByIdLstAsyncTask(this).execute(personIdLst);
+
             }
         }
-
-        ArrayList<Long> personIdLst = new ArrayList<Long>();
-        if(curSpot.getCoachLst()!=null)
-            personIdLst.addAll(SpotsData.getCoachIdsWithoutMe(curSpot));
-        if(curSpot.getPartnerLst()!=null)
-            personIdLst.addAll(SpotsData.getPartnerIdsWithoutMe(curSpot));
-        if(personIdLst.size()>0)
-            new EndpointApi.GetListPersonByIdLstAsyncTask(this).execute(personIdLst);
-
         return spotInfoView;
     }
 
@@ -205,11 +219,12 @@ public class SpotInfoFragment extends Fragment implements EndpointApi.GetListPer
     @Override
     public void onStop() {
         super.onStop();
-        if(isFavoriteChanged) {
-            SpotsData.setSpotFavorite(curSpot.getId(), !(LocalDataManager.isMyFavoriteSpot(curSpot)));
-            new EndpointApi.UpdateSpotAsyncTask(this).execute(spotHashMap.get(curSpot.getId()));
+        /*if(isFavoriteChanged) {
 
-        }
+            //new EndpointApi.UpdateSpotAsyncTask(this).execute(spotHashMap.get(curSpot.getId()));
+
+
+        }*/
     }
 
     /**
@@ -236,6 +251,10 @@ public class SpotInfoFragment extends Fragment implements EndpointApi.GetListPer
             if(event.getAction()==MotionEvent.ACTION_DOWN) {
                 btn.setPressed(!btn.isPressed());
                 isFavoriteChanged = !isFavoriteChanged;
+                SpotsData.setSpotFavorite(curSpot.getId(), btn.isPressed());
+                new EndpointApi.SetSpotAsFavoriteAsyncTask(getFragmentRef()).execute(curSpot.getId(),
+                        LocalDataManager.getMyPersonInfo().getId(),(btn.isPressed())? new Long(1) :new Long(0),
+                        LocalDataManager.getMyPersonInfo().getType().equals("PARTNER")? new Long(1):new Long(2));
                 return true;
             }
             return true;
@@ -267,19 +286,27 @@ public class SpotInfoFragment extends Fragment implements EndpointApi.GetListPer
             partnersAdapter = new ProfileItemLstAdapter(getActivity().getApplicationContext(),
                     new ArrayList<Person>(partnerLst));
             lstView.setAdapter(partnersAdapter);
+
+            if(partnerLst.size()>0 || coachLst.size()>0)
+                setVisible(View.VISIBLE,View.GONE,View.GONE);
+            else
+                setVisible(View.GONE,View.GONE,View.VISIBLE);
+
             return;
         }
         Log.e(TAG, "Error GetListPersonByIdLst");
         if(error!=null)
         {
-            Log.e(TAG,error.getMessage());
-            error.printStackTrace();
+            FrameLayout frameLayout;
+            if((frameLayout = (FrameLayout) spotInfoView.findViewById(R.id.spotinfo_frg_frameLayout))!=null)
+                ErrorVisualizer.showErrorAfterReq(getActivity().getBaseContext(), frameLayout,error,TAG);
+            setVisible(View.GONE,View.VISIBLE,View.GONE);
         }
         else
             Log.d(TAG,"personLst = null");
     }
 
-    @Override
+    /*@Override
     public void onUpdateSpotFinish(Pair<Spot, Exception> result) {
         Spot spot = result.first;
         Exception error = result.second;
@@ -295,5 +322,59 @@ public class SpotInfoFragment extends Fragment implements EndpointApi.GetListPer
         }
         else
             Log.d(TAG,"UpdatedSpot = null");
+    }
+*/
+    @Override
+    public void onSetSpotAsFavoriteFinish(Pair<Boolean,Exception> result) {
+        boolean isFavorite = result.first;
+        Exception ex = result.second;
+        if(ex!=null)
+        {
+            if(spotInfoView!=null) {
+                ImageButton btn = (ImageButton) spotInfoView.findViewById(R.id.spotInfo_btnImg_favorite);
+                if (btn!=null) {
+                    if(btn.isPressed()==isFavorite)
+                        btn.setPressed(!isFavorite);
+                    SpotsData.setSpotFavorite(curSpot.getId(), !isFavorite);
+                    Toast.makeText(getActivity().getBaseContext(), R.string.spotinfo_req_error_msg, Toast.LENGTH_SHORT).show();
+                }
+            }
+        }
+    }
+    private class TryAgainClickListener implements View.OnClickListener
+    {
+        @Override
+        public void onClick(View v) {
+            if(personIdLst.size()>0) {
+                setVisibleProgressBar();
+                new EndpointApi.GetListPersonByIdLstAsyncTask(getFragmentRef()).execute(personIdLst);
+
+            }
+        }
+    }
+    private void setVisible(int tabsVisibility, int frameLayoutVisibility, int noPersonsVisibility)
+    {
+        FrameLayout frameLayout1;
+        View view;
+        if(spotInfoView!=null) {
+            if ((frameLayout1 = (FrameLayout) spotInfoView.findViewById(R.id.spotinfo_frg_frameLayout)) != null)
+                frameLayout1.setVisibility(frameLayoutVisibility);
+            if ((view = spotInfoView.findViewById(R.id.spotInfo_tabHost)) != null)
+                view.setVisibility(tabsVisibility);
+            if ((view = spotInfoView.findViewById(R.id.spotInfo_txt_noPartersCoaches)) != null)
+                view.setVisibility(noPersonsVisibility);
+        }
+    }
+    private void setVisibleProgressBar()
+    {
+        FrameLayout frameLayout;
+        setVisible(View.GONE,View.VISIBLE,View.GONE);
+
+        if((frameLayout = (FrameLayout) spotInfoView.findViewById(R.id.spotinfo_frg_frameLayout))!=null)
+            ErrorVisualizer.showProgressBar(frameLayout);
+    }
+    private Fragment getFragmentRef()
+    {
+        return  this;
     }
 }
