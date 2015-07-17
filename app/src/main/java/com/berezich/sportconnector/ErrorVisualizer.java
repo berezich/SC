@@ -22,7 +22,8 @@ public class ErrorVisualizer {
         if(e!=null) {
             Log.e(TAG, e.getMessage());
             e.printStackTrace();
-            if((UnknownHostException)e!=null)
+            //if((UnknownHostException)e!=null)
+            if(e!=null)
             {
                 if(layout!=null)
                 {

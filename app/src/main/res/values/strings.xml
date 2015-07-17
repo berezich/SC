@@ -44,6 +44,7 @@
     <string name="personprofile_rating">Уровень игры</string>
     <string name="personprofile_email">Email:</string>
     <string name="personprofile_phone">Phone:</string>
+    <string name="personprofile_type">Category:</string>
     <string name="personprofile_favorite_spots">Любимые корты</string>
         <!-- personProfile_fragment/list_spot_item-->
         <string name="spot_item_name">Возраст</string>

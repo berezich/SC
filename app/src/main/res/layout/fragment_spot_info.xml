@@ -4,7 +4,9 @@
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:orientation="vertical" android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:showDividers="middle"
+        android:divider="@drawable/divider">
 
         <LinearLayout
             android:orientation="horizontal"
@@ -75,7 +77,6 @@
                     android:id="@android:id/tabs"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="#ffd1d1d1"
                     android:clickable="false"
                     android:gravity="left"
                     android:tabStripEnabled="false"></TabWidget>
