@@ -1,4 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="gray">#AAAAAA</color>
+    <!-- fragment_personProfile-->
+    <color name="divider_block">#AAAAAA</color>
+    <color name="property_line">#66BBBBBB</color>
+    <!-- fragment_personProfile-->
 </resources>

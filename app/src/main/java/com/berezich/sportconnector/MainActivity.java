@@ -15,6 +15,7 @@ import android.widget.FrameLayout;
 import com.berezich.sportconnector.GoogleMap.GoogleMapFragment;
 import com.berezich.sportconnector.GoogleMap.SpotsData;
 import com.berezich.sportconnector.MainFragment.Filters;
+import com.berezich.sportconnector.PersonProfile.PersonProfileFragment;
 import com.berezich.sportconnector.SpotInfo.SpotInfoFragment;
 import com.berezich.sportconnector.backend.sportConnectorApi.model.RegionInfo;
 import com.berezich.sportconnector.backend.sportConnectorApi.model.Spot;
@@ -95,6 +96,11 @@ public class MainActivity extends ActionBarActivity
                 fragmentManager.beginTransaction()
                     .replace(R.id.container, new MainFragment().setArgs(position ))
                     .commit();
+                break;
+            case 1:
+                fragmentManager.beginTransaction()
+                        .replace(R.id.container, new PersonProfileFragment().setArgs(position))
+                        .commit();
                 break;
             default:
                 fragmentManager.beginTransaction()

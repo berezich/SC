@@ -39,6 +39,20 @@
 
     <!-- spotInfo_fragment end-->
 
+    <!--personProfile_fragment begin-->
+    <string name="personprofile_age">Возраст</string>
+    <string name="personprofile_rating">Уровень игры</string>
+    <string name="personprofile_email">Email:</string>
+    <string name="personprofile_phone">Phone:</string>
+    <string name="personprofile_favorite_spots">Любимые корты</string>
+        <!-- personProfile_fragment/list_spot_item-->
+        <string name="spot_item_name">Возраст</string>
+        <string name="spot_item_address">Адрес</string>
+        <string name="spot_item_rating">Рейтинг</string>
+        <!-- personProfile_fragment/list_spot_item-->
+
+    <!-- spersonProfile_fragment end-->
+
     <!-- srvApi begin-->
         <string name="srvApi_url">https://sportconnector-981.appspot.com/_ah/api/</string>
     <!-- srvApi end-->

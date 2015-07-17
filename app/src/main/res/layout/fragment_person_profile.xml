@@ -1,0 +1,497 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+
+    <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/scrollView" >
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/divider_block"
+            android:divider="@drawable/divider"
+            android:showDividers="beginning|middle|end"
+            android:paddingLeft="@dimen/left_right_offset"
+            android:paddingRight="@dimen/left_right_offset">
+
+            <LinearLayout
+                    android:orientation="horizontal" android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:weightSum="1"
+                    android:background="@color/background_material_light">
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/profile_img_photo"
+                        android:src="@drawable/lst_profile_icon"
+                        android:background="#ffbcbcbc" />
+
+                    <LinearLayout
+                        android:orientation="vertical"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:weightSum="2">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:text="Name"
+                            android:id="@+id/profile_name"
+                            android:layout_marginLeft="15dp"
+                            android:layout_marginTop="15dp"
+                            android:layout_weight="1"
+                            android:textColor="#ff666666"
+                            android:textSize="17dp" />
+
+                        <LinearLayout
+                            android:orientation="horizontal"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:weightSum="2"
+                            android:layout_weight="1">
+
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:text="Description1"
+                                android:id="@+id/profile_desc1"
+                                android:layout_marginTop="15dp"
+                                android:layout_marginLeft="15dp"
+                                android:layout_weight="1"
+                                android:textColor="#ff666666" />
+
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:text="Description2"
+                                android:id="@+id/profile_desc2"
+                                android:layout_marginTop="15dp"
+                                android:layout_marginLeft="15dp"
+                                android:layout_weight="1"
+                                android:textColor="#ff666666" />
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            <View
+                    android:layout_width="fill_parent"
+                    android:layout_height="@dimen/divider_block_width"
+                    android:background="@color/divider_block"
+                    android:id="@+id/profile_0divider"
+                    android:visibility="gone" />
+
+            <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/background_floating_material_light"
+                    android:paddingBottom="25dp">
+
+                    <FrameLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="50dp"
+                        android:layout_marginRight="35dp"
+                        android:layout_marginLeft="35dp">
+
+                        <LinearLayout
+                            android:orientation="horizontal"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="bottom"
+                            android:layout_marginBottom="10dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textAppearance="?android:attr/textAppearanceMedium"
+                                android:text="@string/personprofile_email"
+                                android:id="@+id/profile_email_title"
+                                android:layout_gravity="center_horizontal|left"
+                                android:gravity="left"
+                                android:paddingLeft="5dp"
+                                android:paddingRight="5dp" />
+
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:textAppearance="?android:attr/textAppearanceMedium"
+                                android:text="Medium Text"
+                                android:id="@+id/profile_email_value"
+                                android:gravity="center_horizontal"
+                                android:paddingLeft="5dp"
+                                android:paddingRight="5dp" />
+                        </LinearLayout>
+
+                        <View
+                            android:layout_width="fill_parent"
+                            android:layout_height="@dimen/property_line_width"
+                            android:background="@color/property_line"
+                            android:id="@+id/profile_2divider"
+                            android:paddingLeft="0dp"
+                            android:paddingRight="0dp"
+                            android:padding="0dp"
+                            android:paddingTop="0dp"
+                            android:layout_gravity="bottom"
+                            android:layout_marginBottom="5dp" />
+
+                    </FrameLayout>
+
+                    <FrameLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="50dp"
+                        android:layout_marginRight="35dp"
+                        android:layout_marginLeft="35dp">
+
+                        <LinearLayout
+                            android:orientation="horizontal"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="bottom"
+                            android:layout_marginBottom="10dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textAppearance="?android:attr/textAppearanceMedium"
+                                android:text="@string/personprofile_phone"
+                                android:id="@+id/profile_phone_title"
+                                android:layout_gravity="center_horizontal|left"
+                                android:gravity="left"
+                                android:paddingLeft="5dp"
+                                android:paddingRight="5dp" />
+
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:textAppearance="?android:attr/textAppearanceMedium"
+                                android:text="Medium Text"
+                                android:id="@+id/profile_phone_value"
+                                android:gravity="center_horizontal"
+                                android:paddingLeft="5dp"
+                                android:paddingRight="5dp" />
+                        </LinearLayout>
+
+                        <View
+                            android:layout_width="fill_parent"
+                            android:layout_height="@dimen/property_line_width"
+                            android:background="@color/property_line"
+                            android:id="@+id/profile_1divider"
+                            android:paddingLeft="0dp"
+                            android:paddingRight="0dp"
+                            android:padding="0dp"
+                            android:paddingTop="0dp"
+                            android:layout_gravity="bottom"
+                            android:layout_marginBottom="5dp" />
+
+                    </FrameLayout>
+                </LinearLayout>
+
+            <View
+                    android:layout_width="fill_parent"
+                    android:layout_height="@dimen/divider_block_width"
+                    android:background="@color/divider_block"
+                    android:id="@+id/profile_cap_spot_lst_divider"
+                    android:visibility="gone" />
+
+            <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/background_material_light">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:text="@string/personprofile_favorite_spots"
+                        android:id="@+id/textView"
+                        android:layout_gravity="center_horizontal"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginBottom="10dp" />
+
+                    <LinearLayout
+                        android:orientation="horizontal" android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:weightSum="1"
+                        android:background="#88DADADA"
+                        android:layout_marginTop="0dp"
+                        android:layout_marginBottom="2dp"
+                        android:layout_marginLeft="5dp"
+                        android:layout_marginRight="5dp">
+
+                        <ImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:id="@+id/lstProfileItem_img_photo1"
+                            android:src="@drawable/lst_profile_icon" />
+
+                        <LinearLayout
+                            android:orientation="vertical"
+                            android:layout_width="fill_parent"
+                            android:layout_height="fill_parent"
+                            android:layout_weight="1"
+                            android:weightSum="2">
+
+                            <TextView
+                                android:layout_width="fill_parent"
+                                android:layout_height="fill_parent"
+                                android:text="Name"
+                                android:id="@+id/lstProfileItem_name1"
+                                android:layout_marginLeft="15dp"
+                                android:layout_marginTop="15dp"
+                                android:layout_weight="1"
+                                android:textColor="#ff666666"
+                                android:textSize="17dp" />
+
+                            <LinearLayout
+                                android:orientation="horizontal"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:weightSum="2"
+                                android:layout_weight="1">
+
+                                <TextView
+                                    android:layout_width="fill_parent"
+                                    android:layout_height="fill_parent"
+                                    android:text="Description1"
+                                    android:id="@+id/lstProfileItem_desc11"
+                                    android:layout_marginTop="15dp"
+                                    android:layout_marginLeft="15dp"
+                                    android:layout_weight="1"
+                                    android:textColor="#ff666666" />
+
+                                <TextView
+                                    android:layout_width="fill_parent"
+                                    android:layout_height="fill_parent"
+                                    android:text="Description2"
+                                    android:id="@+id/lstProfileItem_desc21"
+                                    android:layout_marginTop="15dp"
+                                    android:layout_marginLeft="15dp"
+                                    android:layout_weight="1"
+                                    android:textColor="#ff666666" />
+                            </LinearLayout>
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:orientation="horizontal" android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:weightSum="1"
+                        android:background="#88DADADA"
+                        android:layout_marginBottom="2dp"
+                        android:layout_marginTop="0dp"
+                        android:layout_marginLeft="5dp"
+                        android:layout_marginRight="5dp">
+
+                        <ImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:id="@+id/lstProfileItem_img_photo"
+                            android:src="@drawable/lst_profile_icon" />
+
+                        <LinearLayout
+                            android:orientation="vertical"
+                            android:layout_width="fill_parent"
+                            android:layout_height="fill_parent"
+                            android:layout_weight="1"
+                            android:weightSum="2">
+
+                            <TextView
+                                android:layout_width="fill_parent"
+                                android:layout_height="fill_parent"
+                                android:text="Name"
+                                android:id="@+id/lstProfileItem_name"
+                                android:layout_marginLeft="15dp"
+                                android:layout_marginTop="15dp"
+                                android:layout_weight="1"
+                                android:textColor="#ff666666"
+                                android:textSize="17dp" />
+
+                            <LinearLayout
+                                android:orientation="horizontal"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:weightSum="2"
+                                android:layout_weight="1">
+
+                                <TextView
+                                    android:layout_width="fill_parent"
+                                    android:layout_height="fill_parent"
+                                    android:text="Description1"
+                                    android:id="@+id/lstProfileItem_desc1"
+                                    android:layout_marginTop="15dp"
+                                    android:layout_marginLeft="15dp"
+                                    android:layout_weight="1"
+                                    android:textColor="#ff666666" />
+
+                                <TextView
+                                    android:layout_width="fill_parent"
+                                    android:layout_height="fill_parent"
+                                    android:text="Description2"
+                                    android:id="@+id/lstProfileItem_desc2"
+                                    android:layout_marginTop="15dp"
+                                    android:layout_marginLeft="15dp"
+                                    android:layout_weight="1"
+                                    android:textColor="#ff666666" />
+                            </LinearLayout>
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:orientation="horizontal" android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:weightSum="1"
+                        android:background="#88DADADA"
+                        android:layout_marginBottom="2dp"
+                        android:layout_marginTop="0dp"
+                        android:layout_marginLeft="5dp"
+                        android:layout_marginRight="5dp">
+
+                        <ImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:id="@+id/lstProfileItem_img_photo3"
+                            android:src="@drawable/lst_profile_icon" />
+
+                        <LinearLayout
+                            android:orientation="vertical"
+                            android:layout_width="fill_parent"
+                            android:layout_height="fill_parent"
+                            android:layout_weight="1"
+                            android:weightSum="2">
+
+                            <TextView
+                                android:layout_width="fill_parent"
+                                android:layout_height="fill_parent"
+                                android:text="Name"
+                                android:id="@+id/lstProfileItem_name3"
+                                android:layout_marginLeft="15dp"
+                                android:layout_marginTop="15dp"
+                                android:layout_weight="1"
+                                android:textColor="#ff666666"
+                                android:textSize="17dp" />
+
+                            <LinearLayout
+                                android:orientation="horizontal"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:weightSum="2"
+                                android:layout_weight="1">
+
+                                <TextView
+                                    android:layout_width="fill_parent"
+                                    android:layout_height="fill_parent"
+                                    android:text="Description1"
+                                    android:id="@+id/lstProfileItem_desc3"
+                                    android:layout_marginTop="15dp"
+                                    android:layout_marginLeft="15dp"
+                                    android:layout_weight="1"
+                                    android:textColor="#ff666666" />
+
+                                <TextView
+                                    android:layout_width="fill_parent"
+                                    android:layout_height="fill_parent"
+                                    android:text="Description2"
+                                    android:id="@+id/lstProfileItem_desc4"
+                                    android:layout_marginTop="15dp"
+                                    android:layout_marginLeft="15dp"
+                                    android:layout_weight="1"
+                                    android:textColor="#ff666666" />
+                            </LinearLayout>
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+                    <LinearLayout
+                        android:orientation="horizontal" android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:weightSum="1"
+                        android:background="#88DADADA"
+                        android:layout_marginBottom="2dp"
+                        android:layout_marginTop="0dp"
+                        android:layout_marginLeft="5dp"
+                        android:layout_marginRight="5dp">
+
+                        <ImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:id="@+id/lstProfileItem_img_photo4"
+                            android:src="@drawable/lst_profile_icon" />
+
+                        <LinearLayout
+                            android:orientation="vertical"
+                            android:layout_width="fill_parent"
+                            android:layout_height="fill_parent"
+                            android:layout_weight="1"
+                            android:weightSum="2">
+
+                            <TextView
+                                android:layout_width="fill_parent"
+                                android:layout_height="fill_parent"
+                                android:text="Name"
+                                android:id="@+id/lstProfileItem_name4"
+                                android:layout_marginLeft="15dp"
+                                android:layout_marginTop="15dp"
+                                android:layout_weight="1"
+                                android:textColor="#ff666666"
+                                android:textSize="17dp" />
+
+                            <LinearLayout
+                                android:orientation="horizontal"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:weightSum="2"
+                                android:layout_weight="1">
+
+                                <TextView
+                                    android:layout_width="fill_parent"
+                                    android:layout_height="fill_parent"
+                                    android:text="Description1"
+                                    android:id="@+id/lstProfileItem_desc14"
+                                    android:layout_marginTop="15dp"
+                                    android:layout_marginLeft="15dp"
+                                    android:layout_weight="1"
+                                    android:textColor="#ff666666" />
+
+                                <TextView
+                                    android:layout_width="fill_parent"
+                                    android:layout_height="fill_parent"
+                                    android:text="Description2"
+                                    android:id="@+id/lstProfileItem_desc24"
+                                    android:layout_marginTop="15dp"
+                                    android:layout_marginLeft="15dp"
+                                    android:layout_weight="1"
+                                    android:textColor="#ff666666" />
+                            </LinearLayout>
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+                </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+
+    <!--
+        <ListView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/listView" />
+        -->
+
+
+    </FrameLayout>
+<!--</ScrollView>-->
