@@ -9,8 +9,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
-import com.berezich.sportconnector.SportObjects.Person1;
-import com.berezich.sportconnector.backend.sportConnectorApi.SportConnectorApi;
 import com.berezich.sportconnector.backend.sportConnectorApi.model.Person;
 import com.berezich.sportconnector.backend.sportConnectorApi.model.Picture;
 import com.berezich.sportconnector.backend.sportConnectorApi.model.RegionInfo;
@@ -20,7 +18,6 @@ import com.google.api.client.json.gson.GsonFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
@@ -32,7 +29,10 @@ public class LocalDataManager {
     private static final String TAG = "LocalDataManager";
     private static RegionInfo regionInfo;
     private static Person myPersonInfo;
+    private static AppPref appPref;
     private static final String RINFO_KEY = "REGION_INFO";
+    private static final String MY_PERSON_INFO_KEY = "MY_PERSON_INFO";
+    private static final String APP_PREF_KEY = "APP_PREF";
     private static final String SPOT_TABLE_NAME = "spotTable";
     private static final String DB_NAME = "sportConnectorDB";
     private static final int DB_VERSION = 2;
@@ -58,21 +58,9 @@ public class LocalDataManager {
         return true;
 
     }
-    public static boolean loadMyPersonInfoFromPref(Activity activity)throws IOException
-    {
 
-        /*SharedPreferences sp = activity.getPreferences(Context.MODE_PRIVATE);
-        String regionInfoStr = sp.getString(RINFO_KEY, "");
-        if(regionInfoStr.equals(""))
-            return false;
-        regionInfo = gsonFactory.fromString(regionInfoStr,RegionInfo.class);
-        Log.d(TAG, "fromJson:" + regionInfo.toString());
-        */
-        myPersonInfo = new Person();
-        myPersonInfo.setType("PARTNER");
-        myPersonInfo.setId(new Long("5705241014042624"));
-        return true;
-    }
+
+
     public static void saveRegionInfoToPref(Activity activity)throws IOException {
         saveRegionInfoToPref(regionInfo, activity);
     }
@@ -94,9 +82,77 @@ public class LocalDataManager {
         LocalDataManager.regionInfo = regionInfo;
     }
 
+    public static boolean loadMyPersonInfoFromPref(Activity activity)throws IOException
+    {
+
+        SharedPreferences sp = activity.getPreferences(Context.MODE_PRIVATE);
+        String personInfoStr = sp.getString(MY_PERSON_INFO_KEY, "");
+        if(personInfoStr.equals(""))
+            return false;
+        myPersonInfo = gsonFactory.fromString(personInfoStr,Person.class);
+        Log.d(TAG, "fromJson:" + regionInfo.toString());
+
+        /*myPersonInfo = new Person();
+        myPersonInfo.setType("PARTNER");
+        myPersonInfo.setId(new Long("5705241014042624"));*/
+
+        return true;
+    }
+    public static void saveMyPersonInfoToPref(Activity activity)throws IOException {
+        saveMyPersonInfoToPref(myPersonInfo, activity);
+    }
+    public static void saveMyPersonInfoToPref(Person personInfo,Activity activity)throws IOException {
+        SharedPreferences sp = activity.getPreferences(Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sp.edit();
+        editor.putString(RINFO_KEY, gsonFactory.toString(personInfo));
+        editor.commit();
+
+    }
     public static Person getMyPersonInfo() {
         return myPersonInfo;
     }
+
+    public static void setMyPersonInfo(Person myPersonInfo) {
+        LocalDataManager.myPersonInfo = myPersonInfo;
+    }
+
+    public static AppPref getAppPref() {
+        return appPref;
+    }
+
+    public static void setAppPref(AppPref appPref) {
+        LocalDataManager.appPref = appPref;
+    }
+
+    public static void saveAppPref(Activity activity)throws IOException {
+        saveAppPref(appPref, activity);
+    }
+    public static void saveAppPref(AppPref appPref,Activity activity)throws IOException {
+        SharedPreferences sp = activity.getPreferences(Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sp.edit();
+        editor.putString(APP_PREF_KEY, gsonFactory.toString(appPref));
+        editor.commit();
+
+    }
+
+    public static boolean loadAppPref(Activity activity)throws IOException
+    {
+
+        SharedPreferences sp = activity.getPreferences(Context.MODE_PRIVATE);
+        String appPrefStr = sp.getString(APP_PREF_KEY, "");
+        if(appPrefStr.equals(""))
+            return false;
+        appPref = gsonFactory.fromString(appPrefStr,AppPref.class);
+        Log.d(TAG, "fromJson:" + regionInfo.toString());
+
+        /*myPersonInfo = new Person();
+        myPersonInfo.setType("PARTNER");
+        myPersonInfo.setId(new Long("5705241014042624"));*/
+
+        return true;
+    }
+
+
     public static boolean isMyFavoriteSpot(Spot spot)
     {
         boolean isFavorite = false;

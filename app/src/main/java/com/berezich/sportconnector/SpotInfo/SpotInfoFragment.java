@@ -23,7 +23,6 @@ import com.berezich.sportconnector.ErrorVisualizer;
 import com.berezich.sportconnector.GoogleMap.SpotsData;
 import com.berezich.sportconnector.LocalDataManager;
 import com.berezich.sportconnector.R;
-import com.berezich.sportconnector.SportObjects.Person1;
 import com.berezich.sportconnector.backend.sportConnectorApi.model.Person;
 import com.berezich.sportconnector.backend.sportConnectorApi.model.RegionInfo;
 import com.berezich.sportconnector.backend.sportConnectorApi.model.Spot;

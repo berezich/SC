@@ -69,6 +69,7 @@ public class MainActivity extends ActionBarActivity
             e.printStackTrace();
         }
 
+       /*
         mNavigationDrawerFragment = (NavigationDrawerFragment)
                 getSupportFragmentManager().findFragmentById(R.id.navigation_drawer);
         mTitle = getTitle();
@@ -78,8 +79,10 @@ public class MainActivity extends ActionBarActivity
                 R.id.navigation_drawer,
                 (DrawerLayout) findViewById(R.id.drawer_layout));
 
-
-
+        mNavigationDrawerFragment.setMenuVisibility(false);
+        */
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        fragmentManager.beginTransaction().replace(R.id.container, new LoginFragment().setArgs(-1)).commit();
     }
     @Override
     protected void onResume()
@@ -104,7 +107,7 @@ public class MainActivity extends ActionBarActivity
                 break;
             default:
                 fragmentManager.beginTransaction()
-                        .replace(R.id.container, new MainFragment().setArgs(position))
+                        .replace(R.id.container, new LoginFragment().setArgs(position))
                         .commit();
         }
     }
@@ -146,7 +149,7 @@ public class MainActivity extends ActionBarActivity
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        if (!mNavigationDrawerFragment.isDrawerOpen()) {
+        if (mNavigationDrawerFragment!=null && !mNavigationDrawerFragment.isDrawerOpen()) {
             // Only show items in the action bar relevant to this screen
             // if the drawer is not showing. Otherwise, let the drawer
             // decide what to show in the action bar.

@@ -294,5 +294,7 @@ public class EndpointApi {
             void onSetSpotAsFavoriteFinish(Pair<Boolean,Exception> result);
         }
     }
+
+
 }
 

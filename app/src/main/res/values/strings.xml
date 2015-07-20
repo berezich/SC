@@ -38,6 +38,12 @@
         <!-- spotInfo_fragment/list_person_item-->
 
     <!-- spotInfo_fragment end-->
+    <string name="login_login">Login:</string>
+    <string name="login_pass">Pass:</string>
+    <string name="login_btn_txt_login">Login</string>
+    <!--personProfile_fragment begin-->
+
+    <!--personProfile_fragment begin-->
 
     <!--personProfile_fragment begin-->
     <string name="personprofile_age">Возраст</string>

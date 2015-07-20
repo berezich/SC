@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent">
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/imageView2"
+        android:layout_gravity="center"
+        android:src="@drawable/foto1"
+        android:scaleType="centerCrop" />
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/login_background"
+        android:gravity="center"
+        android:layout_gravity="center"
+        android:paddingBottom="15dp"
+        android:paddingTop="15dp">
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginRight="35dp"
+            android:layout_marginLeft="35dp">
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:layout_marginBottom="10dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:text="@string/login_login"
+                    android:id="@+id/login_email_title"
+                    android:layout_gravity="center_horizontal|left"
+                    android:gravity="left"
+                    android:paddingLeft="5dp"
+                    android:paddingRight="5dp" />
+
+                <EditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:text="petrov@gmail.com"
+                    android:id="@+id/login_email_value"
+                    android:gravity="center_horizontal"
+                    android:paddingLeft="5dp"
+                    android:paddingRight="5dp"
+                    android:background="#00FFFFFF" />
+            </LinearLayout>
+
+            <View
+                android:layout_width="fill_parent"
+                android:layout_height="@dimen/property_line_width"
+                android:background="@color/login_line"
+                android:id="@+id/profile_2divider"
+                android:paddingLeft="0dp"
+                android:paddingRight="0dp"
+                android:padding="0dp"
+                android:paddingTop="0dp"
+                android:layout_gravity="bottom"
+                android:layout_marginBottom="5dp" />
+
+        </FrameLayout>
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginRight="35dp"
+            android:layout_marginLeft="35dp">
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:layout_marginBottom="10dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:text="@string/login_pass"
+                    android:id="@+id/login_pass_title"
+                    android:layout_gravity="center_horizontal|left"
+                    android:gravity="left"
+                    android:paddingLeft="5dp"
+                    android:paddingRight="5dp" />
+
+                <EditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:text="password"
+                    android:id="@+id/login_pass_value"
+                    android:gravity="center_horizontal"
+                    android:paddingLeft="5dp"
+                    android:paddingRight="5dp"
+                    android:background="#00FFFFFF"
+                    android:password="true" />
+            </LinearLayout>
+
+            <View
+                android:layout_width="fill_parent"
+                android:layout_height="@dimen/property_line_width"
+                android:background="@color/login_line"
+                android:id="@+id/profile_1divider"
+                android:paddingLeft="0dp"
+                android:paddingRight="0dp"
+                android:padding="0dp"
+                android:paddingTop="0dp"
+                android:layout_gravity="bottom"
+                android:layout_marginBottom="5dp" />
+
+        </FrameLayout>
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/login_btn_txt_login"
+            android:id="@+id/button"
+            android:layout_marginTop="15dp"
+            android:background="@drawable/btn_main"
+            android:textColor="@color/btn_text" />
+
+    </LinearLayout>
+
+</FrameLayout>

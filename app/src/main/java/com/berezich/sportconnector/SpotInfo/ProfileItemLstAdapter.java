@@ -8,7 +8,6 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.berezich.sportconnector.R;
-import com.berezich.sportconnector.SportObjects.Person1;
 import com.berezich.sportconnector.backend.sportConnectorApi.model.Person;
 
 import java.util.ArrayList;
