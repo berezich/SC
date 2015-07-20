@@ -225,7 +225,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:id="@+id/lstSpotItem_img_photo"
-                        android:src="@drawable/lst_profile_icon" />
+                        android:src="@drawable/tennis_court_img" />
 
                     <LinearLayout
                         android:orientation="vertical"
@@ -279,7 +279,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:id="@+id/lstSpotItem_img_photo1"
-                        android:src="@drawable/lst_profile_icon" />
+                        android:src="@drawable/tennis_court_img" />
 
                     <LinearLayout
                         android:orientation="vertical"
