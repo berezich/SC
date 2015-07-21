@@ -5,7 +5,6 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.support.v4.app.Fragment;
 import android.util.Pair;
-import android.widget.Toast;
 
 import com.berezich.sportconnector.backend.sportConnectorApi.SportConnectorApi;
 import com.berezich.sportconnector.backend.sportConnectorApi.model.Person;
@@ -17,13 +16,9 @@ import com.google.api.client.extensions.android.json.AndroidJsonFactory;
 import com.google.api.client.googleapis.services.AbstractGoogleClientRequest;
 import com.google.api.client.googleapis.services.GoogleClientRequestInitializer;
 import com.google.api.client.util.DateTime;
-import com.google.maps.android.geometry.Bounds;
 
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -186,7 +181,7 @@ public class EndpointApi {
         }
     }
 
-    public static class GetListPersonByIdLstAsyncTask extends AsyncTask< List<Long>, Void, Pair<List<Person>,Exception> >{
+    public static class GetListPersonByIdLstAsyncTask extends AsyncTask< List<String>, Void, Pair<List<Person>,Exception> >{
         private OnAction listener=null;
         private Context context = null;
         public GetListPersonByIdLstAsyncTask(Fragment fragment)
@@ -200,10 +195,10 @@ public class EndpointApi {
             }
         }
         @Override
-        protected Pair<List<Person>,Exception> doInBackground(List<Long>... params) {
-            List<Long> idLst = new ArrayList<Long>(params[0]) ;
+        protected Pair<List<Person>,Exception> doInBackground(List<String>... params) {
+            List<String> idLst = new ArrayList<String>(params[0]) ;
             try {
-                return new Pair<List<Person>,Exception>(srvApi.listPersonByIdLst(new ArrayList<Long>(idLst)).execute().getItems(),null);
+                return new Pair<List<Person>,Exception>(srvApi.listPersonByIdLst(new ArrayList<String>(idLst)).execute().getItems(),null);
             } catch (IOException e) {
                 return new Pair<List<Person>,Exception>(null,e);
             }
@@ -256,7 +251,7 @@ public class EndpointApi {
         }
     }
 
-    public static class SetSpotAsFavoriteAsyncTask extends AsyncTask< Long, Void, Pair<Boolean ,Exception> >{
+    public static class SetSpotAsFavoriteAsyncTask extends AsyncTask< Pair<Long,String>, Void, Pair<Boolean ,Exception> >{
         private OnAction listener=null;
         private Context context = null;
         public SetSpotAsFavoriteAsyncTask(Fragment fragment)
@@ -270,11 +265,11 @@ public class EndpointApi {
             }
         }
         @Override
-        protected Pair<Boolean,Exception> doInBackground(Long... params) {
-            Long spot = params[0];
-            Long person = params[1];
-            boolean isFavorite = (params[2]==0) ? false : true ;
-            String personType = (params[3]==1) ? "PARTNER":"COACH";
+        protected Pair<Boolean,Exception> doInBackground(Pair<Long,String>... params) {
+            Long spot = params[0].first;
+            String person = params[0].second;
+            boolean isFavorite = (params[1].first==0) ? false : true ;
+            String personType = params[1].second;
             if(spot!=null && person!=null)
             try {
                 srvApi.setSpotAsFavorite(person,spot,isFavorite,personType).execute();
@@ -292,6 +287,53 @@ public class EndpointApi {
         public static interface OnAction
         {
             void onSetSpotAsFavoriteFinish(Pair<Boolean,Exception> result);
+        }
+    }
+
+    public static class AuthorizePersonAsyncTask extends AsyncTask<String, Void, Pair<Person,Exception> >{
+        private OnAction listener=null;
+        private Context context = null;
+        public AuthorizePersonAsyncTask(Fragment fragment)
+        {
+            context = fragment.getActivity().getBaseContext();
+            setSrvApi(context);
+            try {
+                listener = (OnAction) fragment;
+            } catch (ClassCastException e) {
+                throw new ClassCastException(fragment.toString() + " must implement OnGetRegionAsyncTaskAction for GetRegionAsyncTask");
+            }
+        }
+        public AuthorizePersonAsyncTask(Activity activity)
+        {
+            context = activity.getBaseContext();
+            setSrvApi(context);
+            try {
+                listener = (OnAction) activity;
+            } catch (ClassCastException e) {
+                throw new ClassCastException(activity.toString() + " must implement OnGetRegionAsyncTaskAction for GetRegionAsyncTask");
+            }
+        }
+        @Override
+        protected Pair<Person,Exception> doInBackground(String... params) {
+            String personId,pass;
+            String url;
+            personId = params[0];
+            pass = params[1];
+            try {
+                return new Pair<Person,Exception>(srvApi.authorizePerson(personId,pass).execute(),null);
+            } catch (IOException e) {
+                return new Pair<Person,Exception>(null,e);
+            }
+        }
+
+        @Override
+        protected void onPostExecute(Pair<Person,Exception> result) {
+            listener.onAuthorizePersonAsyncTaskFinish(result);
+        }
+
+        public static interface OnAction
+        {
+            void onAuthorizePersonAsyncTaskFinish(Pair<Person,Exception> result);
         }
     }
 

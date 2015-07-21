@@ -101,9 +101,9 @@ public class SpotsData {
     {
         Spot spot = _allSpots.get(idSpot);
         Person myPersonInfo = LocalDataManager.getMyPersonInfo();
-        Long personId = myPersonInfo.getId();
+        String personId = myPersonInfo.getId();
         List<Long> favoriteSpotLst = null;
-        List<Long> personLst = null;
+        List<String> personLst = null;
 
         if(spot!=null && myPersonInfo!=null) {
 
@@ -133,9 +133,9 @@ public class SpotsData {
         _allSpots.put(id,spot);
         LocalDataManager.updateSpot(id, spot, null);
     }
-    public static List<Long> getCoachIdsWithoutMe(Spot spot)
+    public static List<String> getCoachIdsWithoutMe(Spot spot)
     {
-        List<Long> personIds = new ArrayList<Long>(),coachLst;
+        List<String> personIds = new ArrayList<String>(),coachLst;
         Person myPersonInfo;
         if((coachLst = spot.getCoachLst())!=null) {
             personIds.addAll(coachLst);
@@ -144,9 +144,9 @@ public class SpotsData {
         }
         return personIds;
     }
-    public static List<Long> getPartnerIdsWithoutMe(Spot spot)
+    public static List<String> getPartnerIdsWithoutMe(Spot spot)
     {
-        List<Long> personIds = new ArrayList<Long>(), partnerLst;
+        List<String> personIds = new ArrayList<String>(), partnerLst;
         Person myPersonInfo;
         if((partnerLst = spot.getPartnerLst())!=null) {
             personIds.addAll(partnerLst);

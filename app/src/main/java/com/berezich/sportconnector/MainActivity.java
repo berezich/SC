@@ -30,7 +30,8 @@ import java.util.List;
 public class MainActivity extends ActionBarActivity
         implements NavigationDrawerFragment.NavigationDrawerCallbacks,
         GoogleMapFragment.OnActionListenerGMapFragment,
-        MainFragment.OnActionListenerMainFragment {
+        MainFragment.OnActionListenerMainFragment,
+        LoginFragment.OnActionListenerLoginFragment {
 
     /**
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
@@ -117,6 +118,11 @@ public class MainActivity extends ActionBarActivity
         FragmentManager fragmentManager = getSupportFragmentManager();
         //fragmentManager.beginTransaction().replace(R.id.container, new YaMapFragment().setArgs(sectionNumber,filter)).commit();
         fragmentManager.beginTransaction().replace(R.id.container, new GoogleMapFragment().setArgs(sectionNumber,filter)).addToBackStack("tr1").commit();
+    }
+
+    @Override
+    public void onAuthorized() {
+
     }
 
     public void onSectionAttached(int number) {

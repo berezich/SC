@@ -38,12 +38,14 @@
         <!-- spotInfo_fragment/list_person_item-->
 
     <!-- spotInfo_fragment end-->
-    <string name="login_login">Login:</string>
-    <string name="login_pass">Pass:</string>
-    <string name="login_btn_txt_login">Login</string>
-    <!--personProfile_fragment begin-->
 
-    <!--personProfile_fragment begin-->
+    <!--login_fragment begin-->
+    <string name="login_login">Login:</string>
+    <string name="login_err_hint">Login must be not less then 6 symbols</string>
+    <string name="login_pass">Pass:</string>
+    <string name="login_pass_err_hint">Login must be not less then 8 symbols</string>
+    <string name="login_btn_txt_login">Login</string>
+    <!--login_fragment begin-->
 
     <!--personProfile_fragment begin-->
     <string name="personprofile_age">Возраст</string>

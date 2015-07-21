@@ -21,13 +21,13 @@ public class Spot {
     String workHours;
     String contact;
     String description;
-    List<Long> partnerLst;
-    List<Long> coachLst;
+    List<String> partnerLst;
+    List<String> coachLst;
     List<Picture> pictureLst;
     public Spot(){
         pictureLst = new ArrayList<Picture>();
-        coachLst = new ArrayList<Long>();
-        partnerLst = new ArrayList<Long>();
+        coachLst = new ArrayList<String>();
+        partnerLst = new ArrayList<String>();
     }
     public Spot(Spot anotherSpot)
     {
@@ -44,16 +44,16 @@ public class Spot {
         workHours = anotherSpot.getWorkHours();
         contact = anotherSpot.getContact();
         description = anotherSpot.getDescription();
-        List<Long> longList;
+        List<String> longList;
         if((longList = anotherSpot.getPartnerLst())!=null)
-            partnerLst = new ArrayList<Long>(longList);
+            partnerLst = new ArrayList<String>(longList);
         else
-            partnerLst = new ArrayList<Long>();
+            partnerLst = new ArrayList<String>();
 
         if((longList = anotherSpot.getCoachLst())!=null)
-            coachLst = new ArrayList<Long>(longList);
+            coachLst = new ArrayList<String>(longList);
         else
-            coachLst = new ArrayList<Long>();
+            coachLst = new ArrayList<String>();
         List<Picture> pictureLst1;
 
         if((pictureLst1 = anotherSpot.getPictureLst())!=null)
@@ -99,17 +99,17 @@ public class Spot {
         return description;
     }
 
-    public List<Long> getPartnerLst() {
+    public List<String> getPartnerLst() {
 
         if(partnerLst==null)
-            partnerLst = new ArrayList<Long>();
+            partnerLst = new ArrayList<String>();
         return partnerLst;
     }
 
-    public List<Long> getCoachLst() {
+    public List<String> getCoachLst() {
 
         if(coachLst==null)
-            coachLst = new ArrayList<Long>();
+            coachLst = new ArrayList<String>();
         return coachLst;
     }
 
@@ -151,11 +151,11 @@ public class Spot {
         this.description = _description;
     }
 
-    public void setPartnerLst(List<Long> _partnerLst) {
+    public void setPartnerLst(List<String> _partnerLst) {
         this.partnerLst = _partnerLst;
     }
 
-    public void setCoachLst(List<Long> _couchLst) {
+    public void setCoachLst(List<String> _couchLst) {
         this.coachLst = _couchLst;
     }
 

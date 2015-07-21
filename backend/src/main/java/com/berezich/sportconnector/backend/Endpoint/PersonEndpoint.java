@@ -11,9 +11,12 @@ import com.google.api.server.spi.response.CollectionResponse;
 import com.google.api.server.spi.response.NotFoundException;
 import com.google.appengine.api.datastore.Cursor;
 import com.google.appengine.api.datastore.QueryResultIterator;
+import com.google.appengine.repackaged.com.google.api.client.util.Base64;
 import com.googlecode.objectify.ObjectifyService;
 import com.googlecode.objectify.cmd.Query;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -63,13 +66,28 @@ public class PersonEndpoint {
             name = "getPerson",
             path = "person/{id}",
             httpMethod = ApiMethod.HttpMethod.GET)
-    public Person get(@Named("id") Long id) throws NotFoundException {
+    public Person get(@Named("id") String id) throws NotFoundException {
         logger.info("Getting Person with ID: " + id);
         Person person = ofy().load().type(Person.class).id(id).now();
         if (person == null) {
             throw new NotFoundException("Could not find Person with ID: " + id);
         }
         return person;
+    }
+
+    @ApiMethod(
+            name = "authorizePerson",
+            path = "authorizePerson",
+            httpMethod = ApiMethod.HttpMethod.GET)
+    public Person authorizePerson(@Named("id") String id, @Named("pass") String pass) throws NotFoundException {
+        logger.info("Getting Person with ID: " + id);
+        Person person = ofy().load().type(Person.class).id(id).now();
+        if (person != null) {
+            String encPass = msgDigest(pass);
+            if(encPass!="" && person.getPass().equals(encPass))
+                return person;
+        }
+        throw new NotFoundException("AuthFailed@:Could not find Person with ID: " + id + " or such passowrd");
     }
 
     /**
@@ -85,8 +103,16 @@ public class PersonEndpoint {
         // Objectify ID generator, e.g. long or String, then you should generate the unique ID yourself prior to saving.
         //
         // If your client provides the ID then you should probably use PUT instead.
-        person.setId(null);
         validatePersonProperties(person);
+        Person samePerson = ofy().load().type(Person.class).id(person.getId()).now();
+        if(samePerson!=null)
+        {
+            throw new BadRequestException("loginExists@:Person with the same login already exists");
+        }
+        String digPass = msgDigest(person.getPass());
+        if(digPass.equals(""))
+            throw new BadRequestException("Server error");
+        person.setPass(digPass);
         ofy().save().entity(person).now();
         logger.info("Created Person.");
         Person personRes = ofy().load().entity(person).now();
@@ -107,7 +133,7 @@ public class PersonEndpoint {
             name = "updatePerson",
             path = "person/{id}",
             httpMethod = ApiMethod.HttpMethod.PUT)
-    public Person update(@Named("id") Long id, Person person) throws NotFoundException, BadRequestException {
+    public Person update(@Named("id") String id, Person person) throws NotFoundException, BadRequestException {
         // TODO: You should validate your ID parameter against your resource's ID here.
         Person oldPerson = ofy().load().type(Person.class).id(id).now();
         if(oldPerson==null)
@@ -124,11 +150,11 @@ public class PersonEndpoint {
     }
 
     @ApiResourceProperty(ignored = AnnotationBoolean.TRUE)
-    public void addPersonsFavoriteSpot(@Named("lstPersonIds") List<Long> idLst,@Named("spotId") Long spotId) {
+    public void addPersonsFavoriteSpot(@Named("lstPersonIds") List<String> idLst,@Named("spotId") Long spotId) {
         // TODO: You should validate your ID parameter against your resource's ID here.
         Person person;
         for (int i = 0; i < idLst.size(); i++) {
-            Long id = idLst.get(i);
+            String id = idLst.get(i);
             try {
                 checkExists(id);
                 person = ofy().load().type(Person.class).id(id).now();
@@ -145,11 +171,11 @@ public class PersonEndpoint {
 
 
     @ApiResourceProperty(ignored = AnnotationBoolean.TRUE)
-    public void removePersonsFavoriteSpot(@Named("lstPersonIds") List<Long> idLst,@Named("spotId") Long spotId) {
+    public void removePersonsFavoriteSpot(@Named("lstPersonIds") List<String> idLst,@Named("spotId") Long spotId) {
         // TODO: You should validate your ID parameter against your resource's ID here.
         Person person;
         for (int i = 0; i < idLst.size(); i++) {
-            Long id = idLst.get(i);
+            String id = idLst.get(i);
             try {
                 checkExists(id);
                 person = ofy().load().type(Person.class).id(id).now();
@@ -175,7 +201,7 @@ public class PersonEndpoint {
             name = "removePerson",
             path = "person/{id}",
             httpMethod = ApiMethod.HttpMethod.DELETE)
-    public void remove(@Named("id") Long id) throws NotFoundException {
+    public void remove(@Named("id") String id) throws NotFoundException {
         checkExists(id);
         ofy().delete().type(Person.class).id(id).now();
         logger.info("Deleted Person with ID: " + id);
@@ -210,12 +236,12 @@ public class PersonEndpoint {
             name = "listPersonByIdLst",
             path = "personByIdLst",
             httpMethod = ApiMethod.HttpMethod.GET)
-    public CollectionResponse<Person> listByIdLst(@Named("idLst") ArrayList<Long>idLst) {
-        Map<Long,Person> personMap = ofy().load().type(Person.class).ids(idLst);
+    public CollectionResponse<Person> listByIdLst(@Named("idLst") ArrayList<String>idLst) {
+        Map<String,Person> personMap = ofy().load().type(Person.class).ids(idLst);
         return CollectionResponse.<Person>builder().setItems(personMap.values()).build();
     }
 
-    private void checkExists(Long id) throws NotFoundException {
+    private void checkExists(String id) throws NotFoundException {
         try {
             ofy().load().type(Person.class).id(id).safe();
         } catch (com.googlecode.objectify.NotFoundException e) {
@@ -224,6 +250,10 @@ public class PersonEndpoint {
     }
     private void validatePersonProperties(Person person) throws BadRequestException
     {
+        if(person.getId()==null || person.getId().equals(""))
+            throw new BadRequestException("Id property must be initialized");
+        if(person.getPass()==null || person.getPass().equals(""))
+            throw new BadRequestException("Password property must be initialized");
         if(person.getName()==null || person.getName().equals(""))
             throw new BadRequestException("Name property must be initialized");
         if(person.getSurname()==null || person.getSurname().equals(""))
@@ -234,6 +264,7 @@ public class PersonEndpoint {
             throw new BadRequestException("Type property must be 'PARTNER' or 'COACH'");
     }
 
+    //update lists of partners and coaches of some spots since a person was updated
     private void setSpotCoachesPartners(Person person, Person oldPerson)
     {
         List<Long> addSpotLst = new ArrayList<Long>();
@@ -263,5 +294,22 @@ public class PersonEndpoint {
 
         if(removeSpotLst.size()>0)
             new SpotEndpoint().removePersonsFromSpots(removeSpotLst, person.getType(), person.getId());
+    }
+    private String msgDigest(String stringToEncrypt)
+    {
+        MessageDigest messageDigest;
+        try {
+            messageDigest = MessageDigest.getInstance("SHA-256");
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+            return "";
+        }
+        messageDigest.update(stringToEncrypt.getBytes());
+        String encryptedString = new String(messageDigest.digest());
+        messageDigest.update((stringToEncrypt + "329emdIDSxc8989sfh").getBytes());
+        encryptedString = new String(messageDigest.digest());
+        byte[]   bytesEncoded = Base64.encodeBase64(encryptedString.getBytes());
+        encryptedString = new String(bytesEncoded);
+        return encryptedString;
     }
 }

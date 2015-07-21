@@ -40,9 +40,12 @@ public class ProfileItemLstAdapter extends BaseAdapter {
 
     @Override
     public long getItemId(int position) {
+        /*
         if(position>=0 && position<getCount())
             return ((Person)objects.get(position)).getId();
         return -1;
+        */
+        return position;
     }
 
     @Override

@@ -62,7 +62,7 @@ public class SpotInfoFragment extends Fragment implements EndpointApi.GetListPer
     private View spotInfoView;
     private ProfileItemLstAdapter partnersAdapter;
     private ProfileItemLstAdapter coachesAdapter;
-    private ArrayList<Long> personIdLst;
+    private ArrayList<String> personIdLst;
 
     private OnFragmentInteractionListener mListener;
 
@@ -176,7 +176,7 @@ public class SpotInfoFragment extends Fragment implements EndpointApi.GetListPer
             }*/
 
 
-            personIdLst = new ArrayList<Long>();
+            personIdLst = new ArrayList<String>();
             if(curSpot.getCoachLst()!=null)
                 personIdLst.addAll(SpotsData.getCoachIdsWithoutMe(curSpot));
             if(curSpot.getPartnerLst()!=null)
@@ -251,9 +251,9 @@ public class SpotInfoFragment extends Fragment implements EndpointApi.GetListPer
                 btn.setPressed(!btn.isPressed());
                 isFavoriteChanged = !isFavoriteChanged;
                 SpotsData.setSpotFavorite(curSpot.getId(), btn.isPressed());
-                new EndpointApi.SetSpotAsFavoriteAsyncTask(getFragmentRef()).execute(curSpot.getId(),
-                        LocalDataManager.getMyPersonInfo().getId(),(btn.isPressed())? new Long(1) :new Long(0),
-                        LocalDataManager.getMyPersonInfo().getType().equals("PARTNER")? new Long(1):new Long(2));
+                new EndpointApi.SetSpotAsFavoriteAsyncTask(getFragmentRef()).execute(new Pair<Long, String>(curSpot.getId(),
+                        LocalDataManager.getMyPersonInfo().getId()),new Pair<Long, String>(btn.isPressed()? new Long(1) :new Long(0),
+                        LocalDataManager.getMyPersonInfo().getType()));
                 return true;
             }
             return true;

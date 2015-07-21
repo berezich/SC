@@ -13,7 +13,8 @@ import java.util.List;
 public class Person {
     public enum TYPE{COACH,PARTNER};
     @Id
-    private Long id = null;
+    private String id = null;
+    private String pass;
     private String name;
     private String surname;
     private int age;
@@ -24,6 +25,7 @@ public class Person {
     private TYPE type;
     private List<Picture> pictureLst;
     private List<Long> favoriteSpotIdLst;
+    private List<String> myFriends;
 
     public Person() {
         pictureLst = new ArrayList<Picture>();
@@ -36,8 +38,12 @@ public class Person {
         this.age = age;
     }
 
-    public Long getId() {
+    public String getId() {
         return id;
+    }
+
+    public String getPass() {
+        return pass;
     }
 
     public String getName() {
@@ -76,8 +82,16 @@ public class Person {
         return favoriteSpotIdLst;
     }
 
-    public void setId(Long id) {
+    public List<String> getMyFriends() {
+        return myFriends;
+    }
+
+    public void setId(String id) {
         this.id = id;
+    }
+
+    public void setPass(String pass) {
+        this.pass = pass;
     }
 
     public void setName(String name) {
@@ -114,5 +128,9 @@ public class Person {
 
     public void setFavoriteSpotIdLst(List<Long> favoriteSpotIdLst) {
         this.favoriteSpotIdLst = favoriteSpotIdLst;
+    }
+
+    public void setMyFriends(List<String> myFriends) {
+        this.myFriends = myFriends;
     }
 }

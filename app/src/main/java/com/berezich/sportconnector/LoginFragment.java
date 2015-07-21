@@ -9,8 +9,11 @@ import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.berezich.sportconnector.SpotInfo.ProfileItemLstAdapter;
 import com.berezich.sportconnector.backend.sportConnectorApi.model.Person;
@@ -23,7 +26,7 @@ import java.util.List;
 /**
  * Created by berezkin on 20.07.2015.
  */
-public class LoginFragment extends Fragment implements EndpointApi.GetListPersonByIdLstAsyncTask.OnAction{
+public class LoginFragment extends Fragment implements EndpointApi.AuthorizePersonAsyncTask.OnAction{
 
     private static final String ARG_SECTION_NUMBER = "section_number";
     private final String TAG = "LOGIN_FRAGMENT";
@@ -47,28 +50,19 @@ public class LoginFragment extends Fragment implements EndpointApi.GetListPerson
 
     public LoginFragment() {
 
-        try {
-            if(LocalDataManager.loadMyPersonInfoFromPref(getActivity())) {
-                myPersonInfo = LocalDataManager.getMyPersonInfo();
-                if (LocalDataManager.loadAppPref(getActivity())) {
-                    appPref = LocalDataManager.getAppPref();
-                    if (appPref!=null && appPref.isAutoLogin())
-                    {
 
-                    }
-
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.fragment_login, container, false);
-
+        if(rootView!=null)
+        {
+            Button btn = (Button) rootView.findViewById(R.id.login_btn_ok);
+            if(btn!=null)
+                btn.setOnClickListener(new OnClickLoginListener());
+        }
         return rootView;
     }
 
@@ -82,6 +76,22 @@ public class LoginFragment extends Fragment implements EndpointApi.GetListPerson
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString() + " must implement OnActionListener for LoginFragment");
         }
+
+        try {
+            if(LocalDataManager.loadMyPersonInfoFromPref(getActivity())) {
+                myPersonInfo = LocalDataManager.getMyPersonInfo();
+                if (LocalDataManager.loadAppPref(activity)) {
+                    appPref = LocalDataManager.getAppPref();
+                    if (appPref!=null && appPref.isAutoLogin())
+                    {
+                        new EndpointApi.AuthorizePersonAsyncTask(this).execute(myPersonInfo.getId(),myPersonInfo.getPass());
+                    }
+
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
     @Override
     public void onResume()
@@ -94,7 +104,24 @@ public class LoginFragment extends Fragment implements EndpointApi.GetListPerson
     {
         @Override
         public void onClick(View v) {
+            String pass="", login="";
+            EditText editTxt;
+            if((editTxt = (EditText) rootView.findViewById(R.id.login_email_value))!=null) {
+                login = editTxt.getText().toString();
+                if(login.length()<5) {
+                    //editTxt.setHint(R.string.login_err_hint);
+                    return;
+                }
+            }
+            if((editTxt = (EditText) rootView.findViewById(R.id.login_pass_value))!=null) {
+                pass = editTxt.getText().toString();
+                if(pass.length()<8) {
+                    //editTxt.setHint(R.string.login_pass_err_hint);
+                    return;
+                }
+            }
 
+            new EndpointApi.AuthorizePersonAsyncTask(getFragment()).execute(login,pass);
         }
     }
 
@@ -104,30 +131,34 @@ public class LoginFragment extends Fragment implements EndpointApi.GetListPerson
 
 
     @Override
-    public void onGetListPersonByIdLstFinish(Pair<List<Person>, Exception> result) {
-        List<Person> personLst = result.first;
+    public void onAuthorizePersonAsyncTaskFinish(Pair<Person,Exception> result) {
+        Person person = result.first;
         Exception error = result.second;
-        Person person;
-        if(error == null && personLst!=null && personLst.size()==1)
+        if(error == null && person!=null)
         {
-            person = personLst.get(0);
-            if(person!=null)
-                try {
-                    LocalDataManager.saveMyPersonInfoToPref(person,getActivity());
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+            Log.d(TAG, "AuthorizePerson OK");
+            try {
+                LocalDataManager.saveMyPersonInfoToPref(person, getActivity());
+                listenerLoginFragment.onAuthorized();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
             return;
         }
-        Log.e(TAG, "Error GetListPersonByIdLst");
+        Log.e(TAG, "Error AuthorizePerson");
         if(error!=null)
         {
             FrameLayout frameLayout;
+            Toast.makeText(getActivity().getBaseContext(), error.getMessage(),Toast.LENGTH_LONG).show();
             /*if((frameLayout = (FrameLayout) rootView.findViewById(R.id.spotinfo_frg_frameLayout))!=null)
                 ErrorVisualizer.showErrorAfterReq(getActivity().getBaseContext(), frameLayout,error,TAG);
             setVisible(View.GONE,View.VISIBLE,View.GONE);*/
         }
         else
             Log.d(TAG,"personLst = null");
+    }
+    private Fragment getFragment(){
+        return  this;
     }
 }

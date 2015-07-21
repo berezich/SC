@@ -90,7 +90,6 @@ public class LocalDataManager {
         if(personInfoStr.equals(""))
             return false;
         myPersonInfo = gsonFactory.fromString(personInfoStr,Person.class);
-        Log.d(TAG, "fromJson:" + regionInfo.toString());
 
         /*myPersonInfo = new Person();
         myPersonInfo.setType("PARTNER");
@@ -104,7 +103,7 @@ public class LocalDataManager {
     public static void saveMyPersonInfoToPref(Person personInfo,Activity activity)throws IOException {
         SharedPreferences sp = activity.getPreferences(Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sp.edit();
-        editor.putString(RINFO_KEY, gsonFactory.toString(personInfo));
+        editor.putString(MY_PERSON_INFO_KEY, gsonFactory.toString(personInfo));
         editor.commit();
 
     }
@@ -157,7 +156,7 @@ public class LocalDataManager {
     {
         boolean isFavorite = false;
         String myType = myPersonInfo.getType();
-        Long myPersonId = myPersonInfo.getId();
+        String myPersonId = myPersonInfo.getId();
         if( myType == "COACH")
             isFavorite = spot.getCoachLst().contains(myPersonId);
         else if(myType == "PARTNER")
@@ -310,9 +309,9 @@ public class LocalDataManager {
     public static void initListsOfSpot(Spot spot)
     {
         if(spot.getCoachLst()==null)
-            spot.setCoachLst(new ArrayList<Long>());
+            spot.setCoachLst(new ArrayList<String>());
         if(spot.getPartnerLst()==null)
-            spot.setPartnerLst(new ArrayList<Long>());
+            spot.setPartnerLst(new ArrayList<String>());
         if(spot.getPictureLst()==null)
             spot.setPictureLst(new ArrayList<Picture>());
     }
