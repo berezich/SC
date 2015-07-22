@@ -45,6 +45,10 @@
     <string name="login_pass">Pass:</string>
     <string name="login_pass_err_hint">Login must be not less then 8 symbols</string>
     <string name="login_btn_txt_login">Login</string>
+
+    <string name="login_err_title">Внимание</string>
+    <string name="login_err_authorized">Вы вели неверный логин или пароль</string>
+
     <!--login_fragment begin-->
 
     <!--personProfile_fragment begin-->
@@ -60,16 +64,22 @@
         <string name="spot_item_rating">Рейтинг</string>
         <!-- personProfile_fragment/list_spot_item-->
 
-    <!-- spersonProfile_fragment end-->
+    <!-- personProfile_fragment end-->
 
     <!-- srvApi begin-->
         <string name="srvApi_url">https://sportconnector-981.appspot.com/_ah/api/</string>
     <!-- srvApi end-->
 
     <!-- errorVisualizer begin-->
-        <string name="host_unreacheble_err">Невозможно загрузить данные.\nПроверьте ваше интернет соединение.</string>
+        <string name="host_unreachable_err">Невозможно загрузить данные.\nПроверьте ваше интернет соединение.</string>
+        <string name="server_unknow_err">Произошла ошибка.\nПовторите попытку позже.</string>
         <string name="try_again">Try again</string>
     <!-- errorVisualizer end-->
+
+    <!-- alertDialog begin-->
+    <string name="alert_dialog_ok">OK</string>
+    <string name="alert_dialog_cancel">Cancel</string>
+    <!-- alertDialog end-->
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>

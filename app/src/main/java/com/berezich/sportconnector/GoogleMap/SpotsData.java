@@ -139,7 +139,7 @@ public class SpotsData {
         Person myPersonInfo;
         if((coachLst = spot.getCoachLst())!=null) {
             personIds.addAll(coachLst);
-            if ((myPersonInfo = LocalDataManager.getMyPersonInfo()).getType().equals("COACH"))
+            if ((myPersonInfo = LocalDataManager.getMyPersonInfo())!=null && myPersonInfo.getType().equals("COACH"))
                 personIds.remove(myPersonInfo.getId());
         }
         return personIds;
@@ -150,7 +150,7 @@ public class SpotsData {
         Person myPersonInfo;
         if((partnerLst = spot.getPartnerLst())!=null) {
             personIds.addAll(partnerLst);
-            if ((myPersonInfo = LocalDataManager.getMyPersonInfo()).getType().equals("PARTNER"))
+            if ((myPersonInfo = LocalDataManager.getMyPersonInfo())!=null && myPersonInfo.getType().equals("PARTNER"))
                 personIds.remove(myPersonInfo.getId());
         }
         return personIds;

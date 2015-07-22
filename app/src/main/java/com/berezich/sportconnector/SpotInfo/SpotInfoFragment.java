@@ -294,15 +294,14 @@ public class SpotInfoFragment extends Fragment implements EndpointApi.GetListPer
             return;
         }
         Log.e(TAG, "Error GetListPersonByIdLst");
-        if(error!=null)
-        {
-            FrameLayout frameLayout;
-            if((frameLayout = (FrameLayout) spotInfoView.findViewById(R.id.spotinfo_frg_frameLayout))!=null)
-                ErrorVisualizer.showErrorAfterReq(getActivity().getBaseContext(), frameLayout,error,TAG);
-            setVisible(View.GONE,View.VISIBLE,View.GONE);
-        }
-        else
-            Log.d(TAG,"personLst = null");
+        if(personLst==null)
+            Log.e(TAG,"personLst = null");
+
+        FrameLayout frameLayout;
+        if((frameLayout = (FrameLayout) spotInfoView.findViewById(R.id.spotinfo_frg_frameLayout))!=null)
+            ErrorVisualizer.showErrorAfterReq(getActivity().getBaseContext(), frameLayout, error, TAG);
+        setVisible(View.GONE,View.VISIBLE,View.GONE);
+
     }
 
     /*@Override

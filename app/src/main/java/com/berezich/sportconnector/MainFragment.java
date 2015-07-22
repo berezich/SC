@@ -159,7 +159,6 @@ public class MainFragment extends Fragment implements
         }
         else if (regionInfo!=null)
         {
-            try {
                 if(LocalDataManager.loadRegionInfoFromPref(activity))
                     if ((localRegionInfo = LocalDataManager.getRegionInfo()) != null)
                         if (localRegionInfo.getVersion().equals(regionInfo.getVersion()))
@@ -188,11 +187,8 @@ public class MainFragment extends Fragment implements
                 reqState = ReqState.REQ_SPOT_LIST;
                 new EndpointApi.GetSpotListAsyncTask(this).execute(regionId);
                 //Toast.makeText(getBaseContext(),"get all spots from server",Toast.LENGTH_LONG).show();
-                return;
-            } catch (IOException e) {
-                e.printStackTrace();
-                Log.e(TAG, "Error loading regionInfo from Preferences");
-            }
+
+
         }
     }
 

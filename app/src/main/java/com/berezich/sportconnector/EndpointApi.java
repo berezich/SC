@@ -198,7 +198,7 @@ public class EndpointApi {
         protected Pair<List<Person>,Exception> doInBackground(List<String>... params) {
             List<String> idLst = new ArrayList<String>(params[0]) ;
             try {
-                return new Pair<List<Person>,Exception>(srvApi.listPersonByIdLst(new ArrayList<String>(idLst)).execute().getItems(),null);
+                return new Pair<List<Person>,Exception>(srvApi.listPersonByIdLst(idLst).execute().getItems(),null);
             } catch (IOException e) {
                 return new Pair<List<Person>,Exception>(null,e);
             }

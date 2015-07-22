@@ -1,9 +1,12 @@
 package com.berezich.sportconnector;
 
 import android.app.Activity;
+//import android.app.FragmentManager;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.util.Pair;
 import android.view.LayoutInflater;
@@ -18,15 +21,18 @@ import android.widget.Toast;
 import com.berezich.sportconnector.SpotInfo.ProfileItemLstAdapter;
 import com.berezich.sportconnector.backend.sportConnectorApi.model.Person;
 import com.berezich.sportconnector.backend.sportConnectorApi.model.Spot;
+import com.google.api.client.googleapis.json.GoogleJsonResponseException;
 
 import java.io.IOException;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Created by berezkin on 20.07.2015.
  */
-public class LoginFragment extends Fragment implements EndpointApi.AuthorizePersonAsyncTask.OnAction{
+public class LoginFragment extends Fragment implements EndpointApi.AuthorizePersonAsyncTask.OnAction,
+                                                       AlertDialogFragment.OnActionDialogListener{
 
     private static final String ARG_SECTION_NUMBER = "section_number";
     private final String TAG = "LOGIN_FRAGMENT";
@@ -34,6 +40,7 @@ public class LoginFragment extends Fragment implements EndpointApi.AuthorizePers
     private AppPref appPref;
     int _sectionNumber;
     View rootView;
+    private AlertDialogFragment dialog;
 
     OnActionListenerLoginFragment listenerLoginFragment = null;
     /**
@@ -120,11 +127,21 @@ public class LoginFragment extends Fragment implements EndpointApi.AuthorizePers
                     return;
                 }
             }
-
+            setVisibleProgressBar(true);
             new EndpointApi.AuthorizePersonAsyncTask(getFragment()).execute(login,pass);
         }
     }
 
+    private void setVisibleProgressBar(boolean isVisible)
+    {
+        View view;
+        if(rootView!=null) {
+            if ((view = rootView.findViewById(R.id.loginFragment_linearLayout))!=null)
+                view.setVisibility(!isVisible ? View.VISIBLE : View.GONE);
+            if ((view = rootView.findViewById(R.id.loginFragment_frameLayout))!=null)
+                view.setVisibility(isVisible ? View.VISIBLE : View.GONE);
+        }
+    }
     public static interface OnActionListenerLoginFragment {
         void onAuthorized();
     }
@@ -143,21 +160,40 @@ public class LoginFragment extends Fragment implements EndpointApi.AuthorizePers
             } catch (IOException e) {
                 e.printStackTrace();
             }
-
             return;
         }
         Log.e(TAG, "Error AuthorizePerson");
-        if(error!=null)
-        {
-            FrameLayout frameLayout;
-            Toast.makeText(getActivity().getBaseContext(), error.getMessage(),Toast.LENGTH_LONG).show();
-            /*if((frameLayout = (FrameLayout) rootView.findViewById(R.id.spotinfo_frg_frameLayout))!=null)
-                ErrorVisualizer.showErrorAfterReq(getActivity().getBaseContext(), frameLayout,error,TAG);
-            setVisible(View.GONE,View.VISIBLE,View.GONE);*/
-        }
+        Log.d(TAG,"person = null");
+
+        FrameLayout frameLayout;
+        String dialogMsg;
+        Pair<ErrorVisualizer.ERROR_CODE,String> errTxtCode = ErrorVisualizer.getTextCodeOfRespException(getActivity().getBaseContext(),error);
+        if(errTxtCode!=null && !errTxtCode.second.equals(""))
+            dialogMsg = errTxtCode.second;
         else
-            Log.d(TAG,"personLst = null");
+            dialogMsg = getString(R.string.server_unknow_err);
+
+        dialog = AlertDialogFragment.newInstance(dialogMsg, false);
+        dialog.setTargetFragment(this, 0);
+        FragmentManager ft = getFragmentManager();
+        dialog.show(getFragmentManager(), "");
+
+        /*if((frameLayout = (FrameLayout) rootView.findViewById(R.id.spotinfo_frg_frameLayout))!=null)
+            ErrorVisualizer.showErrorAfterReq(getActivity().getBaseContext(), frameLayout,error,TAG);
+        setVisible(View.GONE,View.VISIBLE,View.GONE);*/
+
     }
+
+    @Override
+    public void onPositiveClick() {
+        setVisibleProgressBar(false);
+    }
+
+    @Override
+    public void onNegativeClick() {
+        setVisibleProgressBar(false);
+    }
+
     private Fragment getFragment(){
         return  this;
     }

@@ -122,7 +122,19 @@ public class MainActivity extends ActionBarActivity
 
     @Override
     public void onAuthorized() {
+        mNavigationDrawerFragment = (NavigationDrawerFragment)
+                getSupportFragmentManager().findFragmentById(R.id.navigation_drawer);
+        mTitle = getTitle();
 
+        // Set up the drawer.
+        mNavigationDrawerFragment.setUp(
+                R.id.navigation_drawer,
+                (DrawerLayout) findViewById(R.id.drawer_layout));
+
+        mNavigationDrawerFragment.setMenuVisibility(false);
+
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        fragmentManager.beginTransaction().replace(R.id.container, new MainFragment().setArgs(0)).commit();
     }
 
     public void onSectionAttached(int number) {

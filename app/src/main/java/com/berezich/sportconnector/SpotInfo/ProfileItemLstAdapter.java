@@ -50,7 +50,6 @@ public class ProfileItemLstAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        // используем созданные, но не используемые view
         View view = convertView;
         if (view == null) {
             view = lInflater.inflate(R.layout.list_person_item, parent, false);
@@ -58,8 +57,6 @@ public class ProfileItemLstAdapter extends BaseAdapter {
 
         Person person = getPerson(position);
         if(person!=null) {
-            // заполняем View в пункте списка данными из товаров: наименование, цена
-            // и картинка
             ((TextView) view.findViewById(R.id.lstProfileItem_name)).setText(person.getName() + " " + person.getSurname());
             ((TextView) view.findViewById(R.id.lstProfileItem_desc1)).setText(ctx.getString(R.string.person_item_age) + " " +person.getAge());
             ((TextView) view.findViewById(R.id.lstProfileItem_desc2)).setText(ctx.getString(R.string.person_item_rating)+ " " + person.getRating());
