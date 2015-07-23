@@ -42,7 +42,7 @@ public class MainActivity extends ActionBarActivity
      * Used to store the last screen title. For use in {@link #restoreActionBar()}.
      */
     private CharSequence mTitle;
-    private static final String TAG = "MainActivity";
+    private static final String TAG = "MyLog_MainActivity";
 
 
     @Override
@@ -61,14 +61,8 @@ public class MainActivity extends ActionBarActivity
         } catch (IOException e) {
             e.printStackTrace();
         }*/
-
-        LocalDataManager.init(this.getBaseContext());
-
-        try {
-            LocalDataManager.loadMyPersonInfoFromPref(this);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        Log.d("TAG","------SpotConnector started-------");
+        LocalDataManager.init(this);
 
        /*
         mNavigationDrawerFragment = (NavigationDrawerFragment)

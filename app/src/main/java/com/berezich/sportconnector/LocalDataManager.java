@@ -26,7 +26,7 @@ import java.util.List;
  */
 public class LocalDataManager {
     public enum DB_TYPE{READ, WRITE}
-    private static final String TAG = "LocalDataManager";
+    private static final String TAG = "MyLog_LocalDataManager";
     private static RegionInfo regionInfo;
     private static Person myPersonInfo;
     private static AppPref appPref;
@@ -38,30 +38,35 @@ public class LocalDataManager {
     private static final int DB_VERSION = 2;
     private static DBHelper dbHelper = null;
     private static Context context = null;
+    private static Activity activity = null;
 
 
     //private static GsonBuilder builder = null;
     private static GsonFactory gsonFactory = new GsonFactory();
-    public static void init(Context context)
+    public static void init(Activity activity)
     {
-        LocalDataManager.context = context;
+        LocalDataManager.activity = activity;
+        LocalDataManager.context = activity.getBaseContext();
     }
-    public static boolean loadRegionInfoFromPref(Activity activity)
+    private static boolean loadRegionInfoFromPref()
     {
 
         SharedPreferences sp = activity.getPreferences(Context.MODE_PRIVATE);
         String regionInfoStr = sp.getString(RINFO_KEY, "");
-        if(regionInfoStr!=null && regionInfoStr.equals(""))
+        if(regionInfoStr==null || regionInfoStr.equals("")) {
+            Log.d(TAG, "no regionInfo was fetched form Preferences");
             return false;
-
+        }
         try {
             regionInfo = gsonFactory.fromString(regionInfoStr,RegionInfo.class);
+            Log.d(TAG, "regionInfo was fetched form Preferences");
+            Log.d(TAG, "regionInfo: " + regionInfoStr);
         } catch (Exception e) {
             e.printStackTrace();
             Log.e(TAG, "Error loading regionInfo from Preferences");
             return false;
         }
-        Log.d(TAG, "fromJson:" + regionInfo.toString());
+
         return true;
 
     }
@@ -82,6 +87,8 @@ public class LocalDataManager {
         editor.apply();
     }
     public static RegionInfo getRegionInfo() {
+        if(regionInfo==null)
+            loadRegionInfoFromPref();
         return regionInfo;
     }
 
@@ -89,16 +96,18 @@ public class LocalDataManager {
         LocalDataManager.regionInfo = regionInfo;
     }
 
-    public static boolean loadMyPersonInfoFromPref(Activity activity)throws IOException
+    private static boolean loadMyPersonInfoFromPref()
     {
 
         SharedPreferences sp = activity.getPreferences(Context.MODE_PRIVATE);
         String personInfoStr = sp.getString(MY_PERSON_INFO_KEY, "");
-        if(personInfoStr != null && personInfoStr.equals("")) {
+        if(personInfoStr == null || personInfoStr.equals("")) {
+            Log.d(TAG, "no myPersonInfo was fetched from Preferences");
             return false;
         }
         try {
             myPersonInfo = gsonFactory.fromString(personInfoStr,Person.class);
+
         } catch (Exception e) {
             e.printStackTrace();
             Log.e(TAG, "Error loading myPersonInfo from Preferences");
@@ -108,6 +117,8 @@ public class LocalDataManager {
         /*myPersonInfo = new Person();
         myPersonInfo.setType("PARTNER");
         myPersonInfo.setId(new Long("5705241014042624"));*/
+        Log.d(TAG, "myPersonInfo was fetched from Preferences");
+        Log.d(TAG, "myPersonInfo: "+personInfoStr);
 
         return true;
     }
@@ -119,9 +130,11 @@ public class LocalDataManager {
         SharedPreferences.Editor editor = sp.edit();
         editor.putString(MY_PERSON_INFO_KEY, gsonFactory.toString(personInfo));
         editor.apply();
-        setMyPersonInfo(myPersonInfo);
+        setMyPersonInfo(personInfo);
     }
     public static Person getMyPersonInfo() {
+        if(myPersonInfo==null)
+            loadMyPersonInfoFromPref();
         return myPersonInfo;
     }
 
@@ -130,6 +143,8 @@ public class LocalDataManager {
     }
 
     public static AppPref getAppPref() {
+        if(appPref==null)
+            loadAppPref();
         return appPref;
     }
 
@@ -148,22 +163,24 @@ public class LocalDataManager {
 
     }
 
-    public static boolean loadAppPref(Activity activity)throws IOException
+    private static boolean loadAppPref()
     {
 
         SharedPreferences sp = activity.getPreferences(Context.MODE_PRIVATE);
         String appPrefStr = sp.getString(APP_PREF_KEY, "");
-        if(appPrefStr != null && "".equals(appPrefStr)) {
+        if(appPrefStr == null || "".equals(appPrefStr)) {
+            Log.d(TAG, "no AppPref was fetched from Preferences");
             return false;
         }
         try {
             appPref = gsonFactory.fromString(appPrefStr,AppPref.class);
+            Log.d(TAG, "AppPref was fetched from Preferences");
+            Log.d(TAG, "AppPref: "+appPrefStr);
         } catch (Exception e) {
             e.printStackTrace();
             Log.e(TAG, "Error loading AppPref from Preferences");
             return false;
         }
-        Log.d(TAG, "fromJson:" + regionInfo.toString());
 
         /*myPersonInfo = new Person();
         myPersonInfo.setType("PARTNER");
@@ -260,10 +277,13 @@ public class LocalDataManager {
                         e.printStackTrace();
                     }
                 } while (c.moveToNext());
+                Log.d(TAG, spots.size() +" spots were fetched from "+SPOT_TABLE_NAME+" table");
             } else
-                Log.d(TAG, "0 spots in "+SPOT_TABLE_NAME+" table");
+                Log.d(TAG, "0 spots exist in "+SPOT_TABLE_NAME+" table");
             c.close();
         }
+        else
+            Log.e(TAG, "Can't open " + SPOT_TABLE_NAME + " table");
         dbHelper.close();
         return spots;
     }
@@ -277,13 +297,15 @@ public class LocalDataManager {
     public static void saveAllSpots(List<Spot> spotLst)
     {
         ContentValues cv;
-
+        int cnt=0;
         Spot spot;
+
+        Log.d(TAG, "Uploading new spots in " + SPOT_TABLE_NAME + " table");
         SQLiteDatabase db = getDB(DB_TYPE.WRITE);
         if(db!=null)
         {
             int clearCount = db.delete(SPOT_TABLE_NAME, null, null);
-            Log.d(TAG, "deleted spots form " + SPOT_TABLE_NAME + " table count = " + clearCount);
+            Log.d(TAG, clearCount+" spots were deleted form " + SPOT_TABLE_NAME + " table");
 
             for (int i = 0; i <spotLst.size() ; i++) {
                 spot = spotLst.get(i);
@@ -293,12 +315,14 @@ public class LocalDataManager {
                 try {
                     cv.put("value", gsonFactory.toString(spot));
                     db.insert(SPOT_TABLE_NAME, null, cv);
+                    cnt++;
                 } catch (IOException e) {
                     e.printStackTrace();
                     Log.e(TAG,"error save Spot(id:"+spot.getId()+" name:"+spot.getName()+") to "+SPOT_TABLE_NAME +" table");
                 }
 
             }
+            Log.d(TAG, cnt+" spots were saved in " + SPOT_TABLE_NAME +" table" );
 
         }
 
@@ -308,16 +332,19 @@ public class LocalDataManager {
     {
         Spot spot;
         Long spotId;
+        int cnt = 0;
         SQLiteDatabase db = getDB(DB_TYPE.WRITE);
+        Log.d(TAG, "Updating spots in" + SPOT_TABLE_NAME + " table");
         if(db!=null) {
-            Log.d(TAG, "--- Update " + SPOT_TABLE_NAME + " ---");
             for (int i = 0; i < updateSpotsLst.size(); i++) {
                 spotId = updateSpotsLst.get(i).getId();
                 spot = updateSpotsLst.get(i).getSpot();
-                updateSpot(spotId,spot,db);
+                if(updateSpot(spotId,spot,db))
+                    cnt++;
             }
         }
         dbHelper.close();
+        Log.d(TAG, +cnt + " spots were updated in " + SPOT_TABLE_NAME + " table");
 
     }
     public static void initListsOfSpot(Spot spot)
@@ -329,9 +356,10 @@ public class LocalDataManager {
         if(spot.getPictureLst()==null)
             spot.setPictureLst(new ArrayList<Picture>());
     }
-    public static void updateSpot(Long spotId, Spot spot,SQLiteDatabase db)
+    public static boolean updateSpot(Long spotId, Spot spot,SQLiteDatabase db)
     {
         boolean needCloseDB = false;
+        boolean isUpdate = false;
         ContentValues cv;
         if(db==null)
         {
@@ -348,17 +376,19 @@ public class LocalDataManager {
                     int updCount = db.update(SPOT_TABLE_NAME, cv, "id = ?", new String[]{spotId.toString()});
                     if (updCount == 0)
                         db.insert(SPOT_TABLE_NAME, null, cv);
+                    isUpdate=true;
                 } catch (IOException e) {
                     e.printStackTrace();
                     Log.e(TAG, "error update Spot(id:" + spotId + " name:" + spot.getName() + ") to " + SPOT_TABLE_NAME + " table");
                 }
 
             } else {
-                Log.d(TAG, "--- Delete from" + SPOT_TABLE_NAME + " : ---");
                 db.delete(SPOT_TABLE_NAME, "spotId = " + spotId, null);
+                Log.d(TAG, "Spot(id:" + spotId + ")was deleted from" + SPOT_TABLE_NAME + " table");
             }
         }
         if(needCloseDB)
             dbHelper.close();
+        return isUpdate;
     }
 }

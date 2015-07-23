@@ -44,19 +44,19 @@
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:text="Андрей Петров"
-                        android:id="@+id/profile_name"
+                        android:id="@+id/profile_txt_name"
                         android:layout_marginLeft="15dp"
                         android:layout_marginTop="15dp"
                         android:textColor="#ff666666"
                         android:textSize="17dp"
-                        android:layout_weight="1" />
+                        android:layout_weight="0.95" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:textAppearance="?android:attr/textAppearanceSmall"
                         android:text="спарринг-пртнер, 26 лет"
-                        android:id="@+id/textView2"
+                        android:id="@+id/profile_txt_typeAge"
                         android:layout_marginLeft="16dp"
                         android:layout_weight="1" />
 
@@ -64,7 +64,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:text="Уровень 9.0"
-                        android:id="@+id/profile_desc2"
+                        android:id="@+id/profile_txt_raiting"
                         android:textColor="#ff666666"
                         android:layout_marginRight="15dp"
                         android:layout_weight="1"
@@ -86,13 +86,15 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@color/background_floating_material_light"
-                android:paddingBottom="25dp">
+                android:paddingBottom="25dp"
+                android:id="@+id/profile_middleBlock">
 
                 <FrameLayout
                     android:layout_width="match_parent"
                     android:layout_height="50dp"
                     android:layout_marginRight="35dp"
-                    android:layout_marginLeft="35dp">
+                    android:layout_marginLeft="35dp"
+                    android:id="@+id/profile_frame_email">
 
                     <LinearLayout
                         android:orientation="horizontal"
@@ -106,7 +108,7 @@
                             android:layout_height="wrap_content"
                             android:textAppearance="?android:attr/textAppearanceMedium"
                             android:text="@string/personprofile_email"
-                            android:id="@+id/profile_email_title"
+                            android:id="@+id/profile_txt_emailTitle"
                             android:layout_gravity="center_horizontal|left"
                             android:gravity="left"
                             android:paddingLeft="5dp"
@@ -117,7 +119,7 @@
                             android:layout_height="wrap_content"
                             android:textAppearance="?android:attr/textAppearanceMedium"
                             android:text="petrov@gmail.com"
-                            android:id="@+id/profile_email_value"
+                            android:id="@+id/profile_txtEdt_emailValue"
                             android:gravity="center_horizontal"
                             android:paddingLeft="5dp"
                             android:paddingRight="5dp" />
@@ -141,7 +143,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="50dp"
                     android:layout_marginRight="35dp"
-                    android:layout_marginLeft="35dp">
+                    android:layout_marginLeft="35dp"
+                    android:id="@+id/profile_frame_phone">
 
                     <LinearLayout
                         android:orientation="horizontal"
@@ -155,7 +158,7 @@
                             android:layout_height="wrap_content"
                             android:textAppearance="?android:attr/textAppearanceMedium"
                             android:text="@string/personprofile_phone"
-                            android:id="@+id/profile_phone_title"
+                            android:id="@+id/profile_txt_phoneTitle"
                             android:layout_gravity="center_horizontal|left"
                             android:gravity="left"
                             android:paddingLeft="5dp"
@@ -166,7 +169,7 @@
                             android:layout_height="wrap_content"
                             android:textAppearance="?android:attr/textAppearanceMedium"
                             android:text="+7(965)439-29-30"
-                            android:id="@+id/profile_phone_value"
+                            android:id="@+id/profile_txtEdt_phoneValue"
                             android:gravity="center_horizontal"
                             android:paddingLeft="5dp"
                             android:paddingRight="5dp" />
@@ -199,7 +202,8 @@
                 android:orientation="vertical"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@color/background_material_light">
+                android:background="@color/background_material_light"
+                android:id="@+id/profile_linearLayout_favoriteSpotLst">
 
                 <TextView
                     android:layout_width="wrap_content"

@@ -11,7 +11,7 @@ import android.support.v7.app.AlertDialog;
  * Created by berezkin on 22.07.2015.
  */
 public class AlertDialogFragment extends DialogFragment {
-    private static final String TAG = "AlertDialogFragment";
+    private static final String TAG = "MyLog_AlertDialogFragment";
     private OnActionDialogListener listener;
     public static AlertDialogFragment newInstance(String msg, boolean isNegativeBtn) {
         return newInstance("",msg,isNegativeBtn);

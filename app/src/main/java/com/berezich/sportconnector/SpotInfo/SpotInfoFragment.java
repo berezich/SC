@@ -52,7 +52,7 @@ public class SpotInfoFragment extends Fragment implements EndpointApi.GetListPer
     private static final String ARG_SPOT_ID = "spotId";
     private static final  String TAB_PARTNERS = "partners";
     private static final  String TAB_COACHES = "coaches";
-    private static final String TAG = "SpotInfoFragment";
+    private static final String TAG = "MyLog_SpotInfoFragment";
     // TODO: Rename and change types of parameters
     private Long spotId;
     private boolean isFavoriteChanged=false;

@@ -52,7 +52,8 @@
     <!--login_fragment begin-->
 
     <!--personProfile_fragment begin-->
-    <string name="personprofile_age">Возраст</string>
+    <string name="personprofile_type_coach">тренер</string>
+    <string name="personprofile_type_partner">спарринг-партнер</string>
     <string name="personprofile_rating">Уровень игры</string>
     <string name="personprofile_email">Email:</string>
     <string name="personprofile_phone">Phone:</string>

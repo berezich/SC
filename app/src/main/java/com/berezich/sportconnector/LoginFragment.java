@@ -35,7 +35,7 @@ public class LoginFragment extends Fragment implements EndpointApi.AuthorizePers
                                                        AlertDialogFragment.OnActionDialogListener{
 
     private static final String ARG_SECTION_NUMBER = "section_number";
-    private final String TAG = "LOGIN_FRAGMENT";
+    private final String TAG = "MyLog_LoginFragment";
     private Person myPersonInfo;
     private AppPref appPref;
     int _sectionNumber;
@@ -84,21 +84,15 @@ public class LoginFragment extends Fragment implements EndpointApi.AuthorizePers
             throw new ClassCastException(activity.toString() + " must implement OnActionListener for LoginFragment");
         }
 
-        try {
-            if(LocalDataManager.loadMyPersonInfoFromPref(getActivity())) {
-                myPersonInfo = LocalDataManager.getMyPersonInfo();
-                if (LocalDataManager.loadAppPref(activity)) {
-                    appPref = LocalDataManager.getAppPref();
-                    if (appPref!=null && appPref.isAutoLogin())
-                    {
-                        new EndpointApi.AuthorizePersonAsyncTask(this).execute(myPersonInfo.getId(),myPersonInfo.getPass());
-                    }
-
+        if(( myPersonInfo = LocalDataManager.getMyPersonInfo())!=null)
+            if ((appPref = LocalDataManager.getAppPref())!=null) {
+                if ((appPref != null) && appPref.isAutoLogin())
+                {
+                    new EndpointApi.AuthorizePersonAsyncTask(this).execute(myPersonInfo.getId(),myPersonInfo.getPass());
                 }
+
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+
     }
     @Override
     public void onResume()

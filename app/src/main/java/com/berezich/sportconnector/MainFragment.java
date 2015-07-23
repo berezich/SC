@@ -46,7 +46,7 @@ public class MainFragment extends Fragment implements
     };
     Activity activity;
     private static final String ARG_SECTION_NUMBER = "section_number";
-    private final String TAG = "MAIN_FRAGMENT";
+    private final String TAG = "MyLog_mainFragment";
     int _sectionNumber;
     View rootView;
     OnActionListenerMainFragment listener;
@@ -159,7 +159,6 @@ public class MainFragment extends Fragment implements
         }
         else if (regionInfo!=null)
         {
-                if(LocalDataManager.loadRegionInfoFromPref(activity))
                     if ((localRegionInfo = LocalDataManager.getRegionInfo()) != null)
                         if (localRegionInfo.getVersion().equals(regionInfo.getVersion()))
                             if (localRegionInfo.getLastSpotUpdate().getValue() - regionInfo.getLastSpotUpdate().getValue()<0) {

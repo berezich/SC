@@ -18,6 +18,8 @@ public class Person {
     private String name;
     private String surname;
     private int age;
+    private String email;
+    private String phone;
     /*for coaches*/
     private String price;
     private float rating;
@@ -56,6 +58,14 @@ public class Person {
 
     public int getAge() {
         return age;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public String getPhone() {
+        return phone;
     }
 
     public float getRating() {
@@ -104,6 +114,14 @@ public class Person {
 
     public void setAge(int age) {
         this.age = age;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
     }
 
     public void setRating(float rating) {

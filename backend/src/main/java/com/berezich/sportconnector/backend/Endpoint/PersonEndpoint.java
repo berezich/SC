@@ -142,6 +142,10 @@ public class PersonEndpoint {
             throw new BadRequestException("Person with id:" + id + " has already another type = "+oldPerson.getType());
         person.setId(id);
         validatePersonProperties(person);
+        String digPass = msgDigest(person.getPass());
+        if(digPass.equals(""))
+            throw new BadRequestException("Server error");
+        person.setPass(digPass);
         ofy().save().entity(person).now();
         logger.info("Updated Person: " + person);
         Person personRes = ofy().load().entity(person).now();

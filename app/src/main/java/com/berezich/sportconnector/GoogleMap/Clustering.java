@@ -1,6 +1,7 @@
 package com.berezich.sportconnector.GoogleMap;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -25,7 +26,7 @@ import java.util.Set;
  * Created by berezkin on 14.05.2015.
  */
 public class Clustering {
-    private static final String TAG = "ClusteringGMap";
+    private static final String TAG = "MyLog_ClusteringGMap";
     public static ClusterManager<AbstractMarker> clusterManager;
     private static GoogleMapFragment gmapFragment;
     private static AbstractMarker chosenMarker;
@@ -39,11 +40,12 @@ public class Clustering {
         clusterManager.setOnClusterItemClickListener(new CustomClusterItemClickListener());
         clusterManager.setOnClusterItemInfoWindowClickListener(new CustomClusterItemInfoWindowClickListener());
     }
-    public static void addAllSpots(HashMap<Long, Spot> spots, GoogleMapFragment.FiltersX filter)
-    {
+    public static void addAllSpots(HashMap<Long, Spot> spots, GoogleMapFragment.FiltersX filter){
+
         SpotMarker spotMarker;
         Set<Long> keys = spots.keySet();
         Spot spot;
+        int cnt=0;
         Person myPersonInfo = LocalDataManager.getMyPersonInfo();
         clusterManager.clearItems();
         // Loop over String keys.
@@ -56,8 +58,10 @@ public class Clustering {
                 spotMarker.setSpotIcon(filter);
                 spotMarker.setDescription(filter);
                 clusterManager.addItem(spotMarker);
+                cnt++;
             }
         }
+        Log.d(TAG, cnt + " spotMarkers (that are appropriate for filter = "+filter+") were added to clusterManager");
         clusterManager.cluster();
 
     }
@@ -115,9 +119,7 @@ public class Clustering {
             return false;
         }
     }
-
-    public static class CustomClusterClickListener implements ClusterManager.OnClusterClickListener<AbstractMarker>
-    {
+    public static class CustomClusterClickListener implements ClusterManager.OnClusterClickListener<AbstractMarker>{
         @Override
         public boolean onClusterClick(Cluster<AbstractMarker> cluster) {
             chosenCluster = cluster;
@@ -126,8 +128,8 @@ public class Clustering {
         }
     }
     //for group of markers
-    private static Integer getDrawableClusterMarker(Cluster<AbstractMarker> cluster, GoogleMapFragment.FiltersX filter)
-    {
+    private static Integer getDrawableClusterMarker(Cluster<AbstractMarker> cluster, GoogleMapFragment.FiltersX filter){
+
         int numPartners = 0, numSpots =0 , numCoaches = 0, numFavorites=0;
         
         for (AbstractMarker p : cluster.getItems()) {
@@ -172,8 +174,7 @@ public class Clustering {
 
         return  R.drawable.gmap_cluster_blue;
     }
-    public static String pluralPostfix(int num)
-    {
+    public static String pluralPostfix(int num){
         if(num>=10 && num<=19)
             return "ов";
         int mod = num%10;
@@ -238,8 +239,7 @@ public class Clustering {
 
         }
     }
-    public static class CustomClusterItemInfoWindowClickListener implements ClusterManager.OnClusterItemInfoWindowClickListener<AbstractMarker>
-    {
+    public static class CustomClusterItemInfoWindowClickListener implements ClusterManager.OnClusterItemInfoWindowClickListener<AbstractMarker>{
         @Override
         public void onClusterItemInfoWindowClick(AbstractMarker item) {
             SpotMarker spotMarker = (SpotMarker) item;

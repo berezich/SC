@@ -38,7 +38,7 @@ public class GoogleMapFragment extends Fragment{
      */
     public static enum FiltersX {F0000,F1000,F0100,F0001,F1100,F1001,F0101,F1101,Fxx1x}
     private static final String ARG_SECTION_NUMBER = "section_number";
-    private static final String TAG = "GoogleMapFragment";
+    private static final String TAG = "MyLog_GoogleMapFragment";
     private final int MARKER_OFFSET = 50;
     private final LatLng MOSCOW_loc = new LatLng(55.754357, 37.620035);
     private SpotMarker selectMarker = null;
@@ -93,12 +93,18 @@ public class GoogleMapFragment extends Fragment{
         View rootView = inflater.inflate(R.layout.fragment_googlemap, container, false);
 
         mapView = ((MapView) rootView.findViewById(R.id.mapview));
+        if(mapView==null)
+        {
+            Log.e(TAG,"Error mapView = NULL");
+            return null;
+        }
         mapView.onCreate(savedInstanceState);
 
         // Gets to GoogleMap from the MapView and does initialization stuff
         map = mapView.getMap();
         if (map == null) {
-
+            Log.e(TAG,"Error map = NULL");
+            return null;
         }
         map.getUiSettings().setMyLocationButtonEnabled(true);
         map.getUiSettings().setZoomControlsEnabled(true);
@@ -176,7 +182,7 @@ public class GoogleMapFragment extends Fragment{
     {
         @Override
         public void onClick(View view) {
-            Log.d(TAG, "button onClick!!!");
+            //Log.d(TAG, "button onClick!!!");
 
             return;
         }
@@ -258,41 +264,34 @@ public class GoogleMapFragment extends Fragment{
 
     private void setCurFilter()
     {
-        if(isCourts) {
+        if(isCourts)
             curFilter = FiltersX.Fxx1x;
-            return;
-        }
-        if(isPartners)
+        else if(isPartners)
         {
             if(isCoaches) {
                 if(isFavorite)
-                {
                     curFilter = FiltersX.F1101;
-                    return;
-                }
-                curFilter = FiltersX.F1100;
-                return;
+                else
+                    curFilter = FiltersX.F1100;
             }
             else if(isFavorite)
-            {
                 curFilter = FiltersX.F1001;
-                return;
-            }
-            curFilter = FiltersX.F1000;
+            else
+                curFilter = FiltersX.F1000;
         }
         else if(isCoaches)
         {
             if(isFavorite)
-            {
                 curFilter = FiltersX.F0101;
-                return;
-            }
-            curFilter = FiltersX.F0100;
+            else
+                curFilter = FiltersX.F0100;
         }
         else if(isFavorite)
             curFilter = FiltersX.F0001;
         else
             curFilter = FiltersX.F0000;
+
+        Log.d(TAG,"Set curFilter = "+curFilter);
 
     }
 
