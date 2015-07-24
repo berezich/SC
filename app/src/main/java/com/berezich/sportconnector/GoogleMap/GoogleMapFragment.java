@@ -90,6 +90,11 @@ public class GoogleMapFragment extends Fragment{
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        Log.d(TAG,"GoogleMapFragment on onCreateView");
+        if(getActivity()==null) {
+            Log.e(TAG,"GoogleMapFragment isn't attached to any activity");
+            return null;
+        }
         View rootView = inflater.inflate(R.layout.fragment_googlemap, container, false);
 
         mapView = ((MapView) rootView.findViewById(R.id.mapview));
@@ -162,12 +167,14 @@ public class GoogleMapFragment extends Fragment{
     }
     @Override
     public void onResume() {
+        Log.d(TAG,"GoogleMapFragment on onResume");
         mapView.onResume();
         super.onResume();
     }
 
     @Override
     public void onDestroy() {
+        Log.d(TAG,"GoogleMapFragment on destroy");
         super.onDestroy();
         mapView.onDestroy();
     }

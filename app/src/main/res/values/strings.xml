@@ -34,7 +34,7 @@
         <string name="spotinfo_req_error_msg">Ошибка</string>
         <!-- spotInfo_fragment/list_person_item-->
             <string name="person_item_age">Возраст:</string>
-            <string name="person_item_rating">Рейтинг:</string>
+            <string name="person_item_rating">Уровень игры </string>
         <!-- spotInfo_fragment/list_person_item-->
 
     <!-- spotInfo_fragment end-->
@@ -60,9 +60,7 @@
     <string name="personprofile_type">Category:</string>
     <string name="personprofile_favorite_spots">Любимые корты</string>
         <!-- personProfile_fragment/list_spot_item-->
-        <string name="spot_item_name">Возраст</string>
-        <string name="spot_item_address">Адрес</string>
-        <string name="spot_item_rating">Рейтинг</string>
+        <string name="spot_item_rating">Рейтинг </string>
         <!-- personProfile_fragment/list_spot_item-->
 
     <!-- personProfile_fragment end-->

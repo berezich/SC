@@ -50,32 +50,13 @@ public class MainActivity extends ActionBarActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-
-        /*RegionInfo regionInfo = new RegionInfo();
-        regionInfo.setId(regionId);
-        regionInfo.setVersion("1.0.0.1");
-        regionInfo.setLastSpotUpdate(new DateTime(new Date().getTime()-24*6*60*60*1000));
-        regionInfo.setRegionName("moscow");
-        try {
-            LocalDataManager.saveRegionInfoToPref(regionInfo,this);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }*/
-        Log.d("TAG","------SpotConnector started-------");
+        Log.d("TAG", "------SpotConnector started-------");
         LocalDataManager.init(this);
 
-       /*
-        mNavigationDrawerFragment = (NavigationDrawerFragment)
-                getSupportFragmentManager().findFragmentById(R.id.navigation_drawer);
-        mTitle = getTitle();
+        DrawerLayout drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        if(drawerLayout!=null)
+            drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
 
-        // Set up the drawer.
-        mNavigationDrawerFragment.setUp(
-                R.id.navigation_drawer,
-                (DrawerLayout) findViewById(R.id.drawer_layout));
-
-        mNavigationDrawerFragment.setMenuVisibility(false);
-        */
         FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction().replace(R.id.container, new LoginFragment().setArgs(-1)).commit();
     }
@@ -89,10 +70,13 @@ public class MainActivity extends ActionBarActivity
     public void onNavigationDrawerItemSelected(int position) {
         // update the main content by replacing fragments
         FragmentManager fragmentManager = getSupportFragmentManager();
+        for(int i = 0; i < fragmentManager.getBackStackEntryCount(); ++i) {
+            fragmentManager.popBackStack();
+        }
         switch (position) {
             case 0:
                 fragmentManager.beginTransaction()
-                    .replace(R.id.container, new MainFragment().setArgs(position ))
+                        .replace(R.id.container, new MainFragment().setArgs(position))
                     .commit();
                 break;
             case 1:
@@ -105,6 +89,7 @@ public class MainActivity extends ActionBarActivity
                         .replace(R.id.container, new LoginFragment().setArgs(position))
                         .commit();
         }
+
     }
     @Override
     public void onBtnClickMF(Filters filter, int sectionNumber)
@@ -116,19 +101,22 @@ public class MainActivity extends ActionBarActivity
 
     @Override
     public void onAuthorized() {
+
         mNavigationDrawerFragment = (NavigationDrawerFragment)
                 getSupportFragmentManager().findFragmentById(R.id.navigation_drawer);
         mTitle = getTitle();
-
         // Set up the drawer.
         mNavigationDrawerFragment.setUp(
                 R.id.navigation_drawer,
                 (DrawerLayout) findViewById(R.id.drawer_layout));
+        mNavigationDrawerFragment.setMenuVisibility(true);
+        mNavigationDrawerFragment.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
+        mNavigationDrawerFragment.selectItem(0);
+        onSectionAttached(0);
+        restoreActionBar();
+        //FragmentManager fragmentManager = getSupportFragmentManager();
+        //fragmentManager.beginTransaction().replace(R.id.container, new MainFragment().setArgs(0)).commit();
 
-        mNavigationDrawerFragment.setMenuVisibility(false);
-
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        fragmentManager.beginTransaction().replace(R.id.container, new MainFragment().setArgs(0)).commit();
     }
 
     public void onSectionAttached(int number) {
@@ -161,6 +149,7 @@ public class MainActivity extends ActionBarActivity
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+
         if (mNavigationDrawerFragment!=null && !mNavigationDrawerFragment.isDrawerOpen()) {
             // Only show items in the action bar relevant to this screen
             // if the drawer is not showing. Otherwise, let the drawer

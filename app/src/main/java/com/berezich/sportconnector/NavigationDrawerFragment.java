@@ -194,7 +194,7 @@ public class NavigationDrawerFragment extends Fragment {
         mDrawerLayout.setDrawerListener(mDrawerToggle);
     }
 
-    private void selectItem(int position) {
+    public void selectItem(int position) {
         mCurrentSelectedPosition = position;
         if (mDrawerListView != null) {
             mDrawerListView.setItemChecked(position, true);
@@ -276,6 +276,10 @@ public class NavigationDrawerFragment extends Fragment {
         return ((ActionBarActivity) getActivity()).getSupportActionBar();
     }
 
+    public void setDrawerLockMode(int lockMode)
+    {
+        mDrawerLayout.setDrawerLockMode(lockMode);
+    }
     /**
      * Callbacks interface that all activities using this fragment must implement.
      */

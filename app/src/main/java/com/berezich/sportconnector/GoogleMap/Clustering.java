@@ -80,9 +80,6 @@ public class Clustering {
                                                    MarkerOptions markerOptions) {
 
             SpotMarker spot =  ((SpotMarker)item);
-
-
-
             markerOptions.icon(spot.getMarker().getIcon());
             markerOptions.title(spot.description());
             markerOptions.anchor((float) 0.4, (float) 17 / 20);
@@ -90,19 +87,20 @@ public class Clustering {
 
         @Override
         protected void onBeforeClusterRendered(Cluster<AbstractMarker> cluster, MarkerOptions markerOptions) {
-            // Draw multiple people.
             // Note: this method runs on the UI thread. Don't spend too much time in here (like in this example).
 
+            if(gmapFragment.getActivity()!=null && cluster!=null) {
 
-            //iconFactory.setBackground(gmapFragment.getResources().getDrawable(R.drawable.gmap_cluster_green_red_purple));
-            iconFactory.setBackground(gmapFragment.getResources().getDrawable(getDrawableClusterMarker(cluster, gmapFragment.curFilter())));
-            iconFactory.setContentPadding(20,10,0,0);
+                //iconFactory.setBackground(gmapFragment.getResources().getDrawable(R.drawable.gmap_cluster_green_red_purple));
+                iconFactory.setBackground(gmapFragment.getResources().getDrawable(getDrawableClusterMarker(cluster, gmapFragment.curFilter())));
+                iconFactory.setContentPadding(20, 10, 0, 0);
 
-            BitmapDescriptor descriptor = BitmapDescriptorFactory.fromBitmap(iconFactory.makeIcon(String.valueOf(cluster.getSize())));
-            markerOptions.icon(descriptor).anchor((float) 0.5, (float) 0.5);
+                BitmapDescriptor descriptor = BitmapDescriptorFactory.fromBitmap(iconFactory.makeIcon(String.valueOf(cluster.getSize())));
+                markerOptions.icon(descriptor).anchor((float) 0.5, (float) 0.5);
 
-            //markerOptions.icon(BitmapDescriptorFactory.fromResource(getDrawableMarker(cluster,gmapFragment.curFilter())));
-            //markerOptions.title(String.valueOf(cluster.getItems().size()));
+                //markerOptions.icon(BitmapDescriptorFactory.fromResource(getDrawableMarker(cluster,gmapFragment.curFilter())));
+                //markerOptions.title(String.valueOf(cluster.getItems().size()));
+            }
         }
         @Override
         protected boolean shouldRenderAsCluster(Cluster cluster) {

@@ -1,24 +1,24 @@
 package com.berezich.sportconnector.PersonProfile;
 
 import android.app.Activity;
-
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.text.Layout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.berezich.sportconnector.GoogleMap.SpotsData;
 import com.berezich.sportconnector.LocalDataManager;
 import com.berezich.sportconnector.MainActivity;
 import com.berezich.sportconnector.R;
 import com.berezich.sportconnector.backend.sportConnectorApi.model.Person;
-import com.berezich.sportconnector.backend.sportConnectorApi.model.RegionInfo;
+import com.berezich.sportconnector.backend.sportConnectorApi.model.Spot;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -48,19 +48,6 @@ public class PersonProfileFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.fragment_person_profile, container, false);
-        return rootView;
-    }
-
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-
-        ((MainActivity) activity).onSectionAttached(getArguments().getInt(ARG_SECTION_NUMBER));
-    }
-    @Override
-    public void onResume()
-    {
-        super.onResume();
         TextView txtView;
         Person myPersonInfo = LocalDataManager.getMyPersonInfo();
         if(myPersonInfo!=null && rootView!=null)
@@ -103,13 +90,55 @@ public class PersonProfileFragment extends Fragment {
             }
 
             //favorite spots lst
+            boolean isVisibleSpotLst = false;
             if((linearLayout = (LinearLayout) rootView.findViewById(R.id.profile_linearLayout_favoriteSpotLst))!=null) {
                 List<Long> spotLst = myPersonInfo.getFavoriteSpotIdLst();
-                if(spotLst!=null && spotLst.size()>0)
-                    linearLayout.setVisibility(View.VISIBLE);
-                else
-                    linearLayout.setVisibility(View.GONE);
+                if(spotLst!=null && spotLst.size()>0) {
+                    Spot spot=null;
+                    HashMap<Long,Spot> hshMapSpot = SpotsData.get_allSpots();
+                    ArrayList<Spot> spots = new ArrayList<>();
+                    for(int i=0; i<spotLst.size(); i++)
+                        if((spot = hshMapSpot.get(spotLst.get(i)))!=null)
+                            spots.add(spot);
+
+                    if(spots.size()>0) {
+                        /*ListView lstView = (ListView) rootView.findViewById(R.id.profile_lstView_favoriteSpots);
+                        if(lstView!=null) {
+
+                            SpotItemLstAdapter spotItemLstAdapter = new SpotItemLstAdapter(getActivity().getApplicationContext(),spots);
+                            lstView.setAdapter(spotItemLstAdapter);
+                            lstView.setScrollContainer(false);
+                        }*/
+                        SpotItemLstAdapter spotItemLstAdapter = new SpotItemLstAdapter(getActivity().getApplicationContext(),spots);
+                        for(int i=0; i<spotItemLstAdapter.getCount(); i++)
+                            linearLayout.addView(spotItemLstAdapter.getView(i,null,null));
+                        isVisibleSpotLst = true;
+                    }
+
+                }
+                linearLayout.setVisibility(isVisibleSpotLst? View.VISIBLE : View.GONE);
             }
         }
+        return rootView;
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+
+        ((MainActivity) activity).onSectionAttached(getArguments().getInt(ARG_SECTION_NUMBER));
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+    }
+
+    @Override
+    public void onResume()
+    {
+        super.onResume();
+
     }
 }

@@ -16,4 +16,11 @@
     <color name="login_background">#CCBBBBBB</color>
     <!-- fragment_login-->
 
+    <color name="text_gray">#ff666666</color>
+
+    <!--list_spot_item-->
+    <color name="list_item_background">#88DADADA</color>
+    <!-- list_spot_item-->
+
+
 </resources>

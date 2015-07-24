@@ -20,6 +20,7 @@ public class Spot {
     String price;
     String workHours;
     String contact;
+    float rating;
     String description;
     List<String> partnerLst;
     List<String> coachLst;
@@ -99,6 +100,10 @@ public class Spot {
         return description;
     }
 
+    public float getRating() {
+        return rating;
+    }
+
     public List<String> getPartnerLst() {
 
         if(partnerLst==null)
@@ -149,6 +154,10 @@ public class Spot {
 
     public void setDescription(String _description) {
         this.description = _description;
+    }
+
+    public void setRating(float rating) {
+        this.rating = rating;
     }
 
     public void setPartnerLst(List<String> _partnerLst) {
