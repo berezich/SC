@@ -50,7 +50,11 @@ public class LocalDataManager {
     }
     private static boolean loadRegionInfoFromPref()
     {
-
+        if(activity==null)
+        {
+            Log.e(TAG,"loadRegionInfoFromPref failed activity == null");
+            return false;
+        }
         SharedPreferences sp = activity.getPreferences(Context.MODE_PRIVATE);
         String regionInfoStr = sp.getString(RINFO_KEY, "");
         if(regionInfoStr==null || regionInfoStr.equals("")) {
@@ -81,12 +85,22 @@ public class LocalDataManager {
         /*if(gsonFactory!=null)
             gsonFactory = new GsonFactory();*/
 
+        if(activity==null)
+        {
+            Log.e(TAG,"saveRegionInfoToPref failed activity == null");
+            return;
+        }
         SharedPreferences sp = activity.getPreferences(Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sp.edit();
         editor.putString(RINFO_KEY, gsonFactory.toString(regionInfo));
         editor.apply();
     }
     public static RegionInfo getRegionInfo() {
+        if(activity==null)
+        {
+            Log.e(TAG,"getRegionInfo failed activity == null");
+            return null;
+        }
         if(regionInfo==null)
             loadRegionInfoFromPref();
         return regionInfo;
@@ -98,7 +112,11 @@ public class LocalDataManager {
 
     private static boolean loadMyPersonInfoFromPref()
     {
-
+        if(activity==null)
+        {
+            Log.e(TAG,"loadMyPersonInfoFromPref failed activity == null");
+            return false;
+        }
         SharedPreferences sp = activity.getPreferences(Context.MODE_PRIVATE);
         String personInfoStr = sp.getString(MY_PERSON_INFO_KEY, "");
         if(personInfoStr == null || personInfoStr.equals("")) {
@@ -118,7 +136,7 @@ public class LocalDataManager {
         myPersonInfo.setType("PARTNER");
         myPersonInfo.setId(new Long("5705241014042624"));*/
         Log.d(TAG, "myPersonInfo was fetched from Preferences");
-        Log.d(TAG, "myPersonInfo: "+personInfoStr);
+        Log.d(TAG, "myPersonInfo: " + personInfoStr);
 
         return true;
     }
@@ -126,6 +144,11 @@ public class LocalDataManager {
         saveMyPersonInfoToPref(myPersonInfo, activity);
     }
     public static void saveMyPersonInfoToPref(Person personInfo,Activity activity)throws IOException {
+        if(activity==null)
+        {
+            Log.e(TAG,"saveMyPersonInfoToPref failed activity == null");
+            return;
+        }
         SharedPreferences sp = activity.getPreferences(Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sp.edit();
         editor.putString(MY_PERSON_INFO_KEY, gsonFactory.toString(personInfo));
@@ -133,6 +156,11 @@ public class LocalDataManager {
         setMyPersonInfo(personInfo);
     }
     public static Person getMyPersonInfo() {
+        if(activity==null)
+        {
+            Log.e(TAG,"getMyPersonInfo failed activity == null");
+            return null;
+        }
         if(myPersonInfo==null)
             loadMyPersonInfoFromPref();
         return myPersonInfo;
@@ -143,6 +171,11 @@ public class LocalDataManager {
     }
 
     public static AppPref getAppPref() {
+        if(activity==null)
+        {
+            Log.e(TAG,"getAppPref failed activity == null");
+            return null;
+        }
         if(appPref==null)
             loadAppPref();
         return appPref;
@@ -156,6 +189,11 @@ public class LocalDataManager {
         saveAppPref(appPref, activity);
     }
     public static void saveAppPref(AppPref appPref,Activity activity)throws IOException {
+        if(activity==null)
+        {
+            Log.e(TAG,"saveAppPref failed activity == null");
+            return;
+        }
         SharedPreferences sp = activity.getPreferences(Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sp.edit();
         editor.putString(APP_PREF_KEY, gsonFactory.toString(appPref));
@@ -165,7 +203,11 @@ public class LocalDataManager {
 
     private static boolean loadAppPref()
     {
-
+        if(activity==null)
+        {
+            Log.e(TAG,"loadAppPref failed activity == null");
+            return false;
+        }
         SharedPreferences sp = activity.getPreferences(Context.MODE_PRIVATE);
         String appPrefStr = sp.getString(APP_PREF_KEY, "");
         if(appPrefStr == null || "".equals(appPrefStr)) {
@@ -247,6 +289,11 @@ public class LocalDataManager {
 
     private static SQLiteDatabase getDB(DB_TYPE type)
     {
+        if(activity==null)
+        {
+            Log.e(TAG,"getDB failed activity == null");
+            return null;
+        }
         if(type==DB_TYPE.READ)
             return getDbHelper(context).getReadableDatabase();
         else if(type==DB_TYPE.WRITE)
@@ -258,6 +305,11 @@ public class LocalDataManager {
         HashMap<Long, Spot> spots = new HashMap<>();
         String spotVal;
         Spot spot;
+        if(activity==null)
+        {
+            Log.e(TAG,"getAllSpots failed activity == null");
+            return null;
+        }
         SQLiteDatabase db = getDB(DB_TYPE.READ);
         if(db!=null)
         {
@@ -300,6 +352,12 @@ public class LocalDataManager {
         int cnt=0;
         Spot spot;
 
+        if(activity==null)
+        {
+            Log.e(TAG,"saveAllSpots failed activity == null");
+            return;
+        }
+
         Log.d(TAG, "Uploading new spots in " + SPOT_TABLE_NAME + " table");
         SQLiteDatabase db = getDB(DB_TYPE.WRITE);
         if(db!=null)
@@ -333,6 +391,11 @@ public class LocalDataManager {
         Spot spot;
         Long spotId;
         int cnt = 0;
+        if(activity==null)
+        {
+            Log.e(TAG,"setUpdateSpots failed activity == null");
+            return;
+        }
         SQLiteDatabase db = getDB(DB_TYPE.WRITE);
         Log.d(TAG, "Updating spots in" + SPOT_TABLE_NAME + " table");
         if(db!=null) {
@@ -361,6 +424,11 @@ public class LocalDataManager {
         boolean needCloseDB = false;
         boolean isUpdate = false;
         ContentValues cv;
+        if(activity==null)
+        {
+            Log.e(TAG,"updateSpot failed activity == null");
+            return false;
+        }
         if(db==null)
         {
             db = getDB(DB_TYPE.WRITE);

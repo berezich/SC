@@ -3,7 +3,12 @@ package com.berezich.sportconnector.PersonProfile;
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
@@ -14,6 +19,7 @@ import com.berezich.sportconnector.GoogleMap.SpotsData;
 import com.berezich.sportconnector.LocalDataManager;
 import com.berezich.sportconnector.MainActivity;
 import com.berezich.sportconnector.R;
+import com.berezich.sportconnector.SpotInfo.SpotInfoFragment;
 import com.berezich.sportconnector.backend.sportConnectorApi.model.Person;
 import com.berezich.sportconnector.backend.sportConnectorApi.model.Spot;
 
@@ -26,7 +32,7 @@ import java.util.List;
  */
 public class PersonProfileFragment extends Fragment {
     private static final String ARG_SECTION_NUMBER = "section_number";
-    private final String TAG = "MyLog_personProfileFragment";
+    private final String TAG = "MyLog_profileFragment";
     int _sectionNumber;
     View rootView;
     /**
@@ -44,6 +50,12 @@ public class PersonProfileFragment extends Fragment {
     public PersonProfileFragment() {
     }
 
+    @Override
+    public void onCreate(Bundle savedInstanceState)
+    {
+        setHasOptionsMenu(true);
+        super.onCreate(savedInstanceState);
+    }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -140,5 +152,24 @@ public class PersonProfileFragment extends Fragment {
     {
         super.onResume();
 
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        Log.d(TAG,"onCreateOptionsMenu");
+        inflater.inflate(R.menu.fragment_person_profile, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // TODO Auto-generated method stub
+        switch (item.getItemId()) {
+            case R.id.menu_edit_profile:
+                FragmentManager fragmentManager = (FragmentManager) getFragmentManager();
+                fragmentManager.beginTransaction().replace(R.id.container, new EditProfileFragment()).addToBackStack(null).commit();
+                break;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

@@ -9,6 +9,15 @@
     <dimen name="left_right_offset">4dp</dimen>
     <!-- fragment_personProfile-->
 
+    <!-- fragment_editProfile-->
+    <dimen name="editprofile_block_left_right_offset">10dp</dimen>
+    <dimen name="editprofile_text_left_right_offset">12dp</dimen>
+    <dimen name="editprofile_title_top_offset">7dp</dimen>
+    <dimen name="editprofile_title_left_offset">22dp</dimen>
+    <dimen name="editprofile_text_top_offset">10dp</dimen>
+    <dimen name="editprofile_text_bottom_offset">3dp</dimen>
+    <!-- fragment_editProfile-->
+
     <!-- Per the design guidelines, navigation drawers should be between 240dp and 320dp:
          https://developer.android.com/design/patterns/navigation-drawer.html -->
     <dimen name="navigation_drawer_width">240dp</dimen>

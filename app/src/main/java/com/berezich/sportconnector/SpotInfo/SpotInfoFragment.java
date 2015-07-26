@@ -56,7 +56,6 @@ public class SpotInfoFragment extends Fragment implements EndpointApi.GetListPer
     // TODO: Rename and change types of parameters
     private Long spotId;
     private boolean isFavoriteChanged=false;
-    private String mParam2;
     private HashMap<Long,Spot> spotHashMap;
     private Spot curSpot;
     private View spotInfoView;
@@ -268,6 +267,11 @@ public class SpotInfoFragment extends Fragment implements EndpointApi.GetListPer
         Person person;
         List<Person> coachLst = new ArrayList<>();
         List<Person> partnerLst = new ArrayList<>();
+        if(getActivity()==null)
+        {
+            Log.e(TAG,"current fragment isn't attached to activity");
+            return;
+        }
         if(error == null && personLst!=null)
         {
             for (int i = 0; i <personLst.size() ; i++) {
@@ -326,6 +330,7 @@ public class SpotInfoFragment extends Fragment implements EndpointApi.GetListPer
     public void onSetSpotAsFavoriteFinish(Pair<Boolean,Exception> result) {
         boolean isFavorite = result.first;
         Exception ex = result.second;
+
         if(ex!=null)
         {
             if(spotInfoView!=null) {

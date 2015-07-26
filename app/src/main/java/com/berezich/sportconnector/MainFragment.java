@@ -147,6 +147,11 @@ public class MainFragment extends Fragment implements
         String resText="";
         Exception exception = result.second;
         RegionInfo regionInfo=result.first, localRegionInfo = null;
+        if(getActivity()==null)
+        {
+            Log.e(TAG,"current fragment isn't attached to activity");
+            return;
+        }
         if(exception!=null)
             resText = result.second.getMessage();
         else if(regionInfo!=null)
@@ -195,6 +200,11 @@ public class MainFragment extends Fragment implements
     public void onGetSpotListFinish(Pair<List<Spot>, Exception> result) {
         Exception error = result.second;
         List<Spot> spotLst = result.first;
+        if(getActivity()==null)
+        {
+            Log.e(TAG,"current fragment isn't attached to activity");
+            return;
+        }
         if(spotLst==null)
             spotLst = new ArrayList<Spot>();
         if(error == null && spotLst!=null)
@@ -223,6 +233,11 @@ public class MainFragment extends Fragment implements
     @Override
     public void onGetUpdateSpotListFinish(Pair<List<UpdateSpotInfo>, Exception> result) {
         Exception error = result.second;
+        if(getActivity()==null)
+        {
+            Log.e(TAG,"current fragment isn't attached to activity");
+            return;
+        }
         List<Spot> spotLst = new ArrayList<Spot>();
         List<UpdateSpotInfo> updateSpotInfoLst = result.first;
 

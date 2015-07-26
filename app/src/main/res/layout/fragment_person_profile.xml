@@ -25,7 +25,8 @@
                 android:orientation="horizontal" android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:weightSum="1"
-                android:background="@color/background_material_light">
+                android:background="@color/background_material_light"
+                android:elevation="2dp">
 
                 <ImageView
                     android:layout_width="wrap_content"
@@ -75,20 +76,14 @@
 
             </LinearLayout>
 
-            <View
-                android:layout_width="fill_parent"
-                android:layout_height="@dimen/divider_block_width"
-                android:background="@color/divider_block"
-                android:id="@+id/profile_0divider"
-                android:visibility="gone" />
-
             <LinearLayout
                 android:orientation="vertical"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@color/background_floating_material_light"
                 android:paddingBottom="25dp"
-                android:id="@+id/profile_middleBlock">
+                android:id="@+id/profile_middleBlock"
+                android:elevation="2dp">
 
                 <FrameLayout
                     android:layout_width="match_parent"
@@ -192,13 +187,6 @@
 
             </LinearLayout>
 
-            <View
-                android:layout_width="fill_parent"
-                android:layout_height="@dimen/divider_block_width"
-                android:background="@color/divider_block"
-                android:id="@+id/profile_cap_spot_lst_divider"
-                android:visibility="gone" />
-
             <LinearLayout
                 android:orientation="vertical"
                 android:layout_width="match_parent"
@@ -208,7 +196,8 @@
                 android:showDividers="middle|end"
                 android:divider="@drawable/devider_transparent"
                 android:paddingLeft="5dp"
-                android:paddingRight="5dp">
+                android:paddingRight="5dp"
+                android:elevation="2dp">
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -220,81 +209,8 @@
                     android:layout_marginTop="10dp"
                     android:layout_marginBottom="10dp" />
 
-                <!--
-                <ListView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/profile_lstView_favoriteSpots" />
-                -->
-
-                <!--
-                 <LinearLayout
-                     android:orientation="horizontal" android:layout_width="fill_parent"
-                     android:layout_height="wrap_content"
-                     android:weightSum="1"
-                     android:background="#88DADADA"
-                     android:layout_marginTop="0dp"
-                     android:layout_marginBottom="2dp"
-                     android:layout_marginLeft="5dp"
-                     android:layout_marginRight="5dp">
-
-                     <ImageView
-                         android:layout_width="wrap_content"
-                         android:layout_height="wrap_content"
-                         android:id="@+id/lstSpotItem_img_photo1"
-                         android:src="@drawable/tennis_court_img" />
-
-                     <LinearLayout
-                         android:orientation="vertical"
-                         android:layout_width="fill_parent"
-                         android:layout_height="fill_parent"
-                         android:layout_weight="1">
-
-                         <TextView
-                             android:layout_width="fill_parent"
-                             android:layout_height="fill_parent"
-                             android:text="Теннисенок"
-                             android:id="@+id/lstSpotItem_name1"
-                             android:layout_marginLeft="15dp"
-                             android:layout_marginTop="15dp"
-                             android:layout_weight="1"
-                             android:textColor="#ff666666"
-                             android:textSize="17dp" />
-
-                         <TextView
-                             android:layout_width="fill_parent"
-                             android:layout_height="fill_parent"
-                             android:text="Москва, Ленинский пр-т, д. 123"
-                             android:id="@+id/lstSpotItem_address1"
-                             android:layout_marginLeft="17dp"
-                             android:layout_weight="1"
-                             android:textColor="#ff666666" />
-
-                         <TextView
-                             android:layout_width="wrap_content"
-                             android:layout_height="fill_parent"
-                             android:text="Рейтинг 4.5"
-                             android:id="@+id/lstSpotItem_raiting1"
-                             android:layout_weight="1"
-                             android:textColor="#ff666666"
-                             android:layout_gravity="right"
-                             android:layout_marginRight="15dp" />
-
-                     </LinearLayout>
-
-                 </LinearLayout>
-                 -->
             </LinearLayout>
         </LinearLayout>
     </ScrollView>
 
-    <!--
-        <ListView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/listView" />
-        -->
-
-
     </FrameLayout>
-<!--</ScrollView>-->

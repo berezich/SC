@@ -145,6 +145,11 @@ public class LoginFragment extends Fragment implements EndpointApi.AuthorizePers
     public void onAuthorizePersonAsyncTaskFinish(Pair<Person,Exception> result) {
         Person person = result.first;
         Exception error = result.second;
+        if(getActivity()==null)
+        {
+            Log.e(TAG,"current fragment isn't attached to activity");
+            return;
+        }
         if(error == null && person!=null)
         {
             Log.d(TAG, "AuthorizePerson OK");

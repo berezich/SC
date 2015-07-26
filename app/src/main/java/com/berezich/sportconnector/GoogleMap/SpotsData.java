@@ -59,11 +59,12 @@ public class SpotsData {
     {
         Spot spot = _allSpots.get(idSpot);
         Person myPersonInfo = LocalDataManager.getMyPersonInfo();
-        String personId = myPersonInfo.getId();
+        String personId;
         List<Long> favoriteSpotLst = null;
         List<String> personLst = null;
 
         if(spot!=null && myPersonInfo!=null) {
+            personId = myPersonInfo.getId();
 
             favoriteSpotLst = myPersonInfo.getFavoriteSpotIdLst();
             if(favoriteSpotLst!=null)

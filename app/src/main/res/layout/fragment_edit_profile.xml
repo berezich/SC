@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/divider_block">
+
+    <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/scrollView" >
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/divider_block"
+            android:divider="@drawable/divider"
+            android:showDividers="beginning|middle|end"
+            android:paddingLeft="@dimen/editprofile_block_left_right_offset"
+            android:paddingRight="@dimen/editprofile_block_left_right_offset">
+
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:id="@+id/edtiProfile_txt_generalTitle"
+                android:background="#00FFFFFF"
+                android:text="@string/editprofile_title_general"
+                android:gravity="left"
+                android:layout_gravity="left"
+                android:layout_marginLeft="@dimen/editprofile_title_left_offset"
+                android:layout_marginTop="@dimen/editprofile_title_top_offset" />
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/background_floating_material_light"
+                android:paddingBottom="10dp"
+                android:id="@+id/profile_generalBlock"
+                android:paddingTop="15dp"
+                android:elevation="2dp"
+                android:divider="@drawable/property_line_gray"
+                android:showDividers="middle"
+                android:dividerPadding="10dp"
+                android:paddingStart="15dp"
+                android:paddingEnd="15dp">
+
+
+                <EditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:text=""
+                    android:id="@+id/editProfile_txtEdt_name"
+                    android:paddingLeft="@dimen/editprofile_text_left_right_offset"
+                    android:paddingRight="@dimen/editprofile_text_left_right_offset"
+                    android:hint="@string/editprofile_hint_name"
+                    android:gravity="left"
+                    android:background="#00FFFFFF"
+                    android:layout_marginBottom="@dimen/editprofile_text_bottom_offset"
+                    android:layout_marginTop="@dimen/editprofile_text_top_offset" />
+
+
+                <EditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:text=""
+                    android:id="@+id/editProfile_txtEdt_surname"
+                    android:gravity="left"
+                    android:layout_marginBottom="@dimen/editprofile_text_bottom_offset"
+                    android:paddingLeft="@dimen/editprofile_text_left_right_offset"
+                    android:paddingRight="@dimen/editprofile_text_left_right_offset"
+                    android:hint="@string/editprofile_hint_surname"
+                    android:background="#00FFFFFF"
+                    android:layout_marginTop="@dimen/editprofile_text_top_offset" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:inputType="date"
+                    android:ems="10"
+                    android:id="@+id/editProfile_txtEdt_birthday"
+                    android:background="#00FFFFFF"
+                    android:layout_marginTop="@dimen/editprofile_text_top_offset"
+                    android:layout_marginBottom="@dimen/editprofile_text_bottom_offset"
+                    android:paddingLeft="@dimen/editprofile_text_left_right_offset"
+                    android:paddingRight="@dimen/editprofile_text_left_right_offset"
+                    android:hint="@string/editprofile_hint_bithday"
+                    android:clickable="true"
+                    android:editable="false"
+                    android:textAppearance="?android:attr/textAppearanceMedium" />
+
+                <RadioGroup
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="@dimen/editprofile_text_top_offset"
+                    android:layout_marginBottom="@dimen/editprofile_text_bottom_offset"
+                    android:paddingLeft="@dimen/editprofile_text_left_right_offset"
+                    android:paddingRight="@dimen/editprofile_text_left_right_offset">
+
+                    <RadioButton
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/editprofile_radio_male"
+                        android:id="@+id/editProfile_radio_male"
+                        android:layout_gravity="center_horizontal"
+                        android:layout_weight="1" />
+
+                    <RadioButton
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/editprofile_radio_female"
+                        android:id="@+id/editProfile_radio_female"
+                        android:layout_gravity="center_horizontal"
+                        android:layout_weight="1" />
+                </RadioGroup>
+
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:id="@+id/edtiProfile_txt_contactsTitle"
+                android:background="#00FFFFFF"
+                android:text="@string/editprofile_title_contacts"
+                android:gravity="left"
+                android:layout_gravity="left"
+                android:layout_marginLeft="@dimen/editprofile_title_left_offset"
+                android:layout_marginTop="@dimen/editprofile_title_top_offset" />
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/background_floating_material_light"
+                android:paddingBottom="25dp"
+                android:id="@+id/profile_contactsBlock"
+                android:paddingTop="15dp"
+                android:elevation="2dp"
+                android:divider="@drawable/property_line_gray"
+                android:showDividers="middle|end"
+                android:dividerPadding="10dp"
+                android:paddingStart="15dp"
+                android:paddingEnd="15dp">
+
+
+                <EditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:text=""
+                    android:id="@+id/editProfile_txtEdt_email"
+                    android:paddingLeft="12dp"
+                    android:paddingRight="12dp"
+                    android:hint="@string/editprofile_hint_email"
+                    android:gravity="left"
+                    android:background="#00FFFFFF" />
+
+
+                <EditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:text=""
+                    android:id="@+id/editProfile_txtEdt_phone"
+                    android:gravity="left"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginBottom="2dp"
+                    android:paddingLeft="12dp"
+                    android:paddingRight="12dp"
+                    android:hint="@string/editprofile_hint_phone"
+                    android:background="#00FFFFFF" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+    </ScrollView>
+
+</FrameLayout>

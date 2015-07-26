@@ -62,8 +62,24 @@
         <!-- personProfile_fragment/list_spot_item-->
         <string name="spot_item_rating">Рейтинг </string>
         <!-- personProfile_fragment/list_spot_item-->
-
+        <!-- menu -->
+        <string name="menu_edit_profile">Редактировать мои данные</string>
+        <!-- menu -->
     <!-- personProfile_fragment end-->
+
+    <!-- editProfile_fragment end-->
+    <string name="editprofile_title_general">Общая информация</string>
+    <string name="editprofile_hint_name">Имя</string>
+    <string name="editprofile_hint_surname">Фамилия</string>
+    <string name="editprofile_hint_bithday">Дата рождения</string>
+    <string name="editprofile_radio_male">Мужской</string>
+    <string name="editprofile_radio_female">Женский</string>
+    <string name="editprofile_title_contacts">Контакты</string>
+    <string name="editprofile_hint_email">Электронная почта</string>
+    <string name="editprofile_hint_phone">Телефон</string>
+    <!-- editProfile_fragment end-->
+
+
 
     <!-- srvApi begin-->
         <string name="srvApi_url">https://sportconnector-981.appspot.com/_ah/api/</string>
