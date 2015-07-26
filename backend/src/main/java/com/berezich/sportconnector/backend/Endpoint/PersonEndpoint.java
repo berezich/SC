@@ -262,8 +262,8 @@ public class PersonEndpoint {
             throw new BadRequestException("Name property must be initialized");
         if(person.getSurname()==null || person.getSurname().equals(""))
             throw new BadRequestException("Surname property must be initialized");
-        if(person.getAge()<=0)
-            throw new BadRequestException("Age property must be more than 0 years");
+        if(person.getBirthday()==null)
+            throw new BadRequestException("Birthday date property must be set");
         if(person.getType()==null)
             throw new BadRequestException("Type property must be 'PARTNER' or 'COACH'");
     }

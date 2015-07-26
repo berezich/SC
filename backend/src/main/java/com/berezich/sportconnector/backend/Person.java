@@ -4,6 +4,7 @@ import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -17,7 +18,7 @@ public class Person {
     private String pass;
     private String name;
     private String surname;
-    private int age;
+    private Date birthday;
     private String email;
     private String phone;
     /*for coaches*/
@@ -34,10 +35,10 @@ public class Person {
         favoriteSpotIdLst = new ArrayList<Long>();
     }
 
-    public Person(String name, String surname, int age) {
+    public Person(String name, String surname, Date birthday) {
         this.name = name;
         this.surname = surname;
-        this.age = age;
+        this.birthday = birthday;
     }
 
     public String getId() {
@@ -56,8 +57,8 @@ public class Person {
         return surname;
     }
 
-    public int getAge() {
-        return age;
+    public Date getBirthday() {
+        return birthday;
     }
 
     public String getEmail() {
@@ -112,8 +113,8 @@ public class Person {
         this.surname = surname;
     }
 
-    public void setAge(int age) {
-        this.age = age;
+    public void setBirthday(Date birthday) {
+        this.birthday = birthday;
     }
 
     public void setEmail(String email) {

@@ -3,28 +3,23 @@ package com.berezich.sportconnector.PersonProfile;
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
-import android.widget.FrameLayout;
-import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.berezich.sportconnector.DatePickerFragment;
-import com.berezich.sportconnector.GoogleMap.SpotsData;
 import com.berezich.sportconnector.LocalDataManager;
-import com.berezich.sportconnector.MainActivity;
 import com.berezich.sportconnector.R;
 import com.berezich.sportconnector.backend.sportConnectorApi.model.Person;
-import com.berezich.sportconnector.backend.sportConnectorApi.model.Spot;
+import com.google.api.client.util.DateTime;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.Date;
 
 /**
  * Created by Sashka on 25.07.2015.
@@ -48,7 +43,7 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
-        setHasOptionsMenu(false);
+        setHasOptionsMenu(true);
         super.onCreate(savedInstanceState);
     }
     @Override
@@ -57,19 +52,26 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
         rootView = inflater.inflate(R.layout.fragment_edit_profile, container, false);
         TextView txtView;
         EditText txtEdt;
+        DateTime birthday;
         Person myPersonInfo = LocalDataManager.getMyPersonInfo();
         if(myPersonInfo!=null && rootView!=null)
         {
-            /*if((txtView = (TextView) rootView.findViewById(R.id.profile_txt_name))!=null)
-                txtView.setText(myPersonInfo.getName() +" "+myPersonInfo.getSurname());
-            if((txtView = (TextView) rootView.findViewById(R.id.profile_txt_typeAge))!=null) {
+            if((txtEdt = (EditText) rootView.findViewById(R.id.editProfile_txtEdt_name))!=null)
+                txtEdt.setText(myPersonInfo.getName());
+            if((txtEdt = (EditText) rootView.findViewById(R.id.editProfile_txtEdt_surname))!=null)
+                txtEdt.setText(myPersonInfo.getSurname());
+            if((txtView = (TextView) rootView.findViewById(R.id.editProfile_txtView_birthday))!=null)
+                if((birthday = myPersonInfo.getBirthday())!=null) {
+                    Date date = new Date(birthday.getValue());
+                    txtView.setText(String.format("%1$td.%1$tm.%1$tY", date));
+                }
+            /*if((txtView = (TextView) rootView.findViewById(R.id.profile_txt_typeAge))!=null) {
                 String str = myPersonInfo.getType().equals("PARTNER")? getString(R.string.personprofile_type_partner):getString(R.string.personprofile_type_coach);
                 str+=", "+myPersonInfo.getAge();
                 txtView.setText(str);
-            }
-            if((txtView = (TextView) rootView.findViewById(R.id.profile_txt_raiting))!=null)
+            }*/
+            if((txtView = (TextView) rootView.findViewById(R.id.editProfile_txtView_setRating))!=null)
                 txtView.setText(getString(R.string.personprofile_rating)+" "+myPersonInfo.getRating());
-*/
             //middle block
             String email = myPersonInfo.getEmail(),phone = myPersonInfo.getPhone();
             if((txtView = (TextView) rootView.findViewById(R.id.editProfile_txtEdt_email))!=null)
@@ -77,7 +79,7 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
             if((txtView = (TextView) rootView.findViewById(R.id.editProfile_txtEdt_phone))!=null)
                 txtView.setText(phone);
 
-            if((txtView = (TextView) rootView.findViewById(R.id.editProfile_txtEdt_birthday))!=null)
+            if((txtView = (TextView) rootView.findViewById(R.id.editProfile_txtView_birthday))!=null)
                 txtView.setOnClickListener(new OnBirthdayClickListener());
         }
         return rootView;
@@ -104,8 +106,19 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
     }
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        //inflater.inflate(R.menu.fragment_person_profile, menu);
+        inflater.inflate(R.menu.fragment_edit_profile, menu);
         super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId())
+        {
+            case R.id.menu_save_profile:
+                Toast.makeText(getActivity().getBaseContext(),"SAVE",Toast.LENGTH_SHORT).show();
+                break;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     private class OnBirthdayClickListener implements View.OnClickListener{
@@ -122,7 +135,7 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
     public void onDateSet(int year, int month, int day) {
         TextView textView;
         if(rootView!=null)
-            if((textView = (TextView) rootView.findViewById(R.id.editProfile_txtEdt_birthday))!=null)
+            if((textView = (TextView) rootView.findViewById(R.id.editProfile_txtView_birthday))!=null)
             {
                 textView.setText(String.format("%02d",day)+ "." + String.format("%02d",month) + "." + year);
                 textView.setTextColor(0xff000000);

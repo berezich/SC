@@ -21,77 +21,34 @@
 
 
             <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:id="@+id/edtiProfile_txt_generalTitle"
-                android:background="#00FFFFFF"
-                android:text="@string/editprofile_title_general"
-                android:gravity="left"
-                android:layout_gravity="left"
-                android:layout_marginLeft="@dimen/editprofile_title_left_offset"
-                android:layout_marginTop="@dimen/editprofile_title_top_offset" />
+                style="@style/EditProfile_TitleBlock"
+                android:id="@+id/editProfile_txt_generalTitle"
+                android:text="@string/editprofile_title_general" />
 
             <LinearLayout
-                android:orientation="vertical"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@color/background_floating_material_light"
-                android:paddingBottom="10dp"
                 android:id="@+id/profile_generalBlock"
-                android:paddingTop="15dp"
-                android:elevation="2dp"
-                android:divider="@drawable/property_line_gray"
-                android:showDividers="middle"
-                android:dividerPadding="10dp"
-                android:paddingStart="15dp"
-                android:paddingEnd="15dp">
+                style="@style/EditProfile_Block">
 
 
                 <EditText
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:text=""
                     android:id="@+id/editProfile_txtEdt_name"
-                    android:paddingLeft="@dimen/editprofile_text_left_right_offset"
-                    android:paddingRight="@dimen/editprofile_text_left_right_offset"
-                    android:hint="@string/editprofile_hint_name"
-                    android:gravity="left"
-                    android:background="#00FFFFFF"
-                    android:layout_marginBottom="@dimen/editprofile_text_bottom_offset"
-                    android:layout_marginTop="@dimen/editprofile_text_top_offset" />
+                    style="@style/EditProfile_TxtPropField"
+                    android:hint="@string/editprofile_hint_name" />
 
 
                 <EditText
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:text=""
                     android:id="@+id/editProfile_txtEdt_surname"
-                    android:gravity="left"
-                    android:layout_marginBottom="@dimen/editprofile_text_bottom_offset"
-                    android:paddingLeft="@dimen/editprofile_text_left_right_offset"
-                    android:paddingRight="@dimen/editprofile_text_left_right_offset"
-                    android:hint="@string/editprofile_hint_surname"
-                    android:background="#00FFFFFF"
-                    android:layout_marginTop="@dimen/editprofile_text_top_offset" />
+                    style="@style/EditProfile_TxtPropField"
+                    android:hint="@string/editprofile_hint_surname" />
 
                 <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    style="@style/EditProfile_TxtPropField"
                     android:inputType="date"
                     android:ems="10"
-                    android:id="@+id/editProfile_txtEdt_birthday"
-                    android:background="#00FFFFFF"
-                    android:layout_marginTop="@dimen/editprofile_text_top_offset"
-                    android:layout_marginBottom="@dimen/editprofile_text_bottom_offset"
-                    android:paddingLeft="@dimen/editprofile_text_left_right_offset"
-                    android:paddingRight="@dimen/editprofile_text_left_right_offset"
+                    android:id="@+id/editProfile_txtView_birthday"
                     android:hint="@string/editprofile_hint_bithday"
                     android:clickable="true"
-                    android:editable="false"
-                    android:textAppearance="?android:attr/textAppearanceMedium" />
+                    android:textColor="@color/text_property" />
 
                 <RadioGroup
                     android:layout_width="match_parent"
@@ -122,59 +79,69 @@
             </LinearLayout>
 
             <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:id="@+id/edtiProfile_txt_contactsTitle"
-                android:background="#00FFFFFF"
-                android:text="@string/editprofile_title_contacts"
-                android:gravity="left"
-                android:layout_gravity="left"
-                android:layout_marginLeft="@dimen/editprofile_title_left_offset"
-                android:layout_marginTop="@dimen/editprofile_title_top_offset" />
+                style="@style/EditProfile_TitleBlock"
+                android:id="@+id/editProfile_txt_contactsTitle"
+                android:text="@string/editprofile_title_contacts"/>
 
             <LinearLayout
-                android:orientation="vertical"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@color/background_floating_material_light"
-                android:paddingBottom="25dp"
                 android:id="@+id/profile_contactsBlock"
-                android:paddingTop="15dp"
-                android:elevation="2dp"
-                android:divider="@drawable/property_line_gray"
-                android:showDividers="middle|end"
-                android:dividerPadding="10dp"
-                android:paddingStart="15dp"
-                android:paddingEnd="15dp">
+                style="@style/EditProfile_Block"
+                android:visibility="visible">
 
 
                 <EditText
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:text=""
                     android:id="@+id/editProfile_txtEdt_email"
-                    android:paddingLeft="12dp"
-                    android:paddingRight="12dp"
-                    android:hint="@string/editprofile_hint_email"
-                    android:gravity="left"
-                    android:background="#00FFFFFF" />
+                    style="@style/EditProfile_TxtPropField"
+                    android:hint="@string/editprofile_hint_email" />
 
 
                 <EditText
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:text=""
                     android:id="@+id/editProfile_txtEdt_phone"
-                    android:gravity="left"
-                    android:layout_marginTop="10dp"
-                    android:layout_marginBottom="2dp"
-                    android:paddingLeft="12dp"
-                    android:paddingRight="12dp"
-                    android:hint="@string/editprofile_hint_phone"
-                    android:background="#00FFFFFF" />
+                    style="@style/EditProfile_TxtPropField"
+                    android:hint="@string/editprofile_hint_phone" />
+
+            </LinearLayout>
+
+            <TextView
+                style="@style/EditProfile_TitleBlock"
+                android:id="@+id/editProfile_txt_secutityTitle"
+                android:text="@string/editprofile_title_security"/>
+
+            <LinearLayout
+                android:id="@+id/profile_securityBlock"
+                style="@style/EditProfile_Block">
+
+                <TextView
+                    style="@style/EditProfile_TxtPropField"
+                    android:id="@+id/editProfile_txtView_changePass"
+                    android:text="@string/editprofile_txt_changePass"
+                    android:clickable="true"
+                    android:textColor="@color/text_property" />
+
+            </LinearLayout>
+
+            <TextView
+                style="@style/EditProfile_TitleBlock"
+                android:id="@+id/editProfile_txt_otherTitle"
+                android:text="@string/editprofile_title_other"/>
+
+            <LinearLayout
+                android:id="@+id/profile_otherBlock"
+                style="@style/EditProfile_Block"
+                android:showDividers="middle|end">
+
+                <TextView
+                    style="@style/EditProfile_TxtPropField"
+                    android:id="@+id/editProfile_txtView_setRating"
+                    android:text="@string/editprofile_txt_setRating"
+                    android:clickable="true"
+                    android:textColor="@color/text_property" />
+
+                <EditText
+                    android:id="@+id/editProfile_txtEdt_desc"
+                    style="@style/EditProfile_TxtPropField"
+                    android:hint="@string/editprofile_hint_desc"
+                    android:minLines="3" />
 
             </LinearLayout>
 

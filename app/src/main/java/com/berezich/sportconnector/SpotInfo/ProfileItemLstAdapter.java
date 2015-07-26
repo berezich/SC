@@ -8,9 +8,14 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.berezich.sportconnector.R;
+import com.berezich.sportconnector.UsefulFunctions;
 import com.berezich.sportconnector.backend.sportConnectorApi.model.Person;
+import com.google.api.client.util.DateTime;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by Sashka on 03.06.2015.
@@ -58,7 +63,10 @@ public class ProfileItemLstAdapter extends BaseAdapter {
         Person person = getPerson(position);
         if(person!=null) {
             ((TextView) view.findViewById(R.id.lstProfileItem_name)).setText(person.getName() + " " + person.getSurname());
-            ((TextView) view.findViewById(R.id.lstProfileItem_desc1)).setText(ctx.getString(R.string.person_item_age) + " " +person.getAge());
+            DateTime birthday;
+            int age = UsefulFunctions.calcPersonAge(person.getBirthday());
+
+            ((TextView) view.findViewById(R.id.lstProfileItem_desc1)).setText(ctx.getString(R.string.person_item_age) + (age>=0 ? " " +age:""));
             ((TextView) view.findViewById(R.id.lstProfileItem_desc2)).setText(ctx.getString(R.string.person_item_rating)+ " " + person.getRating());
             //((ImageView) view.findViewById(R.id.lstProfileItem_img_photo)).setImageResource(person.image());
         }

@@ -1,10 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="msg_error">#AAAAAA</color>
+    <!-- fragment_spotInfo-->
+    <color name="text_msg_error">#AAAAAA</color>
+    <!-- fragment_spotInfo-->
+
     <!-- fragment_personProfile-->
     <color name="divider_block">#AAAAAA</color>
     <color name="property_line">#66BBBBBB</color>
     <!-- fragment_personProfile-->
+
+    <!-- fragment_editProfile-->
+    <color name="text_property">#000000</color>
+    <!-- fragment_editProfile-->
 
     <!-- fragment_main-->
     <color name="btn_text">#444444</color>
@@ -22,5 +29,6 @@
     <color name="list_item_background">#88DADADA</color>
     <!-- list_spot_item-->
 
+    <color name="transparentColor">#00FFFFFF</color>
 
 </resources>

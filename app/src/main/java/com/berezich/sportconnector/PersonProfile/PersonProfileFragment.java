@@ -19,13 +19,17 @@ import com.berezich.sportconnector.GoogleMap.SpotsData;
 import com.berezich.sportconnector.LocalDataManager;
 import com.berezich.sportconnector.MainActivity;
 import com.berezich.sportconnector.R;
-import com.berezich.sportconnector.SpotInfo.SpotInfoFragment;
+import com.berezich.sportconnector.UsefulFunctions;
 import com.berezich.sportconnector.backend.sportConnectorApi.model.Person;
 import com.berezich.sportconnector.backend.sportConnectorApi.model.Spot;
+import com.google.api.client.util.DateTime;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by berezkin on 17.07.2015.
@@ -68,7 +72,10 @@ public class PersonProfileFragment extends Fragment {
                 txtView.setText(myPersonInfo.getName() +" "+myPersonInfo.getSurname());
             if((txtView = (TextView) rootView.findViewById(R.id.profile_txt_typeAge))!=null) {
                 String str = myPersonInfo.getType().equals("PARTNER")? getString(R.string.personprofile_type_partner):getString(R.string.personprofile_type_coach);
-                str+=", "+myPersonInfo.getAge();
+                DateTime birthday;
+                int age = UsefulFunctions.calcPersonAge(myPersonInfo.getBirthday());
+                if(age>=0)
+                    str += ", "+age ;
                 txtView.setText(str);
             }
             if((txtView = (TextView) rootView.findViewById(R.id.profile_txt_raiting))!=null)
