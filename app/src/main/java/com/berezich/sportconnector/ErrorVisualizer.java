@@ -88,4 +88,26 @@ public class ErrorVisualizer {
         }
 
     }
+    public static String getDebugMsgOfRespException(Exception exception)
+    {
+        String errMsg="exception == null";
+        try {
+            if(exception!=null)
+                if (exception instanceof GoogleJsonResponseException) {
+                    GoogleJsonResponseException appError = (GoogleJsonResponseException) exception;
+                    errMsg = ((GoogleJsonResponseException) exception).getDetails().getMessage();
+
+                }
+                else
+                    errMsg = exception.getMessage();
+
+        }
+        catch (Exception ex){
+            errMsg = "get error msg failed";
+        }
+        finally {
+            return  errMsg;
+        }
+
+    }
 }

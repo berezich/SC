@@ -1,7 +1,12 @@
 package com.berezich.sportconnector;
 
+import android.util.Log;
+
 import com.google.api.client.util.DateTime;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
@@ -26,5 +31,18 @@ public class UsefulFunctions {
                 age--;
 
         return age;
+    }
+    public static DateTime parseDateTime(String dtStr)
+    {
+        DateFormat df = new SimpleDateFormat("dd.mm.yyyy");
+        DateTime dtBirthday = null;
+        try {
+            Date dBirthday = df.parse(dtStr);
+            dtBirthday = new DateTime(dBirthday);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        } finally {
+            return dtBirthday;
+        }
     }
 }

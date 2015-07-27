@@ -13,6 +13,7 @@ import java.util.List;
 @Entity
 public class Person {
     public enum TYPE{COACH,PARTNER};
+    public enum SEX{MALE,FEMALE};
     @Id
     private String id = null;
     private String pass;
@@ -21,6 +22,7 @@ public class Person {
     private Date birthday;
     private String email;
     private String phone;
+    private SEX sex;
     /*for coaches*/
     private String price;
     private float rating;
@@ -39,6 +41,26 @@ public class Person {
         this.name = name;
         this.surname = surname;
         this.birthday = birthday;
+    }
+
+    public Person(Person anotherPerson){
+        id = anotherPerson.getId();
+        pass = anotherPerson.getPass();
+        name = anotherPerson.getName();
+        surname = anotherPerson.getSurname();
+        birthday = anotherPerson.getBirthday();
+        email = anotherPerson.getEmail();
+        phone = anotherPerson.getPhone();
+        price = anotherPerson.getPrice();
+        rating = anotherPerson.getRating();
+        description = anotherPerson.getDescription();
+        type = anotherPerson.getType();
+        if(anotherPerson.getPictureLst()!=null)
+            pictureLst = new ArrayList<>(anotherPerson.getPictureLst());
+        if(anotherPerson.getFavoriteSpotIdLst()!=null)
+            favoriteSpotIdLst = new ArrayList<>(anotherPerson.getFavoriteSpotIdLst());
+        if(anotherPerson.getMyFriends()!=null)
+            myFriends = new ArrayList<>(anotherPerson.getMyFriends());
     }
 
     public String getId() {
@@ -71,6 +93,10 @@ public class Person {
 
     public float getRating() {
         return rating;
+    }
+
+    public SEX getSex() {
+        return sex;
     }
 
     public String getPrice() {
@@ -127,6 +153,10 @@ public class Person {
 
     public void setRating(float rating) {
         this.rating = rating;
+    }
+
+    public void setSex(SEX sex) {
+        this.sex = sex;
     }
 
     protected void setType(TYPE _type) {

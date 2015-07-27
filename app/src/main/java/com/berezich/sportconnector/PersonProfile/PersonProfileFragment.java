@@ -11,7 +11,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -25,11 +24,8 @@ import com.berezich.sportconnector.backend.sportConnectorApi.model.Spot;
 import com.google.api.client.util.DateTime;
 
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Created by berezkin on 17.07.2015.
@@ -64,6 +60,27 @@ public class PersonProfileFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.fragment_person_profile, container, false);
+
+        return rootView;
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+
+        ((MainActivity) activity).onSectionAttached(getArguments().getInt(ARG_SECTION_NUMBER));
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+    }
+
+    @Override
+    public void onResume()
+    {
+        super.onResume();
         TextView txtView;
         Person myPersonInfo = LocalDataManager.getMyPersonInfo();
         if(myPersonInfo!=null && rootView!=null)
@@ -81,31 +98,45 @@ public class PersonProfileFragment extends Fragment {
             if((txtView = (TextView) rootView.findViewById(R.id.profile_txt_raiting))!=null)
                 txtView.setText(getString(R.string.personprofile_rating)+" "+myPersonInfo.getRating());
 
-            //middle block
+            //contacts block
             String email = myPersonInfo.getEmail(),phone = myPersonInfo.getPhone();
-            LinearLayout linearLayout = (LinearLayout) rootView.findViewById(R.id.profile_middleBlock);
-            FrameLayout frameLayout;
+            LinearLayout linearLayout = (LinearLayout) rootView.findViewById(R.id.profile_contactsBlock);
+            LinearLayout propertyLstLayout = (LinearLayout) rootView.findViewById(R.id.profile_linearlayout_propertyLst);
+            LinearLayout propertyLayout;
+            if(linearLayout!=null ) {
+                linearLayout.setVisibility(View.GONE);
+                if((propertyLayout = (LinearLayout) rootView.findViewById(R.id.profile_linearlayout_email))!=null && propertyLstLayout!=null)
+                    if (email != null && !email.equals("")) {
+                        if((txtView = (TextView) rootView.findViewById(R.id.profile_txt_emailValue))!=null)
+                            txtView.setText(email);
+                        propertyLayout.setVisibility(View.VISIBLE);
+                        linearLayout.setVisibility(View.VISIBLE);
+                    }
+                    else
+                        propertyLstLayout.removeView(propertyLayout);
+
+                if((propertyLayout = (LinearLayout) rootView.findViewById(R.id.profile_linearlayout_phone))!=null && propertyLstLayout!=null)
+                    if (phone != null && !phone.equals("")) {
+                        if((txtView = (TextView) rootView.findViewById(R.id.profile_txt_phoneValue))!=null)
+                            txtView.setText(phone);
+                        propertyLayout.setVisibility(View.VISIBLE);
+                        linearLayout.setVisibility(View.VISIBLE);
+                    }
+                    else
+                        propertyLstLayout.removeView(propertyLayout);
+            }
+
+            //description block
+            String desc = myPersonInfo.getDescription();
+            linearLayout = (LinearLayout) rootView.findViewById(R.id.profile_descBlock);
             if(linearLayout!=null) {
                 linearLayout.setVisibility(View.GONE);
-                if((frameLayout = (FrameLayout) rootView.findViewById(R.id.profile_frame_email))!=null)
-                    if (email != null && !email.equals("")) {
-                        if((txtView = (TextView) rootView.findViewById(R.id.profile_txtEdt_emailValue))!=null)
-                            txtView.setText(email);
-                        frameLayout.setVisibility(View.VISIBLE);
-                        linearLayout.setVisibility(View.VISIBLE);
-                    }
-                    else
-                        frameLayout.setVisibility(View.GONE);
+                if (desc != null && !desc.equals("")) {
+                    if((txtView = (TextView) rootView.findViewById(R.id.profile_txt_desc))!=null)
+                        txtView.setText(desc);
+                    linearLayout.setVisibility(View.VISIBLE);
+                }
 
-                if((frameLayout = (FrameLayout) rootView.findViewById(R.id.profile_frame_phone))!=null)
-                    if (phone != null && !phone.equals("")) {
-                        if((txtView = (TextView) rootView.findViewById(R.id.profile_txtEdt_phoneValue))!=null)
-                            txtView.setText(phone);
-                        frameLayout.setVisibility(View.VISIBLE);
-                        linearLayout.setVisibility(View.VISIBLE);
-                    }
-                    else
-                        frameLayout.setVisibility(View.GONE);
             }
 
             //favorite spots lst
@@ -129,36 +160,20 @@ public class PersonProfileFragment extends Fragment {
                             lstView.setScrollContainer(false);
                         }*/
                         SpotItemLstAdapter spotItemLstAdapter = new SpotItemLstAdapter(getActivity().getApplicationContext(),spots);
-                        for(int i=0; i<spotItemLstAdapter.getCount(); i++)
-                            linearLayout.addView(spotItemLstAdapter.getView(i,null,null));
-                        isVisibleSpotLst = true;
+                        if( linearLayout.getChildAt(0) instanceof TextView) {
+                            txtView = (TextView) linearLayout.getChildAt(0);
+                            linearLayout.removeAllViews();
+                            linearLayout.addView(txtView);
+                            for (int i = 0; i < spotItemLstAdapter.getCount(); i++)
+                                linearLayout.addView(spotItemLstAdapter.getView(i, null, null));
+                            isVisibleSpotLst = true;
+                        }
                     }
 
                 }
                 linearLayout.setVisibility(isVisibleSpotLst? View.VISIBLE : View.GONE);
             }
         }
-        return rootView;
-    }
-
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-
-        ((MainActivity) activity).onSectionAttached(getArguments().getInt(ARG_SECTION_NUMBER));
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-
-    }
-
-    @Override
-    public void onResume()
-    {
-        super.onResume();
-
     }
 
     @Override

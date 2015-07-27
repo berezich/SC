@@ -38,6 +38,7 @@ public class LoginFragment extends Fragment implements EndpointApi.AuthorizePers
     private final String TAG = "MyLog_LoginFragment";
     private Person myPersonInfo;
     private AppPref appPref;
+    private String pass;
     int _sectionNumber;
     View rootView;
     private AlertDialogFragment dialog;
@@ -105,7 +106,8 @@ public class LoginFragment extends Fragment implements EndpointApi.AuthorizePers
     {
         @Override
         public void onClick(View v) {
-            String pass="", login="";
+            String login="";
+            pass = "";
             EditText editTxt;
             if((editTxt = (EditText) rootView.findViewById(R.id.login_email_value))!=null) {
                 login = editTxt.getText().toString();
@@ -154,6 +156,7 @@ public class LoginFragment extends Fragment implements EndpointApi.AuthorizePers
         {
             Log.d(TAG, "AuthorizePerson OK");
             try {
+                person.setPass(pass);
                 LocalDataManager.saveMyPersonInfoToPref(person, getActivity());
                 listenerLoginFragment.onAuthorized();
             } catch (IOException e) {

@@ -77,27 +77,31 @@
             </LinearLayout>
 
             <LinearLayout
-                android:orientation="vertical"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@color/background_floating_material_light"
-                android:paddingBottom="25dp"
-                android:id="@+id/profile_middleBlock"
-                android:elevation="2dp">
+                style="@style/PersonProfile_Block"
+                android:id="@+id/profile_contactsBlock">
 
-                <FrameLayout
+                <TextView
+                    style="@style/PersonProfile_TitleBlock"
+                    android:text="@string/personprofile_contactsTitle"
+                    android:id="@+id/profile_txt_contactsTitle"/>
+
+                <LinearLayout
+                    android:orientation="vertical"
                     android:layout_width="match_parent"
-                    android:layout_height="50dp"
-                    android:layout_marginRight="35dp"
-                    android:layout_marginLeft="35dp"
-                    android:id="@+id/profile_frame_email">
+                    android:layout_height="match_parent"
+                    android:divider="@drawable/property_line_gray"
+                    android:showDividers="middle|end"
+                    android:id="@+id/profile_linearlayout_propertyLst">
 
                     <LinearLayout
                         android:orientation="horizontal"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_gravity="bottom"
-                        android:layout_marginBottom="10dp">
+                        android:layout_marginBottom="5dp"
+                        android:layout_marginTop="5dp"
+                        android:id="@+id/profile_linearlayout_email"
+                        android:visibility="visible">
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -115,39 +119,20 @@
                             android:layout_height="wrap_content"
                             android:textAppearance="?android:attr/textAppearanceMedium"
                             android:text=""
-                            android:id="@+id/profile_txtEdt_emailValue"
+                            android:id="@+id/profile_txt_emailValue"
                             android:gravity="center_horizontal"
                             android:paddingLeft="5dp"
                             android:paddingRight="5dp" />
                     </LinearLayout>
 
-                    <View
-                        android:layout_width="fill_parent"
-                        android:layout_height="@dimen/property_line_width"
-                        android:background="@color/property_line"
-                        android:id="@+id/profile_2divider"
-                        android:paddingLeft="0dp"
-                        android:paddingRight="0dp"
-                        android:padding="0dp"
-                        android:paddingTop="0dp"
-                        android:layout_gravity="bottom"
-                        android:layout_marginBottom="5dp" />
-
-                </FrameLayout>
-
-                <FrameLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="50dp"
-                    android:layout_marginRight="35dp"
-                    android:layout_marginLeft="35dp"
-                    android:id="@+id/profile_frame_phone">
-
                     <LinearLayout
                         android:orientation="horizontal"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="bottom"
-                        android:layout_marginBottom="10dp">
+                        android:layout_marginBottom="5dp"
+                        android:layout_marginTop="5dp"
+                        android:id="@+id/profile_linearlayout_phone"
+                        android:visibility="visible">
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -165,25 +150,32 @@
                             android:layout_height="wrap_content"
                             android:textAppearance="?android:attr/textAppearanceMedium"
                             android:text=""
-                            android:id="@+id/profile_txtEdt_phoneValue"
+                            android:id="@+id/profile_txt_phoneValue"
                             android:gravity="center_horizontal"
                             android:paddingLeft="5dp"
                             android:paddingRight="5dp" />
                     </LinearLayout>
 
-                    <View
-                        android:layout_width="fill_parent"
-                        android:layout_height="@dimen/property_line_width"
-                        android:background="@color/property_line"
-                        android:id="@+id/profile_1divider"
-                        android:paddingLeft="0dp"
-                        android:paddingRight="0dp"
-                        android:padding="0dp"
-                        android:paddingTop="0dp"
-                        android:layout_gravity="bottom"
-                        android:layout_marginBottom="5dp" />
+                </LinearLayout>
 
-                </FrameLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                style="@style/PersonProfile_Block"
+                android:id="@+id/profile_descBlock"
+                android:showDividers="end">
+
+                <TextView
+                    style="@style/PersonProfile_TitleBlock"
+                    android:text="@string/personprofile_descTitle"
+                    android:id="@+id/profile_txt_descTitle"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:id="@+id/profile_txt_desc"
+                    android:inputType="textMultiLine" />
 
             </LinearLayout>
 
@@ -200,14 +192,11 @@
                 android:elevation="2dp">
 
                 <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:text="@string/personprofile_favorite_spots"
+                    style="@style/PersonProfile_TitleBlock"
+                    android:text="@string/personprofile_favoriteSpotsTitle"
                     android:id="@+id/textView"
-                    android:layout_gravity="center_horizontal"
-                    android:layout_marginTop="10dp"
-                    android:layout_marginBottom="10dp" />
+                    android:layout_marginLeft="35dp"
+                    android:layout_marginTop="15dp" />
 
             </LinearLayout>
         </LinearLayout>

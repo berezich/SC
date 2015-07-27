@@ -33,13 +33,15 @@
                 <EditText
                     android:id="@+id/editProfile_txtEdt_name"
                     style="@style/EditProfile_TxtPropField"
-                    android:hint="@string/editprofile_hint_name" />
+                    android:hint="@string/editprofile_hint_name"
+                    android:inputType="textPersonName" />
 
 
                 <EditText
                     android:id="@+id/editProfile_txtEdt_surname"
                     style="@style/EditProfile_TxtPropField"
-                    android:hint="@string/editprofile_hint_surname" />
+                    android:hint="@string/editprofile_hint_surname"
+                    android:inputType="textPersonName" />
 
                 <TextView
                     style="@style/EditProfile_TxtPropField"
@@ -57,7 +59,8 @@
                     android:layout_marginTop="@dimen/editprofile_text_top_offset"
                     android:layout_marginBottom="@dimen/editprofile_text_bottom_offset"
                     android:paddingLeft="@dimen/editprofile_text_left_right_offset"
-                    android:paddingRight="@dimen/editprofile_text_left_right_offset">
+                    android:paddingRight="@dimen/editprofile_text_left_right_offset"
+                    android:id="@+id/editProfile_radioGrp_sex">
 
                     <RadioButton
                         android:layout_width="match_parent"
@@ -92,13 +95,15 @@
                 <EditText
                     android:id="@+id/editProfile_txtEdt_email"
                     style="@style/EditProfile_TxtPropField"
-                    android:hint="@string/editprofile_hint_email" />
+                    android:hint="@string/editprofile_hint_email"
+                    android:inputType="textEmailAddress" />
 
 
                 <EditText
                     android:id="@+id/editProfile_txtEdt_phone"
                     style="@style/EditProfile_TxtPropField"
-                    android:hint="@string/editprofile_hint_phone" />
+                    android:hint="@string/editprofile_hint_phone"
+                    android:inputType="phone" />
 
             </LinearLayout>
 

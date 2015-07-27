@@ -20,6 +20,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import javax.annotation.Nullable;
@@ -72,6 +73,7 @@ public class PersonEndpoint {
         if (person == null) {
             throw new NotFoundException("Could not find Person with ID: " + id);
         }
+        person.setPass("");
         return person;
     }
 
@@ -84,8 +86,10 @@ public class PersonEndpoint {
         Person person = ofy().load().type(Person.class).id(id).now();
         if (person != null) {
             String encPass = msgDigest(pass);
-            if(encPass!="" && person.getPass().equals(encPass))
+            if(encPass!="" && person.getPass().equals(encPass)) {
+                person.setPass("");
                 return person;
+            }
         }
         throw new NotFoundException("AuthFailed@:Could not find Person with ID: " + id + " or such passowrd");
     }
@@ -117,6 +121,7 @@ public class PersonEndpoint {
         logger.info("Created Person.");
         Person personRes = ofy().load().entity(person).now();
         setSpotCoachesPartners(personRes,null);
+        personRes.setPass("");
         return personRes;
     }
 
@@ -150,6 +155,7 @@ public class PersonEndpoint {
         logger.info("Updated Person: " + person);
         Person personRes = ofy().load().entity(person).now();
         setSpotCoachesPartners(personRes,oldPerson);
+        personRes.setPass("");
         return personRes;
     }
 
@@ -242,6 +248,16 @@ public class PersonEndpoint {
             httpMethod = ApiMethod.HttpMethod.GET)
     public CollectionResponse<Person> listByIdLst(@Named("idLst") ArrayList<String>idLst) {
         Map<String,Person> personMap = ofy().load().type(Person.class).ids(idLst);
+        if(personMap==null)
+            return null;
+        Set<String> keys = personMap.keySet();
+        Person person;
+        for (String key : keys)
+        {
+            person = personMap.get(key);
+            person.setPass("");
+            personMap.put(key,person);
+        }
         return CollectionResponse.<Person>builder().setItems(personMap.values()).build();
     }
 

@@ -10,14 +10,34 @@
         <item name="android:textStyle">normal</item>
     </style>
 
+    <style name="PersonProfile_TitleBlock">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textSize">@dimen/editprofile_title_text_size</item>
+        <item name="android:layout_marginBottom">@dimen/editprofile_title_top_offset</item>
+        <item name="android:gravity">left</item>
+        <item name="android:layout_gravity">left</item>
+        <item name="android:background">@color/transparentColor</item>
+    </style>
+
+    <style name="PersonProfile_Block">
+        <item name="android:orientation">vertical</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:background">@color/background_floating_material_light</item>
+        <item name="android:paddingBottom">20dp</item>
+        <item name="android:paddingTop">15dp</item>
+        <item name="android:paddingLeft">35dp</item>
+        <item name="android:paddingRight">35dp</item>
+    </style>
+
+
     <style name="EditProfile_TitleBlock">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:textSize">@dimen/editprofile_title_text_size</item>
         <item name="android:layout_marginTop">@dimen/editprofile_title_top_offset</item>
-        <item name="android:layout_marginLeft">@dimen/editprofile_title_top_offset</item>
-        <item name="android:paddingLeft">12dp</item>
-        <item name="android:paddingRight">12dp</item>
+        <item name="android:layout_marginLeft">@dimen/editprofile_title_left_offset</item>
         <item name="android:gravity">left</item>
         <item name="android:layout_gravity">left</item>
         <item name="android:background">@color/transparentColor</item>

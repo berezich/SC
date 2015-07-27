@@ -1,6 +1,10 @@
 <resources>
     <string name="app_name">SportConnector</string>
 
+    <!-- srvApi begin-->
+        <string name="srvApi_url">https://sportconnector-981.appspot.com/_ah/api/</string>
+    <!-- srvApi end-->
+
     <!-- main begin -->
         <!-- main/search frame-->
         <string name="frame_main_title">Поиск</string>
@@ -26,74 +30,66 @@
         <!-- main/fiends frame end-->
     <!-- main end -->
 
+    <!--login_fragment begin-->
+        <string name="login_login">Login:</string>
+        <string name="login_err_hint">Login must be not less then 6 symbols</string>
+        <string name="login_pass">Pass:</string>
+        <string name="login_pass_err_hint">Login must be not less then 8 symbols</string>
+        <string name="login_btn_txt_login">Login</string>
+        <string name="login_err_title">Внимание</string>
+        <string name="login_err_authorized">Вы вели неверный логин или пароль</string>
+    <!--login_fragment end-->
 
     <!--spotInfo_fragment begin-->
         <string name="spotinfo_tab1_title">Спарринг партнеры</string>
         <string name="spotinfo_tab2_title">Тренеры</string>
         <string name="spotinfo_no_partners_no_coaches">На данном корте пока нет зарегестрированных соперников и тренеров.</string>
         <string name="spotinfo_req_error_msg">Ошибка</string>
-        <!-- spotInfo_fragment/list_person_item-->
-            <string name="person_item_age">Возраст:</string>
-            <string name="person_item_rating">Уровень игры </string>
-        <!-- spotInfo_fragment/list_person_item-->
 
+        <!-- spotInfo_fragment/list_person_item-->
+        <string name="person_item_age">Возраст:</string>
+        <string name="person_item_rating">Уровень игры </string>
+        <!-- spotInfo_fragment/list_person_item-->
     <!-- spotInfo_fragment end-->
 
-    <!--login_fragment begin-->
-    <string name="login_login">Login:</string>
-    <string name="login_err_hint">Login must be not less then 6 symbols</string>
-    <string name="login_pass">Pass:</string>
-    <string name="login_pass_err_hint">Login must be not less then 8 symbols</string>
-    <string name="login_btn_txt_login">Login</string>
-
-    <string name="login_err_title">Внимание</string>
-    <string name="login_err_authorized">Вы вели неверный логин или пароль</string>
-
-    <!--login_fragment begin-->
-
     <!--personProfile_fragment begin-->
-    <string name="personprofile_type_coach">тренер</string>
-    <string name="personprofile_type_partner">спарринг-партнер</string>
-    <string name="personprofile_rating">Уровень игры</string>
-    <string name="personprofile_email">Email:</string>
-    <string name="personprofile_phone">Phone:</string>
-    <string name="personprofile_type">Category:</string>
-    <string name="personprofile_favorite_spots">Любимые корты</string>
-        <!-- personProfile_fragment/list_spot_item-->
-        <string name="spot_item_rating">Рейтинг </string>
-        <!-- personProfile_fragment/list_spot_item-->
-        <!-- menu -->
-        <string name="menu_edit_profile">Редактировать мои данные</string>
-        <!-- menu -->
+        <string name="personprofile_type_coach">тренер</string>
+        <string name="personprofile_type_partner">спарринг-партнер</string>
+        <string name="personprofile_rating">Уровень игры</string>
+        <string name="personprofile_email">Email:</string>
+        <string name="personprofile_phone">Phone:</string>
+        <string name="personprofile_type">Category:</string>
+        <string name="personprofile_contactsTitle">КОНТАКТЫ</string>
+        <string name="personprofile_descTitle">О СЕБЕ</string>
+        <string name="personprofile_favoriteSpotsTitle">ЛЮБИМЫЕ КОРТЫ</string>
+            <!-- personProfile_fragment/list_spot_item-->
+                <string name="spot_item_rating">Рейтинг </string>
+            <!-- personProfile_fragment/list_spot_item-->
+            <!-- menu -->
+                <string name="menu_edit_profile">Редактировать мои данные</string>
+            <!-- menu -->
     <!-- personProfile_fragment end-->
 
+    <!-- editProfile_fragment begin-->
+        <string name="editprofile_title_general">ОБЩАЯ ИНФОРМАЦИЯ</string>
+        <string name="editprofile_hint_name">Имя</string>
+        <string name="editprofile_hint_surname">Фамилия</string>
+        <string name="editprofile_hint_bithday">Дата рождения</string>
+        <string name="editprofile_radio_male">Мужской</string>
+        <string name="editprofile_radio_female">Женский</string>
+        <string name="editprofile_title_security">БЕЗОПАСНОСТЬ</string>
+        <string name="editprofile_txt_changePass">Сменить пароль</string>
+        <string name="editprofile_title_contacts">КОНТАКТЫ</string>
+        <string name="editprofile_hint_email">Электронная почта</string>
+        <string name="editprofile_hint_phone">Телефон</string>
+        <string name="editprofile_title_other">ДОПОЛНИТЕЛЬНАЯ ИНФОРМАЦИЯ</string>
+        <string name="editprofile_txt_setRating">Уровень игры</string>
+        <string name="editprofile_hint_desc">Немного о себе</string>
+        <string name="editprofile_saveError">Ошибка</string>
+            <!-- menu -->
+                <string name="menu_save_profile">Сохранить</string>
+            <!-- menu -->
     <!-- editProfile_fragment end-->
-    <string name="editprofile_title_general">ОБЩАЯ ИНФОРМАЦИЯ</string>
-    <string name="editprofile_hint_name">Имя</string>
-    <string name="editprofile_hint_surname">Фамилия</string>
-    <string name="editprofile_hint_bithday">Дата рождения</string>
-    <string name="editprofile_radio_male">Мужской</string>
-    <string name="editprofile_radio_female">Женский</string>
-    <string name="editprofile_title_security">БЕЗОПАСНОСТЬ</string>
-    <string name="editprofile_txt_changePass">Сменить пароль</string>
-    <string name="editprofile_title_contacts">КОНТАКТЫ</string>
-    <string name="editprofile_hint_email">Электронная почта</string>
-    <string name="editprofile_hint_phone">Телефон</string>
-    <string name="editprofile_title_other">ДОПОЛНИТЕЛЬНАЯ ИНФОРМАЦИЯ</string>
-    <string name="editprofile_txt_setRating">Уровень игры</string>
-    <string name="editprofile_hint_desc">Немного о себе</string>
-
-    <!-- menu -->
-        <string name="menu_save_profile">Сохранить</string>
-        <!-- menu -->
-
-    <!-- editProfile_fragment end-->
-
-
-
-    <!-- srvApi begin-->
-        <string name="srvApi_url">https://sportconnector-981.appspot.com/_ah/api/</string>
-    <!-- srvApi end-->
 
     <!-- errorVisualizer begin-->
         <string name="host_unreachable_err">Невозможно загрузить данные.\nПроверьте ваше интернет соединение.</string>
@@ -102,8 +98,8 @@
     <!-- errorVisualizer end-->
 
     <!-- alertDialog begin-->
-    <string name="alert_dialog_ok">OK</string>
-    <string name="alert_dialog_cancel">Cancel</string>
+        <string name="alert_dialog_ok">OK</string>
+        <string name="alert_dialog_cancel">Cancel</string>
     <!-- alertDialog end-->
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
