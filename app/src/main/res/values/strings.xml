@@ -6,16 +6,6 @@
     <!-- srvApi end-->
 
     <!-- main begin -->
-        <!-- main/search frame-->
-        <string name="frame_main_title">Поиск</string>
-        <string name="btn_main_1">СПАРРИНГ ПАРТНЕРЫ</string>
-        <string name="btn_main_2">ТРЕНЕРЫ</string>
-        <string name="btn_main_3">КОРТЫ</string>
-        <!-- main/search frame-->
-
-        <!-- main/portfolio frame-->
-        <string name="frame_profile_title">Моя страница</string>
-        <!-- main/portfolio frame-->
 
         <!-- main/msg frame-->
         <string name="frame_msg_title">Мои сообщения</string>
@@ -40,19 +30,19 @@
         <string name="login_err_authorized">Вы вели неверный логин или пароль</string>
     <!--login_fragment end-->
 
-    <!--spotInfo_fragment begin-->
-        <string name="spotinfo_tab1_title">Спарринг партнеры</string>
-        <string name="spotinfo_tab2_title">Тренеры</string>
-        <string name="spotinfo_no_partners_no_coaches">На данном корте пока нет зарегестрированных соперников и тренеров.</string>
-        <string name="spotinfo_req_error_msg">Ошибка</string>
+    <!-- main_search_fragment -->
+        <string name="mainSearch_fragmentTitle">Корты</string>
+        <string name="btn_main_1">СПАРРИНГ ПАРТНЕРЫ</string>
+        <string name="btn_main_2">ТРЕНЕРЫ</string>
+        <string name="btn_main_3">КОРТЫ</string>
+    <!--main_search_fragment-->
 
-        <!-- spotInfo_fragment/list_person_item-->
-        <string name="person_item_age">Возраст:</string>
-        <string name="person_item_rating">Уровень игры </string>
-        <!-- spotInfo_fragment/list_person_item-->
-    <!-- spotInfo_fragment end-->
+    <!--gmap_fragment begin-->
+        <string name="gmap_fragmentTitle">Карта</string>
+    <!--gmap_fragment end-->
 
     <!--personProfile_fragment begin-->
+        <string name="personprofile_fragmentTitle">Моя страница</string>
         <string name="personprofile_type_coach">тренер</string>
         <string name="personprofile_type_partner">спарринг-партнер</string>
         <string name="personprofile_rating">Уровень игры</string>
@@ -71,6 +61,7 @@
     <!-- personProfile_fragment end-->
 
     <!-- editProfile_fragment begin-->
+        <string name="editprofile_fragmentTitle">Редактирование</string>
         <string name="editprofile_title_general">ОБЩАЯ ИНФОРМАЦИЯ</string>
         <string name="editprofile_hint_name">Имя</string>
         <string name="editprofile_hint_surname">Фамилия</string>
@@ -90,6 +81,20 @@
                 <string name="menu_save_profile">Сохранить</string>
             <!-- menu -->
     <!-- editProfile_fragment end-->
+
+    <!--spotInfo_fragment begin-->
+        <string name="spotinfo_fragmentTitle">Инфо о корте</string>
+        <string name="spotinfo_tab1_title">Спарринг партнеры</string>
+        <string name="spotinfo_tab2_title">Тренеры</string>
+        <string name="spotinfo_no_partners_no_coaches">На данном корте пока нет зарегестрированных соперников и тренеров.</string>
+        <string name="spotinfo_req_error_msg">Ошибка</string>
+
+            <!-- spotInfo_fragment/list_person_item-->
+                <string name="person_item_age">Возраст:</string>
+                <string name="person_item_rating">Уровень игры </string>
+            <!-- spotInfo_fragment/list_person_item-->
+    <!-- spotInfo_fragment end-->
+
 
     <!-- errorVisualizer begin-->
         <string name="host_unreachable_err">Невозможно загрузить данные.\nПроверьте ваше интернет соединение.</string>

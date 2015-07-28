@@ -170,6 +170,7 @@ public class GoogleMapFragment extends Fragment{
         Log.d(TAG,"GoogleMapFragment on onResume");
         mapView.onResume();
         super.onResume();
+        getActivity().setTitle(R.string.gmap_fragmentTitle);
     }
 
     @Override

@@ -82,6 +82,7 @@ public class PersonProfileFragment extends Fragment {
     {
         super.onResume();
         TextView txtView;
+        getActivity().setTitle(R.string.personprofile_fragmentTitle);
         Person myPersonInfo = LocalDataManager.getMyPersonInfo();
         if(myPersonInfo!=null && rootView!=null)
         {

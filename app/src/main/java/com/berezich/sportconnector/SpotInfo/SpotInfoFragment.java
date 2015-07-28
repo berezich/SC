@@ -103,6 +103,7 @@ public class SpotInfoFragment extends Fragment implements EndpointApi.GetListPer
         TabHost tabHost;
         ListView lstView;
         ImageButton imgButton;
+        getActivity().setTitle(R.string.spotinfo_fragmentTitle);
         spotInfoView = inflater.inflate(R.layout.fragment_spot_info, container, false);
         spotHashMap = SpotsData.get_allSpots();
         if((txtView = (TextView) spotInfoView.findViewById(R.id.spotinfo_frg_tryAgain_txtView))!=null)

@@ -90,6 +90,7 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
         DateTime birthday;
         Person myPersonInfo = LocalDataManager.getMyPersonInfo();
         RadioGroup radioGroup;
+        getActivity().setTitle(R.string.editprofile_fragmentTitle);
         if (myPersonInfo != null && rootView != null) {
             if ((txtEdt = (EditText) rootView.findViewById(R.id.editProfile_txtEdt_name)) != null)
                 txtEdt.setText(myPersonInfo.getName());

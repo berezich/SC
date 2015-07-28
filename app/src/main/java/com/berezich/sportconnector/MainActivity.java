@@ -1,30 +1,20 @@
 package com.berezich.sportconnector;
 
+import android.content.res.Configuration;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBar;
 import android.support.v4.app.FragmentManager;
 import android.os.Bundle;
+import android.support.v4.app.ActionBarDrawerToggle;
 import android.util.Log;
-import android.util.Pair;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.support.v4.widget.DrawerLayout;
-import android.view.View;
-import android.widget.FrameLayout;
 
 import com.berezich.sportconnector.GoogleMap.GoogleMapFragment;
-import com.berezich.sportconnector.GoogleMap.SpotsData;
 import com.berezich.sportconnector.MainFragment.Filters;
 import com.berezich.sportconnector.PersonProfile.PersonProfileFragment;
 import com.berezich.sportconnector.SpotInfo.SpotInfoFragment;
-import com.berezich.sportconnector.backend.sportConnectorApi.model.RegionInfo;
-import com.berezich.sportconnector.backend.sportConnectorApi.model.Spot;
-import com.berezich.sportconnector.backend.sportConnectorApi.model.UpdateSpotInfo;
-import com.google.api.client.util.DateTime;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 
 public class MainActivity extends ActionBarActivity
@@ -122,10 +112,10 @@ public class MainActivity extends ActionBarActivity
     public void onSectionAttached(int number) {
         switch (number) {
             case 0:
-                mTitle = getString(R.string.frame_main_title);
+                mTitle = getString(R.string.mainSearch_fragmentTitle);
                 break;
             case 1:
-                mTitle = getString(R.string.frame_profile_title);
+                mTitle = getString(R.string.personprofile_fragmentTitle);
                 break;
             case 2:
                 mTitle = getString(R.string.frame_msg_title);
@@ -146,6 +136,27 @@ public class MainActivity extends ActionBarActivity
         actionBar.setTitle(mTitle);
     }
 
+    @Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        // Sync the toggle state after onRestoreInstanceState has occurred.
+
+        if(mNavigationDrawerFragment!=null) {
+            ActionBarDrawerToggle mDrawerToggle = mNavigationDrawerFragment.getDrawerTuggle();
+            if (mDrawerToggle != null)
+                mDrawerToggle.syncState();
+        }
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        if(mNavigationDrawerFragment!=null) {
+            ActionBarDrawerToggle mDrawerToggle = mNavigationDrawerFragment.getDrawerTuggle();
+            if (mDrawerToggle != null)
+                mDrawerToggle.onConfigurationChanged(newConfig);
+        }
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

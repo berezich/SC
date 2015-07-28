@@ -106,8 +106,8 @@ public class NavigationDrawerFragment extends Fragment {
                 android.R.layout.simple_list_item_activated_1,
                 android.R.id.text1,
                 new String[]{
-                        getString(R.string.frame_main_title),
-                        getString(R.string.frame_profile_title),
+                        getString(R.string.mainSearch_fragmentTitle),
+                        getString(R.string.personprofile_fragmentTitle),
                         getString(R.string.frame_msg_title),
                         getString(R.string.frame_friends_title),
                         getString(R.string.frame_photo_title),
@@ -229,6 +229,11 @@ public class NavigationDrawerFragment extends Fragment {
         outState.putInt(STATE_SELECTED_POSITION, mCurrentSelectedPosition);
     }
 
+    public ActionBarDrawerToggle getDrawerTuggle()
+    {
+        return mDrawerToggle;
+    }
+
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
@@ -250,7 +255,8 @@ public class NavigationDrawerFragment extends Fragment {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (mDrawerToggle.onOptionsItemSelected(item)) {
-            return true;
+            //Toast.makeText(getActivity(), "Example action.", Toast.LENGTH_SHORT).show();
+            //return false;
         }
         /*
         if (item.getItemId() == R.id.action_example) {
