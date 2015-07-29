@@ -1,5 +1,6 @@
 package com.berezich.sportconnector;
 
+import android.app.Activity;
 import android.content.res.Configuration;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBar;
@@ -10,6 +11,11 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.support.v4.widget.DrawerLayout;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
 
 import com.berezich.sportconnector.GoogleMap.GoogleMapFragment;
 import com.berezich.sportconnector.MainFragment.Filters;
@@ -195,7 +201,40 @@ public class MainActivity extends ActionBarActivity
         fragmentManager.beginTransaction().replace(R.id.container, SpotInfoFragment.newInstance(spotId)).addToBackStack("tr2").commit();
 
     }
+    private Activity getCurActivty()
+    {
+        return this;
+    }
+    public void setupUI(View view) {
 
+        //Set up touch listener for non-text box views to hide keyboard.
+        if(!(view instanceof EditText)) {
 
+            view.setOnTouchListener(new View.OnTouchListener() {
+
+                public boolean onTouch(View v, MotionEvent event) {
+                    hideSoftKeyboard(getCurActivty());
+                    return false;
+                }
+
+            });
+        }
+
+        //If a layout container, iterate over children and seed recursion.
+        if (view instanceof ViewGroup) {
+
+            for (int i = 0; i < ((ViewGroup) view).getChildCount(); i++) {
+
+                View innerView = ((ViewGroup) view).getChildAt(i);
+
+                setupUI(innerView);
+            }
+        }
+    }
+
+    private void hideSoftKeyboard(Activity activity) {
+        InputMethodManager inputMethodManager = (InputMethodManager)  activity.getSystemService(Activity.INPUT_METHOD_SERVICE);
+        inputMethodManager.hideSoftInputFromWindow(activity.getCurrentFocus().getWindowToken(), 0);
+    }
 
 }

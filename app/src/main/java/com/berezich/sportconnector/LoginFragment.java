@@ -10,8 +10,10 @@ import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.util.Pair;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
@@ -64,12 +66,32 @@ public class LoginFragment extends Fragment implements EndpointApi.AuthorizePers
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        EditText editTxt;
         rootView = inflater.inflate(R.layout.fragment_login, container, false);
         if(rootView!=null)
         {
             Button btn = (Button) rootView.findViewById(R.id.login_btn_ok);
             if(btn!=null)
                 btn.setOnClickListener(new OnClickLoginListener());
+
+            if(( myPersonInfo = LocalDataManager.getMyPersonInfo())!=null) {
+
+                if ((editTxt = (EditText) rootView.findViewById(R.id.login_email_value)) != null) {
+                    editTxt.setText(myPersonInfo.getId());
+                }
+                if ((editTxt = (EditText) rootView.findViewById(R.id.login_pass_value)) != null) {
+                    editTxt.setText(myPersonInfo.getPass());
+
+                    if ((appPref = LocalDataManager.getAppPref()) != null) {
+                        if ((appPref != null) && appPref.isAutoLogin()) {
+                            new EndpointApi.AuthorizePersonAsyncTask(this).execute(myPersonInfo.getId(), myPersonInfo.getPass());
+                        }
+
+                    }
+                }
+            }
+            if(getActivity()!=null)
+                ((MainActivity) getActivity()).setupUI(rootView);
         }
         return rootView;
     }
@@ -85,14 +107,7 @@ public class LoginFragment extends Fragment implements EndpointApi.AuthorizePers
             throw new ClassCastException(activity.toString() + " must implement OnActionListener for LoginFragment");
         }
 
-        if(( myPersonInfo = LocalDataManager.getMyPersonInfo())!=null)
-            if ((appPref = LocalDataManager.getAppPref())!=null) {
-                if ((appPref != null) && appPref.isAutoLogin())
-                {
-                    new EndpointApi.AuthorizePersonAsyncTask(this).execute(myPersonInfo.getId(),myPersonInfo.getPass());
-                }
 
-            }
 
     }
     @Override
@@ -111,17 +126,9 @@ public class LoginFragment extends Fragment implements EndpointApi.AuthorizePers
             EditText editTxt;
             if((editTxt = (EditText) rootView.findViewById(R.id.login_email_value))!=null) {
                 login = editTxt.getText().toString();
-                if(login.length()<5) {
-                    //editTxt.setHint(R.string.login_err_hint);
-                    return;
-                }
             }
             if((editTxt = (EditText) rootView.findViewById(R.id.login_pass_value))!=null) {
                 pass = editTxt.getText().toString();
-                if(pass.length()<8) {
-                    //editTxt.setHint(R.string.login_pass_err_hint);
-                    return;
-                }
             }
             setVisibleProgressBar(true);
             new EndpointApi.AuthorizePersonAsyncTask(getFragment()).execute(login,pass);
@@ -138,6 +145,9 @@ public class LoginFragment extends Fragment implements EndpointApi.AuthorizePers
                 view.setVisibility(isVisible ? View.VISIBLE : View.GONE);
         }
     }
+
+
+
     public static interface OnActionListenerLoginFragment {
         void onAuthorized();
     }

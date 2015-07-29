@@ -50,12 +50,12 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:text="petrov@gmail.com"
                     android:id="@+id/login_email_value"
                     android:gravity="center_horizontal"
                     android:paddingLeft="5dp"
                     android:paddingRight="5dp"
-                    android:background="#00FFFFFF" />
+                    android:background="#00FFFFFF"
+                    android:inputType="textNoSuggestions" />
             </LinearLayout>
 
             <View
@@ -100,7 +100,6 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:text="Pass123456"
                     android:id="@+id/login_pass_value"
                     android:gravity="center_horizontal"
                     android:paddingLeft="5dp"

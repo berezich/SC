@@ -109,9 +109,9 @@ public class NavigationDrawerFragment extends Fragment {
                 new String[]{
                         getString(R.string.mainSearch_fragmentTitle),
                         getString(R.string.personprofile_fragmentTitle),
-                        getString(R.string.frame_msg_title),
+                        /*getString(R.string.frame_msg_title),
                         getString(R.string.frame_friends_title),
-                        getString(R.string.frame_photo_title),
+                        getString(R.string.frame_photo_title),*/
                 }));
         mDrawerListView.setItemChecked(mCurrentSelectedPosition, true);
 

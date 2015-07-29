@@ -23,6 +23,7 @@ import com.berezich.sportconnector.EndpointApi;
 import com.berezich.sportconnector.ErrorVisualizer;
 import com.berezich.sportconnector.GoogleMap.SpotsData;
 import com.berezich.sportconnector.LocalDataManager;
+import com.berezich.sportconnector.MainActivity;
 import com.berezich.sportconnector.R;
 import com.berezich.sportconnector.UsefulFunctions;
 import com.berezich.sportconnector.backend.sportConnectorApi.model.Person;
@@ -125,7 +126,10 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
                 else
                     radioGroup.clearCheck();
             }
+            if(getActivity()!=null)
+                ((MainActivity)getActivity()).setupUI(rootView);
         }
+
     }
     private Fragment getCurFragment(){
         return this;
