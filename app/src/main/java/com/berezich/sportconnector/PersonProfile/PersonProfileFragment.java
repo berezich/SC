@@ -190,7 +190,8 @@ public class PersonProfileFragment extends Fragment {
         switch (item.getItemId()) {
             case R.id.menu_edit_profile:
                 FragmentManager fragmentManager = (FragmentManager) getFragmentManager();
-                fragmentManager.beginTransaction().replace(R.id.container, new EditProfileFragment()).addToBackStack(null).commit();
+                if(fragmentManager!=null)
+                    fragmentManager.beginTransaction().replace(R.id.container, new EditProfileFragment()).addToBackStack(null).commit();
                 break;
         }
         return super.onOptionsItemSelected(item);

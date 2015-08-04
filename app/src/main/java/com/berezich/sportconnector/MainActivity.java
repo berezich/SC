@@ -20,6 +20,7 @@ import android.widget.EditText;
 import com.berezich.sportconnector.GoogleMap.GoogleMapFragment;
 import com.berezich.sportconnector.MainFragment.Filters;
 import com.berezich.sportconnector.PersonProfile.PersonProfileFragment;
+import com.berezich.sportconnector.PersonProfile.TestQuestionFragment;
 import com.berezich.sportconnector.SpotInfo.SpotInfoFragment;
 
 
@@ -92,7 +93,7 @@ public class MainActivity extends ActionBarActivity
     {
         FragmentManager fragmentManager = getSupportFragmentManager();
         //fragmentManager.beginTransaction().replace(R.id.container, new YaMapFragment().setArgs(sectionNumber,filter)).commit();
-        fragmentManager.beginTransaction().replace(R.id.container, new GoogleMapFragment().setArgs(sectionNumber,filter)).addToBackStack("tr1").commit();
+        fragmentManager.beginTransaction().replace(R.id.container, new GoogleMapFragment().setArgs(sectionNumber, filter)).addToBackStack("tr1").commit();
     }
 
     @Override

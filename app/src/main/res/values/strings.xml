@@ -80,7 +80,21 @@
             <!-- menu -->
                 <string name="menu_save_profile">Сохранить</string>
             <!-- menu -->
+
     <!-- editProfile_fragment end-->
+
+    <!-- testQuestion_fragment begin -->
+        <string name="testQuestion_title">Серия утверждений по « Форхэнд» (удар справа у правши или слева у левши)</string>
+        <string name="testQuestion_msg">У Вас заметны недостатки при выполнении основных ударов. Имеете укороченный замах, не можете выбирать направление удара.</string>
+        <string name="testQuestion_radioBtnVal1">1</string>
+        <string name="testQuestion_radioBtnVal2">2</string>
+        <string name="testQuestion_radioBtnVal3">3</string>
+        <string name="testQuestion_radioBtnVal4">4</string>
+        <string name="testQuestion_radioBtnVal5">5</string>
+        <string name="testQuestion_radioBtnVal6">6</string>
+        <string name="testQuestion_radioBtnVal7">7</string>
+        <string name="testQuestion_btnOk">Далее</string>
+    <!-- testQuestion_fragment end -->
 
     <!--spotInfo_fragment begin-->
         <string name="spotinfo_fragmentTitle">Инфо о корте</string>

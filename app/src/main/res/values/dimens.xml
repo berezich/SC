@@ -19,6 +19,26 @@
     <dimen name="editprofile_text_bottom_offset">5dp</dimen>
     <!-- fragment_editProfile-->
 
+    <!-- fragment_test_question-->
+        <dimen name="testQuestion_block_left_right_offset">10dp</dimen>
+        <dimen name="testQuestion_block_topOffset">10dp</dimen>
+        <dimen name="testQuestion_block_bottomOffset">10dp</dimen>
+        <dimen name="testQuestion_title_leftRightOffset">20dp</dimen>
+        <dimen name="testQuestion_title_topOffset">10dp</dimen>
+        <dimen name="testQuestion_title_bottomOffset">10dp</dimen>
+        <dimen name="testQuestion_title_size">22sp</dimen>
+        <dimen name="testQuestion_text_leftRightOffset">20dp</dimen>
+        <dimen name="testQuestion_text_topOffset">15dp</dimen>
+        <dimen name="testQuestion_text_bottomOffset">10dp</dimen>
+        <dimen name="testQuestion_text_size">21sp</dimen>
+        <dimen name="testQuestion_radioGrp_leftRightOffset">10dp</dimen>
+        <dimen name="testQuestion_radioGrp_topOffset">10dp</dimen>
+        <dimen name="testQuestion_radioGrp_bottomOffset">15dp</dimen>
+        <dimen name="testQuestion_radioGrpValue_leftOffset">10dp</dimen>
+        <dimen name="testQuestion_btnOk_rightOffset">20dp</dimen>
+        <dimen name="testQuestion_btnOk_bottomOffset">15dp</dimen>
+    <!-- fragment_test_question-->
+
     <!-- Per the design guidelines, navigation drawers should be between 240dp and 320dp:
          https://developer.android.com/design/patterns/navigation-drawer.html -->
     <dimen name="navigation_drawer_width">240dp</dimen>

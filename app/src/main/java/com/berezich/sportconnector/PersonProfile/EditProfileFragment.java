@@ -102,8 +102,10 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
                     Date date = new Date(birthday.getValue());
                     txtView.setText(String.format("%1$td.%1$tm.%1$tY", date));
                 }
-            if ((txtView = (TextView) rootView.findViewById(R.id.editProfile_txtView_setRating)) != null)
+            if ((txtView = (TextView) rootView.findViewById(R.id.editProfile_txtView_setRating)) != null) {
                 txtView.setText(getString(R.string.personprofile_rating) + " " + myPersonInfo.getRating());
+                txtView.setOnClickListener(new RatingOnClickListener());
+            }
             //middle block
             String email = myPersonInfo.getEmail(), phone = myPersonInfo.getPhone();
             if ((txtView = (TextView) rootView.findViewById(R.id.editProfile_txtEdt_email)) != null)
@@ -213,6 +215,17 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
                 textView.setText(String.format("%02d",day)+ "." + String.format("%02d",month+1) + "." + year);
                 textView.setTextColor( getResources().getColor(R.color.blackColor));
             }
+    }
+
+    private class RatingOnClickListener implements View.OnClickListener
+    {
+        @Override
+        public void onClick(View v) {
+            TestQuestionFragment testQuestionFragment = new TestQuestionFragment().setArgs(1,1);
+            FragmentManager fragmentManager = (FragmentManager) getFragmentManager();
+            if(fragmentManager!=null)
+                fragmentManager.beginTransaction().replace(R.id.container, testQuestionFragment).addToBackStack(null).commit();
+        }
     }
 
     @Override
