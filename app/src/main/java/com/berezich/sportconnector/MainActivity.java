@@ -213,7 +213,7 @@ public class MainActivity extends ActionBarActivity
             view.setOnTouchListener(new View.OnTouchListener() {
 
                 public boolean onTouch(View v, MotionEvent event) {
-                    hideSoftKeyboard(getCurActivty());
+                    hideSoftKeyboard();
                     return false;
                 }
 
@@ -232,9 +232,9 @@ public class MainActivity extends ActionBarActivity
         }
     }
 
-    private void hideSoftKeyboard(Activity activity) {
-        InputMethodManager inputMethodManager = (InputMethodManager)  activity.getSystemService(Activity.INPUT_METHOD_SERVICE);
-        inputMethodManager.hideSoftInputFromWindow(activity.getCurrentFocus().getWindowToken(), 0);
+    public void hideSoftKeyboard() {
+        InputMethodManager inputMethodManager = (InputMethodManager)  getSystemService(Activity.INPUT_METHOD_SERVICE);
+        inputMethodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
     }
 
 }

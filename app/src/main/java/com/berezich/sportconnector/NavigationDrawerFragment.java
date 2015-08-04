@@ -256,6 +256,7 @@ public class NavigationDrawerFragment extends Fragment {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         FragmentManager fragmentManager = getFragmentManager();
+        ((MainActivity) getActivity()).hideSoftKeyboard();
         if(item!=null)
             if(item.getItemId() == android.R.id.home && fragmentManager!=null && fragmentManager.getBackStackEntryCount()>0) {
                 getFragmentManager().popBackStack();

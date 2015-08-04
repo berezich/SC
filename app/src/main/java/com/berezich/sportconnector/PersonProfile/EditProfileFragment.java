@@ -146,6 +146,7 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
         TextView txtView;
         RadioGroup radioGroup;
         Person myPersonInfo = LocalDataManager.getMyPersonInfo();
+        ((MainActivity) getActivity()).hideSoftKeyboard();
         switch (item.getItemId())
         {
             case R.id.menu_save_profile:
