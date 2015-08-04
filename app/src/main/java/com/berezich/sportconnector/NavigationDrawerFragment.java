@@ -256,18 +256,19 @@ public class NavigationDrawerFragment extends Fragment {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         FragmentManager fragmentManager = getFragmentManager();
-        if(fragmentManager!=null && fragmentManager.getBackStackEntryCount()>0) {
-            getFragmentManager().popBackStack();
-            return true;
-        }
-        else if (mDrawerToggle.onOptionsItemSelected(item)) {
-            //Toast.makeText(getActivity(), "Example action.", Toast.LENGTH_SHORT).show();
-            return true;
-        }
-        /*if (item.getItemId() == R.id.action_example) {
-            Toast.makeText(getActivity(), "Example action.", Toast.LENGTH_SHORT).show();
-            return true;
-        }*/
+        if(item!=null)
+            if(item.getItemId() == android.R.id.home && fragmentManager!=null && fragmentManager.getBackStackEntryCount()>0) {
+                getFragmentManager().popBackStack();
+                return true;
+            }
+            else if (mDrawerToggle.onOptionsItemSelected(item)) {
+                //Toast.makeText(getActivity(), "Example action.", Toast.LENGTH_SHORT).show();
+                return true;
+            }
+            /*if (item.getItemId() == R.id.action_example) {
+                Toast.makeText(getActivity(), "Example action.", Toast.LENGTH_SHORT).show();
+                return true;
+            }*/
         return super.onOptionsItemSelected(item);
     }
 
