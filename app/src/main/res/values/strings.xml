@@ -96,6 +96,22 @@
         <string name="testQuestion_btnOk">Далее</string>
     <!-- testQuestion_fragment end -->
 
+    <!-- equalizer_fragment begin -->
+        <string name="equalizer_title">Серия утверждений по « Форхэнд» (удар справа у правши или слева у левши)</string>
+        <string name="equalizer_skill1">Глубина замаха</string>
+        <string name="equalizer_skill2">Выбор направления удара</string>
+        <string name="equalizer_skill3">Спортивная форма</string>
+        <string name="equalizer_skill4">Обработка средних ударов</string>
+        <string name="equalizer_radioBtnVal1">34</string>
+        <string name="equalizer_radioBtnVal2">87</string>
+        <string name="equalizer_radioBtnVal3">63</string>
+        <string name="equalizer_radioBtnVal4">15</string>
+        <string name="equalizer_radioBtnVal5">56</string>
+        <string name="equalizer_radioBtnVal6">39</string>
+        <string name="equalizer_radioBtnVal7">10</string>
+        <string name="equalizer_btnOk">Далее</string>
+    <!-- equalizer_fragment end -->
+
     <!--spotInfo_fragment begin-->
         <string name="spotinfo_fragmentTitle">Инфо о корте</string>
         <string name="spotinfo_tab1_title">Спарринг партнеры</string>

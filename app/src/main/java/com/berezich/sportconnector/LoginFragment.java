@@ -10,6 +10,8 @@ import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.util.Pair;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -204,6 +206,12 @@ public class LoginFragment extends Fragment implements EndpointApi.AuthorizePers
     @Override
     public void onNegativeClick() {
         setVisibleProgressBar(false);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        menu.clear();
     }
 
     private Fragment getFragment(){

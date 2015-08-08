@@ -1,0 +1,338 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/divider_block"
+    android:paddingLeft="@dimen/equalizer_block_left_right_offset"
+    android:paddingRight="@dimen/equalizer_block_left_right_offset">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:background="@color/background_floating_material_light">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="@string/equalizer_title"
+            android:id="@+id/textView2"
+            android:paddingLeft="@dimen/equalizer_title_leftRightOffset"
+            android:paddingRight="@dimen/equalizer_title_leftRightOffset"
+            android:paddingTop="@dimen/equalizer_title_topOffset"
+            android:paddingBottom="@dimen/equalizer_title_bottomOffset" />
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/divider_block" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="@string/equalizer_skill1"
+            android:id="@+id/textView3"
+            android:paddingLeft="@dimen/equalizer_text_leftRightOffset"
+            android:paddingRight="@dimen/equalizer_text_leftRightOffset"
+            android:paddingBottom="@dimen/equalizer_text_bottomOffset"
+            android:paddingTop="@dimen/equalizer_text_topOffset"
+            android:inputType="textMultiLine"
+            android:textSize="@dimen/equalizer_text_size" />
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="@dimen/equalizer_seekBar_leftRightOffset"
+            android:layout_marginRight="@dimen/equalizer_seekBar_leftRightOffset">
+
+            <SeekBar
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/seekBar"
+                android:layout_weight="1"
+                android:progress="0"
+                android:splitTrack="false" />
+
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="0"
+                android:id="@+id/textView11"
+                android:layout_weight="8"
+                android:layout_gravity="center_vertical"
+                android:gravity="right" />
+        </LinearLayout>
+
+        <!--
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingTop="@dimen/equalizer_radioGrp_topOffset"
+            android:paddingBottom="@dimen/equalizer_radioGrp_bottomOffset"
+            android:layout_marginLeft="@dimen/equalizer_block_left_right_offset">
+
+            <RadioGroup
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:layout_gravity="center_vertical"
+                android:baselineAligned="false">
+
+                <RadioButton
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/radioButton"
+                    android:singleLine="false"
+                    android:layout_weight="1" />
+
+                <RadioButton
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/radioButton2"
+                    android:singleLine="false"
+                    android:layout_weight="1" />
+
+                <RadioButton
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/radioButton3"
+                    android:singleLine="false"
+                    android:layout_weight="1"
+                    android:checked="true" />
+
+                <RadioButton
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/radioButton4"
+                    android:singleLine="false"
+                    android:layout_weight="1" />
+
+                <RadioButton
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/radioButton5"
+                    android:singleLine="false"
+                    android:layout_weight="1" />
+
+                <RadioButton
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/radioButton6"
+                    android:singleLine="false"
+                    android:layout_weight="1" />
+
+                <RadioButton
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/radioButton7"
+                    android:singleLine="false"
+                    android:layout_weight="1"
+                    android:layout_gravity="center_horizontal" />
+
+            </RadioGroup>
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:text="@string/equalizer_radioBtnVal1"
+                    android:id="@+id/textView4"
+                    android:layout_weight="1"
+                    android:paddingLeft="@dimen/equalizer_radioGrpValue_leftOffset" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:text="@string/equalizer_radioBtnVal2"
+                    android:id="@+id/textView5"
+                    android:layout_weight="1"
+                    android:paddingLeft="@dimen/equalizer_radioGrpValue_leftOffset" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:text="@string/equalizer_radioBtnVal3"
+                    android:id="@+id/textView6"
+                    android:layout_weight="1"
+                    android:paddingLeft="@dimen/equalizer_radioGrpValue_leftOffset" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:text="@string/equalizer_radioBtnVal4"
+                    android:id="@+id/textView7"
+                    android:layout_weight="1"
+                    android:paddingLeft="@dimen/equalizer_radioGrpValue_leftOffset" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:text="@string/equalizer_radioBtnVal5"
+                    android:id="@+id/textView8"
+                    android:layout_weight="1"
+                    android:paddingLeft="@dimen/equalizer_radioGrpValue_leftOffset" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:text="@string/equalizer_radioBtnVal6"
+                    android:id="@+id/textView9"
+                    android:layout_weight="1"
+                    android:paddingLeft="@dimen/equalizer_radioGrpValue_leftOffset" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:text="@string/equalizer_radioBtnVal7"
+                    android:id="@+id/textView10"
+                    android:layout_weight="1"
+                    android:paddingLeft="@dimen/equalizer_radioGrpValue_leftOffset" />
+
+            </LinearLayout>
+
+        </LinearLayout>-->
+
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="@string/equalizer_skill2"
+            android:id="@+id/textView12"
+            android:paddingLeft="@dimen/equalizer_text_leftRightOffset"
+            android:paddingRight="@dimen/equalizer_text_leftRightOffset"
+            android:paddingBottom="@dimen/equalizer_text_bottomOffset"
+            android:paddingTop="@dimen/equalizer_text_topOffset"
+            android:inputType="textMultiLine"
+            android:textSize="@dimen/equalizer_text_size" />
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="@dimen/equalizer_seekBar_leftRightOffset"
+            android:layout_marginRight="@dimen/equalizer_seekBar_leftRightOffset" >
+
+            <SeekBar
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/seekBar2"
+                android:layout_weight="1"
+                android:progress="0" />
+
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="0"
+                android:id="@+id/textView13"
+                android:layout_weight="8"
+                android:layout_gravity="center_vertical"
+                android:gravity="right" />
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="@string/equalizer_skill3"
+            android:id="@+id/textView14"
+            android:paddingLeft="@dimen/equalizer_text_leftRightOffset"
+            android:paddingRight="@dimen/equalizer_text_leftRightOffset"
+            android:paddingBottom="@dimen/equalizer_text_bottomOffset"
+            android:paddingTop="@dimen/equalizer_text_topOffset"
+            android:inputType="textMultiLine"
+            android:textSize="@dimen/equalizer_text_size" />
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="@dimen/equalizer_seekBar_leftRightOffset"
+            android:layout_marginRight="@dimen/equalizer_seekBar_leftRightOffset" >
+
+            <SeekBar
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/seekBar3"
+                android:layout_weight="1"
+                android:progress="0" />
+
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="0"
+                android:id="@+id/textView16"
+                android:layout_weight="8"
+                android:layout_gravity="center_vertical"
+                android:gravity="right" />
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="@string/equalizer_skill4"
+            android:id="@+id/textView15"
+            android:paddingLeft="@dimen/equalizer_text_leftRightOffset"
+            android:paddingRight="@dimen/equalizer_text_leftRightOffset"
+            android:paddingBottom="@dimen/equalizer_text_bottomOffset"
+            android:paddingTop="@dimen/equalizer_text_topOffset"
+            android:inputType="textMultiLine"
+            android:textSize="@dimen/equalizer_text_size" />
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="@dimen/equalizer_seekBar_leftRightOffset"
+            android:layout_marginRight="@dimen/equalizer_seekBar_leftRightOffset" >
+
+            <SeekBar
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/seekBar4"
+                android:layout_weight="1"
+                android:progress="0" />
+
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="0"
+                android:id="@+id/textView17"
+                android:layout_weight="8"
+                android:layout_gravity="center_vertical"
+                android:gravity="right" />
+        </LinearLayout>
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/equalizer_btnOk"
+            android:id="@+id/button"
+            android:layout_gravity="right"
+            android:layout_marginRight="@dimen/equalizer_btnOk_rightOffset"
+            android:layout_marginBottom="@dimen/equalizer_btnOk_bottomOffset"
+            android:layout_marginTop="@dimen/equalizer_btnOk_topOffset" />
+
+    </LinearLayout>
+</FrameLayout>

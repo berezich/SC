@@ -4,9 +4,7 @@
     android:layout_height="match_parent"
     android:background="@color/divider_block"
     android:paddingLeft="@dimen/testQuestion_block_left_right_offset"
-    android:paddingTop="@dimen/testQuestion_block_topOffset"
-    android:paddingRight="@dimen/testQuestion_block_left_right_offset"
-    android:paddingBottom="@dimen/testQuestion_block_bottomOffset">
+    android:paddingRight="@dimen/testQuestion_block_left_right_offset">
 
     <LinearLayout
         android:orientation="vertical"
