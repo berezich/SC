@@ -271,17 +271,19 @@ public class PersonEndpoint {
     private void validatePersonProperties(Person person) throws BadRequestException
     {
         if(person.getId()==null || person.getId().equals(""))
-            throw new BadRequestException("Id property must be initialized");
+            throw new BadRequestException("idNull@:Id property must be initialized");
         if(person.getPass()==null || person.getPass().equals(""))
-            throw new BadRequestException("Password property must be initialized");
+            throw new BadRequestException("passNull@:Password property must be initialized");
         if(person.getName()==null || person.getName().equals(""))
-            throw new BadRequestException("Name property must be initialized");
+            throw new BadRequestException("nameNull@:Name property must be initialized");
+        /*
         if(person.getSurname()==null || person.getSurname().equals(""))
-            throw new BadRequestException("Surname property must be initialized");
+            throw new BadRequestException("surnameNull@:Surname property must be initialized");
         if(person.getBirthday()==null)
-            throw new BadRequestException("Birthday date property must be set");
+            throw new BadRequestException("birthdayNull@:Birthday date property must be set");
+        */
         if(person.getType()==null)
-            throw new BadRequestException("Type property must be 'PARTNER' or 'COACH'");
+            throw new BadRequestException("typeNull@:Type property must be 'PARTNER' or 'COACH'");
     }
 
     //update lists of partners and coaches of some spots since a person was updated

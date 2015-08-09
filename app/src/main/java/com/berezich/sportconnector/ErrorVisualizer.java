@@ -17,7 +17,7 @@ import java.net.UnknownHostException;
  * Created by Sashka on 12.07.2015.
  */
 public class ErrorVisualizer {
-    enum ERROR_CODE {UNKNOWN_SRV_ERR,HOST_UNREACHABLE,AUTH_FAILED};
+    public enum  ERROR_CODE {UNKNOWN_SRV_ERR,HOST_UNREACHABLE,AUTH_FAILED,REGISTRATION_FAILED};
     public static void showErrorAfterReq(Context context, FrameLayout layout, Exception e, String TAG)
     {
         ProgressBar progressBar;
@@ -77,10 +77,26 @@ public class ErrorVisualizer {
                 }
                 else if (exception instanceof GoogleJsonResponseException){
                     GoogleJsonResponseException appError = (GoogleJsonResponseException) exception;
-                    String errExcpMsg = ((GoogleJsonResponseException) exception).getDetails().getMessage();
-                    if(errExcpMsg.indexOf("AuthFailed@:")==0) {
+                    String errExceptMsg = ((GoogleJsonResponseException) exception).getDetails().getMessage();
+                    if(errExceptMsg.indexOf("AuthFailed@:")==0) {
                         errMsg = context.getString(R.string.login_err_authorized);
                         error_code = ERROR_CODE.AUTH_FAILED;
+                    }
+                    else if(errExceptMsg.indexOf("loginExists@:")==0) {
+                        errMsg = context.getString(R.string.registration_err_loginExists);
+                        error_code = ERROR_CODE.REGISTRATION_FAILED;
+                    }
+                    else if(errExceptMsg.indexOf("idNull@:")==0) {
+                        errMsg = context.getString(R.string.registration_err_idNull);
+                        error_code = ERROR_CODE.REGISTRATION_FAILED;
+                    }
+                    else if(errExceptMsg.indexOf("nameNull@:")==0) {
+                        errMsg = context.getString(R.string.registration_err_nameNull);
+                        error_code = ERROR_CODE.REGISTRATION_FAILED;
+                    }
+                    else if(errExceptMsg.indexOf("passNull@:")==0) {
+                        errMsg = context.getString(R.string.registration_err_passNull);
+                        error_code = ERROR_CODE.REGISTRATION_FAILED;
                     }
                 }
         } finally {

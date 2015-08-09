@@ -300,7 +300,7 @@ public class EndpointApi {
             try {
                 listener = (OnAction) fragment;
             } catch (ClassCastException e) {
-                throw new ClassCastException(fragment.toString() + " must implement OnGetRegionAsyncTaskAction for GetRegionAsyncTask");
+                throw new ClassCastException(fragment.toString() + " must implement OnAction for AuthorizePersonAsyncTask");
             }
         }
         public AuthorizePersonAsyncTask(Activity activity)
@@ -310,7 +310,7 @@ public class EndpointApi {
             try {
                 listener = (OnAction) activity;
             } catch (ClassCastException e) {
-                throw new ClassCastException(activity.toString() + " must implement OnGetRegionAsyncTaskAction for GetRegionAsyncTask");
+                throw new ClassCastException(activity.toString() + " must implement OnAction for AuthorizePersonAsyncTask");
             }
         }
         @Override
@@ -334,6 +334,46 @@ public class EndpointApi {
         public static interface OnAction
         {
             void onAuthorizePersonAsyncTaskFinish(Pair<Person,Exception> result);
+        }
+    }
+
+    public static class RegisterPersonAsyncTask extends AsyncTask<String, Void, Pair<Person,Exception> >{
+        private OnAction listener=null;
+        private Context context = null;
+        public RegisterPersonAsyncTask(Fragment fragment)
+        {
+            context = fragment.getActivity().getBaseContext();
+            setSrvApi(context);
+            try {
+                listener = (OnAction) fragment;
+            } catch (ClassCastException e) {
+                throw new ClassCastException(fragment.toString() + " must implement OnAction for RegisterPersonAsyncTask");
+            }
+        }
+        @Override
+        protected Pair<Person,Exception> doInBackground(String... params) {
+            String url;
+            Person person = new Person();
+            person.setId(params[0]);
+            person.setEmail(params[0]);
+            person.setName(params[1]);
+            person.setPass(params[2]);
+            person.setType(params[3]);
+            try {
+                return new Pair<Person,Exception>(srvApi.insertPerson(person).execute(),null);
+            } catch (IOException e) {
+                return new Pair<Person,Exception>(null,e);
+            }
+        }
+
+        @Override
+        protected void onPostExecute(Pair<Person,Exception> result) {
+            listener.onRegisterPersonAsyncTaskFinish(result);
+        }
+
+        public static interface OnAction
+        {
+            void onRegisterPersonAsyncTaskFinish(Pair<Person, Exception> result);
         }
     }
 

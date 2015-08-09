@@ -1,5 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
+    <!-- fragment_login-->
+        <color name="login_line">#555555</color>
+        <color name="login_background">#CCBBBBBB</color>
+    <!-- fragment_login-->
+
+    <!-- fragment_registration-->
+        <color name="registration_line">#555555</color>
+        <color name="registration_background">#CCBBBBBB</color>
+    <!-- fragment_registration-->
+
     <!-- fragment_spotInfo-->
         <color name="text_msg_error">#AAAAAA</color>
     <!-- fragment_spotInfo-->
@@ -11,6 +22,10 @@
 
     <!-- fragment_editProfile-->
         <color name="text_property">#000000</color>
+        <!-- changePass_dialog-->
+            <color name="changePass_msgError">#b0ff0000</color>
+        <!-- changePass_dialog-->
+
     <!-- fragment_editProfile-->
 
     <!-- fragment_main-->
@@ -18,10 +33,6 @@
         <color name="main_msg_error">#444444</color>
     <!-- fragment_main-->
 
-    <!-- fragment_login-->
-        <color name="login_line">#555555</color>
-        <color name="login_background">#CCBBBBBB</color>
-    <!-- fragment_login-->
 
     <!--list_spot_item-->
         <color name="list_item_background">#88DADADA</color>

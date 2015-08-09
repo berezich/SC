@@ -10,8 +10,11 @@ import android.content.res.Resources;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -22,7 +25,7 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 
 import com.berezich.sportconnector.MainActivity;
-import com.berezich.sportconnector.MainFragment.Filters;
+import com.berezich.sportconnector.Fragments.MainFragment.Filters;
 import com.berezich.sportconnector.R;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -82,6 +85,12 @@ public class GoogleMapFragment extends Fragment{
         }
         setCurFilter();
         return this;
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
     }
 
     public GoogleMapFragment() {
@@ -169,10 +178,9 @@ public class GoogleMapFragment extends Fragment{
     }
     @Override
     public void onResume() {
-        Log.d(TAG,"GoogleMapFragment on onResume");
+        Log.d(TAG, "GoogleMapFragment on onResume");
         mapView.onResume();
         super.onResume();
-        getActivity().setTitle(R.string.gmap_fragmentTitle);
     }
 
     @Override
@@ -376,8 +384,10 @@ public class GoogleMapFragment extends Fragment{
     }
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        super.onCreateOptionsMenu(menu, inflater);
         menu.clear();
+        super.onCreateOptionsMenu(menu, inflater);
+        ActionBar actionBar =((AppCompatActivity) getActivity()).getSupportActionBar();
+        actionBar.setTitle(R.string.gmap_fragmentTitle);
     }
 }
 

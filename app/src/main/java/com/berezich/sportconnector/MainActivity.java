@@ -2,11 +2,11 @@ package com.berezich.sportconnector;
 
 import android.app.Activity;
 import android.content.res.Configuration;
-import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBar;
 import android.support.v4.app.FragmentManager;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -17,14 +17,16 @@ import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
+import com.berezich.sportconnector.Fragments.LoginFragment;
+import com.berezich.sportconnector.Fragments.MainFragment;
+import com.berezich.sportconnector.Fragments.NavigationDrawerFragment;
 import com.berezich.sportconnector.GoogleMap.GoogleMapFragment;
-import com.berezich.sportconnector.MainFragment.Filters;
+import com.berezich.sportconnector.Fragments.MainFragment.Filters;
 import com.berezich.sportconnector.PersonProfile.PersonProfileFragment;
-import com.berezich.sportconnector.PersonProfile.TestQuestionFragment;
 import com.berezich.sportconnector.SpotInfo.SpotInfoFragment;
 
 
-public class MainActivity extends ActionBarActivity
+public class MainActivity extends AppCompatActivity
         implements NavigationDrawerFragment.NavigationDrawerCallbacks,
         GoogleMapFragment.OnActionListenerGMapFragment,
         MainFragment.OnActionListenerMainFragment,
@@ -149,7 +151,7 @@ public class MainActivity extends ActionBarActivity
         // Sync the toggle state after onRestoreInstanceState has occurred.
 
         if(mNavigationDrawerFragment!=null) {
-            ActionBarDrawerToggle mDrawerToggle = mNavigationDrawerFragment.getDrawerTuggle();
+            ActionBarDrawerToggle mDrawerToggle = mNavigationDrawerFragment.getDrawerToggle();
             if (mDrawerToggle != null)
                 mDrawerToggle.syncState();
         }
@@ -159,7 +161,7 @@ public class MainActivity extends ActionBarActivity
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         if(mNavigationDrawerFragment!=null) {
-            ActionBarDrawerToggle mDrawerToggle = mNavigationDrawerFragment.getDrawerTuggle();
+            ActionBarDrawerToggle mDrawerToggle = mNavigationDrawerFragment.getDrawerToggle();
             if (mDrawerToggle != null)
                 mDrawerToggle.onConfigurationChanged(newConfig);
         }
@@ -167,7 +169,6 @@ public class MainActivity extends ActionBarActivity
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-
         if (mNavigationDrawerFragment!=null && !mNavigationDrawerFragment.isDrawerOpen()) {
             // Only show items in the action bar relevant to this screen
             // if the drawer is not showing. Otherwise, let the drawer
@@ -202,7 +203,7 @@ public class MainActivity extends ActionBarActivity
         fragmentManager.beginTransaction().replace(R.id.container, SpotInfoFragment.newInstance(spotId)).addToBackStack("tr2").commit();
 
     }
-    private Activity getCurActivty()
+    private Activity getCurActivity()
     {
         return this;
     }

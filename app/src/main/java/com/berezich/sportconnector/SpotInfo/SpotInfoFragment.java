@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.util.Pair;
 import android.view.LayoutInflater;
@@ -92,6 +94,7 @@ public class SpotInfoFragment extends Fragment implements EndpointApi.GetListPer
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
         if (getArguments() != null) {
             spotId = Long.valueOf(getArguments().getString(ARG_SPOT_ID));
             //mParam2 = getArguments().getString(ARG_PARAM2);
@@ -105,7 +108,6 @@ public class SpotInfoFragment extends Fragment implements EndpointApi.GetListPer
         TabHost tabHost;
         ListView lstView;
         ImageButton imgButton;
-        getActivity().setTitle(R.string.spotinfo_fragmentTitle);
         spotInfoView = inflater.inflate(R.layout.fragment_spot_info, container, false);
         spotHashMap = SpotsData.get_allSpots();
         if((txtView = (TextView) spotInfoView.findViewById(R.id.spotinfo_frg_tryAgain_txtView))!=null)
@@ -386,7 +388,9 @@ public class SpotInfoFragment extends Fragment implements EndpointApi.GetListPer
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        super.onCreateOptionsMenu(menu, inflater);
         menu.clear();
+        super.onCreateOptionsMenu(menu, inflater);
+        ActionBar actionBar =((AppCompatActivity) getActivity()).getSupportActionBar();
+        actionBar.setTitle(R.string.spotinfo_fragmentTitle);
     }
 }

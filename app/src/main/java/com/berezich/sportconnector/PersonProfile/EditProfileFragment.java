@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.util.Pair;
 import android.view.LayoutInflater;
@@ -40,6 +42,7 @@ import java.util.Locale;
  * Created by Sashka on 25.07.2015.
  */
 public class EditProfileFragment extends Fragment implements DatePickerFragment.OnActionDatePickerDialogListener,
+                                                             ChangePassFragment.OnActionPassDialogListener,
                                                              EndpointApi.UpdatePersonAsyncTask.OnAction{
 
     //private static final String ARG_SECTION_NUMBER = "section_number";
@@ -91,8 +94,8 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
         DateTime birthday;
         Person myPersonInfo = LocalDataManager.getMyPersonInfo();
         RadioGroup radioGroup;
-        getActivity().setTitle(R.string.editprofile_fragmentTitle);
         if (myPersonInfo != null && rootView != null) {
+            tempMyPerson = myPersonInfo.clone();
             if ((txtEdt = (EditText) rootView.findViewById(R.id.editProfile_txtEdt_name)) != null)
                 txtEdt.setText(myPersonInfo.getName());
             if ((txtEdt = (EditText) rootView.findViewById(R.id.editProfile_txtEdt_surname)) != null)
@@ -101,26 +104,10 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
                 if ((birthday = myPersonInfo.getBirthday()) != null) {
                     Date date = new Date(birthday.getValue());
                     txtView.setText(String.format("%1$td.%1$tm.%1$tY", date));
+                    txtView.setOnClickListener(new OnBirthdayClickListener());
                 }
-            if ((txtView = (TextView) rootView.findViewById(R.id.editProfile_txtView_setRating)) != null) {
-                txtView.setText(getString(R.string.personprofile_rating) + " " + myPersonInfo.getRating());
-                txtView.setOnClickListener(new RatingOnClickListener());
-            }
-            //middle block
-            String email = myPersonInfo.getEmail(), phone = myPersonInfo.getPhone();
-            if ((txtView = (TextView) rootView.findViewById(R.id.editProfile_txtEdt_email)) != null)
-                txtView.setText(email);
-            if ((txtView = (TextView) rootView.findViewById(R.id.editProfile_txtEdt_phone)) != null)
-                txtView.setText(phone);
-
-            if ((txtView = (TextView) rootView.findViewById(R.id.editProfile_txtView_birthday)) != null)
-                txtView.setOnClickListener(new OnBirthdayClickListener());
-
-            if ((txtView = (TextView) rootView.findViewById(R.id.editProfile_txtEdt_desc)) != null)
-                txtView.setText(myPersonInfo.getDescription());
-
             if ((radioGroup = (RadioGroup) rootView.findViewById(R.id.editProfile_radioGrp_sex)) != null) {
-                String sex = myPersonInfo.getSex()!=null ? myPersonInfo.getSex() : "";
+                String sex = myPersonInfo.getSex() != null ? myPersonInfo.getSex() : "";
                 if (sex.equals(mSex))
                     radioGroup.check(R.id.editProfile_radio_male);
                 else if (sex.equals(fSex))
@@ -128,6 +115,25 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
                 else
                     radioGroup.clearCheck();
             }
+
+            String email = myPersonInfo.getEmail(), phone = myPersonInfo.getPhone();
+            if ((txtView = (TextView) rootView.findViewById(R.id.editProfile_txtEdt_email)) != null)
+                txtView.setText(email);
+            if ((txtView = (TextView) rootView.findViewById(R.id.editProfile_txtEdt_phone)) != null)
+                txtView.setText(phone);
+
+            if ((txtView = (TextView) rootView.findViewById(R.id.editProfile_txtView_changePass)) != null) {
+                txtView.setOnClickListener(new PassOnClickListener());
+            }
+
+            if ((txtView = (TextView) rootView.findViewById(R.id.editProfile_txtView_setRating)) != null) {
+                txtView.setText(getString(R.string.personprofile_rating) + " " + myPersonInfo.getRating());
+                txtView.setOnClickListener(new RatingOnClickListener());
+            }
+
+            if ((txtView = (TextView) rootView.findViewById(R.id.editProfile_txtEdt_desc)) != null)
+                txtView.setText(myPersonInfo.getDescription());
+
             if(getActivity()!=null)
                 ((MainActivity)getActivity()).setupUI(rootView);
         }
@@ -139,9 +145,11 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 
-        super.onCreateOptionsMenu(menu, inflater);
         menu.clear();
+        super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.fragment_edit_profile, menu);
+        ActionBar actionBar =((AppCompatActivity) getActivity()).getSupportActionBar();
+        actionBar.setTitle(R.string.editprofile_fragmentTitle);
     }
 
     @Override
@@ -157,7 +165,6 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
                 //Toast.makeText(getActivity().getBaseContext(),"SAVE",Toast.LENGTH_SHORT).show();
                 if(myPersonInfo!=null && rootView!=null)
                 {
-                    tempMyPerson = myPersonInfo.clone();
                     if((txtEdt = (EditText) rootView.findViewById(R.id.editProfile_txtEdt_name))!=null)
                         tempMyPerson.setName(txtEdt.getText().toString());
                     if((txtEdt = (EditText) rootView.findViewById(R.id.editProfile_txtEdt_surname))!=null)
@@ -219,6 +226,24 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
             }
     }
 
+    private class PassOnClickListener implements View.OnClickListener
+    {
+        @Override
+        public void onClick(View v) {
+            FragmentManager fragmentManager = getFragmentManager();
+            Person myPersonInfo = LocalDataManager.getMyPersonInfo();
+            ChangePassFragment changePassFragment = new ChangePassFragment().newInstance(myPersonInfo.getPass());
+            changePassFragment.setTargetFragment(getCurFragment(),0);
+            changePassFragment.show(fragmentManager,null);
+
+        }
+    }
+
+    @Override
+    public void onChangePassClick(String newPass) {
+        tempMyPerson.setPass(newPass);
+    }
+
     private class RatingOnClickListener implements View.OnClickListener
     {
         @Override
@@ -238,7 +263,7 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
         {
             Person myPerson = LocalDataManager.getMyPersonInfo();
             if(myPerson!=null) {
-                updatedPerson.setPass(myPerson.getPass());
+                updatedPerson.setPass(tempMyPerson.getPass());
                 LocalDataManager.setMyPersonInfo(updatedPerson);
             }
             FragmentManager fragmentManager = getFragmentManager();

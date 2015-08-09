@@ -1,4 +1,4 @@
-package com.berezich.sportconnector;
+package com.berezich.sportconnector.Fragments;
 
 /**
  * Created by berezkin on 17.04.2015.
@@ -19,7 +19,12 @@ import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.berezich.sportconnector.EndpointApi;
+import com.berezich.sportconnector.ErrorVisualizer;
 import com.berezich.sportconnector.GoogleMap.SpotsData;
+import com.berezich.sportconnector.LocalDataManager;
+import com.berezich.sportconnector.MainActivity;
+import com.berezich.sportconnector.R;
 import com.berezich.sportconnector.backend.sportConnectorApi.model.RegionInfo;
 import com.berezich.sportconnector.backend.sportConnectorApi.model.Spot;
 import com.berezich.sportconnector.backend.sportConnectorApi.model.UpdateSpotInfo;
@@ -161,7 +166,7 @@ public class MainFragment extends Fragment implements
 
         if(exception!=null) {
             Log.e(TAG, "Error get regionInfo from server");
-            ErrorVisualizer.showErrorAfterReq( activity.getBaseContext(), (FrameLayout) rootView.findViewById(R.id.main_frg_frameLayout), exception, TAG);
+            ErrorVisualizer.showErrorAfterReq(activity.getBaseContext(), (FrameLayout) rootView.findViewById(R.id.main_frg_frameLayout), exception, TAG);
             //Toast.makeText(getBaseContext(), resText, Toast.LENGTH_LONG).show();
         }
         else if (regionInfo!=null)

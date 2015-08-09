@@ -86,8 +86,10 @@ public class PersonProfileFragment extends Fragment {
         Person myPersonInfo = LocalDataManager.getMyPersonInfo();
         if(myPersonInfo!=null && rootView!=null)
         {
-            if((txtView = (TextView) rootView.findViewById(R.id.profile_txt_name))!=null)
-                txtView.setText(myPersonInfo.getName() +" "+myPersonInfo.getSurname());
+            if((txtView = (TextView) rootView.findViewById(R.id.profile_txt_name))!=null) {
+                String name = myPersonInfo.getName(), surname = myPersonInfo.getSurname();
+                txtView.setText( ((name!=null && !name.equals("")) ? name :"") + ((surname!=null && !surname.equals("")) ? " "+surname :""));
+            }
             if((txtView = (TextView) rootView.findViewById(R.id.profile_txt_typeAge))!=null) {
                 String str = myPersonInfo.getType().equals("PARTNER")? getString(R.string.personprofile_type_partner):getString(R.string.personprofile_type_coach);
                 DateTime birthday;
@@ -180,8 +182,8 @@ public class PersonProfileFragment extends Fragment {
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         Log.d(TAG,"onCreateOptionsMenu");
-        super.onCreateOptionsMenu(menu, inflater);
         menu.clear();
+        super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.fragment_person_profile, menu);
     }
 

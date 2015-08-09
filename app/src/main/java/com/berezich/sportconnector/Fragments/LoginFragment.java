@@ -1,42 +1,38 @@
-package com.berezich.sportconnector;
+package com.berezich.sportconnector.Fragments;
 
 import android.app.Activity;
 //import android.app.FragmentManager;
-import android.content.DialogInterface;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
-import android.widget.ListView;
-import android.widget.Toast;
 
-import com.berezich.sportconnector.SpotInfo.ProfileItemLstAdapter;
+import com.berezich.sportconnector.AlertDialogFragment;
+import com.berezich.sportconnector.AppPref;
+import com.berezich.sportconnector.EndpointApi;
+import com.berezich.sportconnector.ErrorVisualizer;
+import com.berezich.sportconnector.LocalDataManager;
+import com.berezich.sportconnector.MainActivity;
+import com.berezich.sportconnector.R;
 import com.berezich.sportconnector.backend.sportConnectorApi.model.Person;
-import com.berezich.sportconnector.backend.sportConnectorApi.model.Spot;
-import com.google.api.client.googleapis.json.GoogleJsonResponseException;
 
 import java.io.IOException;
-import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by berezkin on 20.07.2015.
  */
 public class LoginFragment extends Fragment implements EndpointApi.AuthorizePersonAsyncTask.OnAction,
-                                                       AlertDialogFragment.OnActionDialogListener{
+        AlertDialogFragment.OnActionDialogListener {
 
     private static final String ARG_SECTION_NUMBER = "section_number";
     private final String TAG = "MyLog_LoginFragment";
@@ -66,6 +62,12 @@ public class LoginFragment extends Fragment implements EndpointApi.AuthorizePers
     }
 
     @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         EditText editTxt;
@@ -75,6 +77,10 @@ public class LoginFragment extends Fragment implements EndpointApi.AuthorizePers
             Button btn = (Button) rootView.findViewById(R.id.login_btn_ok);
             if(btn!=null)
                 btn.setOnClickListener(new OnClickLoginListener());
+
+            btn = (Button) rootView.findViewById(R.id.loginRegister_btn);
+            if(btn!=null)
+                btn.setOnClickListener(new OnClickRegistrationListener());
 
             if(( myPersonInfo = LocalDataManager.getMyPersonInfo())!=null) {
 
@@ -134,6 +140,17 @@ public class LoginFragment extends Fragment implements EndpointApi.AuthorizePers
             }
             setVisibleProgressBar(true);
             new EndpointApi.AuthorizePersonAsyncTask(getFragment()).execute(login,pass);
+        }
+    }
+
+    private class OnClickRegistrationListener implements View.OnClickListener
+    {
+        @Override
+        public void onClick(View v) {
+            FragmentManager fragmentManager = getFragmentManager();
+            if(fragmentManager!=null)
+                fragmentManager.beginTransaction().replace(R.id.container,new RegistrationFragment())
+                        .addToBackStack(null).commit();
         }
     }
 
@@ -212,6 +229,7 @@ public class LoginFragment extends Fragment implements EndpointApi.AuthorizePers
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         menu.clear();
+        ((MainActivity) getActivity()).getSupportActionBar().setTitle(R.string.login_fragmentTitle);
     }
 
     private Fragment getFragment(){

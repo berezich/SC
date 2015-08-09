@@ -21,14 +21,32 @@
     <!-- main end -->
 
     <!--login_fragment begin-->
-        <string name="login_login">Login:</string>
-        <string name="login_err_hint">Login must be not less then 6 symbols</string>
-        <string name="login_pass">Pass:</string>
-        <string name="login_pass_err_hint">Login must be not less then 8 symbols</string>
-        <string name="login_btn_txt_login">Login</string>
+        <string name="login_fragmentTitle">SportConnector</string>
+        <string name="login_login">E-mail:</string>
+        <string name="login_pass">Пароль:</string>
+        <string name="login_checkBox_txt">Автоматический вход</string>
+        <string name="login_btn_txt_login">Войти</string>
+        <string name="login_btn_txt_registration">Зарегистрироваться</string>
         <string name="login_err_title">Внимание</string>
+        <string name="login_err_hint">Login must be not less then 6 symbols</string>
+        <string name="login_pass_err_hint">Login must be not less then 8 symbols</string>
         <string name="login_err_authorized">Вы вели неверный логин или пароль</string>
+
     <!--login_fragment end-->
+
+    <!--registration_fragment begin-->
+        <string name="registration_fragmentTitle">Регистрация</string>
+        <string name="registration_login">E-mail:</string>
+        <string name="registration_name">Имя:</string>
+        <string name="registration_pass">Пароль:</string>
+        <string name="registration_btnOk_txt">Продолжить</string>
+        <string name="registration_btnCancel_txt">Отмена</string>
+        <string name="registration_err_title">Внимание</string>
+        <string name="registration_err_loginExists">Пользователь с таким email уже существует</string>
+        <string name="registration_err_idNull">Введите ваш E-mail</string>
+        <string name="registration_err_nameNull">Введите ваше имя</string>
+        <string name="registration_err_passNull">Введите пароль</string>
+    <!--registration_fragment end-->
 
     <!-- main_search_fragment -->
         <string name="mainSearch_fragmentTitle">Корты</string>
@@ -38,7 +56,7 @@
     <!--main_search_fragment-->
 
     <!--gmap_fragment begin-->
-        <string name="gmap_fragmentTitle">Карта</string>
+        <string name="gmap_fragmentTitle">Поиск кортов</string>
     <!--gmap_fragment end-->
 
     <!--personProfile_fragment begin-->
@@ -61,7 +79,7 @@
     <!-- personProfile_fragment end-->
 
     <!-- editProfile_fragment begin-->
-        <string name="editprofile_fragmentTitle">Редактирование</string>
+        <string name="editprofile_fragmentTitle">Редактирование данных</string>
         <string name="editprofile_title_general">ОБЩАЯ ИНФОРМАЦИЯ</string>
         <string name="editprofile_hint_name">Имя</string>
         <string name="editprofile_hint_surname">Фамилия</string>
@@ -80,10 +98,22 @@
             <!-- menu -->
                 <string name="menu_save_profile">Сохранить</string>
             <!-- menu -->
+            <!--changePass_dialog begin-->
+                <string name="changePass_dialogTitle">Смена пароля</string>
+                <string name="changePass_old_hint">Старый пароль</string>
+                <string name="changePass_new_hint">Новый пароль</string>
+                <string name="changePass_new2_hint">Подтвердите новый пароль</string>
+                <string name="changePass_btnOk">Продолжить</string>
+                <string name="changePass_btnCancel">Отмена</string>
+                <string name="changePass_errOld">Вы ввели неверный старый пароль</string>
+                <string name="changePass_errNew_empty">Введите новый пароль</string>
+                <string name="changePass_errNew_notMatch">Новые пароли не совпадают</string>
+            <!--changePass_dialog end-->
 
     <!-- editProfile_fragment end-->
 
     <!-- testQuestion_fragment begin -->
+        <string name="testQuestion_fragmentTitle">Тест</string>
         <string name="testQuestion_title">Серия утверждений по « Форхэнд» (удар справа у правши или слева у левши)</string>
         <string name="testQuestion_msg">У Вас заметны недостатки при выполнении основных ударов. Имеете укороченный замах, не можете выбирать направление удара.</string>
         <string name="testQuestion_radioBtnVal1">1</string>
@@ -97,6 +127,7 @@
     <!-- testQuestion_fragment end -->
 
     <!-- equalizer_fragment begin -->
+        <string name="equalizer_fragmentTitle">Эквалайзер</string>
         <string name="equalizer_title">Серия утверждений по « Форхэнд» (удар справа у правши или слева у левши)</string>
         <string name="equalizer_skill1">Глубина замаха</string>
         <string name="equalizer_skill2">Выбор направления удара</string>
@@ -113,7 +144,7 @@
     <!-- equalizer_fragment end -->
 
     <!--spotInfo_fragment begin-->
-        <string name="spotinfo_fragmentTitle">Инфо о корте</string>
+        <string name="spotinfo_fragmentTitle">Информация о корте</string>
         <string name="spotinfo_tab1_title">Спарринг партнеры</string>
         <string name="spotinfo_tab2_title">Тренеры</string>
         <string name="spotinfo_no_partners_no_coaches">На данном корте пока нет зарегестрированных соперников и тренеров.</string>
@@ -140,6 +171,6 @@
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="action_example">Example action</string>
-    <string name="action_settings">Settings</string>
+    <string name="action_settings">Настройки</string>
 
 </resources>
