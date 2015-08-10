@@ -20,10 +20,10 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.berezich.sportconnector.AlertDialogFragment;
 import com.berezich.sportconnector.DatePickerFragment;
 import com.berezich.sportconnector.EndpointApi;
 import com.berezich.sportconnector.ErrorVisualizer;
-import com.berezich.sportconnector.GoogleMap.SpotsData;
 import com.berezich.sportconnector.LocalDataManager;
 import com.berezich.sportconnector.MainActivity;
 import com.berezich.sportconnector.R;
@@ -31,12 +31,7 @@ import com.berezich.sportconnector.UsefulFunctions;
 import com.berezich.sportconnector.backend.sportConnectorApi.model.Person;
 import com.google.api.client.util.DateTime;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.Locale;
 
 /**
  * Created by Sashka on 25.07.2015.
@@ -92,6 +87,7 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
         TextView txtView;
         EditText txtEdt;
         DateTime birthday;
+        ImageButton imgBtn;
         Person myPersonInfo = LocalDataManager.getMyPersonInfo();
         RadioGroup radioGroup;
         if (myPersonInfo != null && rootView != null) {
@@ -129,6 +125,11 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
             if ((txtView = (TextView) rootView.findViewById(R.id.editProfile_txtView_setRating)) != null) {
                 txtView.setText(getString(R.string.personprofile_rating) + " " + myPersonInfo.getRating());
                 txtView.setOnClickListener(new RatingOnClickListener());
+            }
+
+
+            if ((imgBtn = (ImageButton) rootView.findViewById(R.id.editProfile_btn_ratingInfo)) != null) {
+                imgBtn.setOnClickListener(new RatingInfoOnClickListener());
             }
 
             if ((txtView = (TextView) rootView.findViewById(R.id.editProfile_txtEdt_desc)) != null)
@@ -236,6 +237,8 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
             changePassFragment.setTargetFragment(getCurFragment(),0);
             changePassFragment.show(fragmentManager,null);
 
+
+
         }
     }
 
@@ -248,10 +251,23 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
     {
         @Override
         public void onClick(View v) {
-            TestQuestionFragment testQuestionFragment = new TestQuestionFragment().setArgs(1,1);
             FragmentManager fragmentManager = (FragmentManager) getFragmentManager();
+            /*TestQuestionFragment testQuestionFragment = new TestQuestionFragment().setArgs(1,1);
             if(fragmentManager!=null)
                 fragmentManager.beginTransaction().replace(R.id.container, testQuestionFragment).addToBackStack(null).commit();
+*/
+        }
+    }
+
+    private class RatingInfoOnClickListener implements View.OnClickListener
+    {
+        @Override
+        public void onClick(View v) {
+            FragmentManager fragmentManager = (FragmentManager) getFragmentManager();
+            AlertDialogFragment dialog;
+            dialog = AlertDialogFragment.newInstance(getString(R.string.ratingInfo_title),getString(R.string.ratingInfo_4_5), false,false);
+            dialog.setTargetFragment(getCurFragment(), 0);
+            dialog.show(fragmentManager, "");
         }
     }
 

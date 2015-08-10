@@ -135,12 +135,36 @@
                 style="@style/EditProfile_Block"
                 android:showDividers="middle|end">
 
-                <TextView
-                    style="@style/EditProfile_TxtPropField"
-                    android:id="@+id/editProfile_txtView_setRating"
-                    android:text="@string/editprofile_txt_setRating"
-                    android:clickable="true"
-                    android:textColor="@color/text_property" />
+                <RelativeLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <TextView
+                        style="@style/EditProfile_TxtPropField"
+                        android:id="@+id/editProfile_txtView_setRating"
+                        android:text="@string/editprofile_txt_setRating"
+                        android:clickable="true"
+                        android:textColor="@color/text_property"
+                        android:layout_gravity="left"
+                        android:layout_height="wrap_content"
+                        android:layout_width="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:layout_marginLeft="0dp"
+                        android:layout_alignParentTop="false" />
+
+                    <ImageButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/editProfile_btn_ratingInfo"
+                        android:background="@drawable/ic_dialog_info"
+                        android:layout_gravity="right|center_horizontal"
+                        android:layout_alignParentLeft="false"
+                        android:layout_alignParentTop="true"
+                        android:layout_marginTop="0dp"
+                        android:layout_marginRight="0dp"
+                        android:layout_alignParentRight="true" />
+                </RelativeLayout>
 
                 <EditText
                     android:id="@+id/editProfile_txtEdt_desc"

@@ -4,7 +4,9 @@
     android:layout_height="match_parent"
     android:background="@color/divider_block"
     android:paddingLeft="@dimen/testQuestion_block_left_right_offset"
-    android:paddingRight="@dimen/testQuestion_block_left_right_offset">
+    android:paddingRight="@dimen/testQuestion_block_left_right_offset"
+    android:paddingBottom="@dimen/testQuestion_block_topBottom_offset"
+    android:paddingTop="@dimen/testQuestion_block_topBottom_offset">
 
     <LinearLayout
         android:orientation="vertical"
@@ -22,7 +24,8 @@
             android:paddingLeft="@dimen/testQuestion_title_leftRightOffset"
             android:paddingRight="@dimen/testQuestion_title_leftRightOffset"
             android:paddingTop="@dimen/testQuestion_title_topOffset"
-            android:paddingBottom="@dimen/testQuestion_title_bottomOffset" />
+            android:paddingBottom="@dimen/testQuestion_title_bottomOffset"
+            android:layout_weight="7.8" />
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
@@ -44,7 +47,7 @@
         <LinearLayout
             android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:paddingTop="@dimen/testQuestion_radioGrp_topOffset"
             android:paddingBottom="@dimen/testQuestion_radioGrp_bottomOffset"
             android:layout_marginLeft="@dimen/testQuestion_block_left_right_offset">
@@ -179,15 +182,20 @@
 
             </LinearLayout>
         </LinearLayout>
-
-        <Button
-            android:layout_width="wrap_content"
+        <FrameLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/testQuestion_btnOk"
-            android:id="@+id/button"
-            android:layout_gravity="right"
-            android:layout_marginRight="@dimen/testQuestion_btnOk_rightOffset"
-            android:layout_marginBottom="@dimen/testQuestion_btnOk_bottomOffset" />
+            android:paddingBottom="@dimen/testQuestion_btnOk_bottomOffset">
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/testQuestion_btnOk"
+                android:id="@+id/button"
+                android:layout_gravity="right"
+                android:layout_marginRight="@dimen/testQuestion_btnOk_rightOffset"
+                android:layout_weight="7.7" />
+        </FrameLayout>
 
     </LinearLayout>
 </FrameLayout>

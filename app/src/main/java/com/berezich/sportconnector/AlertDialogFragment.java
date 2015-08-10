@@ -12,16 +12,17 @@ import android.support.v7.app.AlertDialog;
  */
 public class AlertDialogFragment extends DialogFragment {
     private static final String TAG = "MyLog_AlertDialogFragment";
-    private OnActionDialogListener listener;
+    private OnActionDialogListener listener=null;
     public static AlertDialogFragment newInstance(String msg, boolean isNegativeBtn) {
-        return newInstance("",msg,isNegativeBtn);
+        return newInstance("",msg,isNegativeBtn,true);
     }
-    public static AlertDialogFragment newInstance(String title, String msg, boolean isNegativeBtn) {
+    public static AlertDialogFragment newInstance(String title, String msg, boolean isNegativeBtn, boolean isInterfaceNeed) {
         AlertDialogFragment frag = new AlertDialogFragment();
         Bundle args = new Bundle();
         args.putString("title", title);
         args.putString("msg", msg);
-        args.putBoolean("isNegativeBtn",isNegativeBtn);
+        args.putBoolean("isNegativeBtn", isNegativeBtn);
+        args.putBoolean("isInterfaceNeed",isInterfaceNeed);
         frag.setArguments(args);
         return frag;
     }
@@ -31,14 +32,16 @@ public class AlertDialogFragment extends DialogFragment {
         String title = getArguments().getString("title");
         String msg = getArguments().getString("msg");
         boolean isNegativeBtn = getArguments().getBoolean("isNegativeBtn");
+        boolean isInterfaceNeed = getArguments().getBoolean("isInterfaceNeed");
 
         if(getTargetFragment()==null)
             throw new NullPointerException("Need to set targetFragment for AlertDialogFragment");
-        try {
-            listener = (OnActionDialogListener)getTargetFragment();
-        } catch (ClassCastException e) {
-            throw new ClassCastException(getTargetFragment().toString() + " must implement OnActionDialogListener for AlertDialogFragment");
-        }
+        if(isInterfaceNeed)
+            try {
+                listener = (OnActionDialogListener)getTargetFragment();
+            } catch (ClassCastException e) {
+                throw new ClassCastException(getTargetFragment().toString() + " must implement OnActionDialogListener for AlertDialogFragment");
+            }
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
                 //.setIcon(R.drawable.alert_dialog_icon)
 
@@ -51,7 +54,8 @@ public class AlertDialogFragment extends DialogFragment {
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int whichButton) {
                                 dismiss();
-                                listener.onPositiveClick();
+                                if(listener!=null)
+                                    listener.onPositiveClick();
                             }
                         }
         );
@@ -61,7 +65,8 @@ public class AlertDialogFragment extends DialogFragment {
                     new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int whichButton) {
                             dismiss();
-                            listener.onNegativeClick();
+                            if(listener!=null)
+                                listener.onNegativeClick();
                         }
                     }
             );
