@@ -1,6 +1,7 @@
 package com.berezich.sportconnector.PersonProfile;
 
 import android.app.Activity;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -12,11 +13,16 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.RadioGroup;
+import android.widget.RelativeLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -31,6 +37,7 @@ import com.berezich.sportconnector.UsefulFunctions;
 import com.berezich.sportconnector.backend.sportConnectorApi.model.Person;
 import com.google.api.client.util.DateTime;
 
+import java.util.Calendar;
 import java.util.Date;
 
 /**
@@ -44,6 +51,7 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
     private final String TAG = "MyLog_EditProfileFrg";
     private final String mSex = "MALE";
     private final String fSex = "FEMALE";
+    private final int minAge = 16;
     View rootView;
     Person tempMyPerson;
     /*public EditProfileFragment setArgs(int sectionNumber) {
@@ -88,7 +96,9 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
         EditText txtEdt;
         DateTime birthday;
         ImageButton imgBtn;
-        Person myPersonInfo = LocalDataManager.getMyPersonInfo();
+        Spinner spinner;
+
+        final Person myPersonInfo = LocalDataManager.getMyPersonInfo();
         RadioGroup radioGroup;
         if (myPersonInfo != null && rootView != null) {
             tempMyPerson = myPersonInfo.clone();
@@ -96,12 +106,17 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
                 txtEdt.setText(myPersonInfo.getName());
             if ((txtEdt = (EditText) rootView.findViewById(R.id.editProfile_txtEdt_surname)) != null)
                 txtEdt.setText(myPersonInfo.getSurname());
-            if ((txtView = (TextView) rootView.findViewById(R.id.editProfile_txtView_birthday)) != null)
-                if ((birthday = myPersonInfo.getBirthday()) != null) {
-                    Date date = new Date(birthday.getValue());
-                    txtView.setText(String.format("%1$td.%1$tm.%1$tY", date));
-                    txtView.setOnClickListener(new OnBirthdayClickListener());
+            if ((txtView = (TextView) rootView.findViewById(R.id.editProfile_txtView_birthday)) != null) {
+                Date date;
+                if ((birthday = myPersonInfo.getBirthday()) != null)
+                    date = new Date(birthday.getValue());
+                else {
+                    Calendar calendar = Calendar.getInstance();
+                    date = calendar.getTime();
                 }
+                txtView.setText(String.format("%1$td.%1$tm.%1$tY", date));
+                txtView.setOnClickListener(new OnBirthdayClickListener());
+            }
             if ((radioGroup = (RadioGroup) rootView.findViewById(R.id.editProfile_radioGrp_sex)) != null) {
                 String sex = myPersonInfo.getSex() != null ? myPersonInfo.getSex() : "";
                 if (sex.equals(mSex))
@@ -123,10 +138,47 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
             }
 
             if ((txtView = (TextView) rootView.findViewById(R.id.editProfile_txtView_setRating)) != null) {
-                txtView.setText(getString(R.string.personprofile_rating) + " " + myPersonInfo.getRating());
+                //txtView.setText(getString(R.string.personprofile_rating) + " " + myPersonInfo.getRating());
+                txtView.setText(getString(R.string.personprofile_rating));
                 txtView.setOnClickListener(new RatingOnClickListener());
             }
 
+            if ((spinner = (Spinner) rootView.findViewById(R.id.editProfile_spinner_rating)) != null) {
+                String ratings = getString(R.string.ratingInfo_ratingValLst);
+                if(ratings!=null) {
+                    final String ratingArr[] = ratings.split(",");
+                    ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_item, ratingArr);
+                    adapter.setDropDownViewResource(android.R.layout.simple_spinner_item);
+                    spinner.setAdapter(adapter);
+                    int pos = (int)(tempMyPerson.getRating()/0.5-2);
+                    if(pos<=ratingArr.length)
+                        spinner.setSelection(pos);
+                    else
+                        spinner.setSelection(0);
+
+                    // устанавливаем обработчик нажатия
+                    spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                        @Override
+                        public void onItemSelected(AdapterView<?> parent, View view,
+                                                   int position, long id) {
+                            float rating = Float.valueOf(ratingArr[position]);
+                            if(tempMyPerson.getRating()!=rating) {
+                                tempMyPerson.setRating(rating);
+                                ImageButton imgBtn;
+                                if ((imgBtn = (ImageButton) rootView.findViewById(R.id.editProfile_btn_ratingInfo)) != null) {
+                                    //imgBtn.setFocusableInTouchMode(true);
+                                    //imgBtn.requestFocus();
+                                    imgBtn.performClick();
+                                }
+                            }
+                        }
+
+                        @Override
+                        public void onNothingSelected(AdapterView<?> arg0) {
+                        }
+                    });
+                }
+            }
 
             if ((imgBtn = (ImageButton) rootView.findViewById(R.id.editProfile_btn_ratingInfo)) != null) {
                 imgBtn.setOnClickListener(new RatingInfoOnClickListener());
@@ -138,7 +190,6 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
             if(getActivity()!=null)
                 ((MainActivity)getActivity()).setupUI(rootView);
         }
-
     }
     private Fragment getCurFragment(){
         return this;
@@ -263,11 +314,52 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
     {
         @Override
         public void onClick(View v) {
+            ImageButton imageButton = (ImageButton) v;
+            imageButton.setFocusable(false);
+            imageButton.setFocusableInTouchMode(false);
+            if(rootView!=null) {
+                Spinner spinner = (Spinner) rootView.findViewById(R.id.editProfile_spinner_rating);
+                if (spinner!=null)
+                    spinner.requestFocus();
+            }
+
             FragmentManager fragmentManager = (FragmentManager) getFragmentManager();
             AlertDialogFragment dialog;
-            dialog = AlertDialogFragment.newInstance(getString(R.string.ratingInfo_title),getString(R.string.ratingInfo_4_5), false,false);
-            dialog.setTargetFragment(getCurFragment(), 0);
-            dialog.show(fragmentManager, "");
+            String msgInfoId;
+            if(tempMyPerson.getRating() == 1.0)
+                msgInfoId = getString(R.string.ratingInfo_1_0);
+            else if(tempMyPerson.getRating() == 1.5)
+                msgInfoId = getString(R.string.ratingInfo_1_5);
+            else if(tempMyPerson.getRating() == 2.0)
+                msgInfoId = getString(R.string.ratingInfo_2_0);
+            else if(tempMyPerson.getRating() == 2.5)
+                msgInfoId = getString(R.string.ratingInfo_2_5);
+            else if(tempMyPerson.getRating() == 3.0)
+                msgInfoId = getString(R.string.ratingInfo_3_0);
+            else if(tempMyPerson.getRating() == 3.5)
+                msgInfoId = getString(R.string.ratingInfo_3_5);
+            else if(tempMyPerson.getRating() == 4.0)
+                msgInfoId = getString(R.string.ratingInfo_4_0);
+            else if(tempMyPerson.getRating() == 4.5)
+                msgInfoId = getString(R.string.ratingInfo_4_5);
+            else if(tempMyPerson.getRating() == 5.0)
+                msgInfoId = getString(R.string.ratingInfo_5_0);
+            else if(tempMyPerson.getRating() == 5.5)
+                msgInfoId = getString(R.string.ratingInfo_5_5);
+            else if(tempMyPerson.getRating() == 6.0)
+                msgInfoId = getString(R.string.ratingInfo_6_0);
+            else if(tempMyPerson.getRating() == 6.5)
+                msgInfoId = getString(R.string.ratingInfo_6_5);
+            else if(tempMyPerson.getRating() == 7.0)
+                msgInfoId = getString(R.string.ratingInfo_7_0);
+            else
+                msgInfoId="";
+
+            if(!msgInfoId.equals("")) {
+                dialog = AlertDialogFragment.newInstance(getString(R.string.ratingInfo_title) + " "+tempMyPerson.getRating(), msgInfoId, false, false);
+                dialog.setTargetFragment(getCurFragment(), 0);
+                dialog.show(fragmentManager, "");
+            }
         }
     }
 

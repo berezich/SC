@@ -33,7 +33,7 @@
     <!-- fragment_editProfile-->
         <dimen name="editprofile_block_left_right_offset">10dp</dimen>
         <dimen name="editprofile_title_top_offset">7dp</dimen>
-        <dimen name="editprofile_title_left_offset">22dp</dimen>
+        <dimen name="editprofile_title_left_offset">27dp</dimen>
         <dimen name="editprofile_title_text_size">13sp</dimen>
         <dimen name="editprofile_text_left_right_offset">12dp</dimen>
         <dimen name="editprofile_text_top_offset">5dp</dimen>

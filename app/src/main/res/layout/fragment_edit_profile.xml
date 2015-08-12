@@ -138,7 +138,8 @@
                 <RelativeLayout
                     android:orientation="horizontal"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent">
+                    android:layout_height="match_parent"
+                    android:paddingBottom="@dimen/editprofile_text_bottom_offset">
 
                     <TextView
                         style="@style/EditProfile_TxtPropField"
@@ -151,26 +152,41 @@
                         android:layout_width="wrap_content"
                         android:layout_alignParentLeft="true"
                         android:layout_marginLeft="0dp"
-                        android:layout_alignParentTop="false" />
+                        android:layout_alignParentTop="false"
+                        android:layout_alignParentStart="false" />
 
                     <ImageButton
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:id="@+id/editProfile_btn_ratingInfo"
-                        android:background="@drawable/ic_dialog_info"
+                        android:background="@drawable/btn_info"
                         android:layout_gravity="right|center_horizontal"
                         android:layout_alignParentLeft="false"
-                        android:layout_alignParentTop="true"
+                        android:layout_alignParentTop="false"
                         android:layout_marginTop="0dp"
                         android:layout_marginRight="0dp"
-                        android:layout_alignParentRight="true" />
+                        android:layout_alignParentRight="true"
+                        android:layout_centerVertical="true"
+                        android:layout_alignBottom="@+id/editProfile_txtView_setRating"
+                        android:focusable="false"
+                        android:focusableInTouchMode="false" />
+
+                    <Spinner
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/editProfile_spinner_rating"
+                        android:layout_toRightOf="@+id/editProfile_txtView_setRating"
+                        android:layout_toEndOf="@+id/editProfile_txtView_setRating"
+                        android:spinnerMode="dropdown"
+                        android:padding="0dp"
+                        android:layout_alignBottom="@+id/editProfile_txtView_setRating" />
+
                 </RelativeLayout>
 
                 <EditText
                     android:id="@+id/editProfile_txtEdt_desc"
                     style="@style/EditProfile_TxtPropField"
-                    android:hint="@string/editprofile_hint_desc"
-                    android:minLines="3" />
+                    android:hint="@string/editprofile_hint_desc" />
 
             </LinearLayout>
 

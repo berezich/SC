@@ -98,8 +98,16 @@ public class PersonProfileFragment extends Fragment {
                     str += ", "+age ;
                 txtView.setText(str);
             }
-            if((txtView = (TextView) rootView.findViewById(R.id.profile_txt_raiting))!=null)
-                txtView.setText(getString(R.string.personprofile_rating)+" "+myPersonInfo.getRating());
+            if((txtView = (TextView) rootView.findViewById(R.id.profile_txt_raiting))!=null) {
+                String ratings = getString(R.string.ratingInfo_ratingValLst);
+                if(myPersonInfo.getRating()<1.0 && ratings!=null) {
+                    String ratingArr[] = ratings.split(",");
+                    if(ratingArr.length>0)
+                    txtView.setText(getString(R.string.personprofile_rating) + " " + ratingArr[0]);
+                }
+                else
+                    txtView.setText(getString(R.string.personprofile_rating) + " " + myPersonInfo.getRating());
+            }
 
             //contacts block
             String email = myPersonInfo.getEmail(),phone = myPersonInfo.getPhone();
