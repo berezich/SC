@@ -3,7 +3,9 @@ package com.berezich.sportconnector;
 import android.app.Activity;
 import android.content.Context;
 import android.os.AsyncTask;
+import android.os.Environment;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.util.Pair;
 
 import com.berezich.sportconnector.backend.sportConnectorApi.SportConnectorApi;
@@ -13,12 +15,20 @@ import com.berezich.sportconnector.backend.sportConnectorApi.model.Spot;
 import com.berezich.sportconnector.backend.sportConnectorApi.model.UpdateSpotInfo;
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.extensions.android.json.AndroidJsonFactory;
+import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
 import com.google.api.client.googleapis.services.AbstractGoogleClientRequest;
 import com.google.api.client.googleapis.services.GoogleClientRequestInitializer;
+import com.google.api.client.http.HttpTransport;
 import com.google.api.client.util.DateTime;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.security.GeneralSecurityException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -26,7 +36,9 @@ import java.util.List;
  */
 public class EndpointApi {
     private static SportConnectorApi srvApi = null;
-
+    private static String SERVICE_ACCOUNT_EMAIL = "182489181232-bbiekce9fgm6gtelunr9lp82gmdk3uju@developer.gserviceaccount.com";
+    private static String USERINFO_EMAIL_SCOPE = "https://www.googleapis.com/auth/userinfo.email";
+    private static String FILE_NAME = "file";
     private static void setSrvApi(Context context)
     {
         setSrvApi(context, false);
@@ -34,7 +46,7 @@ public class EndpointApi {
     private static void setSrvApi(Context context, boolean isLocalhost)
     {
         if(srvApi == null) {  // Only do this once
-            SportConnectorApi.Builder builder;
+            SportConnectorApi.Builder builder=null;
             if(isLocalhost) {
                 builder = new SportConnectorApi.Builder(AndroidHttp.newCompatibleTransport(),
                         new AndroidJsonFactory(), null)
@@ -51,15 +63,74 @@ public class EndpointApi {
             }
             else {
                 String url = context.getString(R.string.srvApi_url);
-                builder = new SportConnectorApi.Builder(
-                        AndroidHttp.newCompatibleTransport(), new AndroidJsonFactory(), null).setRootUrl(url);
+                HttpTransport httpTransport =  AndroidHttp.newCompatibleTransport();
+                AndroidJsonFactory androidJsonFactory =  new AndroidJsonFactory();
+                InputStream ins = context.getResources().openRawResource(R.raw.key);
+
+                try {
+                    File file = createFileFromInputStream(context,ins);
+                    GoogleCredential credential = new GoogleCredential.Builder().setTransport(httpTransport)
+                            .setJsonFactory(androidJsonFactory)
+                            .setServiceAccountId(SERVICE_ACCOUNT_EMAIL)
+                            .setServiceAccountScopes(Collections.singleton(USERINFO_EMAIL_SCOPE))
+                            .setServiceAccountPrivateKeyFromP12File(file)
+                            .build();
+                    file.delete();
+                    builder = new SportConnectorApi.Builder(
+                            httpTransport,androidJsonFactory , credential).setRootUrl(url);
+                } catch (GeneralSecurityException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+
             }
             // end options for devappserver
-
-            srvApi = builder.build();
+            if(builder!=null)
+                srvApi = builder.build();
         }
     }
+    private static File createFileFromInputStream(Context context, InputStream inputStream) {
 
+        String path = "";
+
+        /*File file = new File(Environment.getExternalStorageDirectory(),
+                "KeyHolder/KeyFile/");
+        if (!file.exists()) {
+            if (!file.mkdirs())
+                Log.d("KeyHolder", "Folder not created");
+            else
+                Log.d("KeyHolder", "Folder created");
+        } else
+            Log.d("KeyHolder", "Folder present");*/
+
+        //File file = new File(context.getFilesDir(), FILE_NAME);
+
+        //path = file.getAbsolutePath();
+
+        try {
+            File f = new File(context.getFilesDir(), FILE_NAME);
+            //File f = new File(path+"/MyKey");
+            OutputStream outputStream = new FileOutputStream(f);
+            byte buffer[] = new byte[1024];
+            int length = 0;
+
+            while ((length = inputStream.read(buffer)) > 0) {
+                outputStream.write(buffer, 0, length);
+            }
+
+            outputStream.close();
+            inputStream.close();
+
+            return f;
+        } catch (IOException e) {
+            // Logging exception
+            e.printStackTrace();
+        }
+
+        return null;
+    }
     public static class GetRegionAsyncTask extends AsyncTask<Long, Void, Pair<RegionInfo,Exception> >{
         private OnGetRegionAsyncTaskAction listener=null;
         private Context context = null;
