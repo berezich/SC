@@ -63,7 +63,8 @@ public class UpdateSpotInfoEndpoint {
             name = "getUpdateSpotInfo",
             path = "updateSpotInfo/{id}",
             httpMethod = ApiMethod.HttpMethod.GET)
-    public UpdateSpotInfo get(@Named("id") Long id) throws NotFoundException {
+    public UpdateSpotInfo get(@Named("id") Long id) throws NotFoundException,BadRequestException {
+        OAuth_2_0.check();
         logger.info("Getting UpdateSpotInfo with ID: " + id);
         UpdateSpotInfo updateSpotInfo = ofy().load().type(UpdateSpotInfo.class).id(id).now();
         if (updateSpotInfo == null) {
@@ -88,6 +89,7 @@ public class UpdateSpotInfoEndpoint {
         // Objectify ID generator, e.g. long or String, then you should generate the unique ID yourself prior to saving.
         //
         // If your client provides the ID then you should probably use PUT instead.
+        OAuth_2_0.check();
         validateUpdateSpotInfoProperties(updateSpotInfo);
         if(updateSpotInfo.getUpdateDate()==null)
             updateSpotInfo.setUpdateDate(new Date());
@@ -114,6 +116,7 @@ public class UpdateSpotInfoEndpoint {
     @ApiResourceProperty(ignored = AnnotationBoolean.TRUE)
     public UpdateSpotInfo update(@Named("id") Long id, UpdateSpotInfo updateSpotInfo) throws NotFoundException, BadRequestException {
         // TODO: You should validate your ID parameter against your resource's ID here.
+        OAuth_2_0.check();
         checkExists(id);
         validateUpdateSpotInfoProperties(updateSpotInfo);
         if(updateSpotInfo.getUpdateDate()==null)
@@ -155,7 +158,8 @@ public class UpdateSpotInfoEndpoint {
     public CollectionResponse<UpdateSpotInfo> list(@Named("regionId") Long regionId,
                                                    @Named("date") Date lastUpdate,
                                                    @Nullable @Named("cursor") String cursor,
-                                                   @Nullable @Named("limit") Integer limit) {
+                                                   @Nullable @Named("limit") Integer limit) throws BadRequestException{
+        OAuth_2_0.check();
         limit = limit == null ? DEFAULT_LIST_LIMIT : limit;
         Query<UpdateSpotInfo> query = ofy().load().type(UpdateSpotInfo.class).filter("regionId",regionId).filter("updateDate >",lastUpdate).limit(limit);
         if (cursor != null) {

@@ -11,6 +11,11 @@ import com.google.api.server.spi.response.CollectionResponse;
 import com.google.api.server.spi.response.NotFoundException;
 import com.google.appengine.api.datastore.Cursor;
 import com.google.appengine.api.datastore.QueryResultIterator;
+import com.google.appengine.api.oauth.OAuthRequestException;
+import com.google.appengine.api.oauth.OAuthService;
+import com.google.appengine.api.oauth.OAuthServiceFactory;
+import com.google.appengine.api.oauth.OAuthServiceFailureException;
+import com.google.appengine.api.users.User;
 import com.google.appengine.repackaged.com.google.api.client.util.Base64;
 import com.googlecode.objectify.ObjectifyService;
 import com.googlecode.objectify.cmd.Query;
@@ -18,6 +23,7 @@ import com.googlecode.objectify.cmd.Query;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -67,7 +73,8 @@ public class PersonEndpoint {
             name = "getPerson",
             path = "person/{id}",
             httpMethod = ApiMethod.HttpMethod.GET)
-    public Person get(@Named("id") String id) throws NotFoundException {
+    public Person get(@Named("id") String id) throws NotFoundException,BadRequestException {
+        OAuth_2_0.check();
         logger.info("Getting Person with ID: " + id);
         Person person = ofy().load().type(Person.class).id(id).now();
         if (person == null) {
@@ -81,7 +88,8 @@ public class PersonEndpoint {
             name = "authorizePerson",
             path = "authorizePerson",
             httpMethod = ApiMethod.HttpMethod.GET)
-    public Person authorizePerson(@Named("id") String id, @Named("pass") String pass) throws NotFoundException {
+    public Person authorizePerson(@Named("id") String id, @Named("pass") String pass) throws NotFoundException,BadRequestException {
+        OAuth_2_0.check();
         logger.info("Getting Person with ID: " + id);
         Person person = ofy().load().type(Person.class).id(id).now();
         if (person != null) {
@@ -107,6 +115,7 @@ public class PersonEndpoint {
         // Objectify ID generator, e.g. long or String, then you should generate the unique ID yourself prior to saving.
         //
         // If your client provides the ID then you should probably use PUT instead.
+        OAuth_2_0.check();
         validatePersonProperties(person);
         Person samePerson = ofy().load().type(Person.class).id(person.getId()).now();
         if(samePerson!=null)
@@ -140,6 +149,7 @@ public class PersonEndpoint {
             httpMethod = ApiMethod.HttpMethod.PUT)
     public Person update(@Named("id") String id, Person person) throws NotFoundException, BadRequestException {
         // TODO: You should validate your ID parameter against your resource's ID here.
+        OAuth_2_0.check();
         Person oldPerson = ofy().load().type(Person.class).id(id).now();
         if(oldPerson==null)
             throw  new NotFoundException("Person with id:" + id + " not found");
@@ -160,8 +170,9 @@ public class PersonEndpoint {
     }
 
     @ApiResourceProperty(ignored = AnnotationBoolean.TRUE)
-    public void addPersonsFavoriteSpot(@Named("lstPersonIds") List<String> idLst,@Named("spotId") Long spotId) {
+    public void addPersonsFavoriteSpot(@Named("lstPersonIds") List<String> idLst,@Named("spotId") Long spotId) throws BadRequestException{
         // TODO: You should validate your ID parameter against your resource's ID here.
+        OAuth_2_0.check();
         Person person;
         for (int i = 0; i < idLst.size(); i++) {
             String id = idLst.get(i);
@@ -181,8 +192,9 @@ public class PersonEndpoint {
 
 
     @ApiResourceProperty(ignored = AnnotationBoolean.TRUE)
-    public void removePersonsFavoriteSpot(@Named("lstPersonIds") List<String> idLst,@Named("spotId") Long spotId) {
+    public void removePersonsFavoriteSpot(@Named("lstPersonIds") List<String> idLst,@Named("spotId") Long spotId) throws BadRequestException{
         // TODO: You should validate your ID parameter against your resource's ID here.
+        OAuth_2_0.check();
         Person person;
         for (int i = 0; i < idLst.size(); i++) {
             String id = idLst.get(i);
@@ -211,7 +223,8 @@ public class PersonEndpoint {
             name = "removePerson",
             path = "person/{id}",
             httpMethod = ApiMethod.HttpMethod.DELETE)
-    public void remove(@Named("id") String id) throws NotFoundException {
+    public void remove(@Named("id") String id) throws NotFoundException,BadRequestException {
+        OAuth_2_0.check();
         checkExists(id);
         ofy().delete().type(Person.class).id(id).now();
         logger.info("Deleted Person with ID: " + id);
@@ -228,7 +241,8 @@ public class PersonEndpoint {
             name = "listPerson",
             path = "person",
             httpMethod = ApiMethod.HttpMethod.GET)
-    public CollectionResponse<Person> list(@Nullable @Named("cursor") String cursor, @Nullable @Named("limit") Integer limit) {
+    public CollectionResponse<Person> list(@Nullable @Named("cursor") String cursor, @Nullable @Named("limit") Integer limit) throws BadRequestException{
+        OAuth_2_0.check();
         limit = limit == null ? DEFAULT_LIST_LIMIT : limit;
         Query<Person> query = ofy().load().type(Person.class).limit(limit);
         if (cursor != null) {
@@ -246,7 +260,8 @@ public class PersonEndpoint {
             name = "listPersonByIdLst",
             path = "personByIdLst",
             httpMethod = ApiMethod.HttpMethod.GET)
-    public CollectionResponse<Person> listByIdLst(@Named("idLst") ArrayList<String>idLst) {
+    public CollectionResponse<Person> listByIdLst(@Named("idLst") ArrayList<String>idLst) throws BadRequestException{
+        OAuth_2_0.check();
         Map<String,Person> personMap = ofy().load().type(Person.class).ids(idLst);
         if(personMap==null)
             return null;
@@ -287,7 +302,7 @@ public class PersonEndpoint {
     }
 
     //update lists of partners and coaches of some spots since a person was updated
-    private void setSpotCoachesPartners(Person person, Person oldPerson)
+    private void setSpotCoachesPartners(Person person, Person oldPerson) throws BadRequestException
     {
         List<Long> addSpotLst = new ArrayList<Long>();
         List<Long> removeSpotLst = new ArrayList<Long>();

@@ -203,7 +203,7 @@ public class LoginFragment extends Fragment implements EndpointApi.AuthorizePers
             dialogMsg = errTxtCode.second;
         else
             dialogMsg = getString(R.string.server_unknow_err);
-
+        Log.e(TAG,"request error: "+ErrorVisualizer.getDebugMsgOfRespException(error));
         dialog = AlertDialogFragment.newInstance(dialogMsg, false);
         dialog.setTargetFragment(this, 0);
         FragmentManager ft = getFragmentManager();

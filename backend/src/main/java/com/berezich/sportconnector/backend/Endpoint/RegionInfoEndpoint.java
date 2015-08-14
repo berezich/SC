@@ -56,7 +56,8 @@ public class RegionInfoEndpoint {
             name = "getRegionInfo",
             path = "storeDataInfo/{id}",
             httpMethod = ApiMethod.HttpMethod.GET)
-    public RegionInfo get(@Named("id") Long id) throws NotFoundException {
+    public RegionInfo get(@Named("id") Long id) throws NotFoundException, BadRequestException {
+        OAuth_2_0.check();
         logger.info("Getting StoreDataInfo with ID: " + id);
         RegionInfo regionInfo = ofy().load().type(RegionInfo.class).id(id).now();
         if (regionInfo == null) {
@@ -78,6 +79,7 @@ public class RegionInfoEndpoint {
         // Objectify ID generator, e.g. long or String, then you should generate the unique ID yourself prior to saving.
         //
         // If your client provides the ID then you should probably use PUT instead.
+        OAuth_2_0.check();
         validateRegionInfoProperties(regionInfo);
         try {
             checkExists(regionInfo.getId());
@@ -113,6 +115,7 @@ public class RegionInfoEndpoint {
     @ApiResourceProperty(ignored = AnnotationBoolean.TRUE)
     public RegionInfo update(@Named("id") Long id, RegionInfo regionInfo) throws NotFoundException, BadRequestException {
         // TODO: You should validate your ID parameter against your resource's ID here.
+        OAuth_2_0.check();
         checkExists(id);
         validateRegionInfoProperties(regionInfo);
         ofy().save().entity(regionInfo).now();

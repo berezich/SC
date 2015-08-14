@@ -68,7 +68,8 @@ public class SpotEndpoint {
             name = "getSpot",
             path = "spot/{id}",
             httpMethod = ApiMethod.HttpMethod.GET)
-    public Spot get(@Named("id") Long id) throws NotFoundException {
+    public Spot get(@Named("id") Long id) throws NotFoundException,BadRequestException {
+        OAuth_2_0.check();
         logger.info("Getting Spot with ID: " + id);
         Spot spot = ofy().load().type(Spot.class).id(id).now();
         if (spot == null) {
@@ -91,6 +92,7 @@ public class SpotEndpoint {
         //
         // If your client provides the ID then you should probably use PUT instead.
 
+        OAuth_2_0.check();
         validateSpotProperties(spot);
         updateRegionInfoAboutSpot(spot);
         spot.setId(null);
@@ -117,6 +119,7 @@ public class SpotEndpoint {
             httpMethod = ApiMethod.HttpMethod.PUT)
     public Spot update(@Named("id") Long id, Spot spot) throws NotFoundException, BadRequestException {
         // TODO: You should validate your ID parameter against your resource's ID here.
+        OAuth_2_0.check();
         Spot oldSpot = ofy().load().type(Spot.class).id(id).now();
         if(oldSpot==null)
             throw new NotFoundException("Spot with id:"+id+" not found");
@@ -139,6 +142,7 @@ public class SpotEndpoint {
                               @Named("idPerson") String idPerson,
                               @Named("isFavorite") boolean isFavorite,
                               @Named("typePerson")Person.TYPE type) throws NotFoundException, BadRequestException {
+        OAuth_2_0.check();
         Spot oldSpot;
         Spot spot = ofy().load().type(Spot.class).id(idSpot).now();
         if(spot==null) {
@@ -173,8 +177,9 @@ public class SpotEndpoint {
     }
 
     @ApiResourceProperty(ignored = AnnotationBoolean.TRUE)
-    public void removePersonsFromSpots(@Named("lstSpotIds") List<Long> idLst, @Named("personType")Person.TYPE type,@Named("personId") String personId) {
+    public void removePersonsFromSpots(@Named("lstSpotIds") List<Long> idLst, @Named("personType")Person.TYPE type,@Named("personId") String personId) throws BadRequestException{
         // TODO: You should validate your ID parameter against your resource's ID here.
+        OAuth_2_0.check();
         Spot spot;
         List<String> personLst;
         for (int i = 0; i < idLst.size(); i++) {
@@ -199,8 +204,9 @@ public class SpotEndpoint {
         }
     }
     @ApiResourceProperty(ignored = AnnotationBoolean.TRUE)
-    public void addPersonsToSpots(@Named("lstSpotIds") List<Long> idLst, @Named("personType")Person.TYPE type,@Named("personId") String personId) {
+    public void addPersonsToSpots(@Named("lstSpotIds") List<Long> idLst, @Named("personType")Person.TYPE type,@Named("personId") String personId) throws BadRequestException{
         // TODO: You should validate your ID parameter against your resource's ID here.
+        OAuth_2_0.check();
         Spot spot;
         List<String> personLst;
         for (int i = 0; i < idLst.size(); i++) {
@@ -236,7 +242,8 @@ public class SpotEndpoint {
             name = "removeSpot",
             path = "spot/{id}",
             httpMethod = ApiMethod.HttpMethod.DELETE)
-    public void remove(@Named("id") Long id) throws NotFoundException {
+    public void remove(@Named("id") Long id) throws NotFoundException,BadRequestException {
+        OAuth_2_0.check();
         checkExists(id);
         ofy().delete().type(Spot.class).id(id).now();
         logger.info("Deleted Spot with ID: " + id);
@@ -253,7 +260,8 @@ public class SpotEndpoint {
             name = "listSpot",
             path = "spot",
             httpMethod = ApiMethod.HttpMethod.GET)
-    public CollectionResponse<Spot> list(@Nullable @Named("cursor") String cursor, @Nullable @Named("limit") Integer limit) {
+    public CollectionResponse<Spot> list(@Nullable @Named("cursor") String cursor, @Nullable @Named("limit") Integer limit) throws BadRequestException{
+        OAuth_2_0.check();
         limit = limit == null ? DEFAULT_LIST_LIMIT : limit;
         Query<Spot> query = ofy().load().type(Spot.class).limit(limit);
         if (cursor != null) {
@@ -278,7 +286,8 @@ public class SpotEndpoint {
             name = "listSpotByRegId",
             path = "spotByRegId",
             httpMethod = ApiMethod.HttpMethod.GET)
-    public CollectionResponse<Spot> listByRegId(@Named("regionId") Long regionId, @Nullable @Named("cursor") String cursor, @Nullable @Named("limit") Integer limit) {
+    public CollectionResponse<Spot> listByRegId(@Named("regionId") Long regionId, @Nullable @Named("cursor") String cursor, @Nullable @Named("limit") Integer limit) throws BadRequestException{
+        OAuth_2_0.check();
         limit = limit == null ? DEFAULT_LIST_LIMIT : limit;
         Query<Spot> query = ofy().load().type(Spot.class).filter("regionId", regionId).limit(limit);
         if (cursor != null) {
@@ -340,7 +349,7 @@ public class SpotEndpoint {
         }
     }
 
-    private void setFavoritePersonsSpot(Spot spot, Spot oldSpot)
+    private void setFavoritePersonsSpot(Spot spot, Spot oldSpot) throws BadRequestException
     {
         List<String> addPersonLst = new ArrayList<String>();
         List<String> removePersonLst = new ArrayList<String>();
