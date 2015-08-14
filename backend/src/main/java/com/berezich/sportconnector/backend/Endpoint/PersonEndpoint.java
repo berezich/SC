@@ -11,11 +11,6 @@ import com.google.api.server.spi.response.CollectionResponse;
 import com.google.api.server.spi.response.NotFoundException;
 import com.google.appengine.api.datastore.Cursor;
 import com.google.appengine.api.datastore.QueryResultIterator;
-import com.google.appengine.api.oauth.OAuthRequestException;
-import com.google.appengine.api.oauth.OAuthService;
-import com.google.appengine.api.oauth.OAuthServiceFactory;
-import com.google.appengine.api.oauth.OAuthServiceFailureException;
-import com.google.appengine.api.users.User;
 import com.google.appengine.repackaged.com.google.api.client.util.Base64;
 import com.googlecode.objectify.ObjectifyService;
 import com.googlecode.objectify.cmd.Query;
@@ -23,7 +18,6 @@ import com.googlecode.objectify.cmd.Query;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -87,32 +81,7 @@ public class PersonEndpoint {
             name = "authorizePerson",
             path = "authorizePerson",
             httpMethod = ApiMethod.HttpMethod.GET)
-    public Person authorizePerson(@Named("id") String id, @Named("pass") String pass) throws NotFoundException,BadRequestException {
-
-        OAuthService oauth = OAuthServiceFactory.getOAuthService();
-        String scope = "https://www.googleapis.com/auth/userinfo.email";
-        Set<String> allowedClients = new HashSet<>();
-        allowedClients.add("182489181232-bbiekce9fgm6gtelunr9lp82gmdk3uju.apps.googleusercontent.com");
-        allowedClients.add("292824132082.apps.googleusercontent.com");
-
-        if(false)
-            try {
-                //User user = oauth.getCurrentUser(scope);
-                String tokenAudience = oauth.getClientId(scope);
-                if (!allowedClients.contains(tokenAudience)) {
-                    throw new OAuthRequestException("audience of token '" + tokenAudience
-                            + "' is not in allowed list " + allowedClients);
-                }
-                // proceed with authenticated user
-                // ...
-            } catch (OAuthRequestException ex) {
-                // handle auth error
-                throw new BadRequestException("OAuthRequestException@: exception message = "+ ex.getMessage());
-            } catch (OAuthServiceFailureException ex) {
-                // optionally, handle an oauth service failure
-                throw new BadRequestException("OAuthServiceFailureException@: exception message = "+ ex.getMessage());
-            }
-
+    public Person authorizePerson(@Named("id") String id, @Named("pass") String pass) throws NotFoundException {
         logger.info("Getting Person with ID: " + id);
         Person person = ofy().load().type(Person.class).id(id).now();
         if (person != null) {
