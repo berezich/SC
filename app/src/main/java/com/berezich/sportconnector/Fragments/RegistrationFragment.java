@@ -21,6 +21,8 @@ import com.berezich.sportconnector.ErrorVisualizer;
 import com.berezich.sportconnector.LocalDataManager;
 import com.berezich.sportconnector.MainActivity;
 import com.berezich.sportconnector.R;
+import com.berezich.sportconnector.UsefulFunctions;
+import com.berezich.sportconnector.backend.sportConnectorApi.model.AccountForConfirmation;
 import com.berezich.sportconnector.backend.sportConnectorApi.model.Person;
 
 import java.io.IOException;
@@ -113,20 +115,21 @@ public class RegistrationFragment extends Fragment implements EndpointApi.Regist
     }
 
     @Override
-    public void onRegisterPersonAsyncTaskFinish(Pair<Person, Exception> result) {
-        Person person = result.first;
+    public void onRegisterAccountAsyncTaskFinish(Pair<AccountForConfirmation, Exception> result) {
+        AccountForConfirmation account = result.first;
         Exception error = result.second;
         if(getActivity()==null)
         {
             Log.e(TAG, "current fragment isn't attached to activity");
             return;
         }
-        if(error == null && person!=null)
+        if(error == null && account!=null)
         {
-            Log.d(TAG, "Registration OK");
+            Log.d(TAG, "Account for registration was created");
             try {
-                person.setPass(pass);
-                LocalDataManager.saveMyPersonInfoToPref(person, getActivity());
+                account.setPass(pass);
+
+                LocalDataManager.saveMyPersonInfoToPref(UsefulFunctions.createPerson(account), getActivity());
                 listenerLoginFragment.onAuthorized();
             } catch (IOException e) {
                 e.printStackTrace();

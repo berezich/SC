@@ -2,6 +2,8 @@ package com.berezich.sportconnector;
 
 import android.util.Log;
 
+import com.berezich.sportconnector.backend.sportConnectorApi.model.AccountForConfirmation;
+import com.berezich.sportconnector.backend.sportConnectorApi.model.Person;
 import com.google.api.client.util.DateTime;
 
 import java.text.DateFormat;
@@ -44,5 +46,15 @@ public class UsefulFunctions {
         } finally {
             return dtBirthday;
         }
+    }
+    public static Person createPerson(AccountForConfirmation account)
+    {
+        Person person = new Person();
+        person.setId(account.getId());
+        person.setEmail(account.getId());
+        person.setName(account.getName());
+        person.setPass(account.getPass());
+        person.setType(account.getType());
+        return person;
     }
 }

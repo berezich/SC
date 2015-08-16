@@ -1,5 +1,6 @@
 package com.berezich.sportconnector.backend.Endpoint;
 
+import com.berezich.sportconnector.backend.AccountForConfirmation;
 import com.berezich.sportconnector.backend.Person;
 import com.google.api.server.spi.config.AnnotationBoolean;
 import com.google.api.server.spi.config.Api;
@@ -11,26 +12,32 @@ import com.google.api.server.spi.response.CollectionResponse;
 import com.google.api.server.spi.response.NotFoundException;
 import com.google.appengine.api.datastore.Cursor;
 import com.google.appengine.api.datastore.QueryResultIterator;
-import com.google.appengine.api.oauth.OAuthRequestException;
-import com.google.appengine.api.oauth.OAuthService;
-import com.google.appengine.api.oauth.OAuthServiceFactory;
-import com.google.appengine.api.oauth.OAuthServiceFailureException;
-import com.google.appengine.api.users.User;
 import com.google.appengine.repackaged.com.google.api.client.util.Base64;
 import com.googlecode.objectify.ObjectifyService;
 import com.googlecode.objectify.cmd.Query;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 import java.util.logging.Logger;
 
 import javax.annotation.Nullable;
 import javax.inject.Named;
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.AddressException;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
 
 import static com.googlecode.objectify.ObjectifyService.ofy;
 
@@ -60,6 +67,7 @@ public class PersonEndpoint {
     static {
         // Typically you would register this inside an OfyServive wrapper. See: https://code.google.com/p/objectify-appengine/wiki/BestPractices
         ObjectifyService.register(Person.class);
+        ObjectifyService.register(AccountForConfirmation.class);
     }
 
     /**
@@ -85,6 +93,32 @@ public class PersonEndpoint {
     }
 
     @ApiMethod(
+            name = "confirmAccount",
+            path = "confirmAccount",
+            httpMethod = ApiMethod.HttpMethod.GET)
+    public void confirmAccount(@Named("id") String id, @Named("x") String x) throws BadRequestException {
+        try {
+            id = URLDecoder.decode(id, "UTF-8");
+            x = URLDecoder.decode(x,"UTF-8");
+            AccountForConfirmation account = ofy().load().type(AccountForConfirmation.class).id(id).now();
+            if (account != null) {
+                String hshDB = msgDigest(account.getId()+account.getRegisterDate());
+                if(x!="" && x.equals(hshDB)) {
+                    logger.info(String.format("account: %s has been activated",id));
+                    insertPerson(new Person(account));
+                    ofy().delete().type(AccountForConfirmation.class).id(id).now();
+                    logger.info("Deleted AccountForConfirmation with ID: " + id);
+                    return;
+                }
+            }
+            logger.info(String.format("accountForConfirmation: %s wasn't found",id));
+            throw new BadRequestException(String.format("Ошибка! Ваша учетная запись %s не активирована!",id));
+        } catch (UnsupportedEncodingException e) {
+            throw new BadRequestException(String.format("Ошибка! Ваша учетная запись %s не активирована!",id));
+        }
+    }
+
+    @ApiMethod(
             name = "authorizePerson",
             path = "authorizePerson",
             httpMethod = ApiMethod.HttpMethod.GET)
@@ -102,6 +136,45 @@ public class PersonEndpoint {
         throw new NotFoundException("AuthFailed@:Could not find Person with ID: " + id + " or such passowrd");
     }
 
+    @ApiMethod(
+            name = "registerAccount",
+            path = "AccountForConfirmation",
+            httpMethod = ApiMethod.HttpMethod.POST)
+    public AccountForConfirmation registerAccount(AccountForConfirmation account) throws BadRequestException {
+        // Typically in a RESTful API a POST does not have a known ID (assuming the ID is used in the resource path).
+        // You should validate that person._id has not been set. If the ID type is not supported by the
+        // Objectify ID generator, e.g. long or String, then you should generate the unique ID yourself prior to saving.
+        //
+        // If your client provides the ID then you should probably use PUT instead.
+        String subjectAccountConfirmation = "email confirmation SportConnector";
+        String msgBodyAccountConfirmation = "Для активации вашей учетной записи перейдите по ссылке: " +
+                "https://sportconnector-981.appspot.com/?id=%s&x=%s";
+        OAuth_2_0.check();
+        validateAccountProperties(account);
+        Person samePerson = ofy().load().type(Person.class).id(account.getId()).now();
+        if(samePerson!=null)
+        {
+            throw new BadRequestException("loginExists@:Person with the same login already exists");
+        }
+        String digPass = msgDigest(account.getPass());
+        if(digPass.equals(""))
+            throw new BadRequestException("Server error");
+        account.setPass(digPass);
+        account.setRegisterDate(Calendar.getInstance().getTime());
+        ofy().save().entity(account).now();
+        logger.info("Created AccountForConfirmation.");
+        account = ofy().load().entity(account).now();
+        try {
+            sendMail(account.getId(),subjectAccountConfirmation,String.format(msgBodyAccountConfirmation,
+                    URLEncoder.encode(account.getId(), "UTF-8"),URLEncoder.encode(
+                            msgDigest(account.getId()+account.getRegisterDate()), "UTF-8")));
+        } catch (UnsupportedEncodingException e) {
+            throw new BadRequestException("createConfirmMsg@: msg for confirmation account didn't send");
+        }
+        account.setPass("");
+        return account;
+    }
+
     /**
      * Inserts a new {@code Person}.
      */
@@ -115,21 +188,28 @@ public class PersonEndpoint {
         // Objectify ID generator, e.g. long or String, then you should generate the unique ID yourself prior to saving.
         //
         // If your client provides the ID then you should probably use PUT instead.
+        String digPass;
         OAuth_2_0.check();
+        validatePersonProperties(person);
+        digPass  = msgDigest(person.getPass());
+        if(digPass.equals("")) {
+            throw new BadRequestException("Server error");
+        }
+        person.setPass(digPass);
+        return insertPerson(person);
+    }
+
+    private Person insertPerson(Person person) throws BadRequestException {
         validatePersonProperties(person);
         Person samePerson = ofy().load().type(Person.class).id(person.getId()).now();
         if(samePerson!=null)
         {
             throw new BadRequestException("loginExists@:Person with the same login already exists");
         }
-        String digPass = msgDigest(person.getPass());
-        if(digPass.equals(""))
-            throw new BadRequestException("Server error");
-        person.setPass(digPass);
         ofy().save().entity(person).now();
         logger.info("Created Person.");
         Person personRes = ofy().load().entity(person).now();
-        setSpotCoachesPartners(personRes,null);
+        setSpotCoachesPartners(personRes, null);
         personRes.setPass("");
         return personRes;
     }
@@ -301,6 +381,18 @@ public class PersonEndpoint {
             throw new BadRequestException("typeNull@:Type property must be 'PARTNER' or 'COACH'");
     }
 
+    private void validateAccountProperties(AccountForConfirmation accountForConfirmation) throws BadRequestException
+    {
+        if(accountForConfirmation.getId()==null || accountForConfirmation.getId().equals(""))
+            throw new BadRequestException("idNull@:Id property must be initialized");
+        if(accountForConfirmation.getPass()==null || accountForConfirmation.getPass().equals(""))
+            throw new BadRequestException("passNull@:Password property must be initialized");
+        if(accountForConfirmation.getName()==null || accountForConfirmation.getName().equals(""))
+            throw new BadRequestException("nameNull@:Name property must be initialized");
+        if(accountForConfirmation.getType()==null)
+            throw new BadRequestException("typeNull@:Type property must be 'PARTNER' or 'COACH'");
+    }
+
     //update lists of partners and coaches of some spots since a person was updated
     private void setSpotCoachesPartners(Person person, Person oldPerson) throws BadRequestException
     {
@@ -348,5 +440,31 @@ public class PersonEndpoint {
         byte[]   bytesEncoded = Base64.encodeBase64(encryptedString.getBytes());
         encryptedString = new String(bytesEncoded);
         return encryptedString;
+    }
+
+
+
+    private void sendMail(String emailTo,String subject,String msgBody) {
+        // ...
+        Properties props = new Properties();
+        Session session = Session.getDefaultInstance(props, null);
+        String emailForm = "berezaman@gmail.com";
+
+        try {
+
+            Message msg = new MimeMessage(session);
+            msg.setFrom(new InternetAddress(emailForm, "SportConnector Admin"));
+            msg.addRecipient(Message.RecipientType.TO, new InternetAddress(emailTo, "Mr. User"));
+            msg.setSubject(subject);
+            msg.setText(msgBody);
+            Transport.send(msg);
+
+        } catch (AddressException e) {
+            // ...
+        }catch (UnsupportedEncodingException e) {
+            // ...
+        } catch (MessagingException e) {
+            // ...
+        }
     }
 }

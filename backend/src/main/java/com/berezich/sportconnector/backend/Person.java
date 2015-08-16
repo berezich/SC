@@ -42,7 +42,13 @@ public class Person {
         this.surname = surname;
         this.birthday = birthday;
     }
-
+    public Person(AccountForConfirmation account){
+        this.id = account.getId();
+        this.email = account.getId();
+        this.name = account.getName();
+        this.pass = account.getPass();
+        this.type = account.getType();
+    }
     public Person(Person anotherPerson){
         id = anotherPerson.getId();
         pass = anotherPerson.getPass();

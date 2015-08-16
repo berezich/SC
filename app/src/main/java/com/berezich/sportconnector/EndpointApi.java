@@ -3,12 +3,11 @@ package com.berezich.sportconnector;
 import android.app.Activity;
 import android.content.Context;
 import android.os.AsyncTask;
-import android.os.Environment;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.util.Pair;
 
 import com.berezich.sportconnector.backend.sportConnectorApi.SportConnectorApi;
+import com.berezich.sportconnector.backend.sportConnectorApi.model.AccountForConfirmation;
 import com.berezich.sportconnector.backend.sportConnectorApi.model.Person;
 import com.berezich.sportconnector.backend.sportConnectorApi.model.RegionInfo;
 import com.berezich.sportconnector.backend.sportConnectorApi.model.Spot;
@@ -408,7 +407,7 @@ public class EndpointApi {
         }
     }
 
-    public static class RegisterPersonAsyncTask extends AsyncTask<String, Void, Pair<Person,Exception> >{
+    public static class RegisterPersonAsyncTask extends AsyncTask<String, Void, Pair<AccountForConfirmation,Exception> >{
         private OnAction listener=null;
         private Context context = null;
         public RegisterPersonAsyncTask(Fragment fragment)
@@ -422,29 +421,28 @@ public class EndpointApi {
             }
         }
         @Override
-        protected Pair<Person,Exception> doInBackground(String... params) {
+        protected Pair<AccountForConfirmation,Exception> doInBackground(String... params) {
             String url;
-            Person person = new Person();
-            person.setId(params[0]);
-            person.setEmail(params[0]);
-            person.setName(params[1]);
-            person.setPass(params[2]);
-            person.setType(params[3]);
+            AccountForConfirmation account = new AccountForConfirmation();
+            account.setId(params[0]);
+            account.setName(params[1]);
+            account.setPass(params[2]);
+            account.setType(params[3]);
             try {
-                return new Pair<Person,Exception>(srvApi.insertPerson(person).execute(),null);
+                return new Pair<AccountForConfirmation,Exception>(srvApi.registerAccount(account).execute(),null);
             } catch (IOException e) {
-                return new Pair<Person,Exception>(null,e);
+                return new Pair<AccountForConfirmation,Exception>(null,e);
             }
         }
 
         @Override
-        protected void onPostExecute(Pair<Person,Exception> result) {
-            listener.onRegisterPersonAsyncTaskFinish(result);
+        protected void onPostExecute(Pair<AccountForConfirmation,Exception> result) {
+            listener.onRegisterAccountAsyncTaskFinish(result);
         }
 
         public static interface OnAction
         {
-            void onRegisterPersonAsyncTaskFinish(Pair<Person, Exception> result);
+            void onRegisterAccountAsyncTaskFinish(Pair<AccountForConfirmation, Exception> result);
         }
     }
 
