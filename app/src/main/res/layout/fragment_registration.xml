@@ -34,7 +34,7 @@
                 android:layout_marginBottom="@dimen/registration_propLine_topOffset">
 
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:textAppearance="?android:attr/textAppearanceMedium"
                     android:text="@string/registration_login"
@@ -42,7 +42,8 @@
                     android:layout_gravity="center_horizontal|left"
                     android:gravity="left"
                     android:paddingLeft="@dimen/registration_txtPropName_leftRightOffset"
-                    android:paddingRight="@dimen/registration_txtPropName_leftRightOffset" />
+                    android:paddingRight="@dimen/registration_txtPropName_leftRightOffset"
+                    android:layout_weight="2.4" />
 
                 <EditText
                     android:layout_width="match_parent"
@@ -50,10 +51,10 @@
                     android:textAppearance="?android:attr/textAppearanceMedium"
                     android:id="@+id/registration_email_value"
                     android:gravity="center_horizontal"
-                    android:paddingLeft="@dimen/registration_txtPropVal_leftRightOffset"
                     android:paddingRight="@dimen/registration_txtPropVal_leftRightOffset"
                     android:background="#00FFFFFF"
-                    android:inputType="textNoSuggestions" />
+                    android:inputType="textNoSuggestions"
+                    android:layout_weight="1" />
             </LinearLayout>
 
             <View
@@ -81,7 +82,7 @@
                 android:layout_marginBottom="@dimen/registration_propLine_topOffset">
 
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:textAppearance="?android:attr/textAppearanceMedium"
                     android:text="@string/registration_name"
@@ -89,7 +90,8 @@
                     android:layout_gravity="center_horizontal|left"
                     android:gravity="left"
                     android:paddingLeft="@dimen/registration_txtPropName_leftRightOffset"
-                    android:paddingRight="@dimen/registration_txtPropName_leftRightOffset" />
+                    android:paddingRight="@dimen/registration_txtPropName_leftRightOffset"
+                    android:layout_weight="2.4" />
 
                 <EditText
                     android:layout_width="match_parent"
@@ -97,11 +99,11 @@
                     android:textAppearance="?android:attr/textAppearanceMedium"
                     android:id="@+id/registration_name_value"
                     android:gravity="center_horizontal"
-                    android:paddingLeft="@dimen/registration_txtPropVal_leftRightOffset"
                     android:paddingRight="@dimen/registration_txtPropVal_leftRightOffset"
                     android:background="#00FFFFFF"
-                    android:password="true"
-                    android:inputType="textPersonName" />
+                    android:password="false"
+                    android:inputType="textPersonName"
+                    android:layout_weight="1" />
             </LinearLayout>
 
             <View
@@ -129,7 +131,7 @@
                 android:layout_marginBottom="@dimen/registration_propLine_topOffset">
 
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:textAppearance="?android:attr/textAppearanceMedium"
                     android:text="@string/registration_pass"
@@ -137,7 +139,8 @@
                     android:layout_gravity="center_horizontal|left"
                     android:gravity="left"
                     android:paddingLeft="@dimen/registration_txtPropName_leftRightOffset"
-                    android:paddingRight="@dimen/registration_txtPropName_leftRightOffset" />
+                    android:paddingRight="@dimen/registration_txtPropName_leftRightOffset"
+                    android:layout_weight="2.4" />
 
                 <EditText
                     android:layout_width="match_parent"
@@ -145,11 +148,11 @@
                     android:textAppearance="?android:attr/textAppearanceMedium"
                     android:id="@+id/registration_pass_value"
                     android:gravity="center_horizontal"
-                    android:paddingLeft="@dimen/registration_txtPropVal_leftRightOffset"
                     android:paddingRight="@dimen/registration_txtPropVal_leftRightOffset"
                     android:background="#00FFFFFF"
                     android:password="true"
-                    android:inputType="textPassword" />
+                    android:inputType="textPassword"
+                    android:layout_weight="1" />
             </LinearLayout>
 
             <View

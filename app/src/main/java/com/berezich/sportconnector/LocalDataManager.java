@@ -168,6 +168,7 @@ public class LocalDataManager {
 
     public static void setMyPersonInfo(Person myPersonInfo) {
         LocalDataManager.myPersonInfo = myPersonInfo;
+        initListsOfPerson(myPersonInfo);
     }
 
     public static AppPref getAppPref() {
@@ -418,6 +419,15 @@ public class LocalDataManager {
             spot.setPartnerLst(new ArrayList<String>());
         if(spot.getPictureLst()==null)
             spot.setPictureLst(new ArrayList<Picture>());
+    }
+    public static void initListsOfPerson(Person person)
+    {
+        if(person.getPictureLst()==null)
+            person.setPictureLst(new ArrayList<Picture>());
+        if(person.getMyFriends()==null)
+            person.setMyFriends(new ArrayList<String>());
+        if(person.getFavoriteSpotIdLst()==null)
+            person.setFavoriteSpotIdLst(new ArrayList<Long>());
     }
     public static boolean updateSpot(Long spotId, Spot spot,SQLiteDatabase db)
     {

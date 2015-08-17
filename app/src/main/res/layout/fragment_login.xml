@@ -34,7 +34,7 @@
                 android:layout_marginBottom="@dimen/login_propLine_topOffset">
 
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:textAppearance="?android:attr/textAppearanceMedium"
                     android:text="@string/login_login"
@@ -42,7 +42,8 @@
                     android:layout_gravity="center_horizontal|left"
                     android:gravity="left"
                     android:paddingLeft="@dimen/login_txtPropName_leftRightOffset"
-                    android:paddingRight="@dimen/login_txtPropName_leftRightOffset" />
+                    android:paddingRight="@dimen/login_txtPropName_leftRightOffset"
+                    android:layout_weight="2.4" />
 
                 <EditText
                     android:layout_width="match_parent"
@@ -50,10 +51,10 @@
                     android:textAppearance="?android:attr/textAppearanceMedium"
                     android:id="@+id/login_email_value"
                     android:gravity="center_horizontal"
-                    android:paddingLeft="@dimen/login_txtPropVal_leftRightOffset"
                     android:paddingRight="@dimen/login_txtPropVal_leftRightOffset"
                     android:background="#00FFFFFF"
-                    android:inputType="textEmailAddress" />
+                    android:inputType="textEmailAddress"
+                    android:layout_weight="1" />
             </LinearLayout>
 
             <View
@@ -82,7 +83,7 @@
                 android:layout_marginBottom="@dimen/login_propLine_topOffset">
 
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:textAppearance="?android:attr/textAppearanceMedium"
                     android:text="@string/login_pass"
@@ -90,7 +91,8 @@
                     android:layout_gravity="center_horizontal|left"
                     android:gravity="left"
                     android:paddingLeft="@dimen/login_txtPropName_leftRightOffset"
-                    android:paddingRight="@dimen/login_txtPropName_leftRightOffset" />
+                    android:paddingRight="@dimen/login_txtPropName_leftRightOffset"
+                    android:layout_weight="2.4" />
 
                 <EditText
                     android:layout_width="match_parent"
@@ -98,11 +100,11 @@
                     android:textAppearance="?android:attr/textAppearanceMedium"
                     android:id="@+id/login_pass_value"
                     android:gravity="center_horizontal"
-                    android:paddingLeft="@dimen/login_txtPropVal_leftRightOffset"
                     android:paddingRight="@dimen/login_txtPropVal_leftRightOffset"
                     android:background="#00FFFFFF"
                     android:password="true"
-                    android:inputType="textPassword" />
+                    android:inputType="textPassword"
+                    android:layout_weight="1" />
             </LinearLayout>
 
             <View

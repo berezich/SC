@@ -114,6 +114,8 @@ public class Person {
     }
 
     public List<Picture> getPictureLst() {
+        if(pictureLst==null)
+            pictureLst = new ArrayList<Picture>();
         return pictureLst;
     }
 
@@ -122,10 +124,14 @@ public class Person {
     }
 
     public List<Long> getFavoriteSpotIdLst() {
+        if(favoriteSpotIdLst==null)
+            favoriteSpotIdLst = new ArrayList<Long>();
         return favoriteSpotIdLst;
     }
 
     public List<String> getMyFriends() {
+        if(myFriends==null)
+            myFriends = new ArrayList<String>();
         return myFriends;
     }
 
