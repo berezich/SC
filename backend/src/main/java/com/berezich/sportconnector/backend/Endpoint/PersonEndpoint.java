@@ -63,6 +63,14 @@ public class PersonEndpoint {
     private static final Logger logger = Logger.getLogger(PersonEndpoint.class.getName());
 
     private static final int DEFAULT_LIST_LIMIT = 20;
+    private static final int DEFAULT_RATING = 1;
+    private static String ERROR_CONFIRM = "Ошибка! Ваша учетная запись %s не активирована!";
+    private static String ERROR_CONFIRM_ALREADY = "Ваша учетная запись %s уже активирована!";
+    private static String ERROR_CONFIRM_NOTFOUND = "Ошибка! Ваша учетная запись %s не найдена!";
+    private static String subjectAccountConfirmation = "registration SportConnector";
+    private static String msgBodyAccountConfirmation = "Для активации вашей учетной записи перейдите по ссылке: " +
+            "https://sportconnector-981.appspot.com/?id=%s&x=%s";
+
 
     static {
         // Typically you would register this inside an OfyServive wrapper. See: https://code.google.com/p/objectify-appengine/wiki/BestPractices
@@ -102,19 +110,27 @@ public class PersonEndpoint {
             x = URLDecoder.decode(x,"UTF-8");
             AccountForConfirmation account = ofy().load().type(AccountForConfirmation.class).id(id).now();
             if (account != null) {
-                String hshDB = msgDigest(account.getId()+account.getRegisterDate());
+                String hshDB = msgDigest(account.getId() + account.getRegisterDate());
                 if(x!="" && x.equals(hshDB)) {
-                    logger.info(String.format("account: %s has been activated",id));
-                    insertPerson(new Person(account));
+                    logger.info(String.format("account: %s has been activated", id));
+                    Person person = new Person(account);
+                    person.setRating(DEFAULT_RATING);
+                    insertPerson(person);
                     ofy().delete().type(AccountForConfirmation.class).id(id).now();
                     logger.info("Deleted AccountForConfirmation with ID: " + id);
                     return;
                 }
+                logger.info(String.format("AccountForConfirmation: %s hsh = %s doesn't match",id,x));
+                throw new BadRequestException(String.format(ERROR_CONFIRM,id));
             }
             logger.info(String.format("accountForConfirmation: %s wasn't found",id));
-            throw new BadRequestException(String.format("Ошибка! Ваша учетная запись %s не активирована!",id));
+            Person person = ofy().load().type(Person.class).id(id).now();
+            if(person!=null)
+                throw new BadRequestException(String.format(ERROR_CONFIRM_ALREADY,id));
+            else
+                throw new BadRequestException(String.format(ERROR_CONFIRM_NOTFOUND,id));
         } catch (UnsupportedEncodingException e) {
-            throw new BadRequestException(String.format("Ошибка! Ваша учетная запись %s не активирована!",id));
+            throw new BadRequestException(String.format(ERROR_CONFIRM,id));
         }
     }
 
@@ -146,9 +162,6 @@ public class PersonEndpoint {
         // Objectify ID generator, e.g. long or String, then you should generate the unique ID yourself prior to saving.
         //
         // If your client provides the ID then you should probably use PUT instead.
-        String subjectAccountConfirmation = "email confirmation SportConnector";
-        String msgBodyAccountConfirmation = "Для активации вашей учетной записи перейдите по ссылке: " +
-                "https://sportconnector-981.appspot.com/?id=%s&x=%s";
         OAuth_2_0.check();
         validateAccountProperties(account);
         Person samePerson = ofy().load().type(Person.class).id(account.getId()).now();
@@ -165,7 +178,11 @@ public class PersonEndpoint {
         logger.info("Created AccountForConfirmation.");
         account = ofy().load().entity(account).now();
         try {
-            sendMail(account.getId(),subjectAccountConfirmation,String.format(msgBodyAccountConfirmation,
+            //String subject = new String(subjectAccountConfirmation.getBytes("windows-1251"),"windows-1251");
+            String subject = subjectAccountConfirmation;
+            //String msgBody = new String(msgBodyAccountConfirmation.getBytes("windows-1251"),"UTF-8");
+            String msgBody =msgBodyAccountConfirmation;
+            sendMail(account.getId(),subject,String.format(msgBody,
                     URLEncoder.encode(account.getId(), "UTF-8"),URLEncoder.encode(
                             msgDigest(account.getId()+account.getRegisterDate()), "UTF-8")));
         } catch (UnsupportedEncodingException e) {
@@ -453,10 +470,12 @@ public class PersonEndpoint {
         try {
 
             Message msg = new MimeMessage(session);
+            //msg.setHeader("Content-Type", "text/plain; charset=UTF-8");
             msg.setFrom(new InternetAddress(emailForm, "SportConnector Admin"));
             msg.addRecipient(Message.RecipientType.TO, new InternetAddress(emailTo, "Mr. User"));
             msg.setSubject(subject);
             msg.setText(msgBody);
+
             Transport.send(msg);
 
         } catch (AddressException e) {

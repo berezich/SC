@@ -23,7 +23,6 @@ import com.berezich.sportconnector.MainActivity;
 import com.berezich.sportconnector.R;
 import com.berezich.sportconnector.UsefulFunctions;
 import com.berezich.sportconnector.backend.sportConnectorApi.model.AccountForConfirmation;
-import com.berezich.sportconnector.backend.sportConnectorApi.model.Person;
 
 import java.io.IOException;
 
@@ -38,7 +37,7 @@ public class RegistrationFragment extends Fragment implements EndpointApi.Regist
     View rootView;
     private AlertDialogFragment dialog;
 
-    LoginFragment.OnActionListenerLoginFragment listenerLoginFragment = null;
+    RegFragmentAction listenerCreateAccount = null;
 
     public RegistrationFragment() {
     }
@@ -69,9 +68,13 @@ public class RegistrationFragment extends Fragment implements EndpointApi.Regist
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-
+        Fragment targetFragment = getTargetFragment();
+        if(targetFragment==null) {
+            Log.e(TAG,"targetFragment should be set");
+            throw new NullPointerException(String.format("For fragment %s targetFragment should be set", getFragment().toString()));
+        }
         try {
-            listenerLoginFragment  =  (LoginFragment.OnActionListenerLoginFragment) activity;
+            listenerCreateAccount =  (LoginFragment) getTargetFragment();
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString() + " must implement OnActionListener for RegistrationFragment");
         }
@@ -130,7 +133,7 @@ public class RegistrationFragment extends Fragment implements EndpointApi.Regist
                 account.setPass(pass);
 
                 LocalDataManager.saveMyPersonInfoToPref(UsefulFunctions.createPerson(account), getActivity());
-                listenerLoginFragment.onAuthorized();
+                listenerCreateAccount.onCreateAccount(getString(R.string.registration_msgCreateAccount));
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -177,6 +180,11 @@ public class RegistrationFragment extends Fragment implements EndpointApi.Regist
 
     private Fragment getFragment(){
         return  this;
+    }
+
+    public interface RegFragmentAction
+    {
+        void onCreateAccount(String msgResult);
     }
 
 }

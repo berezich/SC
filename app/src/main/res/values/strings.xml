@@ -46,6 +46,7 @@
         <string name="registration_err_idNull">Введите ваш E-mail</string>
         <string name="registration_err_nameNull">Введите ваше имя</string>
         <string name="registration_err_passNull">Введите пароль</string>
+        <string name="registration_msgCreateAccount">Вам на почту отправлено письмо. Для завершения регистрации следуйте инструкциям, описанным в письме.</string>
     <!--registration_fragment end-->
 
     <!-- main_search_fragment -->

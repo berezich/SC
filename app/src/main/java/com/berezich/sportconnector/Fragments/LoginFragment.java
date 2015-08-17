@@ -32,7 +32,8 @@ import java.io.IOException;
  * Created by berezkin on 20.07.2015.
  */
 public class LoginFragment extends Fragment implements EndpointApi.AuthorizePersonAsyncTask.OnAction,
-        AlertDialogFragment.OnActionDialogListener {
+        AlertDialogFragment.OnActionDialogListener,
+        RegistrationFragment.RegFragmentAction {
 
     private static final String ARG_SECTION_NUMBER = "section_number";
     private final String TAG = "MyLog_LoginFragment";
@@ -148,8 +149,10 @@ public class LoginFragment extends Fragment implements EndpointApi.AuthorizePers
         @Override
         public void onClick(View v) {
             FragmentManager fragmentManager = getFragmentManager();
+            RegistrationFragment registrationFragment = new RegistrationFragment();
+            registrationFragment.setTargetFragment(getFragment(),0);
             if(fragmentManager!=null)
-                fragmentManager.beginTransaction().replace(R.id.container,new RegistrationFragment())
+                fragmentManager.beginTransaction().replace(R.id.container,registrationFragment)
                         .addToBackStack(null).commit();
         }
     }
@@ -215,6 +218,7 @@ public class LoginFragment extends Fragment implements EndpointApi.AuthorizePers
 
     }
 
+
     @Override
     public void onPositiveClick() {
         setVisibleProgressBar(false);
@@ -230,6 +234,19 @@ public class LoginFragment extends Fragment implements EndpointApi.AuthorizePers
         super.onCreateOptionsMenu(menu, inflater);
         menu.clear();
         ((MainActivity) getActivity()).getSupportActionBar().setTitle(R.string.login_fragmentTitle);
+    }
+
+    @Override
+    public void onCreateAccount(String msgResult) {
+        FragmentManager fragmentManager = getFragmentManager();
+        if(fragmentManager!=null)
+        {
+            fragmentManager.popBackStack();
+            dialog = AlertDialogFragment.newInstance("",msgResult, false, false);
+            dialog.setTargetFragment(this, 0);
+            FragmentManager ft = getFragmentManager();
+            dialog.show(getFragmentManager(), "");
+        }
     }
 
     private Fragment getFragment(){

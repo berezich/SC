@@ -162,12 +162,10 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
                         public void onItemSelected(AdapterView<?> parent, View view,
                                                    int position, long id) {
                             float rating = Float.valueOf(ratingArr[position]);
-                            if(tempMyPerson.getRating()!=rating) {
+                            if( tempMyPerson.getRating()!=rating) {
                                 tempMyPerson.setRating(rating);
                                 ImageButton imgBtn;
                                 if ((imgBtn = (ImageButton) rootView.findViewById(R.id.editProfile_btn_ratingInfo)) != null) {
-                                    //imgBtn.setFocusableInTouchMode(true);
-                                    //imgBtn.requestFocus();
                                     imgBtn.performClick();
                                 }
                             }
