@@ -45,10 +45,12 @@ function getParams () {
  * param {Object} greeting Greeting to print.
  */
 google.appengine.sportconnector.confirm.print = function(msg) {
-  var element = document.createElement('div');
-  element.classList.add('row');
+  var element = document.getElementById("msg");
   element.innerHTML = msg;
-  document.querySelector('#outputLog').appendChild(element);
+  element = document.getElementById("wait");
+    element.hidden = true;
+  element = document.getElementById("intent");
+  element.hidden = false;
 };
 
 /**
