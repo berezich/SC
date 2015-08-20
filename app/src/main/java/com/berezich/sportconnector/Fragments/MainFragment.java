@@ -151,18 +151,13 @@ public class MainFragment extends Fragment implements
 
     @Override
     public void onGetRegionAsyncTaskFinish(Pair<RegionInfo, Exception> result) {
-        String resText="";
         Exception exception = result.second;
-        RegionInfo regionInfo=result.first, localRegionInfo = null;
+        regionInfo=result.first;
         if(getActivity()==null)
         {
             Log.e(TAG,"current fragment isn't attached to activity");
             return;
         }
-        if(exception!=null)
-            resText = result.second.getMessage();
-        else if(regionInfo!=null)
-            resText = result.first.toString();
 
         if(exception!=null) {
             Log.e(TAG, "Error get regionInfo from server");
@@ -177,7 +172,7 @@ public class MainFragment extends Fragment implements
                                 //get list of updated spots and update existed
                                 /*Toast.makeText(getBaseContext(),"get list of updated spots and update existed",
                                         Toast.LENGTH_LONG).show();*/
-                                LocalDataManager.setRegionInfo(regionInfo);
+                                //LocalDataManager.setRegionInfo(regionInfo);
                                 SpotsData.loadSpotsFromCache();
                                 reqState = ReqState.REQ_UPDATE_SPOTS;
                                 new EndpointApi.GetUpdatedSpotListAsyncTask(this).execute(
@@ -194,7 +189,7 @@ public class MainFragment extends Fragment implements
                                 return;
                             }
                 //get all spots from server
-                LocalDataManager.setRegionInfo(regionInfo);
+                //LocalDataManager.setRegionInfo(regionInfo);
                 reqState = ReqState.REQ_SPOT_LIST;
                 new EndpointApi.GetSpotListAsyncTask(this).execute(regionId);
                 //Toast.makeText(getBaseContext(),"get all spots from server",Toast.LENGTH_LONG).show();
@@ -217,13 +212,16 @@ public class MainFragment extends Fragment implements
         if(error == null && spotLst!=null)
         {
             try {
-                LocalDataManager.saveRegionInfoToPref(activity);
                 SpotsData.saveSpotsToCache(spotLst);
+                LocalDataManager.setRegionInfo(regionInfo);
+                LocalDataManager.saveRegionInfoToPref(activity);
                 //Toast.makeText(getBaseContext(),"got all spots from server and saveRegionInfo to pref",Toast.LENGTH_LONG).show();
-                setVisibleLayouts(true,false);
+                setVisibleLayouts(true, false);
                 reqState = ReqState.EVERYTHING_LOADED;
             } catch (IOException e) {
                 e.printStackTrace();
+                ErrorVisualizer.showErrorAfterReq(getActivity().getBaseContext(),
+                        (FrameLayout) rootView.findViewById(R.id.main_frg_frameLayout), error, TAG);
             }
             return;
         }
@@ -235,6 +233,8 @@ public class MainFragment extends Fragment implements
         }
         else
             Log.e(TAG,"ListSpot = null");
+        ErrorVisualizer.showErrorAfterReq(getActivity().getBaseContext(),
+                (FrameLayout) rootView.findViewById(R.id.main_frg_frameLayout), error, TAG);
     }
 
     @Override
@@ -251,13 +251,16 @@ public class MainFragment extends Fragment implements
         if(error == null && updateSpotInfoLst!=null)
         {
             try {
-                LocalDataManager.saveRegionInfoToPref(activity);
                 SpotsData.setSpotUpdatesToCache(updateSpotInfoLst);
+                LocalDataManager.setRegionInfo(regionInfo);
+                LocalDataManager.saveRegionInfoToPref(activity);
                 //Toast.makeText(getBaseContext(), "got updated spots num=" + updateSpotInfoLst.size() + " from server and saveRegionInfo to pref", Toast.LENGTH_LONG).show();
                 reqState = ReqState.EVERYTHING_LOADED;
                 setVisibleLayouts(true,false);
             } catch (IOException e) {
                 e.printStackTrace();
+                ErrorVisualizer.showErrorAfterReq(getActivity().getBaseContext(),
+                        (FrameLayout) rootView.findViewById(R.id.main_frg_frameLayout), error, TAG);
             }
             return;
         }
@@ -269,6 +272,8 @@ public class MainFragment extends Fragment implements
         }
         else
             Log.e(TAG, "ListUpdatedSpot = null");
+        ErrorVisualizer.showErrorAfterReq(getActivity().getBaseContext(),
+                (FrameLayout)rootView.findViewById(R.id.main_frg_frameLayout),error,TAG);
     }
     private void setVisibleLayouts(boolean relativeLayout, boolean frameLayout)
     {
@@ -296,6 +301,7 @@ public class MainFragment extends Fragment implements
     {
         @Override
         public void onClick(View v) {
+
             reqExecute();
         }
     }

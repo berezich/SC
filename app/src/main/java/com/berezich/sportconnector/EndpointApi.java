@@ -79,7 +79,7 @@ public class EndpointApi {
                             httpTransport,androidJsonFactory , credential).setRootUrl(url);
                 } catch (GeneralSecurityException e) {
                     e.printStackTrace();
-                } catch (IOException e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
 
@@ -123,7 +123,7 @@ public class EndpointApi {
             inputStream.close();
 
             return f;
-        } catch (IOException e) {
+        } catch (Exception e) {
             // Logging exception
             e.printStackTrace();
         }
@@ -160,7 +160,7 @@ public class EndpointApi {
             regionId = params[0];
             try {
                 return new Pair<RegionInfo,Exception>(srvApi.getRegionInfo(regionId).execute(),null);
-            } catch (IOException e) {
+            } catch (Exception e) {
                 return new Pair<RegionInfo,Exception>(null,e);
             }
         }
@@ -196,7 +196,7 @@ public class EndpointApi {
             regionId = params[0];
             try {
                 return new Pair<List<Spot>,Exception>(srvApi.listSpotByRegId(regionId).execute().getItems(),null);
-            } catch (IOException e) {
+            } catch (Exception e) {
                 return new Pair<List<Spot>,Exception>(null,e);
             }
         }
@@ -235,7 +235,7 @@ public class EndpointApi {
             lastUpdate = params[0].second;
             try {
                 return new Pair<List<UpdateSpotInfo>,Exception>(srvApi.listUpdateSpotInfoByRegIdDate(lastUpdate, regionId).execute().getItems(),null);
-            } catch (IOException e) {
+            } catch (Exception e) {
                 return new Pair<List<UpdateSpotInfo>,Exception>(null,e);
             }
         }
@@ -251,7 +251,7 @@ public class EndpointApi {
         }
     }
 
-    public static class GetListPersonByIdLstAsyncTask extends AsyncTask< List<String>, Void, Pair<List<Person>,Exception> >{
+    public static class GetListPersonByIdLstAsyncTask extends AsyncTask< List<Long>, Void, Pair<List<Person>,Exception> >{
         private OnAction listener=null;
         private Context context = null;
         public GetListPersonByIdLstAsyncTask(Fragment fragment)
@@ -265,11 +265,11 @@ public class EndpointApi {
             }
         }
         @Override
-        protected Pair<List<Person>,Exception> doInBackground(List<String>... params) {
-            List<String> idLst = new ArrayList<String>(params[0]) ;
+        protected Pair<List<Person>,Exception> doInBackground(List<Long>... params) {
+            List<Long> idLst = new ArrayList<Long>(params[0]) ;
             try {
                 return new Pair<List<Person>,Exception>(srvApi.listPersonByIdLst(idLst).execute().getItems(),null);
-            } catch (IOException e) {
+            } catch (Exception e) {
                 return new Pair<List<Person>,Exception>(null,e);
             }
         }
@@ -305,7 +305,7 @@ public class EndpointApi {
             try {
                 updatedSpot = srvApi.updateSpot(spot.getId(),spot).execute();
                 return new Pair<Spot,Exception>(updatedSpot,null);
-            } catch (IOException e) {
+            } catch (Exception e) {
                 return new Pair<Spot,Exception>(null,e);
             }
         }
@@ -342,8 +342,11 @@ public class EndpointApi {
             String personType = params[1].second;
             if(spot!=null && person!=null)
             try {
-                srvApi.setSpotAsFavorite(person,spot,isFavorite,personType).execute();
+                srvApi.setSpotAsFavorite( Long.valueOf(person),spot,isFavorite,personType).execute();
             } catch (IOException e) {
+                return new Pair<Boolean,Exception>(isFavorite,e);
+            } catch (Exception e)
+            {
                 return new Pair<Boolean,Exception>(isFavorite,e);
             }
             return new Pair<Boolean,Exception>(isFavorite,null);
@@ -385,14 +388,14 @@ public class EndpointApi {
         }
         @Override
         protected Pair<Person,Exception> doInBackground(String... params) {
-            String personId,pass;
+            String email,pass;
             String url;
-            personId = params[0];
+            email = params[0];
             pass = params[1];
             try {
-                return new Pair<Person,Exception>(srvApi.authorizePerson(personId,pass).execute(),null);
-            } catch (IOException e) {
-                return new Pair<Person,Exception>(null,e);
+                return new Pair<Person,Exception>(srvApi.authorizePerson(email,pass).execute(),null);
+            } catch (Exception e) {
+                return new Pair<Person, Exception>(null, e);
             }
         }
 
@@ -424,13 +427,13 @@ public class EndpointApi {
         protected Pair<AccountForConfirmation,Exception> doInBackground(String... params) {
             String url;
             AccountForConfirmation account = new AccountForConfirmation();
-            account.setId(params[0]);
+            account.setEmail(params[0]);
             account.setName(params[1]);
             account.setPass(params[2]);
             account.setType(params[3]);
             try {
                 return new Pair<AccountForConfirmation,Exception>(srvApi.registerAccount(account).execute(),null);
-            } catch (IOException e) {
+            } catch (Exception e) {
                 return new Pair<AccountForConfirmation,Exception>(null,e);
             }
         }
@@ -466,7 +469,7 @@ public class EndpointApi {
             try {
                 updatedPerson = srvApi.updatePerson(person.getId(),person).execute();
                 return new Pair<Person,Exception>(updatedPerson,null);
-            } catch (IOException e) {
+            } catch (Exception e) {
                 return new Pair<Person,Exception>(null,e);
             }
         }

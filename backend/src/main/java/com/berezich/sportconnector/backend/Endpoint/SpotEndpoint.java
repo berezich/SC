@@ -139,7 +139,7 @@ public class SpotEndpoint {
             path = "spotSetAsFavorite",
             httpMethod = ApiMethod.HttpMethod.PUT)
     public void setAsFavorite(@Named("idSpot") Long idSpot,
-                              @Named("idPerson") String idPerson,
+                              @Named("idPerson") Long idPerson,
                               @Named("isFavorite") boolean isFavorite,
                               @Named("typePerson")Person.TYPE type) throws NotFoundException, BadRequestException {
         OAuth_2_0.check();
@@ -149,7 +149,7 @@ public class SpotEndpoint {
             throw new NotFoundException("Spot with id:" + idSpot + " not found");
         }
         oldSpot = new Spot(spot);
-        List<String> personLst = null;
+        List<Long> personLst = null;
         if(type == Person.TYPE.PARTNER)
             personLst = spot.getPartnerLst();
         else if(type == Person.TYPE.COACH)
@@ -177,11 +177,11 @@ public class SpotEndpoint {
     }
 
     @ApiResourceProperty(ignored = AnnotationBoolean.TRUE)
-    public void removePersonsFromSpots(@Named("lstSpotIds") List<Long> idLst, @Named("personType")Person.TYPE type,@Named("personId") String personId) throws BadRequestException{
+    public void removePersonsFromSpots(@Named("lstSpotIds") List<Long> idLst, @Named("personType")Person.TYPE type,@Named("personId") Long personId) throws BadRequestException{
         // TODO: You should validate your ID parameter against your resource's ID here.
         OAuth_2_0.check();
         Spot spot;
-        List<String> personLst;
+        List<Long> personLst;
         for (int i = 0; i < idLst.size(); i++) {
             Long id = idLst.get(i);
             try {
@@ -204,11 +204,11 @@ public class SpotEndpoint {
         }
     }
     @ApiResourceProperty(ignored = AnnotationBoolean.TRUE)
-    public void addPersonsToSpots(@Named("lstSpotIds") List<Long> idLst, @Named("personType")Person.TYPE type,@Named("personId") String personId) throws BadRequestException{
+    public void addPersonsToSpots(@Named("lstSpotIds") List<Long> idLst, @Named("personType")Person.TYPE type,@Named("personId") Long personId) throws BadRequestException{
         // TODO: You should validate your ID parameter against your resource's ID here.
         OAuth_2_0.check();
         Spot spot;
-        List<String> personLst;
+        List<Long> personLst;
         for (int i = 0; i < idLst.size(); i++) {
             Long id = idLst.get(i);
             try {
@@ -351,15 +351,15 @@ public class SpotEndpoint {
 
     private void setFavoritePersonsSpot(Spot spot, Spot oldSpot) throws BadRequestException
     {
-        List<String> addPersonLst = new ArrayList<String>();
-        List<String> removePersonLst = new ArrayList<String>();
-        List<String> newCoaches = spot.getCoachLst();
-        List<String> newPartners = spot.getPartnerLst();
-        List<String> oldCoaches;
-        List<String> oldPartners;
+        List<Long> addPersonLst = new ArrayList<Long>();
+        List<Long> removePersonLst = new ArrayList<Long>();
+        List<Long> newCoaches = spot.getCoachLst();
+        List<Long> newPartners = spot.getPartnerLst();
+        List<Long> oldCoaches;
+        List<Long> oldPartners;
 
-        List<String> oldies = new ArrayList<String>();
-        List<String> news = new ArrayList<String>();
+        List<Long> oldies = new ArrayList<Long>();
+        List<Long> news = new ArrayList<Long>();
 
         if (newCoaches != null)
             news.addAll(newCoaches);
@@ -376,9 +376,9 @@ public class SpotEndpoint {
                 oldies.addAll(oldPartners);
 
 
-            addPersonLst = new ArrayList<String>(news);
+            addPersonLst = new ArrayList<Long>(news);
             addPersonLst.removeAll(oldies);
-            removePersonLst = new ArrayList<String>(oldies);
+            removePersonLst = new ArrayList<Long>(oldies);
             removePersonLst.removeAll(news);
         }
         else

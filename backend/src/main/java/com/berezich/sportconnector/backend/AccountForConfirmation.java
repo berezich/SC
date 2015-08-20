@@ -2,6 +2,7 @@ package com.berezich.sportconnector.backend;
 
 import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
+import com.googlecode.objectify.annotation.Index;
 
 import java.util.Date;
 
@@ -11,7 +12,7 @@ import java.util.Date;
 @Entity
 public class AccountForConfirmation {
     @Id
-    private String id = null;
+    private String email;
     private String pass;
     private String name;
     private Person.TYPE type;
@@ -20,16 +21,16 @@ public class AccountForConfirmation {
     public AccountForConfirmation() {
     }
 
-    public AccountForConfirmation(String id, String pass, String name, Person.TYPE type,Date registerDate) {
-        this.id = id;
+    public AccountForConfirmation(String email, String pass, String name, Person.TYPE type,Date registerDate) {
+        this.email = email;
         this.pass = pass;
         this.name = name;
         this.type = type;
         this.registerDate = registerDate;
     }
 
-    public String getId() {
-        return id;
+    public String getEmail() {
+        return email;
     }
 
     public String getPass() {
@@ -48,16 +49,17 @@ public class AccountForConfirmation {
         return registerDate;
     }
 
-    public void setId(String id) {
-        this.id = id;
-    }
-
     public void setPass(String pass) {
         this.pass = pass;
     }
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public void setEmail(String  email)
+    {
+        this.email = email;
     }
 
     public void setType(Person.TYPE type) {

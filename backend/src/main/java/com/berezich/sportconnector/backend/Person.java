@@ -2,6 +2,7 @@ package com.berezich.sportconnector.backend;
 
 import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
+import com.googlecode.objectify.annotation.Index;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -15,11 +16,12 @@ public class Person {
     public enum TYPE{COACH,PARTNER};
     public enum SEX{MALE,FEMALE};
     @Id
-    private String id = null;
+    private Long id = null;
     private String pass;
     private String name;
     private String surname;
     private Date birthday;
+    @Index
     private String email;
     private String phone;
     private SEX sex;
@@ -43,8 +45,7 @@ public class Person {
         this.birthday = birthday;
     }
     public Person(AccountForConfirmation account){
-        this.id = account.getId();
-        this.email = account.getId();
+        this.email = account.getEmail();
         this.name = account.getName();
         this.pass = account.getPass();
         this.type = account.getType();
@@ -69,7 +70,7 @@ public class Person {
             myFriends = new ArrayList<>(anotherPerson.getMyFriends());
     }
 
-    public String getId() {
+    public Long getId() {
         return id;
     }
 
@@ -135,7 +136,7 @@ public class Person {
         return myFriends;
     }
 
-    public void setId(String id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

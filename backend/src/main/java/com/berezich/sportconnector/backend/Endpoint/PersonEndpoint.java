@@ -2,6 +2,7 @@ package com.berezich.sportconnector.backend.Endpoint;
 
 import com.berezich.sportconnector.backend.AccountForConfirmation;
 import com.berezich.sportconnector.backend.Person;
+import com.berezich.sportconnector.backend.UpdateSpotInfo;
 import com.google.api.server.spi.config.AnnotationBoolean;
 import com.google.api.server.spi.config.Api;
 import com.google.api.server.spi.config.ApiMethod;
@@ -110,7 +111,7 @@ public class PersonEndpoint {
             x = URLDecoder.decode(x,"UTF-8");
             AccountForConfirmation account = ofy().load().type(AccountForConfirmation.class).id(id).now();
             if (account != null) {
-                String hshDB = msgDigest(account.getId() + account.getRegisterDate());
+                String hshDB = msgDigest(account.getEmail() + account.getRegisterDate());
                 if(x!="" && x.equals(hshDB)) {
                     logger.info(String.format("account: %s has been activated", id));
                     Person person = new Person(account);
@@ -138,10 +139,14 @@ public class PersonEndpoint {
             name = "authorizePerson",
             path = "authorizePerson",
             httpMethod = ApiMethod.HttpMethod.GET)
-    public Person authorizePerson(@Named("id") String id, @Named("pass") String pass) throws NotFoundException,BadRequestException {
+    public Person authorizePerson(@Named("email") String email, @Named("pass") String pass) throws NotFoundException,BadRequestException {
         OAuth_2_0.check();
-        logger.info("Getting Person with ID: " + id);
-        Person person = ofy().load().type(Person.class).id(id).now();
+        logger.info("Getting Person with ID: " + email);
+        Person person = null;
+        Query<Person> query = ofy().load().type(Person.class).filter("email", email);
+        QueryResultIterator<Person> queryIterator = query.iterator();
+        if(queryIterator!=null && queryIterator.hasNext())
+            person = queryIterator.next();
         if (person != null) {
             String encPass = msgDigest(pass);
             if(encPass!="" && person.getPass().equals(encPass)) {
@@ -149,7 +154,7 @@ public class PersonEndpoint {
                 return person;
             }
         }
-        throw new NotFoundException("AuthFailed@:Could not find Person with ID: " + id + " or such passowrd");
+        throw new NotFoundException("AuthFailed@:Could not find Person with ID: " + email + " or such passowrd");
     }
 
     @ApiMethod(
@@ -164,8 +169,9 @@ public class PersonEndpoint {
         // If your client provides the ID then you should probably use PUT instead.
         OAuth_2_0.check();
         validateAccountProperties(account);
-        Person samePerson = ofy().load().type(Person.class).id(account.getId()).now();
-        if(samePerson!=null)
+        //Person samePerson = ofy().load().type(Person.class).id(account.getId()).now();
+        Query<Person> query = ofy().load().type(Person.class).filter("email", account.getEmail());
+        if(query!=null && query.count()>0)
         {
             throw new BadRequestException("loginExists@:Person with the same login already exists");
         }
@@ -182,9 +188,9 @@ public class PersonEndpoint {
             String subject = subjectAccountConfirmation;
             //String msgBody = new String(msgBodyAccountConfirmation.getBytes("windows-1251"),"UTF-8");
             String msgBody =msgBodyAccountConfirmation;
-            sendMail(account.getId(),subject,String.format(msgBody,
-                    URLEncoder.encode(account.getId(), "UTF-8"),URLEncoder.encode(
-                            msgDigest(account.getId()+account.getRegisterDate()), "UTF-8")));
+            sendMail(account.getEmail(),subject,String.format(msgBody,
+                    URLEncoder.encode(account.getEmail(), "UTF-8"), URLEncoder.encode(
+                            msgDigest(account.getEmail() + account.getRegisterDate()), "UTF-8")));
         } catch (UnsupportedEncodingException e) {
             throw new BadRequestException("createConfirmMsg@: msg for confirmation account didn't send");
         }
@@ -218,10 +224,11 @@ public class PersonEndpoint {
 
     private Person insertPerson(Person person) throws BadRequestException {
         validatePersonProperties(person);
-        Person samePerson = ofy().load().type(Person.class).id(person.getId()).now();
-        if(samePerson!=null)
-        {
-            throw new BadRequestException("loginExists@:Person with the same login already exists");
+        if(person.getId()!=null) {
+            Person samePerson = ofy().load().type(Person.class).id(person.getId()).now();
+            if (samePerson != null) {
+                throw new BadRequestException("loginExists@:Person with the same login already exists");
+            }
         }
         ofy().save().entity(person).now();
         logger.info("Created Person.");
@@ -244,7 +251,7 @@ public class PersonEndpoint {
             name = "updatePerson",
             path = "person/{id}",
             httpMethod = ApiMethod.HttpMethod.PUT)
-    public Person update(@Named("id") String id, Person person) throws NotFoundException, BadRequestException {
+    public Person update(@Named("id") Long id, Person person) throws NotFoundException, BadRequestException {
         // TODO: You should validate your ID parameter against your resource's ID here.
         OAuth_2_0.check();
         Person oldPerson = ofy().load().type(Person.class).id(id).now();
@@ -267,12 +274,12 @@ public class PersonEndpoint {
     }
 
     @ApiResourceProperty(ignored = AnnotationBoolean.TRUE)
-    public void addPersonsFavoriteSpot(@Named("lstPersonIds") List<String> idLst,@Named("spotId") Long spotId) throws BadRequestException{
+    public void addPersonsFavoriteSpot(@Named("lstPersonIds") List<Long> idLst,@Named("spotId") Long spotId) throws BadRequestException{
         // TODO: You should validate your ID parameter against your resource's ID here.
         OAuth_2_0.check();
         Person person;
         for (int i = 0; i < idLst.size(); i++) {
-            String id = idLst.get(i);
+            Long id = idLst.get(i);
             try {
                 checkExists(id);
                 person = ofy().load().type(Person.class).id(id).now();
@@ -289,12 +296,12 @@ public class PersonEndpoint {
 
 
     @ApiResourceProperty(ignored = AnnotationBoolean.TRUE)
-    public void removePersonsFavoriteSpot(@Named("lstPersonIds") List<String> idLst,@Named("spotId") Long spotId) throws BadRequestException{
+    public void removePersonsFavoriteSpot(@Named("lstPersonIds") List<Long> idLst,@Named("spotId") Long spotId) throws BadRequestException{
         // TODO: You should validate your ID parameter against your resource's ID here.
         OAuth_2_0.check();
         Person person;
         for (int i = 0; i < idLst.size(); i++) {
-            String id = idLst.get(i);
+            Long id = idLst.get(i);
             try {
                 checkExists(id);
                 person = ofy().load().type(Person.class).id(id).now();
@@ -320,7 +327,7 @@ public class PersonEndpoint {
             name = "removePerson",
             path = "person/{id}",
             httpMethod = ApiMethod.HttpMethod.DELETE)
-    public void remove(@Named("id") String id) throws NotFoundException,BadRequestException {
+    public void remove(@Named("id") Long id) throws NotFoundException,BadRequestException {
         OAuth_2_0.check();
         checkExists(id);
         ofy().delete().type(Person.class).id(id).now();
@@ -357,14 +364,14 @@ public class PersonEndpoint {
             name = "listPersonByIdLst",
             path = "personByIdLst",
             httpMethod = ApiMethod.HttpMethod.GET)
-    public CollectionResponse<Person> listByIdLst(@Named("idLst") ArrayList<String>idLst) throws BadRequestException{
+    public CollectionResponse<Person> listByIdLst(@Named("idLst") ArrayList<Long>idLst) throws BadRequestException{
         OAuth_2_0.check();
-        Map<String,Person> personMap = ofy().load().type(Person.class).ids(idLst);
+        Map<Long,Person> personMap = ofy().load().type(Person.class).ids(idLst);
         if(personMap==null)
             return null;
-        Set<String> keys = personMap.keySet();
+        Set<Long> keys = personMap.keySet();
         Person person;
-        for (String key : keys)
+        for (Long key : keys)
         {
             person = personMap.get(key);
             person.setPass("");
@@ -373,7 +380,7 @@ public class PersonEndpoint {
         return CollectionResponse.<Person>builder().setItems(personMap.values()).build();
     }
 
-    private void checkExists(String id) throws NotFoundException {
+    private void checkExists(Long id) throws NotFoundException {
         try {
             ofy().load().type(Person.class).id(id).safe();
         } catch (com.googlecode.objectify.NotFoundException e) {
@@ -382,8 +389,8 @@ public class PersonEndpoint {
     }
     private void validatePersonProperties(Person person) throws BadRequestException
     {
-        if(person.getId()==null || person.getId().equals(""))
-            throw new BadRequestException("idNull@:Id property must be initialized");
+        if(person.getEmail()==null || person.getEmail().equals(""))
+            throw new BadRequestException("emailNull@:email property must be initialized");
         if(person.getPass()==null || person.getPass().equals(""))
             throw new BadRequestException("passNull@:Password property must be initialized");
         if(person.getName()==null || person.getName().equals(""))
@@ -400,8 +407,8 @@ public class PersonEndpoint {
 
     private void validateAccountProperties(AccountForConfirmation accountForConfirmation) throws BadRequestException
     {
-        if(accountForConfirmation.getId()==null || accountForConfirmation.getId().equals(""))
-            throw new BadRequestException("idNull@:Id property must be initialized");
+        if(accountForConfirmation.getEmail()==null || accountForConfirmation.getEmail().equals(""))
+            throw new BadRequestException("idNull@:Email property must be initialized");
         if(accountForConfirmation.getPass()==null || accountForConfirmation.getPass().equals(""))
             throw new BadRequestException("passNull@:Password property must be initialized");
         if(accountForConfirmation.getName()==null || accountForConfirmation.getName().equals(""))

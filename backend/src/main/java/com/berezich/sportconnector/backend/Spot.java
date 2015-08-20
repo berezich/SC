@@ -22,13 +22,13 @@ public class Spot {
     String contact;
     float rating;
     String description;
-    List<String> partnerLst;
-    List<String> coachLst;
+    List<Long> partnerLst;
+    List<Long> coachLst;
     List<Picture> pictureLst;
     public Spot(){
         pictureLst = new ArrayList<Picture>();
-        coachLst = new ArrayList<String>();
-        partnerLst = new ArrayList<String>();
+        coachLst = new ArrayList<Long>();
+        partnerLst = new ArrayList<Long>();
     }
     public Spot(Spot anotherSpot)
     {
@@ -45,16 +45,16 @@ public class Spot {
         workHours = anotherSpot.getWorkHours();
         contact = anotherSpot.getContact();
         description = anotherSpot.getDescription();
-        List<String> longList;
+        List<Long> longList;
         if((longList = anotherSpot.getPartnerLst())!=null)
-            partnerLst = new ArrayList<String>(longList);
+            partnerLst = new ArrayList<Long>(longList);
         else
-            partnerLst = new ArrayList<String>();
+            partnerLst = new ArrayList<Long>();
 
         if((longList = anotherSpot.getCoachLst())!=null)
-            coachLst = new ArrayList<String>(longList);
+            coachLst = new ArrayList<Long>(longList);
         else
-            coachLst = new ArrayList<String>();
+            coachLst = new ArrayList<Long>();
         List<Picture> pictureLst1;
 
         if((pictureLst1 = anotherSpot.getPictureLst())!=null)
@@ -104,17 +104,17 @@ public class Spot {
         return rating;
     }
 
-    public List<String> getPartnerLst() {
+    public List<Long> getPartnerLst() {
 
         if(partnerLst==null)
-            partnerLst = new ArrayList<String>();
+            partnerLst = new ArrayList<Long>();
         return partnerLst;
     }
 
-    public List<String> getCoachLst() {
+    public List<Long> getCoachLst() {
 
         if(coachLst==null)
-            coachLst = new ArrayList<String>();
+            coachLst = new ArrayList<Long>();
         return coachLst;
     }
 
@@ -160,11 +160,11 @@ public class Spot {
         this.rating = rating;
     }
 
-    public void setPartnerLst(List<String> _partnerLst) {
+    public void setPartnerLst(List<Long> _partnerLst) {
         this.partnerLst = _partnerLst;
     }
 
-    public void setCoachLst(List<String> _couchLst) {
+    public void setCoachLst(List<Long> _couchLst) {
         this.coachLst = _couchLst;
     }
 

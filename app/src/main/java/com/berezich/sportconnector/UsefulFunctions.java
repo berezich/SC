@@ -50,8 +50,7 @@ public class UsefulFunctions {
     public static Person createPerson(AccountForConfirmation account)
     {
         Person person = new Person();
-        person.setId(account.getId());
-        person.setEmail(account.getId());
+        person.setEmail(account.getEmail());
         person.setName(account.getName());
         person.setPass(account.getPass());
         person.setType(account.getType());

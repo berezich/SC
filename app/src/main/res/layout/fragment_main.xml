@@ -113,7 +113,8 @@
                 android:background="@drawable/text_view_backgr_selector"
                 android:textColor="@color/txt_view_color_selector"
                 android:textSize="18dp"
-                android:layout_marginTop="10dp" />
+                android:layout_marginTop="10dp"
+                android:enabled="true" />
 
         </LinearLayout>
     </FrameLayout>

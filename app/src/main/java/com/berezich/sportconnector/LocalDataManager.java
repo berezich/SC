@@ -132,9 +132,6 @@ public class LocalDataManager {
             return false;
         }
 
-        /*myPersonInfo = new Person();
-        myPersonInfo.setType("PARTNER");
-        myPersonInfo.setId(new Long("5705241014042624"));*/
         Log.d(TAG, "myPersonInfo was fetched from Preferences");
         Log.d(TAG, "myPersonInfo: " + personInfoStr);
 
@@ -237,7 +234,7 @@ public class LocalDataManager {
     {
         boolean isFavorite = false;
         String myType = myPersonInfo.getType();
-        String myPersonId = myPersonInfo.getId();
+        Long myPersonId = myPersonInfo.getId();
         if( myType.equals("COACH"))
             isFavorite = spot.getCoachLst().contains(myPersonId);
         else if(myType.equals("PARTNER"))
@@ -414,9 +411,9 @@ public class LocalDataManager {
     public static void initListsOfSpot(Spot spot)
     {
         if(spot.getCoachLst()==null)
-            spot.setCoachLst(new ArrayList<String>());
+            spot.setCoachLst(new ArrayList<Long>());
         if(spot.getPartnerLst()==null)
-            spot.setPartnerLst(new ArrayList<String>());
+            spot.setPartnerLst(new ArrayList<Long>());
         if(spot.getPictureLst()==null)
             spot.setPictureLst(new ArrayList<Picture>());
     }

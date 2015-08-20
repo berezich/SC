@@ -86,14 +86,14 @@ public class LoginFragment extends Fragment implements EndpointApi.AuthorizePers
             if(( myPersonInfo = LocalDataManager.getMyPersonInfo())!=null) {
 
                 if ((editTxt = (EditText) rootView.findViewById(R.id.login_email_value)) != null) {
-                    editTxt.setText(myPersonInfo.getId());
+                    editTxt.setText(myPersonInfo.getEmail());
                 }
                 if ((editTxt = (EditText) rootView.findViewById(R.id.login_pass_value)) != null) {
                     editTxt.setText(myPersonInfo.getPass());
 
                     if ((appPref = LocalDataManager.getAppPref()) != null) {
                         if ((appPref != null) && appPref.isAutoLogin()) {
-                            new EndpointApi.AuthorizePersonAsyncTask(this).execute(myPersonInfo.getId(), myPersonInfo.getPass());
+                            new EndpointApi.AuthorizePersonAsyncTask(this).execute(myPersonInfo.getId().toString(), myPersonInfo.getPass());
                         }
 
                     }
