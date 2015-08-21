@@ -18,6 +18,7 @@ import com.googlecode.objectify.ObjectifyService;
 import com.googlecode.objectify.cmd.Query;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
@@ -177,7 +178,7 @@ public class SpotEndpoint {
     }
 
     @ApiResourceProperty(ignored = AnnotationBoolean.TRUE)
-    public void removePersonsFromSpots(@Named("lstSpotIds") List<Long> idLst, @Named("personType")Person.TYPE type,@Named("personId") Long personId) throws BadRequestException{
+    public void removePersonFromSpots(@Named("lstSpotIds") List<Long> idLst, @Named("personType") Person.TYPE type, @Named("personId") Long personId) throws BadRequestException{
         // TODO: You should validate your ID parameter against your resource's ID here.
         OAuth_2_0.check();
         Spot spot;
@@ -245,6 +246,13 @@ public class SpotEndpoint {
     public void remove(@Named("id") Long id) throws NotFoundException,BadRequestException {
         OAuth_2_0.check();
         checkExists(id);
+        Spot spot = ofy().load().type(Spot.class).id(id).now();
+        if(spot!=null)
+            new PersonEndpoint().removePersonsFavoriteSpot(spot.getCoachLst().addAll(spot.getPartnerLst()), spot.getId());
+        UpdateSpotInfo updateSpotInfo = ofy().load().type(UpdateSpotInfo.class).id(id).now();
+        if(updateSpotInfo!=null)
+            updateSpotInfo.setUpdateDate(Calendar.getInstance().getTime());
+
         ofy().delete().type(Spot.class).id(id).now();
         logger.info("Deleted Spot with ID: " + id);
     }

@@ -35,7 +35,7 @@ public class LocalDataManager {
     private static final String APP_PREF_KEY = "APP_PREF";
     private static final String SPOT_TABLE_NAME = "spotTable";
     private static final String DB_NAME = "sportConnectorDB";
-    private static final int DB_VERSION = 2;
+    private static final int DB_VERSION = 3;
     private static DBHelper dbHelper = null;
     private static Context context = null;
     private static Activity activity = null;
@@ -259,7 +259,7 @@ public class LocalDataManager {
 
         @Override
         public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-            if (oldVersion == 1 && newVersion == 2)
+            if (oldVersion != newVersion)
             {
                 db.beginTransaction();
                 try{
@@ -458,7 +458,13 @@ public class LocalDataManager {
                 }
 
             } else {
-                db.delete(SPOT_TABLE_NAME, "spotId = " + spotId, null);
+                try {
+                    db.delete(SPOT_TABLE_NAME, "spotId = " + spotId, null);
+                }
+                catch (Exception ex)
+                {
+                    Log.e(TAG,String.format("failed deleting spotInfo id = %d form SQL_DB",spotId));
+                }
                 Log.d(TAG, "Spot(id:" + spotId + ")was deleted from" + SPOT_TABLE_NAME + " table");
             }
         }

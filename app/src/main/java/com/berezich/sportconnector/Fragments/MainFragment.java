@@ -110,6 +110,7 @@ public class MainFragment extends Fragment implements
     public void onResume()
     {
         super.onResume();
+        Log.d(TAG, "onResume reqState = " + reqState);
         if(reqState==ReqState.EVERYTHING_LOADED)
             setVisibleLayouts(true,false);
         else {
@@ -162,40 +163,39 @@ public class MainFragment extends Fragment implements
         if(exception!=null) {
             Log.e(TAG, "Error get regionInfo from server");
             ErrorVisualizer.showErrorAfterReq(activity.getBaseContext(), (FrameLayout) rootView.findViewById(R.id.main_frg_frameLayout), exception, TAG);
-            //Toast.makeText(getBaseContext(), resText, Toast.LENGTH_LONG).show();
         }
         else if (regionInfo!=null)
         {
-                    if ((localRegionInfo = LocalDataManager.getRegionInfo()) != null)
-                        if (localRegionInfo.getVersion().equals(regionInfo.getVersion()))
-                            if (localRegionInfo.getLastSpotUpdate().getValue() - regionInfo.getLastSpotUpdate().getValue()<0) {
-                                //get list of updated spots and update existed
-                                /*Toast.makeText(getBaseContext(),"get list of updated spots and update existed",
-                                        Toast.LENGTH_LONG).show();*/
-                                //LocalDataManager.setRegionInfo(regionInfo);
-                                SpotsData.loadSpotsFromCache();
-                                reqState = ReqState.REQ_UPDATE_SPOTS;
-                                new EndpointApi.GetUpdatedSpotListAsyncTask(this).execute(
-                                        new Pair<Long, DateTime>(regionInfo.getId(), localRegionInfo.getLastSpotUpdate()));
-                                return;
-                            }
-                            else {
-                                //we have actual spot information
-                                //Toast.makeText(getBaseContext(),"we have actual spot information",Toast.LENGTH_LONG).show();
-                                SpotsData.loadSpotsFromCache();
-                                //Toast.makeText(getBaseContext(), SpotsData.get_allSpots().toString(), Toast.LENGTH_LONG).show();
-                                setVisibleLayouts(true,false);
-                                reqState = ReqState.EVERYTHING_LOADED;
-                                return;
-                            }
-                //get all spots from server
-                //LocalDataManager.setRegionInfo(regionInfo);
-                reqState = ReqState.REQ_SPOT_LIST;
-                new EndpointApi.GetSpotListAsyncTask(this).execute(regionId);
-                //Toast.makeText(getBaseContext(),"get all spots from server",Toast.LENGTH_LONG).show();
-
-
+            Log.d(TAG,String.format("regionInfo load from server\n%s",regionInfo.toString()));
+            if ((localRegionInfo = LocalDataManager.getRegionInfo()) != null) {
+                Log.d(TAG, String.format("localRegionInfo: %s", localRegionInfo.toString()));
+                if (localRegionInfo.getVersion().equals(regionInfo.getVersion())) {
+                    SpotsData.loadSpotsFromCache();
+                    if (localRegionInfo.getLastSpotUpdate().getValue() - regionInfo.getLastSpotUpdate().getValue() < 0) {
+                        Log.d(TAG, "Get list of updated spots and update existed");
+                        //LocalDataManager.setRegionInfo(regionInfo);
+                        reqState = ReqState.REQ_UPDATE_SPOTS;
+                        Log.d(TAG, "reqState = " + reqState);
+                        new EndpointApi.GetUpdatedSpotListAsyncTask(this).execute(
+                                new Pair<Long, DateTime>(regionInfo.getId(), localRegionInfo.getLastSpotUpdate()));
+                        return;
+                    } else {
+                        Log.d(TAG, "Actual spot information");
+                        setVisibleLayouts(true, false);
+                        reqState = ReqState.EVERYTHING_LOADED;
+                        Log.d(TAG, "reqState = " + reqState);
+                        return;
+                    }
+                }
+            }
+            Log.d(TAG, "get all spots from server");
+            //LocalDataManager.setRegionInfo(regionInfo);
+            reqState = ReqState.REQ_SPOT_LIST;
+            Log.d(TAG, "reqState = " + reqState);
+            new EndpointApi.GetSpotListAsyncTask(this).execute(regionId);
         }
+        else
+            Log.e(TAG,"regionInfo from server == null");
     }
 
     @Override
@@ -212,26 +212,23 @@ public class MainFragment extends Fragment implements
         if(error == null && spotLst!=null)
         {
             try {
+                Log.d(TAG,String.format("got all spots (%s items) from server",spotLst.size()));
                 SpotsData.saveSpotsToCache(spotLst);
+                Log.d(TAG, "all spots saved to cache");
                 LocalDataManager.setRegionInfo(regionInfo);
                 LocalDataManager.saveRegionInfoToPref(activity);
-                //Toast.makeText(getBaseContext(),"got all spots from server and saveRegionInfo to pref",Toast.LENGTH_LONG).show();
+                Log.d(TAG, "updated regionInfo saved to cache");
                 setVisibleLayouts(true, false);
                 reqState = ReqState.EVERYTHING_LOADED;
+                Log.d(TAG, "reqState = " + reqState);
             } catch (IOException e) {
-                e.printStackTrace();
                 ErrorVisualizer.showErrorAfterReq(getActivity().getBaseContext(),
                         (FrameLayout) rootView.findViewById(R.id.main_frg_frameLayout), error, TAG);
             }
             return;
         }
         Log.e(TAG, "Error get ListSpot from server");
-        if(error!=null)
-        {
-            Log.e(TAG,error.getMessage());
-            error.printStackTrace();
-        }
-        else
+        if(error==null)
             Log.e(TAG,"ListSpot = null");
         ErrorVisualizer.showErrorAfterReq(getActivity().getBaseContext(),
                 (FrameLayout) rootView.findViewById(R.id.main_frg_frameLayout), error, TAG);
@@ -251,26 +248,23 @@ public class MainFragment extends Fragment implements
         if(error == null && updateSpotInfoLst!=null)
         {
             try {
+                Log.d(TAG, String.format("got updateSpotList (%d items)from server",updateSpotInfoLst.size()));
                 SpotsData.setSpotUpdatesToCache(updateSpotInfoLst);
+                Log.d(TAG, "updated spots saved to cache");
                 LocalDataManager.setRegionInfo(regionInfo);
                 LocalDataManager.saveRegionInfoToPref(activity);
-                //Toast.makeText(getBaseContext(), "got updated spots num=" + updateSpotInfoLst.size() + " from server and saveRegionInfo to pref", Toast.LENGTH_LONG).show();
+                Log.d(TAG, "updated regionInfo saved to cache");
                 reqState = ReqState.EVERYTHING_LOADED;
+                Log.d(TAG, "reqState = " + reqState);
                 setVisibleLayouts(true,false);
             } catch (IOException e) {
-                e.printStackTrace();
                 ErrorVisualizer.showErrorAfterReq(getActivity().getBaseContext(),
                         (FrameLayout) rootView.findViewById(R.id.main_frg_frameLayout), error, TAG);
             }
             return;
         }
         Log.e(TAG, "Error get updated ListSpot from server");
-        if(error!=null)
-        {
-            Log.e(TAG,error.getMessage());
-            error.printStackTrace();
-        }
-        else
+        if(error==null)
             Log.e(TAG, "ListUpdatedSpot = null");
         ErrorVisualizer.showErrorAfterReq(getActivity().getBaseContext(),
                 (FrameLayout)rootView.findViewById(R.id.main_frg_frameLayout),error,TAG);

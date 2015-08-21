@@ -2,7 +2,6 @@ package com.berezich.sportconnector.backend.Endpoint;
 
 import com.berezich.sportconnector.backend.AccountForConfirmation;
 import com.berezich.sportconnector.backend.Person;
-import com.berezich.sportconnector.backend.UpdateSpotInfo;
 import com.google.api.server.spi.config.AnnotationBoolean;
 import com.google.api.server.spi.config.Api;
 import com.google.api.server.spi.config.ApiMethod;
@@ -300,20 +299,21 @@ public class PersonEndpoint {
         // TODO: You should validate your ID parameter against your resource's ID here.
         OAuth_2_0.check();
         Person person;
-        for (int i = 0; i < idLst.size(); i++) {
-            Long id = idLst.get(i);
-            try {
-                checkExists(id);
-                person = ofy().load().type(Person.class).id(id).now();
-                if(person.getFavoriteSpotIdLst().remove(spotId)) {
-                    ofy().save().entity(person).now();
-                    logger.info("Person with id:" + id + " add favorite spot id:" + spotId);
+        if(idLst!=null)
+            for (int i = 0; i < idLst.size(); i++) {
+                Long id = idLst.get(i);
+                try {
+                    checkExists(id);
+                    person = ofy().load().type(Person.class).id(id).now();
+                    if(person.getFavoriteSpotIdLst().remove(spotId)) {
+                        ofy().save().entity(person).now();
+                        logger.info("Person with id:" + id + " add favorite spot id:" + spotId);
+                    }
+                } catch (NotFoundException e) {
+                    e.printStackTrace();
+                    logger.info("Person with id:" + id + " not found to add favorite spot id:"+ spotId);
                 }
-            } catch (NotFoundException e) {
-                e.printStackTrace();
-                logger.info("Person with id:" + id + " not found to add favorite spot id:"+ spotId);
             }
-        }
     }
 
     /**
@@ -330,6 +330,10 @@ public class PersonEndpoint {
     public void remove(@Named("id") Long id) throws NotFoundException,BadRequestException {
         OAuth_2_0.check();
         checkExists(id);
+        Person person = ofy().load().type(Person.class).id(id).now();
+        if(person!=null) {
+            new SpotEndpoint().removePersonFromSpots(person.getFavoriteSpotIdLst(), person.getType(), id);
+        }
         ofy().delete().type(Person.class).id(id).now();
         logger.info("Deleted Person with ID: " + id);
     }
@@ -426,11 +430,22 @@ public class PersonEndpoint {
         List<Long> oldies = new ArrayList<Long>();
         List<Long> news = new ArrayList<Long>();
 
+        Long id = null;
+        Person.TYPE type = null;
+
+        if(person!=null) {
+            id = person.getId();
+            type = person.getType();
+        }
+
+
         if (person.getFavoriteSpotIdLst() != null)
             news.addAll(person.getFavoriteSpotIdLst());
 
 
         if(oldPerson !=null) {
+            id = oldPerson.getId();
+            type = oldPerson.getType();
             if (oldPerson.getFavoriteSpotIdLst() != null)
                 oldies.addAll(oldPerson.getFavoriteSpotIdLst());
 
@@ -442,11 +457,15 @@ public class PersonEndpoint {
         else
             addSpotLst = news;
 
-        if(addSpotLst.size()>0)
-            new SpotEndpoint().addPersonsToSpots(addSpotLst, person.getType(), person.getId());
+        if(id!=null) {
+            if (addSpotLst.size() > 0)
+                new SpotEndpoint().addPersonsToSpots(addSpotLst, type, id);
 
-        if(removeSpotLst.size()>0)
-            new SpotEndpoint().removePersonsFromSpots(removeSpotLst, person.getType(), person.getId());
+            if (removeSpotLst.size() > 0)
+                new SpotEndpoint().removePersonFromSpots(removeSpotLst, type, id);
+        }
+        else
+            new BadRequestException("setSpotCoachesPartners person && oldPerson == null ");
     }
     private String msgDigest(String stringToEncrypt)
     {
