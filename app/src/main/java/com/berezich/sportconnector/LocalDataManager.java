@@ -459,13 +459,13 @@ public class LocalDataManager {
 
             } else {
                 try {
-                    db.delete(SPOT_TABLE_NAME, "spotId = " + spotId, null);
+                    db.delete(SPOT_TABLE_NAME, "id = " + spotId, null);
+                    Log.d(TAG, "Spot(id:" + spotId + ")was deleted from" + SPOT_TABLE_NAME + " table");
                 }
                 catch (Exception ex)
                 {
                     Log.e(TAG,String.format("failed deleting spotInfo id = %d form SQL_DB",spotId));
                 }
-                Log.d(TAG, "Spot(id:" + spotId + ")was deleted from" + SPOT_TABLE_NAME + " table");
             }
         }
         if(needCloseDB)

@@ -247,12 +247,24 @@ public class SpotEndpoint {
         OAuth_2_0.check();
         checkExists(id);
         Spot spot = ofy().load().type(Spot.class).id(id).now();
-        if(spot!=null)
-            new PersonEndpoint().removePersonsFavoriteSpot(spot.getCoachLst().addAll(spot.getPartnerLst()), spot.getId());
+        if(spot!=null) {
+            ArrayList<Long> personLst = new ArrayList<>();
+            if(spot.getCoachLst()!=null)
+                personLst.addAll(spot.getCoachLst());
+            if(spot.getPartnerLst()!=null)
+                personLst.addAll(spot.getPartnerLst());
+            new PersonEndpoint().removePersonsFavoriteSpot(personLst, spot.getId());
+        }
         UpdateSpotInfo updateSpotInfo = ofy().load().type(UpdateSpotInfo.class).id(id).now();
-        if(updateSpotInfo!=null)
+        if(updateSpotInfo!=null) {
             updateSpotInfo.setUpdateDate(Calendar.getInstance().getTime());
-
+            ofy().save().entity(updateSpotInfo).now();
+            RegionInfo regionInfo = ofy().load().type(RegionInfo.class).id(updateSpotInfo.getRegionId()).now();
+            if(regionInfo!=null) {
+                regionInfo.setLastSpotUpdate(Calendar.getInstance().getTime());
+                ofy().save().entity(regionInfo);
+            }
+        }
         ofy().delete().type(Spot.class).id(id).now();
         logger.info("Deleted Spot with ID: " + id);
     }
