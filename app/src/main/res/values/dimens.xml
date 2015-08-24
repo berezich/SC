@@ -44,6 +44,12 @@
             <dimen name="changePass_bottomOffset">5dp</dimen>
             <dimen name="changePass_btn_topOffset">5dp</dimen>
         <!-- changePass_dialog-->
+        <!-- changePass_dialog-->
+            <dimen name="changeEmail_leftRightOffset">15dp</dimen>
+            <dimen name="changeEmail_topOffset">15dp</dimen>
+            <dimen name="changeEmail_bottomOffset">5dp</dimen>
+            <dimen name="changeEmail_btn_topOffset">5dp</dimen>
+        <!-- changePass_dialog-->
     <!-- fragment_editProfile-->
 
     <!-- fragment_test_question-->

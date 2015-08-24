@@ -63,7 +63,7 @@ public class PersonEndpoint {
     private static final Logger logger = Logger.getLogger(PersonEndpoint.class.getName());
 
     private static final int DEFAULT_LIST_LIMIT = 20;
-    private static final int DEFAULT_RATING = 1;
+    private static final float MIN_RATING = 1;
     private static String ERROR_CONFIRM = "Ошибка! Ваша учетная запись %s не активирована!";
     private static String ERROR_CONFIRM_ALREADY = "Ваша учетная запись %s уже активирована!";
     private static String ERROR_CONFIRM_NOTFOUND = "Ошибка! Ваша учетная запись %s не найдена!";
@@ -114,7 +114,6 @@ public class PersonEndpoint {
                 if(x!="" && x.equals(hshDB)) {
                     logger.info(String.format("account: %s has been activated", id));
                     Person person = new Person(account);
-                    person.setRating(DEFAULT_RATING);
                     insertPerson(person);
                     ofy().delete().type(AccountForConfirmation.class).id(id).now();
                     logger.info("Deleted AccountForConfirmation with ID: " + id);
@@ -407,6 +406,8 @@ public class PersonEndpoint {
         */
         if(person.getType()==null)
             throw new BadRequestException("typeNull@:Type property must be 'PARTNER' or 'COACH'");
+        if(person.getRating()<MIN_RATING)
+            person.setRating(MIN_RATING);
     }
 
     private void validateAccountProperties(AccountForConfirmation accountForConfirmation) throws BadRequestException
