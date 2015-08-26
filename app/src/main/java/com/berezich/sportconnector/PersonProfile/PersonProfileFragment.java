@@ -197,7 +197,6 @@ public class PersonProfileFragment extends Fragment {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // TODO Auto-generated method stub
         switch (item.getItemId()) {
             case R.id.menu_edit_profile:
                 FragmentManager fragmentManager = (FragmentManager) getFragmentManager();

@@ -44,7 +44,7 @@ import java.util.Date;
  * Created by Sashka on 25.07.2015.
  */
 public class EditProfileFragment extends Fragment implements DatePickerFragment.OnActionDatePickerDialogListener,
-                                                             ChangePassFragment.OnActionPassDialogListener,
+                                                             ChangePassFragment.OnActionPassDialogListener,ChangeEmailFragment.OnActionEmailDialogListener,
                                                              EndpointApi.UpdatePersonAsyncTask.OnAction{
 
     //private static final String ARG_SECTION_NUMBER = "section_number";
@@ -128,8 +128,10 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
             }
 
             String email = myPersonInfo.getEmail(), phone = myPersonInfo.getPhone();
-            if ((txtView = (TextView) rootView.findViewById(R.id.editProfile_txtEdt_email)) != null)
+            if ((txtView = (TextView) rootView.findViewById(R.id.editProfile_txtEdt_email)) != null) {
                 txtView.setText(email);
+                txtView.setOnClickListener(new EmailOnClickListener());
+            }
             if ((txtView = (TextView) rootView.findViewById(R.id.editProfile_txtEdt_phone)) != null)
                 txtView.setText(phone);
 
@@ -138,9 +140,7 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
             }
 
             if ((txtView = (TextView) rootView.findViewById(R.id.editProfile_txtView_setRating)) != null) {
-                //txtView.setText(getString(R.string.personprofile_rating) + " " + myPersonInfo.getRating());
                 txtView.setText(getString(R.string.personprofile_rating));
-                txtView.setOnClickListener(new RatingOnClickListener());
             }
 
             if ((spinner = (Spinner) rootView.findViewById(R.id.editProfile_spinner_rating)) != null) {
@@ -156,7 +156,6 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
                     else
                         spinner.setSelection(0);
 
-                    // устанавливаем обработчик нажатия
                     spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                         @Override
                         public void onItemSelected(AdapterView<?> parent, View view,
@@ -212,7 +211,6 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
         switch (item.getItemId())
         {
             case R.id.menu_save_profile:
-                //Toast.makeText(getActivity().getBaseContext(),"SAVE",Toast.LENGTH_SHORT).show();
                 if(myPersonInfo!=null && rootView!=null)
                 {
                     if((txtEdt = (EditText) rootView.findViewById(R.id.editProfile_txtEdt_name))!=null)
@@ -276,6 +274,35 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
             }
     }
 
+    private class EmailOnClickListener implements View.OnClickListener
+    {
+        @Override
+        public void onClick(View v) {
+            FragmentManager fragmentManager = getFragmentManager();
+            Person myPersonInfo = LocalDataManager.getMyPersonInfo();
+            ChangeEmailFragment changeEmailFragment = new ChangeEmailFragment().newInstance(myPersonInfo.getEmail());
+            changeEmailFragment.setTargetFragment(getCurFragment(), 0);
+            changeEmailFragment.show(fragmentManager, null);
+
+
+
+        }
+    }
+
+    @Override
+    public void onChangeEmailClick(String newPass) {
+        //TODO handle changing of email, show dialog
+        //setVisibleProgressBar(true);
+
+        //Log.e(TAG,"request error: "+ErrorVisualizer.getDebugMsgOfRespException(error));
+        AlertDialogFragment dialog = AlertDialogFragment.newInstance("",getString(R.string.registration_msgCreateAccount), false,false);
+        dialog.setTargetFragment(this, 0);
+        FragmentManager ft = getFragmentManager();
+        if(ft!=null)
+            dialog.show(ft, "");
+    }
+
+
     private class PassOnClickListener implements View.OnClickListener
     {
         @Override
@@ -294,18 +321,6 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
     @Override
     public void onChangePassClick(String newPass) {
         tempMyPerson.setPass(newPass);
-    }
-
-    private class RatingOnClickListener implements View.OnClickListener
-    {
-        @Override
-        public void onClick(View v) {
-            FragmentManager fragmentManager = (FragmentManager) getFragmentManager();
-            /*TestQuestionFragment testQuestionFragment = new TestQuestionFragment().setArgs(1,1);
-            if(fragmentManager!=null)
-                fragmentManager.beginTransaction().replace(R.id.container, testQuestionFragment).addToBackStack(null).commit();
-*/
-        }
     }
 
     private class RatingInfoOnClickListener implements View.OnClickListener
@@ -360,7 +375,16 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
             }
         }
     }
-
+    private void setVisibleProgressBar(boolean isVisible)
+    {
+        View view;
+        if(rootView!=null) {
+            if ((view = rootView.findViewById(R.id.editProfile_scrollView))!=null)
+                view.setVisibility(!isVisible ? View.VISIBLE : View.GONE);
+            if ((view = rootView.findViewById(R.id.editProfile_frameLayout))!=null)
+                view.setVisibility(isVisible ? View.VISIBLE : View.GONE);
+        }
+    }
     @Override
     public void onUpdatePersonFinish(Pair<Person, Exception> result) {
         Person updatedPerson = result.first;
@@ -384,4 +408,5 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
             Toast.makeText(getActivity().getBaseContext(), getString(R.string.editprofile_saveError), Toast.LENGTH_LONG).show();
         }
     }
+
 }

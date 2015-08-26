@@ -51,13 +51,10 @@ public class SpotInfoFragment extends Fragment implements EndpointApi.GetListPer
                                                           /*EndpointApi.UpdateSpotAsyncTask.OnAction,*/
                                                           EndpointApi.SetSpotAsFavoriteAsyncTask.OnAction
 {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_SPOT_ID = "spotId";
     private static final  String TAB_PARTNERS = "partners";
     private static final  String TAB_COACHES = "coaches";
     private static final String TAG = "MyLog_SpotInfoFragment";
-    // TODO: Rename and change types of parameters
     private Long spotId;
     private boolean isFavoriteChanged=false;
     private HashMap<Long,Spot> spotHashMap;
@@ -77,7 +74,6 @@ public class SpotInfoFragment extends Fragment implements EndpointApi.GetListPer
      * //@param param2 Parameter 2.
      * @return A new instance of fragment BlankFragment.
      */
-    // TODO: Rename and change types and number of parameters
     public static SpotInfoFragment newInstance(Long spotId) {
         SpotInfoFragment fragment = new SpotInfoFragment();
         Bundle args = new Bundle();
@@ -194,7 +190,6 @@ public class SpotInfoFragment extends Fragment implements EndpointApi.GetListPer
         return spotInfoView;
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
         if (mListener != null) {
             mListener.onFragmentInteraction(uri);
@@ -241,7 +236,6 @@ public class SpotInfoFragment extends Fragment implements EndpointApi.GetListPer
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
         public void onFragmentInteraction(Uri uri);
     }
 

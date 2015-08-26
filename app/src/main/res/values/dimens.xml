@@ -48,6 +48,8 @@
             <dimen name="changeEmail_leftRightOffset">15dp</dimen>
             <dimen name="changeEmail_topOffset">15dp</dimen>
             <dimen name="changeEmail_bottomOffset">5dp</dimen>
+            <dimen name="changeEmail_oldEmailTitle_bottomOffset">0dp</dimen>
+            <dimen name="changeEmail_oldEmail_bottomOffset">10dp</dimen>
             <dimen name="changeEmail_btn_topOffset">5dp</dimen>
         <!-- changePass_dialog-->
     <!-- fragment_editProfile-->

@@ -114,7 +114,6 @@ public class RegionInfoEndpoint {
     */
     @ApiResourceProperty(ignored = AnnotationBoolean.TRUE)
     public RegionInfo update(@Named("id") Long id, RegionInfo regionInfo) throws NotFoundException, BadRequestException {
-        // TODO: You should validate your ID parameter against your resource's ID here.
         OAuth_2_0.check();
         checkExists(id);
         validateRegionInfoProperties(regionInfo);

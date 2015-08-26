@@ -7,7 +7,7 @@
     <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/scrollView" >
+        android:id="@+id/editProfile_scrollView" >
 
         <LinearLayout
             android:orientation="vertical"
@@ -92,11 +92,13 @@
                 android:visibility="visible">
 
 
-                <EditText
+                <TextView
                     android:id="@+id/editProfile_txtEdt_email"
                     style="@style/EditProfile_TxtPropField"
                     android:hint="@string/editprofile_hint_email"
-                    android:inputType="textEmailAddress" />
+                    android:inputType="textEmailAddress"
+                    android:clickable="true"
+                    android:textColor="@color/text_property" />
 
 
                 <EditText
@@ -192,5 +194,19 @@
 
         </LinearLayout>
     </ScrollView>
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:id="@+id/editProfile_frameLayout"
+        android:visibility="gone"
+        android:background="@color/login_background">
+
+        <ProgressBar
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/editProfile_progressBar"
+            android:layout_gravity="center" />
+    </FrameLayout>
 
 </FrameLayout>

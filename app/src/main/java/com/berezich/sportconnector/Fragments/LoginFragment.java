@@ -210,11 +210,8 @@ public class LoginFragment extends Fragment implements EndpointApi.AuthorizePers
         dialog = AlertDialogFragment.newInstance(dialogMsg, false);
         dialog.setTargetFragment(this, 0);
         FragmentManager ft = getFragmentManager();
-        dialog.show(getFragmentManager(), "");
-
-        /*if((frameLayout = (FrameLayout) rootView.findViewById(R.id.spotinfo_frg_frameLayout))!=null)
-            ErrorVisualizer.showErrorAfterReq(getActivity().getBaseContext(), frameLayout,error,TAG);
-        setVisible(View.GONE,View.VISIBLE,View.GONE);*/
+        if(ft!=null)
+            dialog.show(ft, "");
 
     }
 

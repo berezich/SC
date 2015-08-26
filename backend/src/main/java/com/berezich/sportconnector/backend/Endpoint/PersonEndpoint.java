@@ -250,7 +250,6 @@ public class PersonEndpoint {
             path = "person/{id}",
             httpMethod = ApiMethod.HttpMethod.PUT)
     public Person update(@Named("id") Long id, Person person) throws NotFoundException, BadRequestException {
-        // TODO: You should validate your ID parameter against your resource's ID here.
         OAuth_2_0.check();
         Person oldPerson = ofy().load().type(Person.class).id(id).now();
         if(oldPerson==null)
@@ -273,7 +272,6 @@ public class PersonEndpoint {
 
     @ApiResourceProperty(ignored = AnnotationBoolean.TRUE)
     public void addPersonsFavoriteSpot(@Named("lstPersonIds") List<Long> idLst,@Named("spotId") Long spotId) throws BadRequestException{
-        // TODO: You should validate your ID parameter against your resource's ID here.
         OAuth_2_0.check();
         Person person;
         for (int i = 0; i < idLst.size(); i++) {
@@ -295,7 +293,6 @@ public class PersonEndpoint {
 
     @ApiResourceProperty(ignored = AnnotationBoolean.TRUE)
     public void removePersonsFavoriteSpot(@Named("lstPersonIds") List<Long> idLst,@Named("spotId") Long spotId) throws BadRequestException{
-        // TODO: You should validate your ID parameter against your resource's ID here.
         OAuth_2_0.check();
         Person person;
         if(idLst!=null)

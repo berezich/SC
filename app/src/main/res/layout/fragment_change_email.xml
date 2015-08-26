@@ -10,7 +10,8 @@
 
     <android.support.design.widget.TextInputLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:paddingBottom="@dimen/changeEmail_oldEmail_bottomOffset">
 
         <EditText
             android:layout_width="fill_parent"
@@ -19,10 +20,28 @@
             android:hint="@string/changeEmail_old_hint"
             android:singleLine="true"
             android:editable="false"
-            android:enabled="true"
+            android:enabled="false"
             android:inputType="textEmailAddress" />
 
     </android.support.design.widget.TextInputLayout>
+   <!-- <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/changeEmail_title_old"
+        android:text="@string/changeEmail_old_hint"
+        android:singleLine="false"
+        android:paddingBottom="@dimen/changeEmail_oldEmailTitle_bottomOffset"
+        style="@style/Base.TextAppearance.AppCompat.Small" />
+
+    <TextView
+        style="@style/Base.TextAppearance.AppCompat.Medium"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/changeEmail_txtEdt_old"
+        android:text="@string/changeEmail_old_hint"
+        android:singleLine="false"
+        android:paddingBottom="@dimen/changeEmail_oldEmail_bottomOffset"
+        android:enabled="false" />-->
 
     <android.support.design.widget.TextInputLayout
         android:layout_width="match_parent"
@@ -36,7 +55,8 @@
             android:singleLine="true"
             android:inputType="textEmailAddress"
             android:editable="true"
-            android:enabled="true" />
+            android:enabled="true"
+             />
 
     </android.support.design.widget.TextInputLayout>
 

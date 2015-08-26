@@ -119,7 +119,6 @@ public class SpotEndpoint {
             path = "spot/{id}",
             httpMethod = ApiMethod.HttpMethod.PUT)
     public Spot update(@Named("id") Long id, Spot spot) throws NotFoundException, BadRequestException {
-        // TODO: You should validate your ID parameter against your resource's ID here.
         OAuth_2_0.check();
         Spot oldSpot = ofy().load().type(Spot.class).id(id).now();
         if(oldSpot==null)
@@ -179,7 +178,6 @@ public class SpotEndpoint {
 
     @ApiResourceProperty(ignored = AnnotationBoolean.TRUE)
     public void removePersonFromSpots(@Named("lstSpotIds") List<Long> idLst, @Named("personType") Person.TYPE type, @Named("personId") Long personId) throws BadRequestException{
-        // TODO: You should validate your ID parameter against your resource's ID here.
         OAuth_2_0.check();
         Spot spot;
         List<Long> personLst;
@@ -206,7 +204,6 @@ public class SpotEndpoint {
     }
     @ApiResourceProperty(ignored = AnnotationBoolean.TRUE)
     public void addPersonsToSpots(@Named("lstSpotIds") List<Long> idLst, @Named("personType")Person.TYPE type,@Named("personId") Long personId) throws BadRequestException{
-        // TODO: You should validate your ID parameter against your resource's ID here.
         OAuth_2_0.check();
         Spot spot;
         List<Long> personLst;

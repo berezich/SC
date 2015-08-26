@@ -1,6 +1,6 @@
 package com.berezich.sportconnector.PersonProfile;
 
-import android.app.DialogFragment;
+import android.support.v4.app.DialogFragment;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -40,24 +40,27 @@ public class ChangeEmailFragment extends DialogFragment {
         getDialog().setTitle(R.string.changeEmail_dialogTitle);
         rootView = inflater.inflate(R.layout.fragment_change_email, null);
         if(rootView!=null) {
+            TextView txtView = (TextView) rootView.findViewById(R.id.changeEmail_txtEdt_old);
+            if(txtView!=null) {
+                txtView.setText(oldEmail);
+            }
             EditText txtEdt = (EditText) rootView.findViewById(R.id.changeEmail_txtEdt_new);
-            txtEdt.setText(oldEmail);
-            rootView.findViewById(R.id.changePass_btnCancel).setOnClickListener(new View.OnClickListener() {
+            if(txtEdt!=null)
+                txtEdt.requestFocus();
+            rootView.findViewById(R.id.changeEmail_btnCancel).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     dismiss();
                 }
             });
 
-            rootView.findViewById(R.id.changePass_btnOk).setOnClickListener(new View.OnClickListener() {
+            rootView.findViewById(R.id.changeEmail_btnOk).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     EditText edtNew=null, edtOld;
                     String newEmailStr ="";
                     if(rootView!=null) {
-                        if ((edtOld = (EditText) rootView.findViewById(R.id.changeEmail_txtEdt_old)) != null) {
-                            edtOld.setError(null);
-                        }
+
                         if ((edtNew = (EditText) rootView.findViewById(R.id.changeEmail_txtEdt_new)) != null) {
                             newEmailStr = edtNew.getText().toString();
                             edtNew.setError(null);
@@ -81,6 +84,6 @@ public class ChangeEmailFragment extends DialogFragment {
 
     public static interface OnActionEmailDialogListener
     {
-        void onChangeEmailClick(String newPass);
+        void onChangeEmailClick(String newEmail);
     }
 }
