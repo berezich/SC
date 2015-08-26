@@ -78,26 +78,46 @@ public class PersonEndpoint {
         ObjectifyService.register(AccountForConfirmation.class);
     }
 
-    /**
-     * Returns the {@link Person} with the corresponding ID.
-     *
-     * @param id the ID of the entity to be retrieved
-     * @return the entity with the corresponding ID
-     * @throws NotFoundException if there is no {@code Person} with the provided ID.
-     */
+
     @ApiMethod(
-            name = "getPerson",
-            path = "person/{id}",
-            httpMethod = ApiMethod.HttpMethod.GET)
-    public Person get(@Named("id") String id) throws NotFoundException,BadRequestException {
+            name = "registerAccount",
+            path = "AccountForConfirmation",
+            httpMethod = ApiMethod.HttpMethod.POST)
+    public AccountForConfirmation registerAccount(AccountForConfirmation account) throws BadRequestException {
+        // Typically in a RESTful API a POST does not have a known ID (assuming the ID is used in the resource path).
+        // You should validate that person._id has not been set. If the ID type is not supported by the
+        // Objectify ID generator, e.g. long or String, then you should generate the unique ID yourself prior to saving.
+        //
+        // If your client provides the ID then you should probably use PUT instead.
         OAuth_2_0.check();
-        logger.info("Getting Person with ID: " + id);
-        Person person = ofy().load().type(Person.class).id(id).now();
-        if (person == null) {
-            throw new NotFoundException("Could not find Person with ID: " + id);
+        validateAccountProperties(account);
+        //Person samePerson = ofy().load().type(Person.class).id(account.getId()).now();
+        Query<Person> query = ofy().load().type(Person.class).filter("email", account.getEmail());
+        if(query!=null && query.count()>0)
+        {
+            throw new BadRequestException("loginExists@:Person with the same login already exists");
         }
-        person.setPass("");
-        return person;
+        String digPass = msgDigest(account.getPass());
+        if(digPass.equals(""))
+            throw new BadRequestException("Server error");
+        account.setPass(digPass);
+        account.setRegisterDate(Calendar.getInstance().getTime());
+        ofy().save().entity(account).now();
+        logger.info("Created AccountForConfirmation.");
+        account = ofy().load().entity(account).now();
+        try {
+            //String subject = new String(subjectAccountConfirmation.getBytes("windows-1251"),"windows-1251");
+            String subject = subjectAccountConfirmation;
+            //String msgBody = new String(msgBodyAccountConfirmation.getBytes("windows-1251"),"UTF-8");
+            String msgBody =msgBodyAccountConfirmation;
+            sendMail(account.getEmail(),subject,String.format(msgBody,
+                    URLEncoder.encode(account.getEmail(), "UTF-8"), URLEncoder.encode(
+                            msgDigest(account.getEmail() + account.getRegisterDate()), "UTF-8")));
+        } catch (UnsupportedEncodingException e) {
+            throw new BadRequestException("createConfirmMsg@: msg for confirmation account didn't send");
+        }
+        account.setPass("");
+        return account;
     }
 
     @ApiMethod(
@@ -155,45 +175,26 @@ public class PersonEndpoint {
         throw new NotFoundException("AuthFailed@:Could not find Person with ID: " + email + " or such passowrd");
     }
 
+    /**
+     * Returns the {@link Person} with the corresponding ID.
+     *
+     * @param id the ID of the entity to be retrieved
+     * @return the entity with the corresponding ID
+     * @throws NotFoundException if there is no {@code Person} with the provided ID.
+     */
     @ApiMethod(
-            name = "registerAccount",
-            path = "AccountForConfirmation",
-            httpMethod = ApiMethod.HttpMethod.POST)
-    public AccountForConfirmation registerAccount(AccountForConfirmation account) throws BadRequestException {
-        // Typically in a RESTful API a POST does not have a known ID (assuming the ID is used in the resource path).
-        // You should validate that person._id has not been set. If the ID type is not supported by the
-        // Objectify ID generator, e.g. long or String, then you should generate the unique ID yourself prior to saving.
-        //
-        // If your client provides the ID then you should probably use PUT instead.
+            name = "getPerson",
+            path = "person/{id}",
+            httpMethod = ApiMethod.HttpMethod.GET)
+    public Person get(@Named("id") String id) throws NotFoundException,BadRequestException {
         OAuth_2_0.check();
-        validateAccountProperties(account);
-        //Person samePerson = ofy().load().type(Person.class).id(account.getId()).now();
-        Query<Person> query = ofy().load().type(Person.class).filter("email", account.getEmail());
-        if(query!=null && query.count()>0)
-        {
-            throw new BadRequestException("loginExists@:Person with the same login already exists");
+        logger.info("Getting Person with ID: " + id);
+        Person person = ofy().load().type(Person.class).id(id).now();
+        if (person == null) {
+            throw new NotFoundException("Could not find Person with ID: " + id);
         }
-        String digPass = msgDigest(account.getPass());
-        if(digPass.equals(""))
-            throw new BadRequestException("Server error");
-        account.setPass(digPass);
-        account.setRegisterDate(Calendar.getInstance().getTime());
-        ofy().save().entity(account).now();
-        logger.info("Created AccountForConfirmation.");
-        account = ofy().load().entity(account).now();
-        try {
-            //String subject = new String(subjectAccountConfirmation.getBytes("windows-1251"),"windows-1251");
-            String subject = subjectAccountConfirmation;
-            //String msgBody = new String(msgBodyAccountConfirmation.getBytes("windows-1251"),"UTF-8");
-            String msgBody =msgBodyAccountConfirmation;
-            sendMail(account.getEmail(),subject,String.format(msgBody,
-                    URLEncoder.encode(account.getEmail(), "UTF-8"), URLEncoder.encode(
-                            msgDigest(account.getEmail() + account.getRegisterDate()), "UTF-8")));
-        } catch (UnsupportedEncodingException e) {
-            throw new BadRequestException("createConfirmMsg@: msg for confirmation account didn't send");
-        }
-        account.setPass("");
-        return account;
+        person.setPass("");
+        return person;
     }
 
     /**
@@ -234,6 +235,53 @@ public class PersonEndpoint {
         setSpotCoachesPartners(personRes, null);
         personRes.setPass("");
         return personRes;
+    }
+
+    /**
+     * Change email of an existing person.
+     */
+    @ApiMethod(
+            name = "changeEmail",
+            path = "personEmail",
+            httpMethod = ApiMethod.HttpMethod.PUT)
+    public void changeEmail(@Named("id") Long id, @Named("oldEmail") String oldEmail, @Named("newEmail") String newEmail)
+            throws NotFoundException, BadRequestException {
+        Person person = ofy().load().type(Person.class).id(id).now();
+        if(person==null)
+            throw  new NotFoundException("Person with id:" + id + " not found");
+        if(oldEmail.equals(person.getEmail()))
+        {
+            person.setEmail(newEmail);
+            ofy().save().entity(person).now();
+            logger.info("Updated Person: " + person);
+        }
+        else
+            throw new BadRequestException("oldPassErr: old password doesn't match");
+    }
+
+    /**
+     * Change password of an existing person.
+     */
+    @ApiMethod(
+            name = "changePass",
+            path = "personPass",
+            httpMethod = ApiMethod.HttpMethod.PUT)
+    public void changePass(@Named("id") Long id, @Named("oldPass") String oldPass, @Named("newPass") String newPass)
+            throws NotFoundException, BadRequestException {
+        Person person = ofy().load().type(Person.class).id(id).now();
+        if(person==null)
+            throw  new NotFoundException("Person with id:" + id + " not found");
+        if(msgDigest(oldPass).equals(person.getPass()))
+        {
+            String digPass = msgDigest(newPass);
+            if(digPass.equals(""))
+                throw new BadRequestException("Server error");
+            person.setPass(digPass);
+            ofy().save().entity(person).now();
+            logger.info("Updated Person: " + person);
+        }
+        else
+            throw new BadRequestException("oldPassErr: old password doesn't match");
     }
 
     /**
