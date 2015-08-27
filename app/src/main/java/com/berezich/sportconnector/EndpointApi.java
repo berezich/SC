@@ -485,5 +485,79 @@ public class EndpointApi {
         }
     }
 
+    public static class ChangePassAsyncTask extends AsyncTask< Pair<Long,String>, Void, Exception >{
+        private OnAction listener=null;
+        private Context context = null;
+        public ChangePassAsyncTask(Fragment fragment)
+        {
+            context = fragment.getActivity().getBaseContext();
+            setSrvApi(context);
+            try {
+                listener = (OnAction) fragment;
+            } catch (ClassCastException e) {
+                throw new ClassCastException(fragment.toString() + " must implement OnAction for ChangePassAsyncTask");
+            }
+        }
+        @Override
+        protected Exception doInBackground(Pair<Long,String>... params) {
+            Long id = params[0].first;
+            String oldPass = params[0].second;
+            String newPass = params[1].second;
+            try {
+                srvApi.changePass(id,newPass,oldPass).execute();
+                return null;
+            } catch (Exception e) {
+                return e;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(Exception result) {
+            listener.onChangePassFinish(result);
+        }
+
+        public static interface OnAction
+        {
+            void onChangePassFinish(Exception result);
+        }
+    }
+
+    public static class ChangeEmailAsyncTask extends AsyncTask< Pair<Long,String>, Void, Exception >{
+        private OnAction listener=null;
+        private Context context = null;
+        public ChangeEmailAsyncTask(Fragment fragment)
+        {
+            context = fragment.getActivity().getBaseContext();
+            setSrvApi(context);
+            try {
+                listener = (OnAction) fragment;
+            } catch (ClassCastException e) {
+                throw new ClassCastException(fragment.toString() + " must implement OnAction for ChangeEmailAsyncTask");
+            }
+        }
+        @Override
+        protected Exception doInBackground(Pair<Long,String>... params) {
+            Long id = params[0].first;
+            String oldEmail = params[0].second;
+            String newEmail = params[1].second;
+            try {
+                srvApi.changeEmail(id,newEmail,oldEmail).execute();
+                return null;
+            } catch (Exception e) {
+                return e;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(Exception result) {
+            listener.onChangeEmailFinish(result);
+        }
+
+        public static interface OnAction
+        {
+            void onChangeEmailFinish(Exception result);
+        }
+    }
+
 }
 

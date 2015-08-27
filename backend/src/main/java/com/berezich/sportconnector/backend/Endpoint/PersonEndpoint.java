@@ -2,6 +2,7 @@ package com.berezich.sportconnector.backend.Endpoint;
 
 import com.berezich.sportconnector.backend.AccountForConfirmation;
 import com.berezich.sportconnector.backend.Person;
+import com.berezich.sportconnector.backend.ReqChangeEmail;
 import com.google.api.server.spi.config.AnnotationBoolean;
 import com.google.api.server.spi.config.Api;
 import com.google.api.server.spi.config.ApiMethod;
@@ -70,12 +71,16 @@ public class PersonEndpoint {
     private static String subjectAccountConfirmation = "registration SportConnector";
     private static String msgBodyAccountConfirmation = "Для активации вашей учетной записи перейдите по ссылке: " +
             "https://sportconnector-981.appspot.com/?id=%s&x=%s";
+    private static String subjectConfirmEmail = "change Email SportConnector";
+    private static String msgBodyConfirmEmail = "Для смены email перейдите по ссылке: " +
+            "https://sportconnector-981.appspot.com/email.html?id=%s&x=%s";
 
 
     static {
         // Typically you would register this inside an OfyServive wrapper. See: https://code.google.com/p/objectify-appengine/wiki/BestPractices
         ObjectifyService.register(Person.class);
         ObjectifyService.register(AccountForConfirmation.class);
+        ObjectifyService.register(ReqChangeEmail.class);
     }
 
 
@@ -248,15 +253,27 @@ public class PersonEndpoint {
             throws NotFoundException, BadRequestException {
         Person person = ofy().load().type(Person.class).id(id).now();
         if(person==null)
-            throw  new NotFoundException("Person with id:" + id + " not found");
+            throw new NotFoundException("Person with id:" + id + " not found");
         if(oldEmail.equals(person.getEmail()))
         {
-            person.setEmail(newEmail);
-            ofy().save().entity(person).now();
-            logger.info("Updated Person: " + person);
+            ReqChangeEmail reqChangeEmail = new ReqChangeEmail(oldEmail,newEmail,person.getId(),Calendar.getInstance().getTime());
+            ofy().save().entity(reqChangeEmail).now();
+            reqChangeEmail = ofy().load().type(ReqChangeEmail.class).id(id).now();
+            if(reqChangeEmail!=null) {
+                try {
+                    logger.info("ReqChangeEmail was created: " + reqChangeEmail);
+                    String subject = subjectConfirmEmail;
+                    String msgBody =msgBodyConfirmEmail;
+                    sendMail(reqChangeEmail.getNewEmail(),subject,String.format(msgBody,
+                            URLEncoder.encode(reqChangeEmail.getEmail(), "UTF-8"), URLEncoder.encode(
+                                    msgDigest(reqChangeEmail.getEmail()+ reqChangeEmail.getNewEmail() + reqChangeEmail.getRegisterDate()), "UTF-8")));
+                } catch (UnsupportedEncodingException e) {
+                    throw new BadRequestException("createConfirmEmailMsg@: msg for confirm email didn't send");
+                }
+            }
         }
         else
-            throw new BadRequestException("oldPassErr: old password doesn't match");
+            throw new BadRequestException("oldEmailErr@: old email doesn't match");
     }
 
     /**
@@ -278,14 +295,14 @@ public class PersonEndpoint {
                 throw new BadRequestException("Server error");
             person.setPass(digPass);
             ofy().save().entity(person).now();
-            logger.info("Updated Person: " + person);
+            logger.info("Updated Person pass: " + person);
         }
         else
-            throw new BadRequestException("oldPassErr: old password doesn't match");
+            throw new BadRequestException("oldPassErr@: old password doesn't match");
     }
 
     /**
-     * Updates an existing {@code Person}.
+     * Updates an existing {@code Person} except Email.
      *
      * @param id    the ID of the entity to be updated
      * @param person the desired state of the entity
@@ -310,6 +327,7 @@ public class PersonEndpoint {
         if(digPass.equals(""))
             throw new BadRequestException("Server error");
         person.setPass(digPass);
+        person.setEmail(oldPerson.getEmail());
         ofy().save().entity(person).now();
         logger.info("Updated Person: " + person);
         Person personRes = ofy().load().entity(person).now();

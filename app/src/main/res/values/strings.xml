@@ -109,6 +109,7 @@
                 <string name="changePass_errOld">Вы ввели неверный старый пароль</string>
                 <string name="changePass_errNew_empty">Введите новый пароль</string>
                 <string name="changePass_errNew_notMatch">Новые пароли не совпадают</string>
+                <string name="changePass_msgChangePass">Ваш пароль изменен.</string>
             <!--changePass_dialog end-->
             <!--changePass_dialog begin-->
                 <string name="changeEmail_dialogTitle">Смена Email</string>
@@ -117,6 +118,8 @@
                 <string name="changeEmail_errNew_empty">Введите новый Email</string>
                 <string name="changeEmail_btnOk">Продолжить</string>
                 <string name="changeEmail_btnCancel">Отмена</string>
+                <string name="changeEmail_msgChangeEmail">Вам на почту отправлено письмо. Для подтверждения почты следуйте инструкциям, описанным в письме.</string>
+                <string name="changeEmail_err_oldEmailErr">Введите пароль</string>
             <!--changePass_dialog end-->
 
     <!-- editProfile_fragment end-->

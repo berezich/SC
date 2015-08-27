@@ -98,6 +98,7 @@ public class ErrorVisualizer {
                         errMsg = context.getString(R.string.registration_err_passNull);
                         error_code = ERROR_CODE.REGISTRATION_FAILED;
                     }
+
                 }
         } finally {
             return  new Pair<>(error_code,errMsg);

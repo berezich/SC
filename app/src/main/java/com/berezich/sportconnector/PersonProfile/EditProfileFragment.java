@@ -45,6 +45,8 @@ import java.util.Date;
  */
 public class EditProfileFragment extends Fragment implements DatePickerFragment.OnActionDatePickerDialogListener,
                                                              ChangePassFragment.OnActionPassDialogListener,ChangeEmailFragment.OnActionEmailDialogListener,
+                                                             EndpointApi.ChangeEmailAsyncTask.OnAction,
+                                                             EndpointApi.ChangePassAsyncTask.OnAction,
                                                              EndpointApi.UpdatePersonAsyncTask.OnAction{
 
     //private static final String ARG_SECTION_NUMBER = "section_number";
@@ -284,24 +286,53 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
             changeEmailFragment.setTargetFragment(getCurFragment(), 0);
             changeEmailFragment.show(fragmentManager, null);
 
-
-
         }
     }
 
     @Override
-    public void onChangeEmailClick(String newPass) {
-        //TODO handle changing of email, show dialog
-        //setVisibleProgressBar(true);
-
-        //Log.e(TAG,"request error: "+ErrorVisualizer.getDebugMsgOfRespException(error));
-        AlertDialogFragment dialog = AlertDialogFragment.newInstance("",getString(R.string.registration_msgCreateAccount), false,false);
-        dialog.setTargetFragment(this, 0);
-        FragmentManager ft = getFragmentManager();
-        if(ft!=null)
-            dialog.show(ft, "");
+    public void onChangeEmailClick(String newEmail) {
+        try {
+            setVisibleProgressBar(true);
+            new EndpointApi.ChangeEmailAsyncTask(this).execute(new Pair<Long, String>(tempMyPerson.getId(), tempMyPerson.getEmail()), new Pair<Long, String>(null, newEmail));
+        }
+        catch (Exception ex)
+        {
+            Log.e(TAG,"ChangeEmailAsyncTask.execute() exception: "+ex.getMessage());
+            ex.printStackTrace();
+        }
     }
 
+    @Override
+    public void onChangeEmailFinish(Exception error) {
+        AlertDialogFragment dialog;
+        FragmentManager ft;
+        String dialogMsg;
+        setVisibleProgressBar(false);
+        if(error==null)
+        {
+            dialogMsg = getString(R.string.changeEmail_msgChangeEmail);
+            dialog = AlertDialogFragment.newInstance("",dialogMsg, false,false);
+            dialog.setTargetFragment(this, 0);
+            ft = getFragmentManager();
+            if(ft!=null)
+                dialog.show(ft, "");
+        }
+        else {
+
+            Pair<ErrorVisualizer.ERROR_CODE, String> errTxtCode = ErrorVisualizer.getTextCodeOfRespException(getActivity().getBaseContext(), error);
+            if (errTxtCode != null && !errTxtCode.second.equals(""))
+                dialogMsg = errTxtCode.second;
+            else
+                dialogMsg = getString(R.string.server_unknow_err);
+            Log.d(TAG, "registrationError code = " + errTxtCode.first + " msg = " + errTxtCode.second);
+
+        }
+        dialog = AlertDialogFragment.newInstance("",dialogMsg, false,false);
+        dialog.setTargetFragment(this, 0);
+        ft = getFragmentManager();
+        if (ft != null)
+            dialog.show(getFragmentManager(), "");
+    }
 
     private class PassOnClickListener implements View.OnClickListener
     {
@@ -313,14 +344,65 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
             changePassFragment.setTargetFragment(getCurFragment(),0);
             changePassFragment.show(fragmentManager,null);
 
-
-
         }
     }
 
     @Override
     public void onChangePassClick(String newPass) {
-        tempMyPerson.setPass(newPass);
+
+        //tempMyPerson.setPass(newPass);
+        try {
+            setVisibleProgressBar(true);
+            new EndpointApi.ChangePassAsyncTask(this).execute(new Pair<Long, String>(tempMyPerson.getId(), tempMyPerson.getPass()), new Pair<Long, String>(null, newPass));
+            if(tempMyPerson!=null)
+                tempMyPerson.setPass(newPass);
+        }
+        catch (Exception ex)
+        {
+            Log.e(TAG,"ChangePassAsyncTask.execute() exception: "+ex.getMessage());
+            ex.printStackTrace();
+        }
+    }
+
+    @Override
+    public void onChangePassFinish(Exception error) {
+        AlertDialogFragment dialog;
+        FragmentManager ft;
+        String dialogMsg;
+        setVisibleProgressBar(false);
+        if(error==null)
+        {
+            if(tempMyPerson!=null)
+            {
+                Person myPersonInfo = LocalDataManager.getMyPersonInfo();
+                if(myPersonInfo!=null)
+                {
+                    myPersonInfo.setPass(tempMyPerson.getPass());
+                    LocalDataManager.setMyPersonInfo(myPersonInfo);
+                }
+            }
+            dialogMsg = getString(R.string.changePass_msgChangePass);
+        }
+        else {
+            if(tempMyPerson!=null)
+            {
+                Person myPersonInfo = LocalDataManager.getMyPersonInfo();
+                if(myPersonInfo!=null)
+                    tempMyPerson.setPass(myPersonInfo.getPass());
+            }
+            Pair<ErrorVisualizer.ERROR_CODE, String> errTxtCode = ErrorVisualizer.getTextCodeOfRespException(getActivity().getBaseContext(), error);
+            if (errTxtCode != null && !errTxtCode.second.equals(""))
+                dialogMsg = errTxtCode.second;
+            else
+                dialogMsg = getString(R.string.server_unknow_err);
+            Log.d(TAG, "registrationError code = " + errTxtCode.first + " msg = " + errTxtCode.second);
+
+        }
+        dialog = AlertDialogFragment.newInstance("",dialogMsg, false,false);
+        dialog.setTargetFragment(this, 0);
+        ft = getFragmentManager();
+        if (ft != null)
+            dialog.show(getFragmentManager(), "");
     }
 
     private class RatingInfoOnClickListener implements View.OnClickListener
@@ -393,7 +475,7 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
         {
             Person myPerson = LocalDataManager.getMyPersonInfo();
             if(myPerson!=null) {
-                updatedPerson.setPass(tempMyPerson.getPass());
+                updatedPerson.setPass(myPerson.getPass());
                 LocalDataManager.setMyPersonInfo(updatedPerson);
             }
             FragmentManager fragmentManager = getFragmentManager();
