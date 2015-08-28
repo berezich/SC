@@ -16,6 +16,9 @@ public class ReqChangeEmail {
     private Date registerDate;
     long personId;
 
+    public ReqChangeEmail() {
+    }
+
     public ReqChangeEmail( String email, String newEmail, long personId,Date registerDate) {
         this.personId = personId;
         this.email = email;

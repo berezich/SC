@@ -309,14 +309,7 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
         String dialogMsg;
         setVisibleProgressBar(false);
         if(error==null)
-        {
             dialogMsg = getString(R.string.changeEmail_msgChangeEmail);
-            dialog = AlertDialogFragment.newInstance("",dialogMsg, false,false);
-            dialog.setTargetFragment(this, 0);
-            ft = getFragmentManager();
-            if(ft!=null)
-                dialog.show(ft, "");
-        }
         else {
 
             Pair<ErrorVisualizer.ERROR_CODE, String> errTxtCode = ErrorVisualizer.getTextCodeOfRespException(getActivity().getBaseContext(), error);

@@ -4,17 +4,11 @@
  * Hello Endpoints API.
  */
 
-/** google global namespace for Google projects. */
 var google = google || {};
-
-/** appengine namespace for Google Developer Relations projects. */
 google.appengine = google.appengine || {};
-
-/** samples namespace for App Engine sample code. */
 google.appengine.sportconnector = google.appengine.sportconnector || {};
-
-/** hello namespace for this sample. */
-google.appengine.sportconnector.confirm = google.appengine.sportconnector.confirm || {};
+google.appengine.sportconnector.confirmAccount = google.appengine.sportconnector.confirmAccount || {};
+google.appengine.sportconnector.confirmEmail = google.appengine.sportconnector.confirmEmail || {};
 
 
 function getParams () {
@@ -41,10 +35,9 @@ function getParams () {
 };
 
 /**
- * Prints a greeting to the greeting log.
- * param {Object} greeting Greeting to print.
+ * Shows a message for user.
  */
-google.appengine.sportconnector.confirm.print = function(msg) {
+google.appengine.sportconnector.confirmAccount.print = function(msg) {
   var element = document.getElementById("msg");
   element.innerHTML = msg;
   element = document.getElementById("wait");
@@ -57,18 +50,18 @@ google.appengine.sportconnector.confirm.print = function(msg) {
  * Execute confirmation via the API.
  * @param {string} id ID of the greeting.
  */
-google.appengine.sportconnector.confirm.execute = function() {
+google.appengine.sportconnector.confirmAccount.execute = function() {
   var params = getParams();
   if(typeof params['id'] === "string" && typeof params['x'] === "string")
     gapi.client.sportConnectorApi.confirmAccount({'id':params['id'],'x':params['x']}).execute(
         function(resp) {
           if (!resp.code)
-            google.appengine.sportconnector.confirm.print('Ваша учетная запись '+decodeURIComponent(params['id'])+' успешно активирована!');
+            google.appengine.sportconnector.confirmAccount.print('Ваша учетная запись '+decodeURIComponent(params['id'])+' успешно активирована!');
           else
-            google.appengine.sportconnector.confirm.print(resp.message);
+            google.appengine.sportconnector.confirmAccount.print(resp.message);
         });
   else
-    google.appengine.sportconnector.confirm.print("Ошибка! Ваша учетная запись не активирована!");
+    google.appengine.sportconnector.confirmAccount.print("Ошибка! Ваша учетная запись не активирована!");
 };
 
 
@@ -77,16 +70,56 @@ google.appengine.sportconnector.confirm.execute = function() {
  * Initializes the application.
  * @param {string} apiRoot Root of the API's path.
  */
-google.appengine.sportconnector.confirm.init = function(apiRoot) {
+google.appengine.sportconnector.confirmAccount.init = function(apiRoot) {
   // Loads the OAuth and helloworld APIs asynchronously, and triggers login
   // when they have completed.
   var apisToLoad;
   var callback = function() {
     if (--apisToLoad == 0) {
-        google.appengine.sportconnector.confirm.execute();
+        google.appengine.sportconnector.confirmAccount.execute();
     }
   }
 
   apisToLoad = 1; // must match number of calls to gapi.client.load()
   gapi.client.load('sportConnectorApi', 'v1', callback, apiRoot);
 };
+
+
+/**
+ * Initializes the application.
+ * @param {string} apiRoot Root of the API's path.
+ */
+google.appengine.sportconnector.confirmEmail.init = function(apiRoot) {
+  // Loads the OAuth and helloworld APIs asynchronously, and triggers login
+  // when they have completed.
+  var apisToLoad;
+  var callback = function() {
+    if (--apisToLoad == 0) {
+        google.appengine.sportconnector.confirmEmail.execute();
+    }
+  }
+
+  apisToLoad = 1; // must match number of calls to gapi.client.load()
+  gapi.client.load('sportConnectorApi', 'v1', callback, apiRoot);
+};
+
+
+/**
+ * Execute confirmation via the API.
+ * @param {string} id ID of the greeting.
+ */
+google.appengine.sportconnector.confirmEmail.execute = function() {
+  var params = getParams();
+  if(typeof params['id'] === "string" && typeof params['x'] === "string")
+    gapi.client.sportConnectorApi.confirmEmail({'id':params['id'],'x':params['x']}).execute(
+        function(resp) {
+          if (!resp.code)
+            google.appengine.sportconnector.confirmAccount.print('Ваша почта изменена!');
+          else
+            google.appengine.sportconnector.confirmAccount.print(resp.message);
+        });
+  else
+    google.appengine.sportconnector.confirmAccount.print("Ошибка! Ваша почта не подтверждена!");
+};
+
+google.appengine.sportconnector.confirmEmail.print = google.appengine.sportconnector.confirmAccount.print;

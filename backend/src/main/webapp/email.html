@@ -3,7 +3,7 @@
 <head>
     <meta charset="windows-1251">
     <meta name=viewport content="width=device-width, initial-scale=1">
-    <title>Активация учетной записи</title>
+    <title>Подтверждение Email</title>
     <script src="/js/base.js"></script>
     <style>
         body {
@@ -28,7 +28,7 @@
     </div>
     <script>
         function init() {
-            google.appengine.sportconnector.confirmAccount.init('//' + window.location.host + '/_ah/api');
+            google.appengine.sportconnector.confirmEmail.init('//' + window.location.host + '/_ah/api');
         }
     </script>
     <script src="https://apis.google.com/js/client.js?onload=init"></script>

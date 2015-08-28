@@ -71,6 +71,9 @@ public class PersonEndpoint {
     private static String subjectAccountConfirmation = "registration SportConnector";
     private static String msgBodyAccountConfirmation = "Для активации вашей учетной записи перейдите по ссылке: " +
             "https://sportconnector-981.appspot.com/?id=%s&x=%s";
+    private static String ERROR_CONFIRM_EMAIL = "Ошибка! Ваш email %s не изменен!";
+    private static String ERROR_CONFIRM_EMAIL_ALREADY = "Ваш старый email %s уже изменен!";
+    private static String ERROR_CONFIRM_EMAIL_NOTFOUND = "Ошибка! Ваша учетная запись %s не найдена!";
     private static String subjectConfirmEmail = "change Email SportConnector";
     private static String msgBodyConfirmEmail = "Для смены email перейдите по ссылке: " +
             "https://sportconnector-981.appspot.com/email.html?id=%s&x=%s";
@@ -117,7 +120,7 @@ public class PersonEndpoint {
             String msgBody =msgBodyAccountConfirmation;
             sendMail(account.getEmail(),subject,String.format(msgBody,
                     URLEncoder.encode(account.getEmail(), "UTF-8"), URLEncoder.encode(
-                            msgDigest(account.getEmail() + account.getRegisterDate()), "UTF-8")));
+                            getHshForConfirmAccount(account), "UTF-8")));
         } catch (UnsupportedEncodingException e) {
             throw new BadRequestException("createConfirmMsg@: msg for confirmation account didn't send");
         }
@@ -135,7 +138,7 @@ public class PersonEndpoint {
             x = URLDecoder.decode(x,"UTF-8");
             AccountForConfirmation account = ofy().load().type(AccountForConfirmation.class).id(id).now();
             if (account != null) {
-                String hshDB = msgDigest(account.getEmail() + account.getRegisterDate());
+                String hshDB = getHshForConfirmAccount(account);
                 if(x!="" && x.equals(hshDB)) {
                     logger.info(String.format("account: %s has been activated", id));
                     Person person = new Person(account);
@@ -157,7 +160,10 @@ public class PersonEndpoint {
             throw new BadRequestException(String.format(ERROR_CONFIRM,id));
         }
     }
-
+    private String getHshForConfirmAccount(AccountForConfirmation account)
+    {
+        return msgDigest(account.getEmail() + account.getRegisterDate());
+    }
     @ApiMethod(
             name = "authorizePerson",
             path = "authorizePerson",
@@ -251,6 +257,7 @@ public class PersonEndpoint {
             httpMethod = ApiMethod.HttpMethod.PUT)
     public void changeEmail(@Named("id") Long id, @Named("oldEmail") String oldEmail, @Named("newEmail") String newEmail)
             throws NotFoundException, BadRequestException {
+        OAuth_2_0.check();
         Person person = ofy().load().type(Person.class).id(id).now();
         if(person==null)
             throw new NotFoundException("Person with id:" + id + " not found");
@@ -258,7 +265,7 @@ public class PersonEndpoint {
         {
             ReqChangeEmail reqChangeEmail = new ReqChangeEmail(oldEmail,newEmail,person.getId(),Calendar.getInstance().getTime());
             ofy().save().entity(reqChangeEmail).now();
-            reqChangeEmail = ofy().load().type(ReqChangeEmail.class).id(id).now();
+            reqChangeEmail = ofy().load().type(ReqChangeEmail.class).id(oldEmail).now();
             if(reqChangeEmail!=null) {
                 try {
                     logger.info("ReqChangeEmail was created: " + reqChangeEmail);
@@ -266,7 +273,7 @@ public class PersonEndpoint {
                     String msgBody =msgBodyConfirmEmail;
                     sendMail(reqChangeEmail.getNewEmail(),subject,String.format(msgBody,
                             URLEncoder.encode(reqChangeEmail.getEmail(), "UTF-8"), URLEncoder.encode(
-                                    msgDigest(reqChangeEmail.getEmail()+ reqChangeEmail.getNewEmail() + reqChangeEmail.getRegisterDate()), "UTF-8")));
+                                    getHshForChangeEmail(reqChangeEmail),"UTF-8")));
                 } catch (UnsupportedEncodingException e) {
                     throw new BadRequestException("createConfirmEmailMsg@: msg for confirm email didn't send");
                 }
@@ -276,6 +283,43 @@ public class PersonEndpoint {
             throw new BadRequestException("oldEmailErr@: old email doesn't match");
     }
 
+    @ApiMethod(
+            name = "confirmEmail",
+            path = "confirmEmail",
+            httpMethod = ApiMethod.HttpMethod.GET)
+    public void confirmEmail(@Named("id") String oldEmail, @Named("x") String x) throws BadRequestException {
+        try {
+            oldEmail = URLDecoder.decode(oldEmail, "UTF-8");
+            x = URLDecoder.decode(x, "UTF-8");
+            ReqChangeEmail reqChangeEmail = ofy().load().type(ReqChangeEmail.class).id(oldEmail).now();
+            if (reqChangeEmail != null) {
+                String hshDB = getHshForChangeEmail(reqChangeEmail);
+                if(x!="" && x.equals(hshDB)) {
+                    Person person = ofy().load().type(Person.class).id(reqChangeEmail.getPersonId()).now();
+                    person.setEmail(reqChangeEmail.getNewEmail());
+                    ofy().save().entity(person).now();
+                    logger.info(String.format("account: %d email changed form %s to %s", reqChangeEmail.getPersonId(),reqChangeEmail.getEmail(),reqChangeEmail.getNewEmail()));
+                    ofy().delete().type(ReqChangeEmail.class).id(oldEmail).now();
+                    logger.info("Deleted ReqChangeEmail with ID: " + reqChangeEmail.getPersonId()+" email: "+ oldEmail);
+                    return;
+                }
+                logger.info(String.format("ReqChangeEmail: id: %s oldEmail = %s newEmail = %s hsh = %s doesn't match",reqChangeEmail.getPersonId(),reqChangeEmail.getEmail(),reqChangeEmail.getNewEmail(),x));
+                throw new BadRequestException(String.format(ERROR_CONFIRM_EMAIL,oldEmail));
+            }
+            logger.info(String.format("reqChangeEmail: %s wasn't found",oldEmail));
+            Query<Person> query = ofy().load().type(Person.class).filter("email", oldEmail);
+            if(query==null || query.count()==0)
+                throw new BadRequestException(String.format(ERROR_CONFIRM_EMAIL_ALREADY,oldEmail));
+            else
+                throw new BadRequestException(String.format(ERROR_CONFIRM_EMAIL_NOTFOUND,oldEmail));
+        } catch (UnsupportedEncodingException e) {
+            throw new BadRequestException(String.format(ERROR_CONFIRM_EMAIL,oldEmail));
+        }
+    }
+    private String getHshForChangeEmail(ReqChangeEmail reqChangeEmail)
+    {
+        return msgDigest(reqChangeEmail.getEmail()+reqChangeEmail.getNewEmail() + reqChangeEmail.getRegisterDate());
+    }
     /**
      * Change password of an existing person.
      */
@@ -285,6 +329,7 @@ public class PersonEndpoint {
             httpMethod = ApiMethod.HttpMethod.PUT)
     public void changePass(@Named("id") Long id, @Named("oldPass") String oldPass, @Named("newPass") String newPass)
             throws NotFoundException, BadRequestException {
+        OAuth_2_0.check();
         Person person = ofy().load().type(Person.class).id(id).now();
         if(person==null)
             throw  new NotFoundException("Person with id:" + id + " not found");
