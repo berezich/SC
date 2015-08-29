@@ -20,21 +20,33 @@
                 com.berezich.sportconnector.backend.Endpoint.PersonEndpoint</param-value>
         </init-param>
     </servlet>
+
     <servlet-mapping>
         <servlet-name>SystemServiceServlet</servlet-name>
         <url-pattern>/_ah/spi/*</url-pattern>
     </servlet-mapping>
 
+    <servlet>
+        <servlet-name>UploadFile</servlet-name>
+        <servlet-class>com.berezich.sportconnector.backend.Endpoint.UploadFile</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>ServeFile</servlet-name>
+        <servlet-class>com.berezich.sportconnector.backend.Endpoint.ServeFile</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>UploadFile</servlet-name>
+        <url-pattern>/upload_file</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>ServeFile</servlet-name>
+        <url-pattern>/serve_file</url-pattern>
+    </servlet-mapping>
+
     <welcome-file-list>
         <welcome-file>index.html</welcome-file>
     </welcome-file-list>
-    <!--<security-constraint>-->
-        <!--<web-resource-collection>-->
-            <!--<web-resource-name>services</web-resource-name>-->
-            <!--<url-pattern>/_ah/*</url-pattern>-->
-        <!--</web-resource-collection>-->
-        <!--<auth-constraint>-->
-            <!--<role-name>*</role-name>-->
-        <!--</auth-constraint>-->
-    <!--</security-constraint>-->
 </web-app>

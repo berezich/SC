@@ -92,25 +92,8 @@ public class EndpointApi {
     }
     private static File createFileFromInputStream(Context context, InputStream inputStream) {
 
-        String path = "";
-
-        /*File file = new File(Environment.getExternalStorageDirectory(),
-                "KeyHolder/KeyFile/");
-        if (!file.exists()) {
-            if (!file.mkdirs())
-                Log.d("KeyHolder", "Folder not created");
-            else
-                Log.d("KeyHolder", "Folder created");
-        } else
-            Log.d("KeyHolder", "Folder present");*/
-
-        //File file = new File(context.getFilesDir(), FILE_NAME);
-
-        //path = file.getAbsolutePath();
-
         try {
             File f = new File(context.getFilesDir(), FILE_NAME);
-            //File f = new File(path+"/MyKey");
             OutputStream outputStream = new FileOutputStream(f);
             byte buffer[] = new byte[1024];
             int length = 0;
@@ -124,7 +107,6 @@ public class EndpointApi {
 
             return f;
         } catch (Exception e) {
-            // Logging exception
             e.printStackTrace();
         }
 

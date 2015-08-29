@@ -130,8 +130,8 @@ public class PersonEndpoint {
 
     @ApiMethod(
             name = "confirmAccount",
-            path = "confirmAccount",
-            httpMethod = ApiMethod.HttpMethod.GET)
+            path = "AccountForConfirmation",
+            httpMethod = ApiMethod.HttpMethod.DELETE)
     public void confirmAccount(@Named("id") String id, @Named("x") String x) throws BadRequestException {
         try {
             id = URLDecoder.decode(id, "UTF-8");
@@ -286,7 +286,7 @@ public class PersonEndpoint {
     @ApiMethod(
             name = "confirmEmail",
             path = "confirmEmail",
-            httpMethod = ApiMethod.HttpMethod.GET)
+            httpMethod = ApiMethod.HttpMethod.DELETE)
     public void confirmEmail(@Named("id") String oldEmail, @Named("x") String x) throws BadRequestException {
         try {
             oldEmail = URLDecoder.decode(oldEmail, "UTF-8");
@@ -326,7 +326,7 @@ public class PersonEndpoint {
     @ApiMethod(
             name = "changePass",
             path = "personPass",
-            httpMethod = ApiMethod.HttpMethod.PUT)
+            httpMethod = ApiMethod.HttpMethod.GET)
     public void changePass(@Named("id") Long id, @Named("oldPass") String oldPass, @Named("newPass") String newPass)
             throws NotFoundException, BadRequestException {
         OAuth_2_0.check();
