@@ -197,7 +197,7 @@ public class PersonEndpoint {
             name = "getPerson",
             path = "person/{id}",
             httpMethod = ApiMethod.HttpMethod.GET)
-    public Person get(@Named("id") String id) throws NotFoundException,BadRequestException {
+    public Person get(@Named("id") Long id) throws NotFoundException,BadRequestException {
         OAuth_2_0.check();
         logger.info("Getting Person with ID: " + id);
         Person person = ofy().load().type(Person.class).id(id).now();
