@@ -4,8 +4,8 @@ android {
     signingConfigs {
         config {
             keyPassword 'Telepuziki101'
-            storeFile file('D:/Development/Android/Android_Studio/sportConnector_key.jks')
-            //storeFile file('C:/Andorid/Android_Studio_projects/sportConnector_key.jks')
+            //storeFile file('D:/Development/Android/Android_Studio/sportConnector_key.jks')
+            storeFile file('C:/Andorid/Android_Studio_projects/sportConnector_key.jks')
             storePassword 'Telepuziki101'
             keyAlias 'SportConnector_key'
         }
@@ -38,4 +38,10 @@ dependencies {
     compile 'com.google.android.gms:play-services:7.3.0'
     compile project(path: ':backend', configuration: 'android-endpoints')
     compile 'com.google.http-client:google-http-client-gson:1.19.0'
+    compile group: 'org.apache.httpcomponents' , name: 'httpclient-android' , version: '4.3.5'
+    compile (group: 'org.apache.httpcomponents' , name: 'httpmime' , version: '4.3.5') {
+        exclude module: 'org.apache.httpcomponents:httpclient'
+    }
 }
+
+

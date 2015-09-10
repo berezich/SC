@@ -1,12 +1,14 @@
 package com.berezich.sportconnector.backend;
 
 import com.googlecode.objectify.annotation.Entity;
+import com.googlecode.objectify.annotation.Id;
 
 /**
  * Created by berezkin on 10.09.2015.
  */
 @Entity
 public class FileUrl {
+    @Id
     String urlForUpload;
     public FileUrl() {
     }

@@ -29,7 +29,6 @@ import java.util.logging.Logger;
         )
 )
 
-
 public class FileManager {
     static {
         ObjectifyService.register(FileUrl.class);
@@ -38,7 +37,7 @@ public class FileManager {
 
     @ApiMethod(
             name = "getUrlForUpload",
-            path = "fileManager/uploadUrl",
+            path = "fileManager",
             httpMethod = ApiMethod.HttpMethod.GET)
     public FileUrl uploadFileHandle() throws BadRequestException {
         OAuth_2_0.check();

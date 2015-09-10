@@ -17,7 +17,9 @@
             <param-value>com.berezich.sportconnector.backend.Endpoint.RegionInfoEndpoint,
                 com.berezich.sportconnector.backend.Endpoint.SpotEndpoint,
                 com.berezich.sportconnector.backend.Endpoint.UpdateSpotInfoEndpoint,
-                com.berezich.sportconnector.backend.Endpoint.PersonEndpoint</param-value>
+                com.berezich.sportconnector.backend.Endpoint.PersonEndpoint,
+                com.berezich.sportconnector.backend.Endpoint.FileManager
+            </param-value>
         </init-param>
     </servlet>
 
