@@ -544,14 +544,14 @@ public class EndpointApi {
 
 
     public static class GetUrlForUploadAsyncTask extends AsyncTask<String, Void, Pair<List<String>,Exception> >{
-        private OnGetRegionAsyncTaskAction listener=null;
+        private OnGetUrlForUploadAsyncTaskAction listener=null;
         private Context context = null;
         public GetUrlForUploadAsyncTask(Fragment fragment)
         {
             context = fragment.getActivity().getBaseContext();
             setSrvApi(context);
             try {
-                listener = (OnGetRegionAsyncTaskAction) fragment;
+                listener = (OnGetUrlForUploadAsyncTaskAction) fragment;
             } catch (ClassCastException e) {
                 throw new ClassCastException(fragment.toString() + " must implement onGeUrlForUploadAsyncTaskFinish for GetUrlForUploadAsyncTask");
             }
@@ -575,7 +575,7 @@ public class EndpointApi {
             listener.onGeUrlForUploadAsyncTaskFinish(result);
         }
 
-        public static interface OnGetRegionAsyncTaskAction
+        public static interface OnGetUrlForUploadAsyncTaskAction
         {
             void onGeUrlForUploadAsyncTaskFinish(Pair<List<String>,Exception> result);
         }

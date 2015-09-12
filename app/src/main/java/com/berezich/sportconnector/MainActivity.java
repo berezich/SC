@@ -1,6 +1,7 @@
 package com.berezich.sportconnector;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.support.v7.app.ActionBar;
 import android.support.v4.app.FragmentManager;
@@ -239,4 +240,8 @@ public class MainActivity extends AppCompatActivity
         inputMethodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+    }
 }

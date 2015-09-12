@@ -5,9 +5,11 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.ParcelFileDescriptor;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.util.Log;
+import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -17,7 +19,10 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.berezich.sportconnector.EndpointApi;
+import com.berezich.sportconnector.FileUploader;
 import com.berezich.sportconnector.GoogleMap.SpotsData;
 import com.berezich.sportconnector.LocalDataManager;
 import com.berezich.sportconnector.MainActivity;
@@ -29,17 +34,21 @@ import com.google.api.client.util.DateTime;
 
 import java.io.FileDescriptor;
 import java.io.FileNotFoundException;
+import java.net.FileNameMap;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.logging.Logger;
 
 /**
  * Created by berezkin on 17.07.2015.
  */
-public class PersonProfileFragment extends Fragment {
+public class PersonProfileFragment extends Fragment
+        implements EndpointApi.GetUrlForUploadAsyncTask.OnGetUrlForUploadAsyncTaskAction,
+                   FileUploader.UploadFileAsyncTask.OnAction{
     private static final String ARG_SECTION_NUMBER = "section_number";
     private final String TAG = "MyLog_profileFragment";
-    private final int PICK_IMAGE = 1;
+    public static final int PICK_IMAGE = 111;
     int _sectionNumber;
     View rootView;
     /**
@@ -201,44 +210,56 @@ public class PersonProfileFragment extends Fragment {
     private class ImageOnClick implements View.OnClickListener {
         @Override
         public void onClick(View v) {
-            //TODO: implement intend choose image for photo
-            Intent intent = new Intent();
-            intent.setType("image/jpg");
-            intent.setAction(Intent.ACTION_PICK);
+            Intent intent = new Intent(Intent.ACTION_PICK,android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+            intent.setType("image/*");
+            //intent.setAction();
             startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE);
         }
     }
 
-//    @Override
-//    public void onActivityResult(int requestCode, int resultCode,
-//                                 Intent returnIntent) {
-//        // If the selection didn't work
-//        if (resultCode != RESULT_OK) {
-//            // Exit without doing anything else
-//            return;
-//        } else {
-//            // Get the file's content URI from the incoming Intent
-//            Uri returnUri = returnIntent.getData();
-//            /*
-//             * Try to open the file for "read" access using the
-//             * returned URI. If the file isn't found, write to the
-//             * error log and return.
-//             */
-//            try {
-//                /*
-//                 * Get the content resolver instance for this context, and use it
-//                 * to get a ParcelFileDescriptor for the file.
-//                 */
-//                //mInputPFD = getContentResolver().openFileDescriptor(returnUri, "r");
-//            } catch (FileNotFoundException e) {
-//                e.printStackTrace();
-//                Log.e("MainActivity", "File not found.");
-//                return;
-//            }
-//            // Get a regular file descriptor for the file
-//            //FileDescriptor fd = mInputPFD.getFileDescriptor();
-//        }
-//    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode,
+                                 Intent returnIntent) {
+        if (resultCode != Activity.RESULT_OK) {
+            Log.d(TAG, "resultCode !=  Activity.RESULT_OK");
+            return;
+        } else if (requestCode == PICK_IMAGE) {
+            // Get the file's content URI from the incoming Intent
+
+            Uri returnUri = returnIntent.getData();
+
+            new EndpointApi.GetUrlForUploadAsyncTask(this).execute(returnUri.toString());
+
+        }
+    }
+    @Override
+    public void onGeUrlForUploadAsyncTaskFinish(Pair<List<String>, Exception> result) {
+        /*
+         * Try to open the file for "read" access using the
+         * returned URI. If the file isn't found, write to the
+         * error log and return.
+         */
+        String urlForUpload = result.first.get(1);
+        String fileUri = result.first.get(0);
+        FileUploader.FileInfo fileInfo = new FileUploader.FileInfo(this,fileUri);
+        new FileUploader.UploadFileAsyncTask(this).execute(new Pair<>(fileInfo,urlForUpload));
+    }
+
+    @Override
+    public void onUploadFileFinish(Exception exception) {
+        String text;
+        if(exception!=null) {
+            exception.printStackTrace();
+            text = "File not uploaded!";
+            Log.e(TAG,text );
+        }
+        else {
+            text = "File uploaded!";
+            Log.d(TAG, text);
+        }
+        Toast.makeText(getActivity().getBaseContext(),text,Toast.LENGTH_SHORT).show();
+    }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
@@ -258,5 +279,9 @@ public class PersonProfileFragment extends Fragment {
                 break;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    public String getTAG() {
+        return TAG;
     }
 }

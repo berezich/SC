@@ -1,9 +1,18 @@
 package com.berezich.sportconnector;
 
+import android.content.Context;
+import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.ParcelFileDescriptor;
+import android.provider.MediaStore;
+import android.provider.OpenableColumns;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.util.Pair;
+import android.widget.TextView;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -16,38 +25,94 @@ import org.apache.http.entity.mime.content.ByteArrayBody;
 import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.DefaultHttpClient;
 
+import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.FileDescriptor;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Date;
 
 /**
  * Created by Sashka on 11.09.2015.
  */
 public class FileUploader {
-    public class FileInfo{
+    public static class FileInfo{
+        //private final int MAX_SIZE = 1024*10;
         private String name;
-        private String path;
+        private Uri uri;
         private Bitmap bitmap;
-        private int size;
+        private Long size;
         private Date date;
         private String description;
+        private String mimeType;
+        private Fragment fragment;
 
-        public FileInfo(String filePath) {
-            this.path = filePath;
+        public FileInfo(Fragment fragment, String fileUri) {
+            //byte[] dataFile = new byte[MAX_SIZE];
+            String TAG = fragment.getTag();
+            ParcelFileDescriptor mInputPFD;
+            this.fragment = fragment;
+            uri= Uri.parse(fileUri);
+            try {
+                bitmap =  MediaStore.Images.Media.getBitmap(fragment.getActivity().getContentResolver(), uri);
+            } catch (IOException e) {
+                Log.d(TAG, "getBitmap error uri = " + uri.toString());
+                e.printStackTrace();
+                return;
+            }
+
+            /*
+            try {
+                mInputPFD = fragment.getActivity().getContentResolver().openFileDescriptor(uri, "r");
+                // Get a regular file descriptor for the file
+                FileDescriptor fd = mInputPFD.getFileDescriptor();
+                Log.d(TAG, "file descriptor = " + fd.toString());
+
+                InputStream in = null;
+                try {
+                    in = new BufferedInputStream(new FileInputStream(fd));
+                    in.read(dataFile);
+                }
+                finally {
+                    if (in != null) {
+                        in.close();
+                    }
+                }
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+                Log.e(TAG, "File not found.");
+                return;
+            }
+            catch (IOException e) {
+                e.printStackTrace();
+                return;
+            }
+            */
+
+            Cursor returnCursor = fragment.getActivity().getContentResolver().query(uri, null, null, null, null);
+            int nameIndex = returnCursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
+            int sizeIndex = returnCursor.getColumnIndex(OpenableColumns.SIZE);
+            returnCursor.moveToFirst();
+            this.name = returnCursor.getString(nameIndex);
+            this.size = returnCursor.getLong(sizeIndex);
+            this.mimeType = fragment.getActivity().getContentResolver().getType(uri);
         }
 
         public String getName() {
             return name;
         }
 
-        public String getPath() {
-            return path;
+        public Uri getUri() {
+            return uri;
         }
 
         public Bitmap getBitmap() {
             return bitmap;
         }
 
-        public int getSize() {
+        public Long getSize() {
             return size;
         }
 
@@ -59,19 +124,23 @@ public class FileUploader {
             return description;
         }
 
+        public String getMimeType() {
+            return mimeType;
+        }
+
         public void setName(String name) {
             this.name = name;
         }
 
-        public void setPath(String path) {
-            this.path = path;
+        public void setUri(Uri uri) {
+            this.uri = uri;
         }
 
         public void setBitmap(Bitmap bitmap) {
             this.bitmap = bitmap;
         }
 
-        public void setSize(int size) {
+        public void setSize(Long size) {
             this.size = size;
         }
 
@@ -81,6 +150,10 @@ public class FileUploader {
 
         public void setDescription(String description) {
             this.description = description;
+        }
+
+        public void setMimeType(String mimeType) {
+            this.mimeType = mimeType;
         }
     }
     public static class UploadFileAsyncTask extends AsyncTask< Pair <FileInfo,String>, Void, Exception > {
@@ -103,19 +176,24 @@ public class FileUploader {
                 HttpPost postRequest = new HttpPost(uploadUrl);
                 MultipartEntityBuilder builder = MultipartEntityBuilder.create();
                 builder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
-                builder.addPart(fileInfo.getName(), new StringBody("Name", ContentType.MULTIPART_FORM_DATA));
-                builder.addPart(fileInfo.getDescription(), new StringBody("Caption", ContentType.MULTIPART_FORM_DATA));
+                builder.addPart("Name",new StringBody(fileInfo.getName(), ContentType.MULTIPART_FORM_DATA));
+                builder.addPart("Type", new StringBody(fileInfo.getMimeType(), ContentType.MULTIPART_FORM_DATA));
 
                 try{
                     ByteArrayOutputStream bos = new ByteArrayOutputStream();
                     bitmap.compress(Bitmap.CompressFormat.JPEG, 75, bos);
                     byte[] data = bos.toByteArray();
-                    ByteArrayBody bab = new ByteArrayBody(data, fileInfo.getName());
+                    //ByteArrayBody bab = new ByteArrayBody(data, fileInfo.getName());
 
-                    builder.addPart("myFile", bab);
+                    //builder.addPart("myFile", bab);
+
+                    builder.addBinaryBody("myFile", data, ContentType.create(fileInfo.getMimeType()), fileInfo.getName());
+
+
                 }
                 catch(Exception e){
-                    builder.addPart("myFile", new StringBody("",ContentType.MULTIPART_FORM_DATA));
+                    return e;
+                    //builder.addPart("myFile", new StringBody("",ContentType.MULTIPART_FORM_DATA));
                 }
                 HttpEntity entity = builder.build();
                 postRequest.setEntity(entity);
