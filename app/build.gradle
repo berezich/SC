@@ -10,6 +10,7 @@ android {
             keyAlias 'SportConnector_key'
         }
     }
+
     compileSdkVersion 21
     buildToolsVersion "21.1.2"
     defaultConfig {
@@ -18,6 +19,7 @@ android {
         targetSdkVersion 21
         versionCode 1
         versionName "1.0"
+        multiDexEnabled true
     }
     buildTypes {
         release {
@@ -28,14 +30,21 @@ android {
             signingConfig signingConfigs.config
         }
     }
+    packagingOptions {
+        exclude 'META-INF/DEPENDENCIES'
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'META-INF/NOTICE'
+        exclude 'META-INF/NOTICE.txt'
+    }
 }
-
 dependencies {
+    compile 'com.android.support:multidex:1.0.1'
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile project(':library')
     compile 'com.android.support:design:22.2.0'
-    compile 'com.android.support:appcompat-v7:22.1.1'
-    compile 'com.google.android.gms:play-services:7.3.0'
+    compile 'com.android.support:appcompat-v7:22.2.0'
+    compile 'com.google.android.gms:play-services:7.5.0'
     compile project(path: ':backend', configuration: 'android-endpoints')
     compile 'com.google.http-client:google-http-client-gson:1.19.0'
     compile group: 'org.apache.httpcomponents' , name: 'httpclient-android' , version: '4.3.5'
@@ -43,5 +52,4 @@ dependencies {
         exclude module: 'org.apache.httpcomponents:httpclient'
     }
 }
-
 

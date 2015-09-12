@@ -1,6 +1,9 @@
 package com.berezich.sportconnector.PersonProfile;
 
 import android.app.Activity;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -11,6 +14,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -23,6 +27,8 @@ import com.berezich.sportconnector.backend.sportConnectorApi.model.Person;
 import com.berezich.sportconnector.backend.sportConnectorApi.model.Spot;
 import com.google.api.client.util.DateTime;
 
+import java.io.FileDescriptor;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -33,6 +39,7 @@ import java.util.List;
 public class PersonProfileFragment extends Fragment {
     private static final String ARG_SECTION_NUMBER = "section_number";
     private final String TAG = "MyLog_profileFragment";
+    private final int PICK_IMAGE = 1;
     int _sectionNumber;
     View rootView;
     /**
@@ -82,10 +89,14 @@ public class PersonProfileFragment extends Fragment {
     {
         super.onResume();
         TextView txtView;
+        ImageView imageView;
         getActivity().setTitle(R.string.personprofile_fragmentTitle);
         Person myPersonInfo = LocalDataManager.getMyPersonInfo();
         if(myPersonInfo!=null && rootView!=null)
         {
+            if((imageView = (ImageView) rootView.findViewById(R.id.profile_img_photo))!=null) {
+                imageView.setOnClickListener(new ImageOnClick());
+            }
             if((txtView = (TextView) rootView.findViewById(R.id.profile_txt_name))!=null) {
                 String name = myPersonInfo.getName(), surname = myPersonInfo.getSurname();
                 txtView.setText( ((name!=null && !name.equals("")) ? name :"") + ((surname!=null && !surname.equals("")) ? " "+surname :""));
@@ -186,6 +197,48 @@ public class PersonProfileFragment extends Fragment {
             }
         }
     }
+
+    private class ImageOnClick implements View.OnClickListener {
+        @Override
+        public void onClick(View v) {
+            //TODO: implement intend choose image for photo
+            Intent intent = new Intent();
+            intent.setType("image/jpg");
+            intent.setAction(Intent.ACTION_PICK);
+            startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE);
+        }
+    }
+
+//    @Override
+//    public void onActivityResult(int requestCode, int resultCode,
+//                                 Intent returnIntent) {
+//        // If the selection didn't work
+//        if (resultCode != RESULT_OK) {
+//            // Exit without doing anything else
+//            return;
+//        } else {
+//            // Get the file's content URI from the incoming Intent
+//            Uri returnUri = returnIntent.getData();
+//            /*
+//             * Try to open the file for "read" access using the
+//             * returned URI. If the file isn't found, write to the
+//             * error log and return.
+//             */
+//            try {
+//                /*
+//                 * Get the content resolver instance for this context, and use it
+//                 * to get a ParcelFileDescriptor for the file.
+//                 */
+//                //mInputPFD = getContentResolver().openFileDescriptor(returnUri, "r");
+//            } catch (FileNotFoundException e) {
+//                e.printStackTrace();
+//                Log.e("MainActivity", "File not found.");
+//                return;
+//            }
+//            // Get a regular file descriptor for the file
+//            //FileDescriptor fd = mInputPFD.getFileDescriptor();
+//        }
+//    }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {

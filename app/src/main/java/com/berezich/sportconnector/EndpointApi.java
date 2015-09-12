@@ -8,6 +8,7 @@ import android.util.Pair;
 
 import com.berezich.sportconnector.backend.sportConnectorApi.SportConnectorApi;
 import com.berezich.sportconnector.backend.sportConnectorApi.model.AccountForConfirmation;
+import com.berezich.sportconnector.backend.sportConnectorApi.model.FileUrl;
 import com.berezich.sportconnector.backend.sportConnectorApi.model.Person;
 import com.berezich.sportconnector.backend.sportConnectorApi.model.RegionInfo;
 import com.berezich.sportconnector.backend.sportConnectorApi.model.Spot;
@@ -523,7 +524,7 @@ public class EndpointApi {
             String oldEmail = params[0].second;
             String newEmail = params[1].second;
             try {
-                srvApi.changeEmail(id,newEmail,oldEmail).execute();
+                srvApi.changeEmail(id, newEmail, oldEmail).execute();
                 return null;
             } catch (Exception e) {
                 return e;
@@ -541,5 +542,43 @@ public class EndpointApi {
         }
     }
 
+
+    public static class GetUrlForUploadAsyncTask extends AsyncTask<String, Void, Pair<List<String>,Exception> >{
+        private OnGetRegionAsyncTaskAction listener=null;
+        private Context context = null;
+        public GetUrlForUploadAsyncTask(Fragment fragment)
+        {
+            context = fragment.getActivity().getBaseContext();
+            setSrvApi(context);
+            try {
+                listener = (OnGetRegionAsyncTaskAction) fragment;
+            } catch (ClassCastException e) {
+                throw new ClassCastException(fragment.toString() + " must implement onGeUrlForUploadAsyncTaskFinish for GetUrlForUploadAsyncTask");
+            }
+        }
+        @Override
+        protected Pair<List<String>,Exception> doInBackground(String ...params) {
+            String fileForUpload = params[0];
+            List<String> strings = new ArrayList<>();
+            strings.add(fileForUpload);
+            try {
+                FileUrl fileUrl = srvApi.getUrlForUpload().execute();
+                strings.add( fileUrl.getUrlForUpload());
+                return new Pair<List<String>,Exception>(strings,null);
+            } catch (Exception e) {
+                return new Pair<List<String>,Exception>(null,e);
+            }
+        }
+
+        @Override
+        protected void onPostExecute(Pair<List<String>,Exception> result) {
+            listener.onGeUrlForUploadAsyncTaskFinish(result);
+        }
+
+        public static interface OnGetRegionAsyncTaskAction
+        {
+            void onGeUrlForUploadAsyncTaskFinish(Pair<List<String>,Exception> result);
+        }
+    }
 }
 
