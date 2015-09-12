@@ -30,6 +30,7 @@ public class Person {
     private float rating;
     private String description;
     private TYPE type;
+    private Picture photo;
     private List<Picture> pictureLst;
     private List<Long> favoriteSpotIdLst;
     private List<String> myFriends;
@@ -62,6 +63,8 @@ public class Person {
         rating = anotherPerson.getRating();
         description = anotherPerson.getDescription();
         type = anotherPerson.getType();
+        sex = anotherPerson.getSex();
+        photo = anotherPerson.getPhoto();
         if(anotherPerson.getPictureLst()!=null)
             pictureLst = new ArrayList<>(anotherPerson.getPictureLst());
         if(anotherPerson.getFavoriteSpotIdLst()!=null)
@@ -112,6 +115,10 @@ public class Person {
 
     public String getDescription() {
         return description;
+    }
+
+    public Picture getPhoto() {
+        return photo;
     }
 
     public List<Picture> getPictureLst() {
@@ -182,6 +189,10 @@ public class Person {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public void setPhoto(Picture photo) {
+        this.photo = photo;
     }
 
     public void setPictureLst(List<Picture> pictureLst) {

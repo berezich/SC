@@ -112,8 +112,7 @@ public class RegionInfoEndpoint {
             path = "storeRegionInfo/{getId}",
             httpMethod = ApiMethod.HttpMethod.PUT)
     */
-    @ApiResourceProperty(ignored = AnnotationBoolean.TRUE)
-    public RegionInfo update(@Named("id") Long id, RegionInfo regionInfo) throws NotFoundException, BadRequestException {
+    protected RegionInfo update(Long id, RegionInfo regionInfo) throws NotFoundException, BadRequestException {
         OAuth_2_0.check();
         checkExists(id);
         validateRegionInfoProperties(regionInfo);

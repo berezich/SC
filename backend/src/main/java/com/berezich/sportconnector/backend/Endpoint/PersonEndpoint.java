@@ -381,8 +381,7 @@ public class PersonEndpoint {
         return personRes;
     }
 
-    @ApiResourceProperty(ignored = AnnotationBoolean.TRUE)
-    public void addPersonsFavoriteSpot(@Named("lstPersonIds") List<Long> idLst,@Named("spotId") Long spotId) throws BadRequestException{
+    protected void addPersonsFavoriteSpot(List<Long> idLst,Long spotId) throws BadRequestException{
         OAuth_2_0.check();
         Person person;
         for (int i = 0; i < idLst.size(); i++) {
@@ -402,8 +401,7 @@ public class PersonEndpoint {
     }
 
 
-    @ApiResourceProperty(ignored = AnnotationBoolean.TRUE)
-    public void removePersonsFavoriteSpot(@Named("lstPersonIds") List<Long> idLst,@Named("spotId") Long spotId) throws BadRequestException{
+    protected void removePersonsFavoriteSpot(List<Long> idLst, Long spotId) throws BadRequestException{
         OAuth_2_0.check();
         Person person;
         if(idLst!=null)
@@ -422,7 +420,16 @@ public class PersonEndpoint {
                 }
             }
     }
-
+    protected void setPersonPhoto(Long id, String photoKey) throws BadRequestException,NotFoundException{
+        //OAuth_2_0.check();
+        Person person;
+        checkExists(id);
+        person = ofy().load().type(Person.class).id(id).now();
+        com.berezich.sportconnector.backend.Picture pic = new com.berezich.sportconnector.backend.Picture(photoKey);
+        person.setPhoto(pic);
+        ofy().save().entity(person).now();
+        logger.info("Person with id:" + id + " set photo id:" + photoKey);
+    }
     /**
      * Deletes the specified {@code Person}.
      *
@@ -614,7 +621,7 @@ public class PersonEndpoint {
             Transport.send(msg);
 
         } catch (AddressException e) {
-            // ...
+            // TODO: sendMail handle exception
         }catch (UnsupportedEncodingException e) {
             // ...
         } catch (MessagingException e) {

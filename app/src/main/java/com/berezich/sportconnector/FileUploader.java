@@ -14,6 +14,8 @@ import android.util.Log;
 import android.util.Pair;
 import android.widget.TextView;
 
+import com.berezich.sportconnector.backend.sportConnectorApi.model.Person;
+
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -176,8 +178,12 @@ public class FileUploader {
                 HttpPost postRequest = new HttpPost(uploadUrl);
                 MultipartEntityBuilder builder = MultipartEntityBuilder.create();
                 builder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
-                builder.addPart("Name",new StringBody(fileInfo.getName(), ContentType.MULTIPART_FORM_DATA));
+                builder.addPart("Name", new StringBody(fileInfo.getName(), ContentType.MULTIPART_FORM_DATA));
                 builder.addPart("Type", new StringBody(fileInfo.getMimeType(), ContentType.MULTIPART_FORM_DATA));
+                Person myPersonInfo = LocalDataManager.getMyPersonInfo();
+                if(myPersonInfo==null)
+                    new NullPointerException("myPersonInfo == null");
+                builder.addPart("usrId", new StringBody(myPersonInfo.getId().toString(), ContentType.MULTIPART_FORM_DATA));
 
                 try{
                     ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -187,7 +193,7 @@ public class FileUploader {
 
                     //builder.addPart("myFile", bab);
 
-                    builder.addBinaryBody("myFile", data, ContentType.create(fileInfo.getMimeType()), fileInfo.getName());
+                    builder.addBinaryBody("usrPhoto", data, ContentType.create(fileInfo.getMimeType()), fileInfo.getName());
 
 
                 }

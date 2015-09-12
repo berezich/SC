@@ -73,17 +73,8 @@ public class UpdateSpotInfoEndpoint {
         return updateSpotInfo;
     }
 
-    /**
-     * Inserts a new {@code UpdateSpotInfo}.
-     */
-    /*
-    @ApiMethod(
-            name = "insertUpdateSpotInfo",
-            path = "updateSpotInfo",
-            httpMethod = ApiMethod.HttpMethod.POST)
-    */
-    @ApiResourceProperty(ignored = AnnotationBoolean.TRUE)
-    public UpdateSpotInfo insert(UpdateSpotInfo updateSpotInfo) throws BadRequestException {
+
+    protected UpdateSpotInfo insert(UpdateSpotInfo updateSpotInfo) throws BadRequestException {
         // Typically in a RESTful API a POST does not have a known ID (assuming the ID is used in the resource path).
         // You should validate that updateSpotInfo._id has not been set. If the ID type is not supported by the
         // Objectify ID generator, e.g. long or String, then you should generate the unique ID yourself prior to saving.
@@ -98,23 +89,8 @@ public class UpdateSpotInfoEndpoint {
 
         return ofy().load().entity(updateSpotInfo).now();
     }
-    /**
-     * Updates an existing {@code UpdateSpotInfo}.
-     *
-     * @param id            the ID of the entity to be updated
-     * @param updateSpotInfo the desired state of the entity
-     * @return the updated version of the entity
-     * @throws NotFoundException if the {@code _id} does not correspond to an existing
-     *                           {@code UpdateSpotInfo}
-     */
-    /*
-    @ApiMethod(
-            name = "updateUpdateSpotInfo",
-            path = "updateSpotInfo/{id}",
-            httpMethod = ApiMethod.HttpMethod.PUT)
-    */
-    @ApiResourceProperty(ignored = AnnotationBoolean.TRUE)
-    public UpdateSpotInfo update(@Named("id") Long id, UpdateSpotInfo updateSpotInfo) throws NotFoundException, BadRequestException {
+
+    protected UpdateSpotInfo update(Long id, UpdateSpotInfo updateSpotInfo) throws NotFoundException, BadRequestException {
         OAuth_2_0.check();
         checkExists(id);
         validateUpdateSpotInfoProperties(updateSpotInfo);
@@ -130,8 +106,7 @@ public class UpdateSpotInfoEndpoint {
      * @param id the ID of the entity to delete
      * @throws NotFoundException if the {@code _id} does not correspond to an existing
      *                           {@code UpdateSpotInfo}
-     */
-    /*
+
     @ApiMethod(
             name = "remove",
             path = "updateSpotInfo/{getId}",
@@ -141,9 +116,7 @@ public class UpdateSpotInfoEndpoint {
         ofy().delete().type(UpdateSpotInfo.class).getId(getId).now();
         logger.info("Deleted UpdateSpotInfo with ID: " + getId);
     }
-    */
 
-    /**
      * List all entities.
      *
      * @param cursor used for pagination to determine which page to return
@@ -172,14 +145,15 @@ public class UpdateSpotInfoEndpoint {
         return CollectionResponse.<UpdateSpotInfo>builder().setItems(updateSpotInfoList)
                 .setNextPageToken(queryIterator.getCursor().toWebSafeString()).build();
     }
+
     /**
+     *
      * List all entities.
      *
      * @param cursor used for pagination to determine which page to return
      * @param limit  the maximum number of entries to return
      * @return a response that encapsulates the result list and the next page token/cursor
-     */
-    /*
+
     @ApiMethod(
             getName = "list",
             path = "updateSpotInfo",
@@ -197,7 +171,7 @@ public class UpdateSpotInfoEndpoint {
         }
         return CollectionResponse.<UpdateSpotInfo>builder().setItems(updateSpotInfoList).setNextPageToken(queryIterator.getCursor().toWebSafeString()).build();
     }
-    */
+    **/
     private void checkExists(Long _id) throws NotFoundException {
         try {
             ofy().load().type(UpdateSpotInfo.class).id(_id).safe();

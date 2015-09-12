@@ -176,8 +176,7 @@ public class SpotEndpoint {
         return;
     }
 
-    @ApiResourceProperty(ignored = AnnotationBoolean.TRUE)
-    public void removePersonFromSpots(@Named("lstSpotIds") List<Long> idLst, @Named("personType") Person.TYPE type, @Named("personId") Long personId) throws BadRequestException{
+    protected void removePersonFromSpots(List<Long> idLst, Person.TYPE type, Long personId) throws BadRequestException{
         OAuth_2_0.check();
         Spot spot;
         List<Long> personLst;
@@ -202,8 +201,7 @@ public class SpotEndpoint {
             }
         }
     }
-    @ApiResourceProperty(ignored = AnnotationBoolean.TRUE)
-    public void addPersonsToSpots(@Named("lstSpotIds") List<Long> idLst, @Named("personType")Person.TYPE type,@Named("personId") Long personId) throws BadRequestException{
+    protected void addPersonsToSpots(List<Long> idLst, Person.TYPE type,Long personId) throws BadRequestException{
         OAuth_2_0.check();
         Spot spot;
         List<Long> personLst;
