@@ -41,7 +41,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -293,8 +292,8 @@ public class PersonProfileFragment extends Fragment
                 LocalDataManager.setMyPersonInfo(myPersonInfo.setPass(myPersonInfo.getPass()));
                 Picture pic = myPersonInfo.getPhoto();
                 if(pic!=null){
-                    cacheImage = picInfo.savePicToCache(UsefulFunctions.getDigest(myPersonInfo.getPhoto().getBlobKey()),myPersonInfo.getId());
-                    //cacheImage = picInfo.savePicToCache("test.jpeg",myPersonInfo.getId());
+                    cacheImage = picInfo.savePicPreviewToCache(UsefulFunctions.getDigest(myPersonInfo.getPhoto().getBlobKey()), myPersonInfo.getId());
+                    //cacheImage = picInfo.savePicPreviewToCache("test.jpeg",myPersonInfo.getId());
                     if(cacheImage!=null && rootView!=null) {
                         ImageView imageView = (ImageView) rootView.findViewById(R.id.profile_img_photo);
                         if(imageView!=null)

@@ -28,6 +28,8 @@
         <dimen name="divider_block_width">4dp</dimen>
         <dimen name="property_line_width">2dp</dimen>
         <dimen name="left_right_offset">4dp</dimen>
+        <dimen name="personProfile_photoHeight">200dp</dimen>
+        <dimen name="personProfile_photoWidth">200dp</dimen>
     <!-- fragment_personProfile-->
 
     <!-- fragment_editProfile-->

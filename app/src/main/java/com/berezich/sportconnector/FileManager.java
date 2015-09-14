@@ -3,6 +3,7 @@ package com.berezich.sportconnector;
 import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Environment;
@@ -28,6 +29,8 @@ import org.apache.http.impl.client.DefaultHttpClient;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.security.MessageDigest;
@@ -40,9 +43,10 @@ import java.util.Date;
 public class FileManager {
     //private final int MAX_SIZE = 1024*10;
     private static final int COMPRESS_QUALITY = 75;
+    private static final int REQUIRED_SIZE = 1000;
     public static class PicInfo {
         private String name;
-        private Uri uri;
+        private String path;
         private Bitmap bitmap;
         private Long size;
         private Date date;
@@ -53,21 +57,25 @@ public class FileManager {
         public PicInfo(Fragment fragment, String fileUri) {
             String TAG = fragment.getTag();
             this.fragment = fragment;
-            uri= Uri.parse(fileUri);
-            try {
+            Uri uri= Uri.parse(fileUri);
+            Cursor returnCursor = fragment.getActivity().getContentResolver().query(uri, null, null, null, null);
+            int nameIndex = returnCursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
+            int sizeIndex = returnCursor.getColumnIndex(OpenableColumns.SIZE);
+            int dataIdx = returnCursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA);
+            returnCursor.moveToFirst();
+            this.name = returnCursor.getString(nameIndex);
+            this.size = returnCursor.getLong(sizeIndex);
+            this.mimeType = fragment.getActivity().getContentResolver().getType(uri);
+            this.path = returnCursor.getString(dataIdx);
+            bitmap = decodeFile(new File(path));
+            /*try {
                 bitmap =  MediaStore.Images.Media.getBitmap(fragment.getActivity().getContentResolver(), uri);
             } catch (IOException e) {
                 Log.d(TAG, "getBitmap error uri = " + uri.toString());
                 e.printStackTrace();
                 return;
-            }
-            Cursor returnCursor = fragment.getActivity().getContentResolver().query(uri, null, null, null, null);
-            int nameIndex = returnCursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
-            int sizeIndex = returnCursor.getColumnIndex(OpenableColumns.SIZE);
-            returnCursor.moveToFirst();
-            this.name = returnCursor.getString(nameIndex);
-            this.size = returnCursor.getLong(sizeIndex);
-            this.mimeType = fragment.getActivity().getContentResolver().getType(uri);
+            }*/
+
         }
 
         /**
@@ -79,21 +87,33 @@ public class FileManager {
             return bos.toByteArray();
         }
 
-        public File savePicToCache(String fileName, Long personId)
+        public File savePicPreviewToCache(String fileName, Long personId)
         {
-            if(fileName.equals(""))
+            String TAG = getFragment().getTag();
+            Context context = getFragment().getActivity().getBaseContext();
+            if(fileName==null || fileName.equals("")) {
+                Log.e(TAG, "file name not valid");
                 return null;
+            }
+            if(!isExternalStorageWritable()) {
+                Log.e(TAG, "ExternalStorage not writable");
+                return null;
+            }
 
-            File file = FileManager.getAlbumStorageDir(getFragment().getTag(),getFragment().getActivity().getBaseContext(),personId.toString());
+            File file = FileManager.getAlbumStorageDir(TAG,context,personId.toString());
             if(file!=null)
             {
-                Log.d(getFragment().getTag(), "filePath = " + file.getPath());
+                Log.d(TAG, "filePath = " + file.getPath());
                 file = new File (file,fileName);
-                if (file.exists ()) file.delete ();
+                if (file.exists ())
+                    file.delete ();
                 try {
                     FileOutputStream out = new FileOutputStream(file);
-
-                    bitmap.compress(Bitmap.CompressFormat.JPEG, FileManager.COMPRESS_QUALITY, out);
+                    Bitmap endBitmap = cropCenterBitmap(bitmap);
+                    int photoHeight = (int)context.getResources().getDimension(R.dimen.personProfile_photoHeight);
+                    int photoWidth = (int)context.getResources().getDimension(R.dimen.personProfile_photoWidth);
+                    endBitmap = Bitmap.createScaledBitmap(endBitmap,photoWidth, photoHeight, false);
+                    endBitmap.compress(Bitmap.CompressFormat.JPEG, FileManager.COMPRESS_QUALITY, out);
                     out.flush();
                     out.close();
                     return file;
@@ -112,8 +132,8 @@ public class FileManager {
             return name;
         }
 
-        public Uri getUri() {
-            return uri;
+        public String getPath() {
+            return path;
         }
 
         public Bitmap getBitmap() {
@@ -144,8 +164,8 @@ public class FileManager {
             this.name = name;
         }
 
-        public void setUri(Uri uri) {
-            this.uri = uri;
+        public void setPath(String path) {
+            this.path = path;
         }
 
         public void setBitmap(Bitmap bitmap) {
@@ -181,7 +201,6 @@ public class FileManager {
         @Override
         protected Pair<PicInfo, Exception > doInBackground(Pair <PicInfo,String>... params) {
             PicInfo picInfo = params[0].first;
-            Bitmap bitmap = picInfo.getBitmap();
             String uploadUrl = params[0].second;
             try {
                 HttpClient httpClient = new DefaultHttpClient();
@@ -236,5 +255,74 @@ public class FileManager {
             Log.e(LOG_TAG, "Directory has already created");
         }
         return file;
+    }
+
+    /* Checks if external storage is available for read and write */
+    public static boolean isExternalStorageWritable() {
+        String state = Environment.getExternalStorageState();
+        if (Environment.MEDIA_MOUNTED.equals(state)) {
+            return true;
+        }
+        return false;
+    }
+
+    /* Checks if external storage is available to at least read */
+    public static boolean isExternalStorageReadable() {
+        String state = Environment.getExternalStorageState();
+        if (Environment.MEDIA_MOUNTED.equals(state) ||
+                Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)) {
+            return true;
+        }
+        return false;
+    }
+
+    public static Bitmap cropCenterBitmap(Bitmap srcBmp){
+        Bitmap dstBmp;
+        if (srcBmp.getWidth() >= srcBmp.getHeight()){
+
+            dstBmp = Bitmap.createBitmap(
+                    srcBmp,
+                    srcBmp.getWidth()/2 - srcBmp.getHeight()/2,
+                    0,
+                    srcBmp.getHeight(),
+                    srcBmp.getHeight()
+            );
+
+        }else{
+
+            dstBmp = Bitmap.createBitmap(
+                    srcBmp,
+                    0,
+                    srcBmp.getHeight()/2 - srcBmp.getWidth()/2,
+                    srcBmp.getWidth(),
+                    srcBmp.getWidth()
+            );
+        }
+        return dstBmp;
+    }
+    // Decodes image and scales it to reduce memory consumption
+    private static Bitmap decodeFile(File f) {
+        try {
+            // Decode image size
+            Log.d("TAG","file absolutePath = "+f.getAbsolutePath());
+            BitmapFactory.Options o = new BitmapFactory.Options();
+            o.inJustDecodeBounds = true;
+            BitmapFactory.decodeStream(new FileInputStream(f), null, o);
+
+            // Find the correct scale value. It should be the power of 2.
+            int scale = 1;
+            while(o.outWidth / scale / 2 >= REQUIRED_SIZE &&
+                    o.outHeight / scale / 2 >= REQUIRED_SIZE) {
+                scale *= 2;
+            }
+
+            // Decode with inSampleSize
+            BitmapFactory.Options o2 = new BitmapFactory.Options();
+            o2.inSampleSize = scale;
+            return BitmapFactory.decodeStream(new FileInputStream(f), null, o2);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }
