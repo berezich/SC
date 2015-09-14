@@ -4,8 +4,11 @@ import android.util.Log;
 
 import com.berezich.sportconnector.backend.sportConnectorApi.model.AccountForConfirmation;
 import com.berezich.sportconnector.backend.sportConnectorApi.model.Person;
+import com.google.api.client.util.Base64;
 import com.google.api.client.util.DateTime;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -55,5 +58,28 @@ public class UsefulFunctions {
         person.setPass(account.getPass());
         person.setType(account.getType());
         return person;
+    }
+    public static String getDigest(String stringToEncrypt)
+    {
+        MessageDigest messageDigest;
+        try {
+            messageDigest = MessageDigest.getInstance("MD5");
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+            return "";
+        }
+        messageDigest.update(stringToEncrypt.getBytes());
+        return bytesToHex(messageDigest.digest());
+        //return encryptedString;
+    }
+    public static String bytesToHex(byte[] bytes) {
+        final char[] hexArray = "0123456789ABCDEF".toCharArray();
+        char[] hexChars = new char[bytes.length * 2];
+        for ( int j = 0; j < bytes.length; j++ ) {
+            int v = bytes[j] & 0xFF;
+            hexChars[j * 2] = hexArray[v >>> 4];
+            hexChars[j * 2 + 1] = hexArray[v & 0x0F];
+        }
+        return new String(hexChars);
     }
 }

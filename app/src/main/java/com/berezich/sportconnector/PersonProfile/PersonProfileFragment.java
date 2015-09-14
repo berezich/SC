@@ -1,11 +1,11 @@
 package com.berezich.sportconnector.PersonProfile;
 
 import android.app.Activity;
-import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.ParcelFileDescriptor;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.util.Log;
@@ -22,33 +22,42 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.berezich.sportconnector.EndpointApi;
-import com.berezich.sportconnector.FileUploader;
+import com.berezich.sportconnector.FileManager;
 import com.berezich.sportconnector.GoogleMap.SpotsData;
 import com.berezich.sportconnector.LocalDataManager;
 import com.berezich.sportconnector.MainActivity;
 import com.berezich.sportconnector.R;
 import com.berezich.sportconnector.UsefulFunctions;
 import com.berezich.sportconnector.backend.sportConnectorApi.model.Person;
+import com.berezich.sportconnector.backend.sportConnectorApi.model.Picture;
 import com.berezich.sportconnector.backend.sportConnectorApi.model.Spot;
 import com.google.api.client.util.DateTime;
+import com.google.api.client.util.IOUtils;
 
-import java.io.FileDescriptor;
+import java.io.BufferedInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.net.FileNameMap;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.logging.Logger;
 
 /**
  * Created by berezkin on 17.07.2015.
  */
 public class PersonProfileFragment extends Fragment
-        implements EndpointApi.GetUrlForUploadAsyncTask.OnGetUrlForUploadAsyncTaskAction,
-                   FileUploader.UploadFileAsyncTask.OnAction{
+        implements EndpointApi.GetUrlForUploadAsyncTask.OnAction,
+                   FileManager.UploadFileAsyncTask.OnAction,
+                   EndpointApi.GetListPersonByIdLstAsyncTask.OnAction
+{
     private static final String ARG_SECTION_NUMBER = "section_number";
     private final String TAG = "MyLog_profileFragment";
     public static final int PICK_IMAGE = 111;
+    FileManager.PicInfo picInfo;
     int _sectionNumber;
     View rootView;
     /**
@@ -242,13 +251,15 @@ public class PersonProfileFragment extends Fragment
          */
         String urlForUpload = result.first.get(1);
         String fileUri = result.first.get(0);
-        FileUploader.FileInfo fileInfo = new FileUploader.FileInfo(this,fileUri);
-        new FileUploader.UploadFileAsyncTask(this).execute(new Pair<>(fileInfo,urlForUpload));
+        FileManager.PicInfo picInfo = new FileManager.PicInfo(this,fileUri);
+        new FileManager.UploadFileAsyncTask(this).execute(new Pair<>(picInfo,urlForUpload));
     }
 
     @Override
-    public void onUploadFileFinish(Exception exception) {
+    public void onUploadFileFinish(Pair<FileManager.PicInfo,Exception> result) {
         String text;
+        picInfo = result.first;
+        Exception exception = result.second;
         if(exception!=null) {
             exception.printStackTrace();
             text = "File not uploaded!";
@@ -258,9 +269,89 @@ public class PersonProfileFragment extends Fragment
             text = "File uploaded!";
             Log.d(TAG, text);
         }
-        Toast.makeText(getActivity().getBaseContext(),text,Toast.LENGTH_SHORT).show();
+
+        //TODO: turn off toast message
+        Toast.makeText(getActivity().getBaseContext(),text,Toast.LENGTH_LONG).show();
+        Person myPersonInfo = LocalDataManager.getMyPersonInfo();
+        if(myPersonInfo!=null) {
+            List list = new ArrayList();
+            list.add(new Long(myPersonInfo.getId()));
+            new EndpointApi.GetListPersonByIdLstAsyncTask(this).execute(list);
+        }
     }
 
+    @Override
+    public void onGetListPersonByIdLstFinish(Pair<List<Person>, Exception> result) {
+        Exception exception = result.second;
+        List<Person> personList = result.first;
+        File cacheImage;
+        if(exception==null && personList.size()>0)
+        {
+            Person myPersonInfoOld = LocalDataManager.getMyPersonInfo();
+            if(myPersonInfoOld!=null) {
+                Person myPersonInfo = personList.get(0);
+                LocalDataManager.setMyPersonInfo(myPersonInfo.setPass(myPersonInfo.getPass()));
+                Picture pic = myPersonInfo.getPhoto();
+                if(pic!=null){
+                    cacheImage = picInfo.savePicToCache(UsefulFunctions.getDigest(myPersonInfo.getPhoto().getBlobKey()),myPersonInfo.getId());
+                    //cacheImage = picInfo.savePicToCache("test.jpeg",myPersonInfo.getId());
+                    if(cacheImage!=null && rootView!=null) {
+                        ImageView imageView = (ImageView) rootView.findViewById(R.id.profile_img_photo);
+                        if(imageView!=null)
+                            setPicToImageView(cacheImage, imageView);
+                    }
+                }
+            }
+        }
+
+    }
+    private void setPicToImageView(File imgFile,ImageView imgView)
+    {
+        int height = 200, width = 200;
+        InputStream in = null;
+        try {
+            in = new BufferedInputStream(new FileInputStream(imgFile));
+            if(in!=null) {
+                ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                try {
+                    IOUtils.copy(in, bos);
+                    in.close();
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    return;
+                }
+                finally {
+                    if (in != null) {
+                        try {
+                            in.close();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                            return;
+                        }
+                    }
+                }
+                Bitmap bitmap = BitmapFactory.decodeByteArray(bos.toByteArray(), 0, bos.toByteArray().length);
+                if (bitmap != null && imgView != null) {
+                    imgView.setImageBitmap(Bitmap.createScaledBitmap(bitmap, width, height, false));
+                }
+                if (bos != null) {
+                    try {
+                        bos.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        return;
+                    }
+                }
+            }
+        }
+        catch (FileNotFoundException ex)
+        {
+            ex.printStackTrace();
+        }
+
+
+    }
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         Log.d(TAG,"onCreateOptionsMenu");

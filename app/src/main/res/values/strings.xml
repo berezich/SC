@@ -71,6 +71,7 @@
         <string name="personprofile_contactsTitle">КОНТАКТЫ</string>
         <string name="personprofile_descTitle">О СЕБЕ</string>
         <string name="personprofile_favoriteSpotsTitle">ЛЮБИМЫЕ КОРТЫ</string>
+        <string name="personprofile_reqError">Ошибка</string>
             <!-- personProfile_fragment/list_spot_item-->
                 <string name="spot_item_rating">Рейтинг </string>
             <!-- personProfile_fragment/list_spot_item-->
