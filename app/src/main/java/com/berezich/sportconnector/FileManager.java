@@ -4,6 +4,8 @@ import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
+import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Environment;
@@ -13,6 +15,7 @@ import android.provider.OpenableColumns;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.util.Pair;
+import android.widget.ImageView;
 
 import com.berezich.sportconnector.backend.sportConnectorApi.model.Person;
 import com.google.api.client.util.Base64;
@@ -33,6 +36,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Date;
@@ -52,11 +56,8 @@ public class FileManager {
         private Date date;
         private String description;
         private String mimeType;
-        private Fragment fragment;
 
-        public PicInfo(Fragment fragment, String fileUri) {
-            String TAG = fragment.getTag();
-            this.fragment = fragment;
+        public PicInfo(Fragment fragment,String TAG, String fileUri) {
             Uri uri= Uri.parse(fileUri);
             Cursor returnCursor = fragment.getActivity().getContentResolver().query(uri, null, null, null, null);
             int nameIndex = returnCursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
@@ -68,6 +69,21 @@ public class FileManager {
             this.mimeType = fragment.getActivity().getContentResolver().getType(uri);
             this.path = returnCursor.getString(dataIdx);
             bitmap = decodeFile(new File(path));
+            try {
+                int rotation = checkRotationDegrees(this.path);
+                Log.d(TAG,"picture rotation = "+rotation);
+                Matrix matrix = new Matrix();
+                if (rotation != 0f) {
+                    matrix.preRotate(rotation);
+                    bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+                    Log.d(TAG,"picture rotated");
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+
+
             /*try {
                 bitmap =  MediaStore.Images.Media.getBitmap(fragment.getActivity().getContentResolver(), uri);
             } catch (IOException e) {
@@ -87,43 +103,9 @@ public class FileManager {
             return bos.toByteArray();
         }
 
-        public File savePicPreviewToCache(String fileName, Long personId)
+        public File savePicPreviewToCache(String TAG,Context context ,String fileName, Long personId)
         {
-            String TAG = getFragment().getTag();
-            Context context = getFragment().getActivity().getBaseContext();
-            if(fileName==null || fileName.equals("")) {
-                Log.e(TAG, "file name not valid");
-                return null;
-            }
-            if(!isExternalStorageWritable()) {
-                Log.e(TAG, "ExternalStorage not writable");
-                return null;
-            }
-
-            File file = FileManager.getAlbumStorageDir(TAG,context,personId.toString());
-            if(file!=null)
-            {
-                Log.d(TAG, "filePath = " + file.getPath());
-                file = new File (file,fileName);
-                if (file.exists ())
-                    file.delete ();
-                try {
-                    FileOutputStream out = new FileOutputStream(file);
-                    Bitmap endBitmap = cropCenterBitmap(bitmap);
-                    int photoHeight = (int)context.getResources().getDimension(R.dimen.personProfile_photoHeight);
-                    int photoWidth = (int)context.getResources().getDimension(R.dimen.personProfile_photoWidth);
-                    endBitmap = Bitmap.createScaledBitmap(endBitmap,photoWidth, photoHeight, false);
-                    endBitmap.compress(Bitmap.CompressFormat.JPEG, FileManager.COMPRESS_QUALITY, out);
-                    out.flush();
-                    out.close();
-                    return file;
-
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    return null;
-                }
-            }
-            return null;
+            return FileManager.savePicPreviewToCache(TAG, context, fileName, personId, bitmap);
         }
 
 
@@ -156,10 +138,6 @@ public class FileManager {
             return mimeType;
         }
 
-        public Fragment getFragment() {
-            return fragment;
-        }
-
         public void setName(String name) {
             this.name = name;
         }
@@ -190,12 +168,13 @@ public class FileManager {
     }
     public static class UploadFileAsyncTask extends AsyncTask< Pair <PicInfo,String>, Void, Pair<PicInfo, Exception >> {
         private OnAction listener=null;
+        private final String TAG = "MyLog_UploadFile";
         public UploadFileAsyncTask(Fragment fragment)
         {
             try {
                 listener = (OnAction) fragment;
             } catch (ClassCastException e) {
-                throw new ClassCastException(fragment.toString() + " must implement OnAction for UploadFileAsyncTask");
+                throw new ClassCastException(fragment.toString() + " must implement onUploadFileFinish for UploadFileAsyncTask");
             }
         }
         @Override
@@ -226,7 +205,7 @@ public class FileManager {
                 postRequest.setEntity(entity);
                 HttpResponse response = null;
                 response = httpClient.execute(postRequest);
-                Log.d(picInfo.getFragment().getTag(),String.format("upload pic response http status: %s\n entity content: %s",
+                Log.d(TAG,String.format("upload pic response http status: %s\n entity content: %s",
                         response.getStatusLine(), response.getEntity().getContent()));
                 //TODO: check response state
 
@@ -247,12 +226,57 @@ public class FileManager {
         }
     }
 
+    public static class DownloadImageTask extends AsyncTask<String, Void, Pair<Bitmap,Exception>> {
+        String imgId;
+        Fragment fragment;
+        String TAG="MyLog_loadImg";
+        OnAction listener=null;
+
+        public DownloadImageTask(Fragment fragment, String imgId) {
+            this.imgId = imgId;
+            this.fragment = fragment;
+            TAG = fragment.getTag();
+            try {
+                listener = (OnAction) fragment;
+            } catch (ClassCastException e) {
+                throw new ClassCastException(fragment.toString() + " must implement onDownloadFileFinish for DownloadImageTask");
+            }
+
+        }
+
+        protected Pair<Bitmap,Exception> doInBackground(String... urls) {
+            String urldisplay = urls[0];
+            Bitmap mIcon11 = null;
+            try {
+                InputStream in = new java.net.URL(urldisplay).openStream();
+                mIcon11 = BitmapFactory.decodeStream(in);
+            } catch (Exception e) {
+                Log.e(TAG, e.getMessage());
+                e.printStackTrace();
+                return new Pair<>(null,e);
+            }
+            return new Pair<>(mIcon11,null);
+        }
+
+        protected void onPostExecute(Pair<Bitmap,Exception> result) {
+
+            if(listener!=null)
+                listener.onDownloadFileFinish(result.first,imgId,result.second);
+
+
+        }
+        public static interface OnAction
+        {
+            void onDownloadFileFinish(Bitmap bitmap,String imgId,Exception exception);
+        }
+    }
+
     public static File getAlbumStorageDir(String LOG_TAG, Context context,String albumName) {
         // Get the directory for the user's public pictures directory.
         File file = new File(context.getExternalFilesDir(
                 Environment.DIRECTORY_PICTURES), albumName);
-        if (!file.mkdirs()) {
-            Log.e(LOG_TAG, "Directory has already created");
+        if (file.mkdirs()) {
+            Log.d(LOG_TAG, String.format("Directory %s created",file.getPath()));
         }
         return file;
     }
@@ -304,7 +328,6 @@ public class FileManager {
     private static Bitmap decodeFile(File f) {
         try {
             // Decode image size
-            Log.d("TAG","file absolutePath = "+f.getAbsolutePath());
             BitmapFactory.Options o = new BitmapFactory.Options();
             o.inJustDecodeBounds = true;
             BitmapFactory.decodeStream(new FileInputStream(f), null, o);
@@ -324,5 +347,56 @@ public class FileManager {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public static File savePicPreviewToCache(String TAG,Context context ,String fileName, Long personId, Bitmap bitmap)
+    {
+        if(fileName==null || fileName.equals("")) {
+            Log.e(TAG, "file name not valid");
+            return null;
+        }
+        if(!isExternalStorageWritable()) {
+            Log.e(TAG, "ExternalStorage not writable");
+            return null;
+        }
+
+        File file = FileManager.getAlbumStorageDir(TAG,context,personId.toString());
+        if(file!=null)
+        {
+            Log.d(TAG, "filePath = " + file.getPath());
+            file = new File (file,fileName);
+            if (file.exists ())
+                file.delete ();
+            try {
+                FileOutputStream out = new FileOutputStream(file);
+                Bitmap endBitmap = cropCenterBitmap(bitmap);
+                int photoHeight = (int)context.getResources().getDimension(R.dimen.personProfile_photoHeight);
+                int photoWidth = (int)context.getResources().getDimension(R.dimen.personProfile_photoWidth);
+                Log.d(TAG,String.format("myPhoto preview size = %dx%d",photoWidth,photoHeight));
+                endBitmap = Bitmap.createScaledBitmap(endBitmap,photoWidth, photoHeight, false);
+                endBitmap.compress(Bitmap.CompressFormat.JPEG, FileManager.COMPRESS_QUALITY, out);
+                out.flush();
+                out.close();
+                return file;
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                return null;
+            }
+        }
+        return null;
+    }
+    public static int checkRotationDegrees (String filePath)throws IOException
+    {
+            ExifInterface exif = new ExifInterface(filePath);
+            int rotation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
+            int rotationInDegrees = exifToDegrees(rotation);
+            return rotationInDegrees;
+    }
+    private static int exifToDegrees(int exifOrientation) {
+        if (exifOrientation == ExifInterface.ORIENTATION_ROTATE_90) { return 90; }
+        else if (exifOrientation == ExifInterface.ORIENTATION_ROTATE_180) {  return 180; }
+        else if (exifOrientation == ExifInterface.ORIENTATION_ROTATE_270) {  return 270; }
+        return 0;
     }
 }

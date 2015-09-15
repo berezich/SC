@@ -51,7 +51,8 @@ import java.util.List;
 public class PersonProfileFragment extends Fragment
         implements EndpointApi.GetUrlForUploadAsyncTask.OnAction,
                    FileManager.UploadFileAsyncTask.OnAction,
-                   EndpointApi.GetListPersonByIdLstAsyncTask.OnAction
+                   EndpointApi.GetListPersonByIdLstAsyncTask.OnAction,
+                   FileManager.DownloadImageTask.OnAction
 {
     private static final String ARG_SECTION_NUMBER = "section_number";
     private final String TAG = "MyLog_profileFragment";
@@ -113,6 +114,28 @@ public class PersonProfileFragment extends Fragment
         {
             if((imageView = (ImageView) rootView.findViewById(R.id.profile_img_photo))!=null) {
                 imageView.setOnClickListener(new ImageOnClick());
+                Picture photoInfo = myPersonInfo.getPhoto();
+                if(photoInfo!=null)
+                {
+                    String photoId = UsefulFunctions.getDigest(photoInfo.getBlobKey());
+                    File myFolder = FileManager.getAlbumStorageDir(TAG, getActivity().getBaseContext(), myPersonInfo.getId().toString());
+                    boolean isNeedLoad=true;
+                    if(myFolder !=null)
+                    {
+                        File myPhoto = new File(myFolder,photoId);
+                        if(myPhoto.exists()) {
+                            setPicToImageView(myPhoto, imageView);
+                            isNeedLoad = false;
+                        }
+                    }
+                    if(isNeedLoad)
+                    {
+                        Log.d(TAG,"need to load myPhoto from server");
+                        String dynamicUrl = String.format("%s=s%d-c",photoInfo.getServingUrl(),(int) getResources().getDimension(R.dimen.personProfile_photoHeight));
+                        Log.d(TAG,String.format("url for download image = %s",dynamicUrl));
+                        new FileManager.DownloadImageTask(this,photoId).execute(dynamicUrl);
+                    }
+                }
             }
             if((txtView = (TextView) rootView.findViewById(R.id.profile_txt_name))!=null) {
                 String name = myPersonInfo.getName(), surname = myPersonInfo.getSurname();
@@ -250,8 +273,8 @@ public class PersonProfileFragment extends Fragment
          */
         String urlForUpload = result.first.get(1);
         String fileUri = result.first.get(0);
-        FileManager.PicInfo picInfo = new FileManager.PicInfo(this,fileUri);
-        new FileManager.UploadFileAsyncTask(this).execute(new Pair<>(picInfo,urlForUpload));
+        FileManager.PicInfo picInfo = new FileManager.PicInfo(this,TAG,fileUri);
+        new FileManager.UploadFileAsyncTask(this).execute(new Pair<>(picInfo, urlForUpload));
     }
 
     @Override
@@ -270,12 +293,39 @@ public class PersonProfileFragment extends Fragment
         }
 
         //TODO: turn off toast message
-        Toast.makeText(getActivity().getBaseContext(),text,Toast.LENGTH_LONG).show();
+        //Toast.makeText(getActivity().getBaseContext(),text,Toast.LENGTH_LONG).show();
         Person myPersonInfo = LocalDataManager.getMyPersonInfo();
         if(myPersonInfo!=null) {
             List list = new ArrayList();
             list.add(new Long(myPersonInfo.getId()));
             new EndpointApi.GetListPersonByIdLstAsyncTask(this).execute(list);
+        }
+    }
+
+    @Override
+    public void onDownloadFileFinish(Bitmap bitmap,String imgId,Exception exception) {
+        if (exception==null) {
+            if(bitmap==null) {
+                Log.e(TAG, "bitmap not loaded from server cause: bitmap == null");
+                Toast.makeText(getActivity().getBaseContext(),getString(R.string.personprofile_reqError),Toast.LENGTH_SHORT).show();
+                return;
+            }
+            Log.d(TAG, "bitmap loaded from server");
+            if(rootView!=null) {
+                ImageView imageView = (ImageView) rootView.findViewById(R.id.profile_img_photo);
+                imageView.setImageBitmap(bitmap);
+                Person myPresonInfo = LocalDataManager.getMyPersonInfo();
+                if(myPresonInfo!=null) {
+                    FileManager.savePicPreviewToCache(TAG, getActivity().getBaseContext(), imgId, myPresonInfo.getId(), bitmap);
+                }
+            }
+        }
+        else {
+            Log.e(TAG,"bitmap not loaded from server");
+            Log.e(TAG, exception.getMessage());
+            exception.printStackTrace();
+            Toast.makeText(getActivity().getBaseContext(),getString(R.string.personprofile_reqError),Toast.LENGTH_SHORT).show();
+            return;
         }
     }
 
@@ -292,8 +342,8 @@ public class PersonProfileFragment extends Fragment
                 LocalDataManager.setMyPersonInfo(myPersonInfo.setPass(myPersonInfo.getPass()));
                 Picture pic = myPersonInfo.getPhoto();
                 if(pic!=null){
-                    cacheImage = picInfo.savePicPreviewToCache(UsefulFunctions.getDigest(myPersonInfo.getPhoto().getBlobKey()), myPersonInfo.getId());
-                    //cacheImage = picInfo.savePicPreviewToCache("test.jpeg",myPersonInfo.getId());
+                    cacheImage = picInfo.savePicPreviewToCache(TAG,getActivity().getBaseContext(),
+                            UsefulFunctions.getDigest(myPersonInfo.getPhoto().getBlobKey()), myPersonInfo.getId());
                     if(cacheImage!=null && rootView!=null) {
                         ImageView imageView = (ImageView) rootView.findViewById(R.id.profile_img_photo);
                         if(imageView!=null)
@@ -306,7 +356,8 @@ public class PersonProfileFragment extends Fragment
     }
     private void setPicToImageView(File imgFile,ImageView imgView)
     {
-        int height = 200, width = 200;
+        int height = (int) getResources().getDimension(R.dimen.personProfile_photoHeight);
+        int width = (int) getResources().getDimension(R.dimen.personProfile_photoWidth);
         InputStream in = null;
         try {
             in = new BufferedInputStream(new FileInputStream(imgFile));
