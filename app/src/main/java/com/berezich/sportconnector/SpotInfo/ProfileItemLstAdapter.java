@@ -10,6 +10,7 @@ import android.widget.TextView;
 import com.berezich.sportconnector.R;
 import com.berezich.sportconnector.UsefulFunctions;
 import com.berezich.sportconnector.backend.sportConnectorApi.model.Person;
+import com.berezich.sportconnector.backend.sportConnectorApi.model.Picture;
 import com.google.api.client.util.DateTime;
 
 import java.util.ArrayList;
@@ -62,6 +63,11 @@ public class ProfileItemLstAdapter extends BaseAdapter {
 
         Person person = getPerson(position);
         if(person!=null) {
+            Picture photo = person.getPhoto();
+            if(photo!=null)
+            {
+
+            }
             String name = person.getName(), surname = person.getSurname();
             ((TextView) view.findViewById(R.id.lstProfileItem_name)).setText(
                     ((name!=null && !name.equals(""))? name:"")
