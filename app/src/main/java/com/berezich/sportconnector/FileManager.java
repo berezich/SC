@@ -16,9 +16,12 @@ import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.util.Pair;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.berezich.sportconnector.backend.sportConnectorApi.model.Person;
+import com.berezich.sportconnector.backend.sportConnectorApi.model.Picture;
 import com.google.api.client.util.Base64;
+import com.google.api.client.util.IOUtils;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -30,6 +33,7 @@ import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.DefaultHttpClient;
 
+import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -48,6 +52,7 @@ public class FileManager {
     //private final int MAX_SIZE = 1024*10;
     private static final int COMPRESS_QUALITY = 75;
     private static final int REQUIRED_SIZE = 1000;
+    private static final String TAG = "MyLog_fileManager";
     public static class PicInfo {
         private String name;
         private String path;
@@ -226,22 +231,67 @@ public class FileManager {
         }
     }
 
+    public static void providePhotoForImgView(Context context,ImageView imageView, Picture photoInfo, Long personId){
+        int height = (int) context.getResources().getDimension(R.dimen.personProfile_photoHeight);
+        int width = (int) context.getResources().getDimension(R.dimen.personProfile_photoWidth);
+
+        if(photoInfo!=null)
+        {
+            String photoId = UsefulFunctions.getDigest(photoInfo.getBlobKey());
+            File myFolder = FileManager.getAlbumStorageDir(TAG,context, personId.toString());
+            boolean isNeedLoad=true;
+            if(myFolder !=null)
+            {
+                File myPhoto = new File(myFolder,photoId);
+                if(myPhoto.exists()) {
+                    setPicToImageView(myPhoto, imageView,height,width);
+                    isNeedLoad = false;
+                }
+            }
+            if(isNeedLoad)
+            {
+                Log.d(TAG,"need to load myPhoto from server");
+                String dynamicUrl = String.format("%s=s%d-c",photoInfo.getServingUrl(),(int) context.getResources().getDimension(R.dimen.personProfile_photoHeight));
+                Log.d(TAG,String.format("url for download image = %s",dynamicUrl));
+                new FileManager.DownloadImageTask(context,photoId,imageView).execute(dynamicUrl);
+            }
+        }
+    }
+
     public static class DownloadImageTask extends AsyncTask<String, Void, Pair<Bitmap,Exception>> {
         String imgId;
-        Fragment fragment;
+        Context context;
         String TAG="MyLog_loadImg";
         OnAction listener=null;
+        boolean isRespHandled = true;
+        ImageView imageView;
+        String msgError;
 
         public DownloadImageTask(Fragment fragment, String imgId) {
             this.imgId = imgId;
-            this.fragment = fragment;
-            TAG = fragment.getTag();
+            this.context = fragment.getActivity().getBaseContext();
             try {
                 listener = (OnAction) fragment;
             } catch (ClassCastException e) {
                 throw new ClassCastException(fragment.toString() + " must implement onDownloadFileFinish for DownloadImageTask");
             }
 
+        }
+
+        public DownloadImageTask(Context context, String imgId, ImageView imageView) {
+            this.imgId = imgId;
+            this.context = context;
+            isRespHandled = false;
+            this.imageView = imageView;
+            this.msgError = "";
+        }
+
+        public DownloadImageTask(Fragment fragment, String imgId, ImageView imageView, String msgError) {
+            this.imgId = imgId;
+            this.context = context;
+            isRespHandled = false;
+            this.imageView = imageView;
+            this.msgError = msgError;
         }
 
         protected Pair<Bitmap,Exception> doInBackground(String... urls) {
@@ -260,10 +310,36 @@ public class FileManager {
 
         protected void onPostExecute(Pair<Bitmap,Exception> result) {
 
-            if(listener!=null)
-                listener.onDownloadFileFinish(result.first,imgId,result.second);
+            if(isRespHandled) {
+                if (listener != null)
+                    listener.onDownloadFileFinish(result.first, imgId, result.second);
+            }
+            else if(imageView!=null) {
+                Exception exception = result.second;
+                Bitmap bitmap = result.first;
+                if (exception==null) {
+                    if(bitmap==null) {
+                        Log.e(TAG, "bitmap not loaded from server cause: bitmap == null");
+                        Toast.makeText(context, context.getString(R.string.personprofile_reqError), Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    Log.d(TAG, "bitmap loaded from server");
+                    imageView.setImageBitmap(bitmap);
+                    Person myPersonInfo = LocalDataManager.getMyPersonInfo();
+                    if(myPersonInfo!=null) {
+                        FileManager.savePicPreviewToCache(TAG, context, imgId, myPersonInfo.getId(), bitmap);
+                    }
+                }
+                else {
+                    Log.e(TAG, "bitmap not loaded from server");
+                    Log.e(TAG, exception.getMessage());
+                    exception.printStackTrace();
+                    if(!msgError.equals(""))
+                        Toast.makeText(context,msgError,Toast.LENGTH_SHORT).show();
+                    return;
+                }
 
-
+            }
         }
         public static interface OnAction
         {
@@ -349,7 +425,7 @@ public class FileManager {
         return null;
     }
 
-    public static File savePicPreviewToCache(String TAG,Context context ,String fileName, Long personId, Bitmap bitmap)
+    public static File  savePicPreviewToCache(String TAG,Context context ,String fileName, Long personId, Bitmap bitmap)
     {
         if(fileName==null || fileName.equals("")) {
             Log.e(TAG, "file name not valid");
@@ -360,7 +436,7 @@ public class FileManager {
             return null;
         }
 
-        File file = FileManager.getAlbumStorageDir(TAG,context,personId.toString());
+        File file = FileManager.getAlbumStorageDir(TAG, context, personId.toString());
         if(file!=null)
         {
             Log.d(TAG, "filePath = " + file.getPath());
@@ -385,6 +461,52 @@ public class FileManager {
             }
         }
         return null;
+    }
+    public static void setPicToImageView(File imgFile,ImageView imgView, int height, int width)
+    {
+        InputStream in = null;
+        try {
+            in = new BufferedInputStream(new FileInputStream(imgFile));
+            if(in!=null) {
+                ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                try {
+                    IOUtils.copy(in, bos);
+                    in.close();
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    return;
+                }
+                finally {
+                    if (in != null) {
+                        try {
+                            in.close();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                            return;
+                        }
+                    }
+                }
+                Bitmap bitmap = BitmapFactory.decodeByteArray(bos.toByteArray(), 0, bos.toByteArray().length);
+                if (bitmap != null && imgView != null) {
+                    imgView.setImageBitmap(Bitmap.createScaledBitmap(bitmap, width, height, false));
+                }
+                if (bos != null) {
+                    try {
+                        bos.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        return;
+                    }
+                }
+            }
+        }
+        catch (FileNotFoundException ex)
+        {
+            ex.printStackTrace();
+        }
+
+
     }
     public static int checkRotationDegrees (String filePath)throws IOException
     {

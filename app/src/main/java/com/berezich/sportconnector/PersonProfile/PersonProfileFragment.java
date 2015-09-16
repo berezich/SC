@@ -51,8 +51,8 @@ import java.util.List;
 public class PersonProfileFragment extends Fragment
         implements EndpointApi.GetUrlForUploadAsyncTask.OnAction,
                    FileManager.UploadFileAsyncTask.OnAction,
-                   EndpointApi.GetListPersonByIdLstAsyncTask.OnAction,
-                   FileManager.DownloadImageTask.OnAction
+                   EndpointApi.GetListPersonByIdLstAsyncTask.OnAction
+                   //FileManager.DownloadImageTask.OnAction
 {
     private static final String ARG_SECTION_NUMBER = "section_number";
     private final String TAG = "MyLog_profileFragment";
@@ -115,7 +115,8 @@ public class PersonProfileFragment extends Fragment
             if((imageView = (ImageView) rootView.findViewById(R.id.profile_img_photo))!=null) {
                 imageView.setOnClickListener(new ImageOnClick());
                 Picture photoInfo = myPersonInfo.getPhoto();
-                if(photoInfo!=null)
+                FileManager.providePhotoForImgView(this.getActivity().getBaseContext(),imageView,photoInfo,myPersonInfo.getId());
+                /*if(photoInfo!=null)
                 {
                     String photoId = UsefulFunctions.getDigest(photoInfo.getBlobKey());
                     File myFolder = FileManager.getAlbumStorageDir(TAG, getActivity().getBaseContext(), myPersonInfo.getId().toString());
@@ -124,7 +125,9 @@ public class PersonProfileFragment extends Fragment
                     {
                         File myPhoto = new File(myFolder,photoId);
                         if(myPhoto.exists()) {
-                            setPicToImageView(myPhoto, imageView);
+                            int height = (int) getResources().getDimension(R.dimen.personProfile_photoHeight);
+                            int width = (int) getResources().getDimension(R.dimen.property_line_width);
+                            FileManager.setPicToImageView(myPhoto, imageView,height,width);
                             isNeedLoad = false;
                         }
                     }
@@ -135,7 +138,7 @@ public class PersonProfileFragment extends Fragment
                         Log.d(TAG,String.format("url for download image = %s",dynamicUrl));
                         new FileManager.DownloadImageTask(this,photoId).execute(dynamicUrl);
                     }
-                }
+                }*/
             }
             if((txtView = (TextView) rootView.findViewById(R.id.profile_txt_name))!=null) {
                 String name = myPersonInfo.getName(), surname = myPersonInfo.getSurname();
@@ -302,6 +305,7 @@ public class PersonProfileFragment extends Fragment
         }
     }
 
+    /*
     @Override
     public void onDownloadFileFinish(Bitmap bitmap,String imgId,Exception exception) {
         if (exception==null) {
@@ -328,7 +332,7 @@ public class PersonProfileFragment extends Fragment
             return;
         }
     }
-
+    */
     @Override
     public void onGetListPersonByIdLstFinish(Pair<List<Person>, Exception> result) {
         Exception exception = result.second;
@@ -347,61 +351,18 @@ public class PersonProfileFragment extends Fragment
                     if(cacheImage!=null && rootView!=null) {
                         ImageView imageView = (ImageView) rootView.findViewById(R.id.profile_img_photo);
                         if(imageView!=null)
-                            setPicToImageView(cacheImage, imageView);
-                    }
-                }
-            }
-        }
-
-    }
-    private void setPicToImageView(File imgFile,ImageView imgView)
-    {
-        int height = (int) getResources().getDimension(R.dimen.personProfile_photoHeight);
-        int width = (int) getResources().getDimension(R.dimen.personProfile_photoWidth);
-        InputStream in = null;
-        try {
-            in = new BufferedInputStream(new FileInputStream(imgFile));
-            if(in!=null) {
-                ByteArrayOutputStream bos = new ByteArrayOutputStream();
-                try {
-                    IOUtils.copy(in, bos);
-                    in.close();
-
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    return;
-                }
-                finally {
-                    if (in != null) {
-                        try {
-                            in.close();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                            return;
+                        {
+                            int height = (int)getResources().getDimension(R.dimen.personProfile_photoHeight);
+                            int width = (int)getResources().getDimension(R.dimen.personProfile_photoWidth);
+                            FileManager.setPicToImageView(cacheImage, imageView,height,width);
                         }
                     }
                 }
-                Bitmap bitmap = BitmapFactory.decodeByteArray(bos.toByteArray(), 0, bos.toByteArray().length);
-                if (bitmap != null && imgView != null) {
-                    imgView.setImageBitmap(Bitmap.createScaledBitmap(bitmap, width, height, false));
-                }
-                if (bos != null) {
-                    try {
-                        bos.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                        return;
-                    }
-                }
             }
         }
-        catch (FileNotFoundException ex)
-        {
-            ex.printStackTrace();
-        }
-
 
     }
+
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         Log.d(TAG,"onCreateOptionsMenu");

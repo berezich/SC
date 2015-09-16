@@ -1,12 +1,15 @@
 package com.berezich.sportconnector.SpotInfo;
 
 import android.content.Context;
+import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.berezich.sportconnector.FileManager;
 import com.berezich.sportconnector.R;
 import com.berezich.sportconnector.UsefulFunctions;
 import com.berezich.sportconnector.backend.sportConnectorApi.model.Person;
@@ -25,6 +28,7 @@ public class ProfileItemLstAdapter extends BaseAdapter {
     Context ctx;
     LayoutInflater lInflater;
     ArrayList<Person> objects;
+    Fragment fragment;
 
     ProfileItemLstAdapter(Context context, ArrayList<Person> persons) {
         ctx = context;
@@ -62,12 +66,10 @@ public class ProfileItemLstAdapter extends BaseAdapter {
         }
 
         Person person = getPerson(position);
-        if(person!=null) {
+        if(person!=null && view!=null) {
             Picture photo = person.getPhoto();
-            if(photo!=null)
-            {
-
-            }
+            ImageView imageView = (ImageView) view.findViewById(R.id.lstProfileItem_img_photo);
+            FileManager.providePhotoForImgView(ctx, imageView, photo, person.getId());
             String name = person.getName(), surname = person.getSurname();
             ((TextView) view.findViewById(R.id.lstProfileItem_name)).setText(
                     ((name!=null && !name.equals(""))? name:"")
