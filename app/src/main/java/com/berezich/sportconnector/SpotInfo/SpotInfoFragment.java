@@ -55,6 +55,7 @@ public class SpotInfoFragment extends Fragment implements EndpointApi.GetListPer
     private static final  String TAB_PARTNERS = "partners";
     private static final  String TAB_COACHES = "coaches";
     private static final String TAG = "MyLog_SpotInfoFragment";
+    public static final String SPOT_CACHE_DIR = "Spot";
     private Long spotId;
     private boolean isFavoriteChanged=false;
     private HashMap<Long,Spot> spotHashMap;

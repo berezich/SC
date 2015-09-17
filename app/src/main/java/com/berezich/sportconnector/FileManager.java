@@ -9,7 +9,6 @@ import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Environment;
-import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
 import android.provider.OpenableColumns;
 import android.support.v4.app.Fragment;
@@ -20,7 +19,6 @@ import android.widget.Toast;
 
 import com.berezich.sportconnector.backend.sportConnectorApi.model.Person;
 import com.berezich.sportconnector.backend.sportConnectorApi.model.Picture;
-import com.google.api.client.util.Base64;
 import com.google.api.client.util.IOUtils;
 
 import org.apache.http.HttpEntity;
@@ -41,8 +39,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.Date;
 
 /**
@@ -108,9 +104,9 @@ public class FileManager {
             return bos.toByteArray();
         }
 
-        public File savePicPreviewToCache(String TAG,Context context ,String fileName, Long personId)
+        public File savePicPreviewToCache(String TAG,Context context ,String fileName, String cacheDir)
         {
-            return FileManager.savePicPreviewToCache(TAG, context, fileName, personId, bitmap);
+            return FileManager.savePicPreviewToCache(TAG, context, fileName, cacheDir, bitmap);
         }
 
 
@@ -234,14 +230,14 @@ public class FileManager {
         }
     }
 
-    public static void providePhotoForImgView(Context context,ImageView imageView, Picture photoInfo, Long personId){
+    public static void providePhotoForImgView(Context context,ImageView imageView, Picture photoInfo, String cacheDir){
         int height = (int) context.getResources().getDimension(R.dimen.personProfile_photoHeight);
         int width = (int) context.getResources().getDimension(R.dimen.personProfile_photoWidth);
 
         if(photoInfo!=null)
         {
             String photoId = UsefulFunctions.getDigest(photoInfo.getBlobKey());
-            File myFolder = FileManager.getAlbumStorageDir(TAG,context, personId.toString());
+            File myFolder = FileManager.getAlbumStorageDir(TAG, context, cacheDir);
             boolean isNeedLoad=true;
             if(myFolder !=null)
             {
@@ -256,7 +252,7 @@ public class FileManager {
                 Log.d(TAG,"need to load myPhoto from server");
                 String dynamicUrl = String.format("%s=s%d-c",photoInfo.getServingUrl(),(int) context.getResources().getDimension(R.dimen.personProfile_photoHeight));
                 Log.d(TAG,String.format("url for download image = %s",dynamicUrl));
-                new FileManager.DownloadImageTask(context,photoId,imageView,personId).execute(dynamicUrl);
+                new FileManager.DownloadImageTask(context,photoId,imageView, cacheDir).execute(dynamicUrl);
             }
         }
     }
@@ -268,7 +264,7 @@ public class FileManager {
         OnAction listener=null;
         boolean isRespHandled = true;
         ImageView imageView;
-        Long personId;
+        String cacheDir;
         String msgError;
 
         public DownloadImageTask(Fragment fragment, String imgId) {
@@ -282,21 +278,21 @@ public class FileManager {
 
         }
 
-        public DownloadImageTask(Context context, String imgId, ImageView imageView, Long personId) {
+        public DownloadImageTask(Context context, String imgId, ImageView imageView, String cacheDir) {
             this.imgId = imgId;
             this.context = context;
             isRespHandled = false;
             this.imageView = imageView;
-            this.personId = personId;
+            this.cacheDir = cacheDir;
             this.msgError = "";
         }
 
-        public DownloadImageTask(Context context, String imgId, ImageView imageView, Long personId, String msgError) {
+        public DownloadImageTask(Context context, String imgId, ImageView imageView, String cacheDir, String msgError) {
             this.imgId = imgId;
             this.context = context;
             isRespHandled = false;
             this.imageView = imageView;
-            this.personId = personId;
+            this.cacheDir = cacheDir;
             this.msgError = msgError;
         }
 
@@ -320,7 +316,7 @@ public class FileManager {
                 if (listener != null)
                     listener.onDownloadFileFinish(result.first, imgId, result.second);
             }
-            else if(imageView!=null) {
+            else {
                 Exception exception = result.second;
                 Bitmap bitmap = result.first;
                 if (exception==null) {
@@ -330,8 +326,10 @@ public class FileManager {
                         return;
                     }
                     Log.d(TAG, "bitmap loaded from server");
-                    imageView.setImageBitmap(bitmap);
-                    FileManager.savePicPreviewToCache(TAG, context, imgId, personId, bitmap);
+                    FileManager.savePicPreviewToCache(TAG, context, imgId, cacheDir, bitmap);
+                    if(imageView!=null) {
+                        imageView.setImageBitmap(bitmap);
+                    }
                 }
                 else {
                     Log.e(TAG, "bitmap not loaded from server");
@@ -428,7 +426,7 @@ public class FileManager {
         return null;
     }
 
-    public static File  savePicPreviewToCache(String TAG,Context context ,String fileName, Long personId, Bitmap bitmap)
+    public static File  savePicPreviewToCache(String TAG,Context context ,String fileName, String cacheDir, Bitmap bitmap)
     {
         if(fileName==null || fileName.equals("")) {
             Log.e(TAG, "file name not valid");
@@ -439,7 +437,7 @@ public class FileManager {
             return null;
         }
 
-        File file = FileManager.getAlbumStorageDir(TAG, context, personId.toString());
+        File file = FileManager.getAlbumStorageDir(TAG, context, cacheDir);
         if(file!=null)
         {
             Log.d(TAG, "filePath = " + file.getPath());

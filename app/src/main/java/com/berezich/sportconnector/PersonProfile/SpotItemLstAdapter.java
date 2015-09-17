@@ -5,13 +5,18 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.berezich.sportconnector.FileManager;
 import com.berezich.sportconnector.R;
+import com.berezich.sportconnector.SpotInfo.SpotInfoFragment;
 import com.berezich.sportconnector.backend.sportConnectorApi.model.Person;
+import com.berezich.sportconnector.backend.sportConnectorApi.model.Picture;
 import com.berezich.sportconnector.backend.sportConnectorApi.model.Spot;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by berezkin on 24.07.2015.
@@ -69,6 +74,12 @@ public class SpotItemLstAdapter extends BaseAdapter {
             ((TextView) view.findViewById(R.id.lstProfileItem_desc1)).setText(ctx.getString(R.string.person_item_age) + " " + spot.getAge());
             ((TextView) view.findViewById(R.id.lstProfileItem_desc2)).setText(ctx.getString(R.string.person_item_rating) + " " + spot.getRating());*/
             //((ImageView) view.findViewById(R.id.lstProfileItem_img_photo)).setImageResource(person.image());
+            List<Picture> pictureLst = spot.getPictureLst();
+            if(pictureLst!=null && pictureLst.size()>0) {
+                Picture photo = pictureLst.get(0);
+                ImageView imageView = (ImageView) view.findViewById(R.id.lstSpotItem_img_photo1);
+                FileManager.providePhotoForImgView(ctx, imageView, photo, SpotInfoFragment.SPOT_CACHE_DIR+"/"+spot.getId().toString());
+            }
         }
 
         return view;

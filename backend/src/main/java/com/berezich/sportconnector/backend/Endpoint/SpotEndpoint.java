@@ -1,6 +1,7 @@
 package com.berezich.sportconnector.backend.Endpoint;
 
 import com.berezich.sportconnector.backend.Person;
+import com.berezich.sportconnector.backend.Picture;
 import com.berezich.sportconnector.backend.Spot;
 import com.berezich.sportconnector.backend.RegionInfo;
 import com.berezich.sportconnector.backend.UpdateSpotInfo;
@@ -130,7 +131,47 @@ public class SpotEndpoint {
         Spot resSpot = ofy().load().entity(spot).now();
         logger.info("Updated Spot id:" + resSpot.getId() + " getName:" + resSpot.getName());
         setSpotUpdateInstance(resSpot);
-        setFavoritePersonsSpot(resSpot,oldSpot);
+        setFavoritePersonsSpot(resSpot, oldSpot);
+        return resSpot;
+    }
+
+    @ApiMethod(
+            name = "attacheSpotPictures",
+            path = "spot/{id}/pictures",
+            httpMethod = ApiMethod.HttpMethod.PUT)
+    public Spot attacheSpotPictures(@Named("id") Long id, @Named("picBlobKeyLst") List<String> picBlobKeyLst,
+                                @Named("isOverwrite") boolean isOverwrite)
+            throws NotFoundException, BadRequestException {
+        OAuth_2_0.check();
+        Spot spot = ofy().load().type(Spot.class).id(id).now();
+        if(spot==null)
+            throw new NotFoundException("Spot with id:"+id+" not found");
+        updateRegionInfoAboutSpot(spot);
+
+        List<Picture> newPictureLst = new ArrayList<>();
+        for(String blobKey: picBlobKeyLst)
+            newPictureLst.add(new Picture(blobKey));
+
+        List<Picture> pictureList =spot.getPictureLst();
+        if(pictureList==null)
+            spot.setPictureLst(newPictureLst);
+        else if(isOverwrite)
+        {
+            List<String> oldBlobKeys = new ArrayList<>();
+            for (Picture pic: pictureList)
+                oldBlobKeys.add(pic.getBlobKey());
+            if(oldBlobKeys.size()>0) {
+                new FileManager().deleteFile(oldBlobKeys);
+            }
+            spot.setPictureLst(newPictureLst);
+        }
+        else
+            pictureList.addAll(newPictureLst);
+
+        ofy().save().entity(spot).now();
+        Spot resSpot = ofy().load().entity(spot).now();
+        logger.info("Pictures attached/replaced/removed to Spot id:" + resSpot.getId() + " getName:" + resSpot.getName());
+        setSpotUpdateInstance(resSpot);
         return resSpot;
     }
 

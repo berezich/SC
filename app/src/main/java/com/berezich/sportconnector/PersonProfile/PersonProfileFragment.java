@@ -56,6 +56,7 @@ public class PersonProfileFragment extends Fragment
 {
     private static final String ARG_SECTION_NUMBER = "section_number";
     private final String TAG = "MyLog_profileFragment";
+    public static final String PERSON_CACHE_DIR = "Person";
     public static final int PICK_IMAGE = 111;
     FileManager.PicInfo picInfo;
     int _sectionNumber;
@@ -115,7 +116,8 @@ public class PersonProfileFragment extends Fragment
             if((imageView = (ImageView) rootView.findViewById(R.id.profile_img_photo))!=null) {
                 imageView.setOnClickListener(new ImageOnClick());
                 Picture photoInfo = myPersonInfo.getPhoto();
-                FileManager.providePhotoForImgView(this.getActivity().getBaseContext(),imageView,photoInfo,myPersonInfo.getId());
+                FileManager.providePhotoForImgView(this.getActivity().getBaseContext(),imageView,
+                        photoInfo,PERSON_CACHE_DIR+"/"+ myPersonInfo.getId().toString());
                 /*if(photoInfo!=null)
                 {
                     String photoId = UsefulFunctions.getDigest(photoInfo.getBlobKey());
@@ -350,8 +352,8 @@ public class PersonProfileFragment extends Fragment
                 LocalDataManager.setMyPersonInfo(myPersonInfo.setPass(myPersonInfo.getPass()));
                 Picture pic = myPersonInfo.getPhoto();
                 if(pic!=null){
-                    cacheImage = picInfo.savePicPreviewToCache(TAG,getActivity().getBaseContext(),
-                            UsefulFunctions.getDigest(myPersonInfo.getPhoto().getBlobKey()), myPersonInfo.getId());
+                    cacheImage = picInfo.savePicPreviewToCache(TAG, getActivity().getBaseContext(),
+                            UsefulFunctions.getDigest(myPersonInfo.getPhoto().getBlobKey()), PERSON_CACHE_DIR + "/" + myPersonInfo.getId());
                     if(cacheImage!=null && rootView!=null) {
                         ImageView imageView = (ImageView) rootView.findViewById(R.id.profile_img_photo);
                         if(imageView!=null)

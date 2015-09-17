@@ -10,6 +10,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.berezich.sportconnector.FileManager;
+import com.berezich.sportconnector.PersonProfile.PersonProfileFragment;
 import com.berezich.sportconnector.R;
 import com.berezich.sportconnector.UsefulFunctions;
 import com.berezich.sportconnector.backend.sportConnectorApi.model.Person;
@@ -69,7 +70,7 @@ public class ProfileItemLstAdapter extends BaseAdapter {
         if(person!=null && view!=null) {
             Picture photo = person.getPhoto();
             ImageView imageView = (ImageView) view.findViewById(R.id.lstProfileItem_img_photo);
-            FileManager.providePhotoForImgView(ctx, imageView, photo, person.getId());
+            FileManager.providePhotoForImgView(ctx, imageView, photo, PersonProfileFragment.PERSON_CACHE_DIR+"/"+ person.getId().toString());
             String name = person.getName(), surname = person.getSurname();
             ((TextView) view.findViewById(R.id.lstProfileItem_name)).setText(
                     ((name!=null && !name.equals(""))? name:"")
