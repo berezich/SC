@@ -171,7 +171,7 @@ public class FileManager {
             this.mimeType = mimeType;
         }
     }
-    public static class UploadFileAsyncTask extends AsyncTask< Pair <PicInfo,String>, Void, Pair<PicInfo, Exception >> {
+    public static class UploadFileAsyncTask extends AsyncTask< Pair <PicInfo,Pair<String,String>>, Void, Pair<PicInfo, Exception >> {
         private OnAction listener=null;
         private final String TAG = "MyLog_UploadFile";
         public UploadFileAsyncTask(Fragment fragment)
@@ -183,9 +183,10 @@ public class FileManager {
             }
         }
         @Override
-        protected Pair<PicInfo, Exception > doInBackground(Pair <PicInfo,String>... params) {
+        protected Pair<PicInfo, Exception > doInBackground(Pair <PicInfo,Pair<String,String>>... params) {
             PicInfo picInfo = params[0].first;
-            String uploadUrl = params[0].second;
+            String uploadUrl = params[0].second.first;
+            String replacePicKey = params[0].second.second;
             try {
                 HttpClient httpClient = new DefaultHttpClient();
                 HttpPost postRequest = new HttpPost(uploadUrl);
@@ -196,11 +197,13 @@ public class FileManager {
                 Person myPersonInfo = LocalDataManager.getMyPersonInfo();
                 if(myPersonInfo==null)
                     new NullPointerException("myPersonInfo == null");
-                builder.addPart("usrId", new StringBody(myPersonInfo.getId().toString(), ContentType.MULTIPART_FORM_DATA));
+                builder.addPart("UsrId", new StringBody(myPersonInfo.getId().toString(), ContentType.MULTIPART_FORM_DATA));
+                if(replacePicKey!=null && !replacePicKey.equals(""))
+                    builder.addPart("ReplaceBlob", new StringBody(replacePicKey, ContentType.MULTIPART_FORM_DATA));
 
                 try{
                     byte[] data = picInfo.getCompressedPic();
-                    builder.addBinaryBody("usrPhoto", data, ContentType.create(picInfo.getMimeType()), picInfo.getName());
+                    builder.addBinaryBody("UsrPhoto", data, ContentType.create(picInfo.getMimeType()), picInfo.getName());
                 }
                 catch(Exception e){
                     return new Pair<>(picInfo,e);
@@ -253,7 +256,7 @@ public class FileManager {
                 Log.d(TAG,"need to load myPhoto from server");
                 String dynamicUrl = String.format("%s=s%d-c",photoInfo.getServingUrl(),(int) context.getResources().getDimension(R.dimen.personProfile_photoHeight));
                 Log.d(TAG,String.format("url for download image = %s",dynamicUrl));
-                new FileManager.DownloadImageTask(context,photoId,imageView).execute(dynamicUrl);
+                new FileManager.DownloadImageTask(context,photoId,imageView,personId).execute(dynamicUrl);
             }
         }
     }
@@ -265,6 +268,7 @@ public class FileManager {
         OnAction listener=null;
         boolean isRespHandled = true;
         ImageView imageView;
+        Long personId;
         String msgError;
 
         public DownloadImageTask(Fragment fragment, String imgId) {
@@ -278,19 +282,21 @@ public class FileManager {
 
         }
 
-        public DownloadImageTask(Context context, String imgId, ImageView imageView) {
+        public DownloadImageTask(Context context, String imgId, ImageView imageView, Long personId) {
             this.imgId = imgId;
             this.context = context;
             isRespHandled = false;
             this.imageView = imageView;
+            this.personId = personId;
             this.msgError = "";
         }
 
-        public DownloadImageTask(Fragment fragment, String imgId, ImageView imageView, String msgError) {
+        public DownloadImageTask(Context context, String imgId, ImageView imageView, Long personId, String msgError) {
             this.imgId = imgId;
             this.context = context;
             isRespHandled = false;
             this.imageView = imageView;
+            this.personId = personId;
             this.msgError = msgError;
         }
 
@@ -325,10 +331,7 @@ public class FileManager {
                     }
                     Log.d(TAG, "bitmap loaded from server");
                     imageView.setImageBitmap(bitmap);
-                    Person myPersonInfo = LocalDataManager.getMyPersonInfo();
-                    if(myPersonInfo!=null) {
-                        FileManager.savePicPreviewToCache(TAG, context, imgId, myPersonInfo.getId(), bitmap);
-                    }
+                    FileManager.savePicPreviewToCache(TAG, context, imgId, personId, bitmap);
                 }
                 else {
                     Log.e(TAG, "bitmap not loaded from server");

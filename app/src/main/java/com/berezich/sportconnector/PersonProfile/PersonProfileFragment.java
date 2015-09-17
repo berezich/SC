@@ -277,7 +277,11 @@ public class PersonProfileFragment extends Fragment
         String urlForUpload = result.first.get(1);
         String fileUri = result.first.get(0);
         FileManager.PicInfo picInfo = new FileManager.PicInfo(this,TAG,fileUri);
-        new FileManager.UploadFileAsyncTask(this).execute(new Pair<>(picInfo, urlForUpload));
+        String replaceBlob = "";
+        Person myPersonInfo = LocalDataManager.getMyPersonInfo();
+        if(myPersonInfo!=null && myPersonInfo.getPhoto()!=null)
+            replaceBlob = myPersonInfo.getPhoto().getBlobKey();
+        new FileManager.UploadFileAsyncTask(this).execute(new Pair<>(picInfo, new Pair<>(urlForUpload,replaceBlob)));
     }
 
     @Override
