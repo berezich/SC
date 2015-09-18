@@ -78,7 +78,7 @@ public class SpotItemLstAdapter extends BaseAdapter {
             if(pictureLst!=null && pictureLst.size()>0) {
                 Picture photo = pictureLst.get(0);
                 ImageView imageView = (ImageView) view.findViewById(R.id.lstSpotItem_img_photo1);
-                FileManager.providePhotoForImgView(ctx, imageView, photo, SpotInfoFragment.SPOT_CACHE_DIR+"/"+spot.getId().toString());
+                FileManager.providePhotoForImgView(ctx, imageView, photo, FileManager.SPOT_CACHE_DIR+"/"+spot.getId().toString());
             }
         }
 

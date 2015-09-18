@@ -139,12 +139,11 @@ public class EndpointApi {
         @Override
         protected Pair<RegionInfo,Exception> doInBackground(Long... params) {
             Long regionId;
-            String url;
             regionId = params[0];
             try {
-                return new Pair<RegionInfo,Exception>(srvApi.getRegionInfo(regionId).execute(),null);
+                return new Pair<>(srvApi.getRegionInfo(regionId).execute(),null);
             } catch (Exception e) {
-                return new Pair<RegionInfo,Exception>(null,e);
+                return new Pair<>(null,e);
             }
         }
 
@@ -175,12 +174,11 @@ public class EndpointApi {
         @Override
         protected Pair<List<Spot>,Exception> doInBackground(Long... params) {
             Long regionId;
-            String url;
             regionId = params[0];
             try {
-                return new Pair<List<Spot>,Exception>(srvApi.listSpotByRegId(regionId).execute().getItems(),null);
+                return new Pair<>(srvApi.listSpotByRegId(regionId).execute().getItems(),null);
             } catch (Exception e) {
-                return new Pair<List<Spot>,Exception>(null,e);
+                return new Pair<>(null,e);
             }
         }
 
@@ -213,13 +211,12 @@ public class EndpointApi {
         protected Pair<List<UpdateSpotInfo>,Exception> doInBackground(Pair<Long,DateTime>... params) {
             Long regionId;
             DateTime lastUpdate;
-            String url;
             regionId = params[0].first;
             lastUpdate = params[0].second;
             try {
-                return new Pair<List<UpdateSpotInfo>,Exception>(srvApi.listUpdateSpotInfoByRegIdDate(lastUpdate, regionId).execute().getItems(),null);
+                return new Pair<>(srvApi.listUpdateSpotInfoByRegIdDate(lastUpdate, regionId).execute().getItems(),null);
             } catch (Exception e) {
-                return new Pair<List<UpdateSpotInfo>,Exception>(null,e);
+                return new Pair<>(null,e);
             }
         }
 
@@ -249,11 +246,11 @@ public class EndpointApi {
         }
         @Override
         protected Pair<List<Person>,Exception> doInBackground(List<Long>... params) {
-            List<Long> idLst = new ArrayList<Long>(params[0]) ;
+            List<Long> idLst = new ArrayList<>(params[0]) ;
             try {
-                return new Pair<List<Person>,Exception>(srvApi.listPersonByIdLst(idLst).execute().getItems(),null);
+                return new Pair<>(srvApi.listPersonByIdLst(idLst).execute().getItems(),null);
             } catch (Exception e) {
-                return new Pair<List<Person>,Exception>(null,e);
+                return new Pair<>(null,e);
             }
         }
 
@@ -287,9 +284,9 @@ public class EndpointApi {
             Spot updatedSpot;
             try {
                 updatedSpot = srvApi.updateSpot(spot.getId(),spot).execute();
-                return new Pair<Spot,Exception>(updatedSpot,null);
+                return new Pair<>(updatedSpot,null);
             } catch (Exception e) {
-                return new Pair<Spot,Exception>(null,e);
+                return new Pair<>(null,e);
             }
         }
 
@@ -321,7 +318,7 @@ public class EndpointApi {
         protected Pair<Boolean,Exception> doInBackground(Pair<Long,String>... params) {
             Long spot = params[0].first;
             String person = params[0].second;
-            boolean isFavorite = (params[1].first==0) ? false : true ;
+            boolean isFavorite = (params[1].first!=0);
             String personType = params[1].second;
             if(spot!=null && person!=null)
             try {
@@ -330,9 +327,9 @@ public class EndpointApi {
                 return new Pair<Boolean,Exception>(isFavorite,e);
             } catch (Exception e)
             {
-                return new Pair<Boolean,Exception>(isFavorite,e);
+                return new Pair<>(isFavorite,e);
             }
-            return new Pair<Boolean,Exception>(isFavorite,null);
+            return new Pair<>(isFavorite,null);
         }
 
         @Override
@@ -376,9 +373,9 @@ public class EndpointApi {
             email = params[0];
             pass = params[1];
             try {
-                return new Pair<Person,Exception>(srvApi.authorizePerson(email,pass).execute(),null);
+                return new Pair<>(srvApi.authorizePerson(email,pass).execute(),null);
             } catch (Exception e) {
-                return new Pair<Person, Exception>(null, e);
+                return new Pair<>(null, e);
             }
         }
 
@@ -415,9 +412,9 @@ public class EndpointApi {
             account.setPass(params[2]);
             account.setType(params[3]);
             try {
-                return new Pair<AccountForConfirmation,Exception>(srvApi.registerAccount(account).execute(),null);
+                return new Pair<>(srvApi.registerAccount(account).execute(),null);
             } catch (Exception e) {
-                return new Pair<AccountForConfirmation,Exception>(null,e);
+                return new Pair<>(null,e);
             }
         }
 
@@ -451,9 +448,9 @@ public class EndpointApi {
             Person updatedPerson;
             try {
                 updatedPerson = srvApi.updatePerson(person.getId(),person).execute();
-                return new Pair<Person,Exception>(updatedPerson,null);
+                return new Pair<>(updatedPerson,null);
             } catch (Exception e) {
-                return new Pair<Person,Exception>(null,e);
+                return new Pair<>(null,e);
             }
         }
 
@@ -564,9 +561,9 @@ public class EndpointApi {
             try {
                 FileUrl fileUrl = srvApi.getUrlForUpload().execute();
                 strings.add( fileUrl.getUrlForUpload());
-                return new Pair<List<String>,Exception>(strings,null);
+                return new Pair<>(strings,null);
             } catch (Exception e) {
-                return new Pair<List<String>,Exception>(null,e);
+                return new Pair<>(null,e);
             }
         }
 

@@ -29,13 +29,11 @@ public class ProfileItemLstAdapter extends BaseAdapter {
     Context ctx;
     LayoutInflater lInflater;
     ArrayList<Person> objects;
-    Fragment fragment;
 
     ProfileItemLstAdapter(Context context, ArrayList<Person> persons) {
         ctx = context;
         objects = persons;
-        lInflater = (LayoutInflater) ctx
-                .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        lInflater = (LayoutInflater) ctx.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
     @Override
     public int getCount() {
@@ -65,33 +63,33 @@ public class ProfileItemLstAdapter extends BaseAdapter {
         if (view == null) {
             view = lInflater.inflate(R.layout.list_person_item, parent, false);
         }
-
         Person person = getPerson(position);
-        if(person!=null && view!=null) {
-            Picture photo = person.getPhoto();
-            ImageView imageView = (ImageView) view.findViewById(R.id.lstProfileItem_img_photo);
-            FileManager.providePhotoForImgView(ctx, imageView, photo, PersonProfileFragment.PERSON_CACHE_DIR+"/"+ person.getId().toString());
-            String name = person.getName(), surname = person.getSurname();
-            ((TextView) view.findViewById(R.id.lstProfileItem_name)).setText(
-                    ((name!=null && !name.equals(""))? name:"")
-                    +((name!=null && !name.equals("") && surname!=null && !surname.equals(""))?" ":"")
-                    + ((surname!=null && !surname.equals(""))? surname:""));
-            DateTime birthday;
-            int age = UsefulFunctions.calcPersonAge(person.getBirthday());
+        if(person!=null) {
+            FileManager.removeOldPersonCache(ctx, person);
+            if (view != null) {
+                Picture photo = person.getPhoto();
+                ImageView imageView = (ImageView) view.findViewById(R.id.lstProfileItem_img_photo);
+                FileManager.providePhotoForImgView(ctx, imageView, photo, FileManager.PERSON_CACHE_DIR + "/" + person.getId().toString());
+                String name = person.getName(), surname = person.getSurname();
+                ((TextView) view.findViewById(R.id.lstProfileItem_name)).setText(
+                        ((name != null && !name.equals("")) ? name : "")
+                                + ((name != null && !name.equals("") && surname != null && !surname.equals("")) ? " " : "")
+                                + ((surname != null && !surname.equals("")) ? surname : ""));
+                int age = UsefulFunctions.calcPersonAge(person.getBirthday());
 
-            ((TextView) view.findViewById(R.id.lstProfileItem_desc1)).setText(
-                    (age>=0 ? ctx.getString(R.string.person_item_age)+" " +age:""));
-            ((TextView) view.findViewById(R.id.lstProfileItem_desc2)).setText(
-                    (person.getRating()>0)?
-                            ctx.getString(R.string.person_item_rating)+ " " + person.getRating():"");
-            //((ImageView) view.findViewById(R.id.lstProfileItem_img_photo)).setImageResource(person.image());
+                ((TextView) view.findViewById(R.id.lstProfileItem_desc1)).setText(
+                        (age >= 0 ? ctx.getString(R.string.person_item_age) + " " + age : ""));
+                ((TextView) view.findViewById(R.id.lstProfileItem_desc2)).setText(
+                        (person.getRating() > 0) ?
+                                ctx.getString(R.string.person_item_rating) + " " + person.getRating() : "");
+                //((ImageView) view.findViewById(R.id.lstProfileItem_img_photo)).setImageResource(person.image());
+            }
         }
-
         return view;
     }
     public Person getPerson(int position) {
         if(position>=0 && position<getCount())
-            return (Person) objects.get(position);
+            return objects.get(position);
         return null;
     }
 }

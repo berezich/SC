@@ -2,8 +2,6 @@ package com.berezich.sportconnector.PersonProfile;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -19,7 +17,6 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.berezich.sportconnector.EndpointApi;
 import com.berezich.sportconnector.FileManager;
@@ -32,15 +29,8 @@ import com.berezich.sportconnector.backend.sportConnectorApi.model.Person;
 import com.berezich.sportconnector.backend.sportConnectorApi.model.Picture;
 import com.berezich.sportconnector.backend.sportConnectorApi.model.Spot;
 import com.google.api.client.util.DateTime;
-import com.google.api.client.util.IOUtils;
 
-import java.io.BufferedInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -56,7 +46,6 @@ public class PersonProfileFragment extends Fragment
 {
     private static final String ARG_SECTION_NUMBER = "section_number";
     private final String TAG = "MyLog_profileFragment";
-    public static final String PERSON_CACHE_DIR = "Person";
     public static final int PICK_IMAGE = 111;
     FileManager.PicInfo picInfo;
     int _sectionNumber;
@@ -81,6 +70,9 @@ public class PersonProfileFragment extends Fragment
     {
         setHasOptionsMenu(true);
         super.onCreate(savedInstanceState);
+        Person myPersonInfo = LocalDataManager.getMyPersonInfo();
+        if(myPersonInfo!=null)
+            FileManager.removeOldPersonCache(getActivity().getBaseContext(),myPersonInfo);
     }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -117,7 +109,7 @@ public class PersonProfileFragment extends Fragment
                 imageView.setOnClickListener(new ImageOnClick());
                 Picture photoInfo = myPersonInfo.getPhoto();
                 FileManager.providePhotoForImgView(this.getActivity().getBaseContext(),imageView,
-                        photoInfo,PERSON_CACHE_DIR+"/"+ myPersonInfo.getId().toString());
+                        photoInfo,FileManager.PERSON_CACHE_DIR+"/"+ myPersonInfo.getId().toString());
                 /*if(photoInfo!=null)
                 {
                     String photoId = UsefulFunctions.getDigest(photoInfo.getBlobKey());
@@ -148,7 +140,6 @@ public class PersonProfileFragment extends Fragment
             }
             if((txtView = (TextView) rootView.findViewById(R.id.profile_txt_typeAge))!=null) {
                 String str = myPersonInfo.getType().equals("PARTNER")? getString(R.string.personprofile_type_partner):getString(R.string.personprofile_type_coach);
-                DateTime birthday;
                 int age = UsefulFunctions.calcPersonAge(myPersonInfo.getBirthday());
                 if(age>=0)
                     str += ", "+age ;
@@ -211,7 +202,7 @@ public class PersonProfileFragment extends Fragment
             if((linearLayout = (LinearLayout) rootView.findViewById(R.id.profile_linearLayout_favoriteSpotLst))!=null) {
                 List<Long> spotLst = myPersonInfo.getFavoriteSpotIdLst();
                 if(spotLst!=null && spotLst.size()>0) {
-                    Spot spot=null;
+                    Spot spot;
                     HashMap<Long,Spot> hshMapSpot = SpotsData.get_allSpots();
                     ArrayList<Spot> spots = new ArrayList<>();
                     for(int i=0; i<spotLst.size(); i++)
@@ -259,14 +250,10 @@ public class PersonProfileFragment extends Fragment
                                  Intent returnIntent) {
         if (resultCode != Activity.RESULT_OK) {
             Log.d(TAG, "resultCode !=  Activity.RESULT_OK");
-            return;
         } else if (requestCode == PICK_IMAGE) {
             // Get the file's content URI from the incoming Intent
-
             Uri returnUri = returnIntent.getData();
-
             new EndpointApi.GetUrlForUploadAsyncTask(this).execute(returnUri.toString());
-
         }
     }
     @Override
@@ -305,8 +292,8 @@ public class PersonProfileFragment extends Fragment
         //Toast.makeText(getActivity().getBaseContext(),text,Toast.LENGTH_LONG).show();
         Person myPersonInfo = LocalDataManager.getMyPersonInfo();
         if(myPersonInfo!=null) {
-            List list = new ArrayList();
-            list.add(new Long(myPersonInfo.getId()));
+            List<Long> list = new ArrayList<>();
+            list.add(myPersonInfo.getId());
             new EndpointApi.GetListPersonByIdLstAsyncTask(this).execute(list);
         }
     }
@@ -353,7 +340,7 @@ public class PersonProfileFragment extends Fragment
                 Picture pic = myPersonInfo.getPhoto();
                 if(pic!=null){
                     cacheImage = picInfo.savePicPreviewToCache(TAG, getActivity().getBaseContext(),
-                            UsefulFunctions.getDigest(myPersonInfo.getPhoto().getBlobKey()), PERSON_CACHE_DIR + "/" + myPersonInfo.getId());
+                            UsefulFunctions.getDigest(myPersonInfo.getPhoto().getBlobKey()), FileManager.PERSON_CACHE_DIR + "/" + myPersonInfo.getId());
                     if(cacheImage!=null && rootView!=null) {
                         ImageView imageView = (ImageView) rootView.findViewById(R.id.profile_img_photo);
                         if(imageView!=null)
@@ -381,7 +368,7 @@ public class PersonProfileFragment extends Fragment
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_edit_profile:
-                FragmentManager fragmentManager = (FragmentManager) getFragmentManager();
+                FragmentManager fragmentManager = getFragmentManager();
                 if(fragmentManager!=null)
                     fragmentManager.beginTransaction().replace(R.id.container, new EditProfileFragment()).addToBackStack(null).commit();
                 break;
