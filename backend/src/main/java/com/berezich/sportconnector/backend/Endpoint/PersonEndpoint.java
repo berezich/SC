@@ -2,6 +2,7 @@ package com.berezich.sportconnector.backend.Endpoint;
 
 import com.berezich.sportconnector.backend.AccountForConfirmation;
 import com.berezich.sportconnector.backend.Person;
+import com.berezich.sportconnector.backend.Picture;
 import com.berezich.sportconnector.backend.ReqChangeEmail;
 import com.google.api.server.spi.config.AnnotationBoolean;
 import com.google.api.server.spi.config.Api;
@@ -347,7 +348,7 @@ public class PersonEndpoint {
     }
 
     /**
-     * Updates an existing {@code Person} except Email.
+     * Updates an existing {@code Person} except EMAIL, PASSWORD, PHOTO.
      *
      * @param id    the ID of the entity to be updated
      * @param person the desired state of the entity
@@ -367,12 +368,10 @@ public class PersonEndpoint {
         if(oldPerson.getType()!=person.getType())
             throw new BadRequestException("Person with id:" + id + " has already another type = "+oldPerson.getType());
         person.setId(id);
-        validatePersonProperties(person);
-        String digPass = msgDigest(person.getPass());
-        if(digPass.equals(""))
-            throw new BadRequestException("Server error");
-        person.setPass(digPass);
+        person.setPass(oldPerson.getPass());
         person.setEmail(oldPerson.getEmail());
+        person.setPhoto(oldPerson.getPhoto());
+        validatePersonProperties(person);
         ofy().save().entity(person).now();
         logger.info("Updated Person: " + person);
         Person personRes = ofy().load().entity(person).now();
@@ -447,9 +446,19 @@ public class PersonEndpoint {
         Person person = ofy().load().type(Person.class).id(id).now();
         if(person!=null) {
             new SpotEndpoint().removePersonFromSpots(person.getFavoriteSpotIdLst(), person.getType(), id);
+            List<String> picBlobLst = new ArrayList<>();
+            Picture photo = person.getPhoto();
+            if(photo!=null)
+                picBlobLst.add(photo.getBlobKey());
+            List<Picture> pictureList = person.getPictureLst();
+            if(pictureList!=null && pictureList.size()>0){
+                for (Picture pic:pictureList)
+                    picBlobLst.add(pic.getBlobKey());
+                new FileManager().deleteFile(picBlobLst);
+            }
         }
         ofy().delete().type(Person.class).id(id).now();
-        logger.info("Deleted Person with ID: " + id);
+        logger.info(String.format("Person with ID: %d removed",id));
     }
 
     /**

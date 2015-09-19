@@ -100,7 +100,7 @@ public class SpotEndpoint {
         spot.setId(null);
         ofy().save().entity(spot).now();
         Spot spotRes = ofy().load().entity(spot).now();
-        logger.info("Created Spot getId:" + spotRes.getId() + " name:" + spotRes.getName());
+        logger.info("Created Spot id:" + spotRes.getId() + " name:" + spotRes.getName());
         setSpotUpdateInstance(spotRes);
         setFavoritePersonsSpot(spotRes,null);
         return spotRes;
@@ -129,7 +129,7 @@ public class SpotEndpoint {
         updateRegionInfoAboutSpot(spot);
         ofy().save().entity(spot).now();
         Spot resSpot = ofy().load().entity(spot).now();
-        logger.info("Updated Spot id:" + resSpot.getId() + " getName:" + resSpot.getName());
+        logger.info("Updated Spot id:" + resSpot.getId() + " name:" + resSpot.getName());
         setSpotUpdateInstance(resSpot);
         setFavoritePersonsSpot(resSpot, oldSpot);
         return resSpot;
@@ -170,7 +170,7 @@ public class SpotEndpoint {
 
         ofy().save().entity(spot).now();
         Spot resSpot = ofy().load().entity(spot).now();
-        logger.info("Pictures attached/replaced/removed to Spot id:" + resSpot.getId() + " getName:" + resSpot.getName());
+        logger.info("Pictures attached/replaced/removed to Spot id:" + resSpot.getId() + " name:" + resSpot.getName());
         setSpotUpdateInstance(resSpot);
         return resSpot;
     }
@@ -290,6 +290,14 @@ public class SpotEndpoint {
             if(spot.getPartnerLst()!=null)
                 personLst.addAll(spot.getPartnerLst());
             new PersonEndpoint().removePersonsFavoriteSpot(personLst, spot.getId());
+
+            List<Picture> pictureList = spot.getPictureLst();
+            List<String> picBlobLst = new ArrayList<>();
+            if(pictureList!=null && pictureList.size()>0){
+                for (Picture pic:pictureList)
+                    picBlobLst.add(pic.getBlobKey());
+                new FileManager().deleteFile(picBlobLst);
+            }
         }
         UpdateSpotInfo updateSpotInfo = ofy().load().type(UpdateSpotInfo.class).id(id).now();
         if(updateSpotInfo!=null) {
@@ -302,7 +310,7 @@ public class SpotEndpoint {
             }
         }
         ofy().delete().type(Spot.class).id(id).now();
-        logger.info("Deleted Spot with ID: " + id);
+        logger.info(String.format("Spot with ID: %d removed", id));
     }
 
     /**

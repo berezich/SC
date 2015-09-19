@@ -19,6 +19,7 @@ import android.widget.Toast;
 
 import com.berezich.sportconnector.backend.sportConnectorApi.model.Person;
 import com.berezich.sportconnector.backend.sportConnectorApi.model.Picture;
+import com.berezich.sportconnector.backend.sportConnectorApi.model.Spot;
 import com.google.api.client.util.IOUtils;
 
 import org.apache.http.HttpEntity;
@@ -172,7 +173,7 @@ public class FileManager {
         }
     }
 
-    public static class UploadFileAsyncTask extends AsyncTask<Pair<PicInfo, Pair<String, String>>, Void, Pair<PicInfo, Exception>> {
+    public static class UploadFileAsyncTask extends AsyncTask<Pair<PicInfo, Pair<String, String>>, Void, Exception> {
         private OnAction listener = null;
         private final String TAG = "MyLog_UploadFile";
 
@@ -185,7 +186,7 @@ public class FileManager {
         }
 
         @Override
-        protected Pair<PicInfo, Exception> doInBackground(Pair<PicInfo, Pair<String, String>>... params) {
+        protected Exception doInBackground(Pair<PicInfo, Pair<String, String>>... params) {
             PicInfo picInfo = params[0].first;
             String uploadUrl = params[0].second.first;
             String replacePicKey = params[0].second.second;
@@ -207,7 +208,7 @@ public class FileManager {
                     byte[] data = picInfo.getCompressedPic();
                     builder.addBinaryBody("UsrPhoto", data, ContentType.create(picInfo.getMimeType()), picInfo.getName());
                 } catch (Exception e) {
-                    return new Pair<>(picInfo, e);
+                    return e;
                 }
 
                 HttpEntity entity = builder.build();
@@ -218,19 +219,19 @@ public class FileManager {
                         response.getStatusLine(), response.getEntity().getContent()));
                 //TODO: check response state
 
-                return new Pair<>(picInfo, null);
+                return null;
             } catch (Exception e) {
-                return new Pair<>(picInfo, e);
+                return e;
             }
         }
 
         @Override
-        protected void onPostExecute(Pair<PicInfo, Exception> result) {
-            listener.onUploadFileFinish(result);
+        protected void onPostExecute(Exception exception) {
+            listener.onUploadFileFinish(exception);
         }
 
         public static interface OnAction {
-            void onUploadFileFinish(Pair<PicInfo, Exception> result);
+            void onUploadFileFinish(Exception exception);
         }
     }
 
@@ -503,15 +504,36 @@ public class FileManager {
         }
     }
 
-    public static void removeOldPersonCache(Context context, Person person) {
-        List<String> usefulCacheFiles = new ArrayList<>();
-        if(person.getPhoto()!=null)
-            usefulCacheFiles.add(UsefulFunctions.getDigest(person.getPhoto().getBlobKey()));
-        List<Picture> pictures = person.getPictureLst();
-        if(pictures!=null)
-            for(Picture pic:pictures)
-                usefulCacheFiles.add(UsefulFunctions.getDigest(pic.getBlobKey()));
-        removeOldFiles(TAG, context, usefulCacheFiles, PERSON_CACHE_DIR + "/" + person.getId());
+    public static class RemoveOldPersonCache extends AsyncTask<Pair<Context,Person>,Void,Void>{
+        protected Void doInBackground(Pair<Context, Person>... params) {
+            Context context = params[0].first;
+            Person person = params[0].second;
+            List<String> usefulCacheFiles = new ArrayList<>();
+            if(person.getPhoto()!=null)
+                usefulCacheFiles.add(UsefulFunctions.getDigest(person.getPhoto().getBlobKey()));
+            List<Picture> pictures = person.getPictureLst();
+            if(pictures!=null)
+                for(Picture pic:pictures)
+                    usefulCacheFiles.add(UsefulFunctions.getDigest(pic.getBlobKey()));
+            removeOldFiles(TAG, context, usefulCacheFiles, PERSON_CACHE_DIR + "/" + person.getId());
+            return null;
+        }
+
+    }
+
+    public static class RemoveOldSpotCache extends AsyncTask<Pair<Context,Spot>,Void,Void>{
+        protected Void doInBackground(Pair<Context, Spot>... params) {
+            Context context = params[0].first;
+            Spot spot = params[0].second;
+            List<String> usefulCacheFiles = new ArrayList<>();
+            List<Picture> pictures = spot.getPictureLst();
+            if(pictures!=null)
+                for(Picture pic:pictures)
+                    usefulCacheFiles.add(UsefulFunctions.getDigest(pic.getBlobKey()));
+            removeOldFiles(TAG, context, usefulCacheFiles, SPOT_CACHE_DIR + "/" + spot.getId());
+            return null;
+        }
+
     }
 
     public static void removeOldFiles(String TAG, Context context, List<String> usefulFileNameLst, String folder){
@@ -531,10 +553,16 @@ public class FileManager {
                 File[] allFiles = file.listFiles();
                 String fileName="";
                 for (File item : allFiles) {
+                    if(item.isDirectory()) {
+                        removeDirectory(item);
+                        continue;
+                    }
                     fileName = item.getName();
                     if (!usefulFileNameLst.contains(fileName)) {
-                        item.delete();
-                        Log.d(TAG, "old cache file filePath = " + item.getPath() + " removed");
+                        if(item.delete())
+                            Log.d(TAG, "old cache file filePath = " + item.getPath() + " removed");
+                        else
+                            Log.e(TAG, "old cache file filePath = " + item.getPath() + "not removed");
                     }
                 }
             }
@@ -549,9 +577,16 @@ public class FileManager {
                     removeDirectory(aFile);
                 }
             }
-            dir.delete();
+            if(dir.delete())
+                Log.d(TAG, "old cache filePath = " + dir.getPath() + " removed");
+            else
+                Log.e(TAG, "old cache filePath = " + dir.getPath() + " not removed");
+
         } else {
-            dir.delete();
+            if(dir.delete())
+                Log.d(TAG, "old cache filePath = " + dir.getPath() + " removed");
+            else
+                Log.e(TAG, "old cache filePath = " + dir.getPath() + " not removed");
         }
     }
     public static int checkRotationDegrees (String filePath)throws IOException
@@ -566,5 +601,19 @@ public class FileManager {
         else if (exifOrientation == ExifInterface.ORIENTATION_ROTATE_180) {  return 180; }
         else if (exifOrientation == ExifInterface.ORIENTATION_ROTATE_270) {  return 270; }
         return 0;
+    }
+    public static boolean renameFile(String TAG, Context context,String cacheFile, String newFileName){
+        if(!isExternalStorageWritable()) {
+            Log.e(TAG, "ExternalStorage not writable");
+            return false;
+        }
+        File file = FileManager.getAlbumStorageDir(TAG, context, cacheFile);
+        if(file!=null && file.exists())
+            if(file.renameTo(new File(file.getParent()+"/"+newFileName))) {
+                Log.d(TAG,String.format("file %s renamed to %s",file.getPath(),newFileName));
+                return true;
+            }
+        Log.e(TAG,String.format("file %s renamed failed",file.getPath()));
+        return false;
     }
 }

@@ -1,6 +1,7 @@
 package com.berezich.sportconnector.PersonProfile;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -38,16 +39,11 @@ import java.util.List;
 /**
  * Created by berezkin on 17.07.2015.
  */
-public class PersonProfileFragment extends Fragment
-        implements EndpointApi.GetUrlForUploadAsyncTask.OnAction,
-                   FileManager.UploadFileAsyncTask.OnAction,
-                   EndpointApi.GetListPersonByIdLstAsyncTask.OnAction
-                   //FileManager.DownloadImageTask.OnAction
-{
+public class PersonProfileFragment extends Fragment {
+
     private static final String ARG_SECTION_NUMBER = "section_number";
     private final String TAG = "MyLog_profileFragment";
-    public static final int PICK_IMAGE = 111;
-    FileManager.PicInfo picInfo;
+    //FileManager.PicInfo picInfo;
     int _sectionNumber;
     View rootView;
     /**
@@ -72,7 +68,7 @@ public class PersonProfileFragment extends Fragment
         super.onCreate(savedInstanceState);
         Person myPersonInfo = LocalDataManager.getMyPersonInfo();
         if(myPersonInfo!=null)
-            FileManager.removeOldPersonCache(getActivity().getBaseContext(),myPersonInfo);
+            new FileManager.RemoveOldPersonCache().execute(new Pair<>(getActivity().getBaseContext(),myPersonInfo));
     }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -106,33 +102,10 @@ public class PersonProfileFragment extends Fragment
         if(myPersonInfo!=null && rootView!=null)
         {
             if((imageView = (ImageView) rootView.findViewById(R.id.profile_img_photo))!=null) {
-                imageView.setOnClickListener(new ImageOnClick());
+                //imageView.setOnClickListener(new ImageOnClick());
                 Picture photoInfo = myPersonInfo.getPhoto();
                 FileManager.providePhotoForImgView(this.getActivity().getBaseContext(),imageView,
                         photoInfo,FileManager.PERSON_CACHE_DIR+"/"+ myPersonInfo.getId().toString());
-                /*if(photoInfo!=null)
-                {
-                    String photoId = UsefulFunctions.getDigest(photoInfo.getBlobKey());
-                    File myFolder = FileManager.getAlbumStorageDir(TAG, getActivity().getBaseContext(), myPersonInfo.getId().toString());
-                    boolean isNeedLoad=true;
-                    if(myFolder !=null)
-                    {
-                        File myPhoto = new File(myFolder,photoId);
-                        if(myPhoto.exists()) {
-                            int height = (int) getResources().getDimension(R.dimen.personProfile_photoHeight);
-                            int width = (int) getResources().getDimension(R.dimen.property_line_width);
-                            FileManager.setPicToImageView(myPhoto, imageView,height,width);
-                            isNeedLoad = false;
-                        }
-                    }
-                    if(isNeedLoad)
-                    {
-                        Log.d(TAG,"need to load myPhoto from server");
-                        String dynamicUrl = String.format("%s=s%d-c",photoInfo.getServingUrl(),(int) getResources().getDimension(R.dimen.personProfile_photoHeight));
-                        Log.d(TAG,String.format("url for download image = %s",dynamicUrl));
-                        new FileManager.DownloadImageTask(this,photoId).execute(dynamicUrl);
-                    }
-                }*/
             }
             if((txtView = (TextView) rootView.findViewById(R.id.profile_txt_name))!=null) {
                 String name = myPersonInfo.getName(), surname = myPersonInfo.getSurname();
@@ -234,69 +207,7 @@ public class PersonProfileFragment extends Fragment
         }
     }
 
-    private class ImageOnClick implements View.OnClickListener {
-        @Override
-        public void onClick(View v) {
-            Intent intent = new Intent(Intent.ACTION_PICK,android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-            intent.setType("image/*");
-            //intent.setAction();
-            startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE);
-        }
-    }
 
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode,
-                                 Intent returnIntent) {
-        if (resultCode != Activity.RESULT_OK) {
-            Log.d(TAG, "resultCode !=  Activity.RESULT_OK");
-        } else if (requestCode == PICK_IMAGE) {
-            // Get the file's content URI from the incoming Intent
-            Uri returnUri = returnIntent.getData();
-            new EndpointApi.GetUrlForUploadAsyncTask(this).execute(returnUri.toString());
-        }
-    }
-    @Override
-    public void onGeUrlForUploadAsyncTaskFinish(Pair<List<String>, Exception> result) {
-        /*
-         * Try to open the file for "read" access using the
-         * returned URI. If the file isn't found, write to the
-         * error log and return.
-         */
-        String urlForUpload = result.first.get(1);
-        String fileUri = result.first.get(0);
-        FileManager.PicInfo picInfo = new FileManager.PicInfo(this,TAG,fileUri);
-        String replaceBlob = "";
-        Person myPersonInfo = LocalDataManager.getMyPersonInfo();
-        if(myPersonInfo!=null && myPersonInfo.getPhoto()!=null)
-            replaceBlob = myPersonInfo.getPhoto().getBlobKey();
-        new FileManager.UploadFileAsyncTask(this).execute(new Pair<>(picInfo, new Pair<>(urlForUpload,replaceBlob)));
-    }
-
-    @Override
-    public void onUploadFileFinish(Pair<FileManager.PicInfo,Exception> result) {
-        String text;
-        picInfo = result.first;
-        Exception exception = result.second;
-        if(exception!=null) {
-            exception.printStackTrace();
-            text = "File not uploaded!";
-            Log.e(TAG,text );
-        }
-        else {
-            text = "File uploaded!";
-            Log.d(TAG, text);
-        }
-
-        //TODO: turn off toast message
-        //Toast.makeText(getActivity().getBaseContext(),text,Toast.LENGTH_LONG).show();
-        Person myPersonInfo = LocalDataManager.getMyPersonInfo();
-        if(myPersonInfo!=null) {
-            List<Long> list = new ArrayList<>();
-            list.add(myPersonInfo.getId());
-            new EndpointApi.GetListPersonByIdLstAsyncTask(this).execute(list);
-        }
-    }
 
     /*
     @Override
@@ -326,35 +237,7 @@ public class PersonProfileFragment extends Fragment
         }
     }
     */
-    @Override
-    public void onGetListPersonByIdLstFinish(Pair<List<Person>, Exception> result) {
-        Exception exception = result.second;
-        List<Person> personList = result.first;
-        File cacheImage;
-        if(exception==null && personList.size()>0)
-        {
-            Person myPersonInfoOld = LocalDataManager.getMyPersonInfo();
-            if(myPersonInfoOld!=null) {
-                Person myPersonInfo = personList.get(0);
-                LocalDataManager.setMyPersonInfo(myPersonInfo.setPass(myPersonInfo.getPass()));
-                Picture pic = myPersonInfo.getPhoto();
-                if(pic!=null){
-                    cacheImage = picInfo.savePicPreviewToCache(TAG, getActivity().getBaseContext(),
-                            UsefulFunctions.getDigest(myPersonInfo.getPhoto().getBlobKey()), FileManager.PERSON_CACHE_DIR + "/" + myPersonInfo.getId());
-                    if(cacheImage!=null && rootView!=null) {
-                        ImageView imageView = (ImageView) rootView.findViewById(R.id.profile_img_photo);
-                        if(imageView!=null)
-                        {
-                            int height = (int)getResources().getDimension(R.dimen.personProfile_photoHeight);
-                            int width = (int)getResources().getDimension(R.dimen.personProfile_photoWidth);
-                            FileManager.setPicToImageView(cacheImage, imageView,height,width);
-                        }
-                    }
-                }
-            }
-        }
 
-    }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {

@@ -20,6 +20,49 @@
             android:paddingRight="@dimen/editprofile_block_left_right_offset">
 
 
+            <LinearLayout
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:background="@color/background_floating_material_light"
+                android:orientation="horizontal">
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/editProfile_img_photo"
+                    android:src="@drawable/lst_profile_icon"
+                    android:background="#ffbcbcbc" />
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:id="@+id/editProfile_frame_changePhoto">
+
+                    <LinearLayout
+                        android:orientation="horizontal"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:gravity="center_vertical">
+
+                        <ImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:id="@+id/editprofile_ic_editPhoto"
+                            android:background="@drawable/ic_menu_edit"/>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textAppearance="?android:attr/textAppearanceMedium"
+                            android:text="@string/editprofile_chagePhoto"
+                            android:id="@+id/editprofile_txt_changePhoto"
+                            android:paddingLeft="@dimen/editprofile_changePhoto_leftOffset" />
+                    </LinearLayout>
+
+                </FrameLayout>
+
+            </LinearLayout>
+
             <TextView
                 style="@style/EditProfile_TitleBlock"
                 android:id="@+id/editProfile_txt_generalTitle"

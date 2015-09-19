@@ -82,6 +82,7 @@
 
     <!-- editProfile_fragment begin-->
         <string name="editprofile_fragmentTitle">Редактирование данных</string>
+        <string name="editprofile_chagePhoto">Изменить фото</string>
         <string name="editprofile_title_general">ОБЩАЯ ИНФОРМАЦИЯ</string>
         <string name="editprofile_hint_name">Имя</string>
         <string name="editprofile_hint_surname">Фамилия</string>

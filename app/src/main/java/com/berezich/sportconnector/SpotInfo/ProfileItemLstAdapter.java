@@ -1,7 +1,9 @@
 package com.berezich.sportconnector.SpotInfo;
 
 import android.content.Context;
+import android.os.AsyncTask;
 import android.support.v4.app.Fragment;
+import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -65,7 +67,7 @@ public class ProfileItemLstAdapter extends BaseAdapter {
         }
         Person person = getPerson(position);
         if(person!=null) {
-            FileManager.removeOldPersonCache(ctx, person);
+            new FileManager.RemoveOldPersonCache().execute(new Pair<>(ctx, person));
             if (view != null) {
                 Picture photo = person.getPhoto();
                 ImageView imageView = (ImageView) view.findViewById(R.id.lstProfileItem_img_photo);
@@ -82,7 +84,6 @@ public class ProfileItemLstAdapter extends BaseAdapter {
                 ((TextView) view.findViewById(R.id.lstProfileItem_desc2)).setText(
                         (person.getRating() > 0) ?
                                 ctx.getString(R.string.person_item_rating) + " " + person.getRating() : "");
-                //((ImageView) view.findViewById(R.id.lstProfileItem_img_photo)).setImageResource(person.image());
             }
         }
         return view;

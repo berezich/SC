@@ -540,7 +540,7 @@ public class EndpointApi {
     }
 
 
-    public static class GetUrlForUploadAsyncTask extends AsyncTask<String, Void, Pair<List<String>,Exception> >{
+    public static class GetUrlForUploadAsyncTask extends AsyncTask<Void, Void, Pair<String,Exception> >{
         private OnAction listener=null;
         private Context context = null;
         public GetUrlForUploadAsyncTask(Fragment fragment)
@@ -550,31 +550,27 @@ public class EndpointApi {
             try {
                 listener = (OnAction) fragment;
             } catch (ClassCastException e) {
-                throw new ClassCastException(fragment.toString() + " must implement onGeUrlForUploadAsyncTaskFinish for GetUrlForUploadAsyncTask");
+                throw new ClassCastException(fragment.toString() + " must implement onGetUrlForUploadAsyncTaskFinish for GetUrlForUploadAsyncTask");
             }
         }
         @Override
-        protected Pair<List<String>,Exception> doInBackground(String ...params) {
-            String fileForUpload = params[0];
-            List<String> strings = new ArrayList<>();
-            strings.add(fileForUpload);
+        protected Pair<String,Exception> doInBackground(Void... params) {
             try {
                 FileUrl fileUrl = srvApi.getUrlForUpload().execute();
-                strings.add( fileUrl.getUrlForUpload());
-                return new Pair<>(strings,null);
+                return new Pair<>(fileUrl.getUrlForUpload(),null);
             } catch (Exception e) {
                 return new Pair<>(null,e);
             }
         }
 
         @Override
-        protected void onPostExecute(Pair<List<String>,Exception> result) {
-            listener.onGeUrlForUploadAsyncTaskFinish(result);
+        protected void onPostExecute(Pair<String,Exception> result) {
+            listener.onGetUrlForUploadAsyncTaskFinish(result);
         }
 
         public static interface OnAction
         {
-            void onGeUrlForUploadAsyncTaskFinish(Pair<List<String>,Exception> result);
+            void onGetUrlForUploadAsyncTaskFinish(Pair<String, Exception> result);
         }
     }
 }

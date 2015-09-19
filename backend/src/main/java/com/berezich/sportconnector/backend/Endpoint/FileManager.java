@@ -61,8 +61,9 @@ public class FileManager {
                 blobKey = new BlobKey(blobKeyLst.get(i));
                 try {
                     blobstoreService.delete(blobKey);
+                    logger.info(String.format("blob file %s deleted",blobKey));
                 } catch (BlobstoreFailureException e) {
-                    logger.info("blob file delete failed\n"+e.getMessage());
+                    logger.info(String.format("blob file %s delete failed\n%s",blobKey,e.getMessage()));
                     e.printStackTrace();
                 }
             }
