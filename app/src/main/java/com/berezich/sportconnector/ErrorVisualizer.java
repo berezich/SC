@@ -112,7 +112,7 @@ public class ErrorVisualizer {
             if(exception!=null)
                 if (exception instanceof GoogleJsonResponseException) {
                     GoogleJsonResponseException appError = (GoogleJsonResponseException) exception;
-                    errMsg = ((GoogleJsonResponseException) exception).getDetails().getMessage();
+                    errMsg = appError.getDetails().getMessage();
 
                 }
                 else

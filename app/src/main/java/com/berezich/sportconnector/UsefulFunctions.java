@@ -82,4 +82,17 @@ public class UsefulFunctions {
         }
         return new String(hexChars);
     }
+
+    public static boolean isSameStrValue(String v1, String v2)
+    {
+        if(v1==null && v2==null)
+            return true;
+        if(v1!=null && v2!=null) {
+            if (!v1.equals(v2))
+                return false;
+        }
+        else if(v1==null && !v2.equals("") || v2==null && !v1.equals(""))
+            return false;
+        return true;
+    }
 }

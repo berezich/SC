@@ -2,7 +2,6 @@ package com.berezich.sportconnector.PersonProfile;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -16,7 +15,6 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -26,7 +24,6 @@ import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RadioGroup;
-import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -47,10 +44,8 @@ import com.google.api.client.util.DateTime;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
 
 /**
  * Created by Sashka on 25.07.2015.
@@ -61,10 +56,9 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
                                                              EndpointApi.ChangePassAsyncTask.OnAction,
                                                              EndpointApi.UpdatePersonAsyncTask.OnAction,
                                                              EndpointApi.GetUrlForUploadAsyncTask.OnAction,
-                                                             FileManager.UploadFileAsyncTask.OnAction,
-                                                             EndpointApi.GetListPersonByIdLstAsyncTask.OnAction {
+                                                             FileManager.UploadFileAsyncTask.OnAction/*,
+                                                             EndpointApi.GetListPersonByIdLstAsyncTask.OnAction*/ {
 
-    //private static final String ARG_SECTION_NUMBER = "section_number";
     private final String TAG = "MyLog_EditProfileFrg";
     private final String mSex = "MALE";
     private final String fSex = "FEMALE";
@@ -267,11 +261,31 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         ((MainActivity) getActivity()).hideSoftKeyboard();
+        Context ctx = getActivity().getBaseContext();
         switch (item.getItemId())
         {
             case R.id.menu_save_profile:
+                Person myPersonInfo = LocalDataManager.getMyPersonInfo();
                 updateTempMyPerson();
-                new EndpointApi.GetUrlForUploadAsyncTask(this).execute();
+                if(myPersonInfo!=null && tempMyPerson!=null) {
+                    if (picInfo != null) {
+                        item.setVisible(false);
+                        setVisibleProgressBar(true);
+                        new EndpointApi.GetUrlForUploadAsyncTask(this).execute();
+                    }
+                    else if (isChanged(tempMyPerson, myPersonInfo)) {
+                        item.setVisible(false);
+                        setVisibleProgressBar(true);
+                        new EndpointApi.UpdatePersonAsyncTask(this).execute(tempMyPerson);
+                    }
+                    else{
+                        FragmentManager fragmentManager = getFragmentManager();
+                        if(fragmentManager!=null)
+                            fragmentManager.popBackStack();
+                    }
+                }
+                else
+                    Toast.makeText(ctx, getString(R.string.editprofile_saveError), Toast.LENGTH_SHORT).show();
                 break;
         }
         return super.onOptionsItemSelected(item);
@@ -320,7 +334,7 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
                     tempMyPerson.setSex(mSex);
                     break;
                 case R.id.editProfile_radio_female:
-                    tempMyPerson.setSex(mSex);
+                    tempMyPerson.setSex(fSex);
                     break;
             }
 
@@ -404,7 +418,7 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
         //tempMyPerson.setPass(newPass);
         try {
             setVisibleProgressBar(true);
-            new EndpointApi.ChangePassAsyncTask(this).execute(new Pair<Long, String>(tempMyPerson.getId(), tempMyPerson.getPass()), new Pair<Long, String>(null, newPass));
+            new EndpointApi.ChangePassAsyncTask(this).execute(new Pair<>(tempMyPerson.getId(), tempMyPerson.getPass()), new Pair<Long, String>(null, newPass));
             if(tempMyPerson!=null)
                 tempMyPerson.setPass(newPass);
         }
@@ -469,7 +483,7 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
                     spinner.requestFocus();
             }
 
-            FragmentManager fragmentManager = (FragmentManager) getFragmentManager();
+            FragmentManager fragmentManager = getFragmentManager();
             AlertDialogFragment dialog;
             String msgInfoId;
             if(tempMyPerson.getRating() == 1.0)
@@ -521,39 +535,68 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
     @Override
     public void onActivityResult(int requestCode, int resultCode,
                                  Intent returnIntent) {
+        FileManager.PicInfo tempPicInfo = null;
         if (resultCode != Activity.RESULT_OK) {
             Log.d(TAG, "resultCode !=  Activity.RESULT_OK");
         } else if (requestCode == PICK_IMAGE) {
+            Context context = getActivity().getBaseContext();
             // Get the file's content URI from the incoming Intent
             Uri returnUri = returnIntent.getData();
-            picInfo = new FileManager.PicInfo(this,TAG,returnUri.toString());
-            Person myPersonInfo = LocalDataManager.getMyPersonInfo();
-            //TODO: v2
+            try {
+                tempPicInfo = new FileManager.PicInfo(this,TAG,returnUri.toString());
+            } catch (IOException e) {
+                Log.e(TAG, String.format("PicInfo constructor exception %s", e.getMessage()));
+                e.printStackTrace();
+                Toast.makeText(context, getString(R.string.editprofile_pickImageError), Toast.LENGTH_SHORT).show();
+                return;
+            }
+            if(tempPicInfo!=null) {
+                if (tempPicInfo.getPath()==null) {
+                    Log.e(TAG, String.format("PICK_IMAGE returned not valid URI"));
+                    Toast.makeText(context, getString(R.string.editprofile_pickImageError), Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                File pickedFile = new File(tempPicInfo.getPath());
+                if (!pickedFile.exists()){
+                    Log.e(TAG, String.format("PICK_IMAGE %s not exist",tempPicInfo.getPath()));
+                    Toast.makeText(context, getString(R.string.editprofile_pickImageError), Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+            }
             if(tempMyPerson!=null) {
                 String cacheDir = FileManager.PERSON_CACHE_DIR + "/" + tempMyPerson.getId();
-                Context context = getActivity().getBaseContext();
-                picInfo.savePicPreviewToCache(TAG, context, UsefulFunctions.getDigest(tempPhotoName),
+                tempPicInfo.savePicPreviewToCache(TAG, context, UsefulFunctions.getDigest(tempPhotoName),
                         cacheDir);
                 Picture picture = new Picture();
                 picture.setBlobKey(tempPhotoName);
                 tempMyPerson.setPhoto(picture);
-                ImageView imageView = (ImageView) rootView.findViewById(R.id.editProfile_img_photo);
-                //if(imageView!=null)
-                //    FileManager.providePhotoForImgView(context,imageView,picture,cacheDir);
+                picInfo = tempPicInfo;
+                //setting picture to imageView is proceeded in onResume()
             }
-            /*TODO: v1
-            new EndpointApi.GetUrlForUploadAsyncTask(this).execute(returnUri.toString());*/
         }
     }
     @Override
     public void onGetUrlForUploadAsyncTaskFinish(Pair<String, Exception> result) {
-        /*
-         * Try to open the file for "read" access using the
-         * returned URI. If the file isn't found, write to the
-         * error log and return.
-         */
         String urlForUpload = result.first;
+        Exception ex = result.second;
         String replaceBlob = "";
+        Context ctx = getActivity().getBaseContext();
+        if(ex!=null)
+        {
+            Log.e(TAG,String.format("getUrlForUpload error %s", ErrorVisualizer.getDebugMsgOfRespException(ex)));
+            ex.printStackTrace();
+            setVisibleProgressBar(false);
+            Toast.makeText(ctx,getString(R.string.editprofile_saveError),Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if(urlForUpload==null || urlForUpload.equals(""))
+        {
+            Log.e(TAG, String.format("getUrlForUpload error urlForUpload not valid"));
+            setVisibleProgressBar(false);
+            Toast.makeText(ctx, getString(R.string.editprofile_saveError), Toast.LENGTH_SHORT).show();
+            return;
+        }
         Person myPersonInfo = LocalDataManager.getMyPersonInfo();
         if(myPersonInfo!=null && myPersonInfo.getPhoto()!=null)
             replaceBlob = myPersonInfo.getPhoto().getBlobKey();
@@ -561,33 +604,21 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
     }
     @Override
     public void onUploadFileFinish(Exception exception) {
-        String text;
         if(exception!=null) {
             exception.printStackTrace();
-            text = "File not uploaded!";
-            Log.e(TAG, text);
+            Log.e(TAG, String.format("UploadFile failed: %s", exception.getMessage()));
+            exception.printStackTrace();
+            setVisibleProgressBar(false);
             Toast.makeText(getActivity().getBaseContext(),getString(R.string.editprofile_saveError),
                     Toast.LENGTH_SHORT).show();
         }
         else {
-            text = "File uploaded!";
-            Log.d(TAG, text);
+            Log.d(TAG, "File uploaded!");
             new EndpointApi.UpdatePersonAsyncTask(this).execute(tempMyPerson);
         }
 
-        //TODO: turn off toast message
-        //Toast.makeText(getActivity().getBaseContext(),text,Toast.LENGTH_LONG).show();
-
-        /*Person myPersonInfo = LocalDataManager.getMyPersonInfo();
-        if(myPersonInfo!=null) {
-            List<Long> list = new ArrayList<>();
-            list.add(myPersonInfo.getId());
-            new EndpointApi.GetListPersonByIdLstAsyncTask(this).execute(list);
-        }*/
-
-
     }
-    @Override
+    /*@Override
     public void onGetListPersonByIdLstFinish(Pair<List<Person>, Exception> result) {
         Exception exception = result.second;
         List<Person> personList = result.first;
@@ -615,7 +646,7 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
             }
         }
 
-    }
+    }*/
     private void setVisibleProgressBar(boolean isVisible)
     {
         View view;
@@ -625,23 +656,26 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
             if ((view = rootView.findViewById(R.id.editProfile_frameLayout))!=null)
                 view.setVisibility(isVisible ? View.VISIBLE : View.GONE);
         }
+        if(!isVisible)
+            getActivity().invalidateOptionsMenu();
     }
 
     @Override
     public void onUpdatePersonFinish(Pair<Person, Exception> result) {
         Person updatedPerson = result.first;
         Exception ex = result.second;
+        Person myPerson = LocalDataManager.getMyPersonInfo();
         if(ex==null && updatedPerson!=null)
         {
-            Picture pic = updatedPerson.getPhoto();
-            if(pic!=null) {
-                String tempFileName = UsefulFunctions.getDigest(tempPhotoName);
-                String newFileName = UsefulFunctions.getDigest(pic.getBlobKey());
-                FileManager.renameFile(TAG, getActivity().getBaseContext(), FileManager.PERSON_CACHE_DIR
-                        + "/" + updatedPerson.getId() + "/" + tempFileName, newFileName);
-            }
-            Person myPerson = LocalDataManager.getMyPersonInfo();
             if(myPerson!=null) {
+                Picture newPic = updatedPerson.getPhoto();
+                Picture oldPic = myPerson.getPhoto();
+                if(newPic!=null &&(oldPic==null || !newPic.getBlobKey().equals(oldPic.getBlobKey()))) {
+                    String tempFileName = UsefulFunctions.getDigest(tempPhotoName);
+                    String newFileName = UsefulFunctions.getDigest(newPic.getBlobKey());
+                    FileManager.renameFile(TAG, getActivity().getBaseContext(), FileManager.PERSON_CACHE_DIR
+                            + "/" + updatedPerson.getId() + "/" + tempFileName, newFileName);
+                }
                 updatedPerson.setPass(myPerson.getPass());
                 LocalDataManager.setMyPersonInfo(updatedPerson);
             }
@@ -653,9 +687,31 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
             Log.e(TAG, "updatePerson failed error");
             String debugMsg = ErrorVisualizer.getDebugMsgOfRespException(ex);
             if(debugMsg!=null)
-                Log.e(TAG,debugMsg);
+                Log.e(TAG, debugMsg);
+
+            setVisibleProgressBar(false);
             Toast.makeText(getActivity().getBaseContext(), getString(R.string.editprofile_saveError), Toast.LENGTH_LONG).show();
         }
     }
 
+    public boolean isChanged(Person pNew, Person p)
+    {
+        if(!UsefulFunctions.isSameStrValue(p.getName(),pNew.getName()))
+            return true;
+        if(!UsefulFunctions.isSameStrValue(p.getSurname(),pNew.getSurname()))
+            return true;
+        if(pNew.getBirthday().getValue() != p.getBirthday().getValue())
+            return true;
+        if(!UsefulFunctions.isSameStrValue(p.getPhone(), pNew.getPhone()))
+            return true;
+        if(!UsefulFunctions.isSameStrValue(p.getPrice(),pNew.getPrice()))
+            return true;
+        if(pNew.getRating() != p.getRating())
+            return true;
+        if(!UsefulFunctions.isSameStrValue(p.getDescription(), pNew.getDescription()))
+            return true;
+        if(!UsefulFunctions.isSameStrValue(p.getSex(),pNew.getSex()))
+            return true;
+        return false;
+    }
 }

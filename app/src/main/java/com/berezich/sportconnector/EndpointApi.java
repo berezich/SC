@@ -550,7 +550,8 @@ public class EndpointApi {
             try {
                 listener = (OnAction) fragment;
             } catch (ClassCastException e) {
-                throw new ClassCastException(fragment.toString() + " must implement onGetUrlForUploadAsyncTaskFinish for GetUrlForUploadAsyncTask");
+                throw new ClassCastException(fragment.toString() +
+                        " must implement onGetUrlForUploadAsyncTaskFinish for GetUrlForUploadAsyncTask");
             }
         }
         @Override

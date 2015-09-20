@@ -65,7 +65,7 @@ public class FileManager {
         private String description;
         private String mimeType;
 
-        public PicInfo(Fragment fragment, String TAG, String fileUri) {
+        public PicInfo(Fragment fragment, String TAG, String fileUri) throws IOException{
             Uri uri = Uri.parse(fileUri);
             Cursor returnCursor = fragment.getActivity().getContentResolver().query(uri, null, null, null, null);
             int nameIndex = returnCursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
@@ -77,29 +77,14 @@ public class FileManager {
             this.mimeType = fragment.getActivity().getContentResolver().getType(uri);
             this.path = returnCursor.getString(dataIdx);
             bitmap = decodeFile(new File(path));
-            try {
-                int rotation = checkRotationDegrees(this.path);
-                Log.d(TAG, "picture rotation = " + rotation);
-                Matrix matrix = new Matrix();
-                if (rotation != 0f) {
-                    matrix.preRotate(rotation);
-                    bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
-                    Log.d(TAG, "picture rotated");
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
+            int rotation = checkRotationDegrees(this.path);
+            Log.d(TAG, "picture rotation = " + rotation);
+            Matrix matrix = new Matrix();
+            if (rotation != 0f) {
+                matrix.preRotate(rotation);
+                bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+                Log.d(TAG, "picture rotated");
             }
-
-
-
-            /*try {
-                bitmap =  MediaStore.Images.Media.getBitmap(fragment.getActivity().getContentResolver(), uri);
-            } catch (IOException e) {
-                Log.d(TAG, "getBitmap error uri = " + uri.toString());
-                e.printStackTrace();
-                return;
-            }*/
-
         }
 
         /**
@@ -403,28 +388,23 @@ public class FileManager {
     }
 
     // Decodes image and scales it to reduce memory consumption
-    private static Bitmap decodeFile(File f) {
-        try {
-            // Decode image size
-            BitmapFactory.Options o = new BitmapFactory.Options();
-            o.inJustDecodeBounds = true;
-            BitmapFactory.decodeStream(new FileInputStream(f), null, o);
+    private static Bitmap decodeFile(File f) throws FileNotFoundException{
+        // Decode image size
+        BitmapFactory.Options o = new BitmapFactory.Options();
+        o.inJustDecodeBounds = true;
+        BitmapFactory.decodeStream(new FileInputStream(f), null, o);
 
-            // Find the correct scale value. It should be the power of 2.
-            int scale = 1;
-            while (o.outWidth / scale / 2 >= REQUIRED_SIZE &&
-                    o.outHeight / scale / 2 >= REQUIRED_SIZE) {
-                scale *= 2;
-            }
-
-            // Decode with inSampleSize
-            BitmapFactory.Options o2 = new BitmapFactory.Options();
-            o2.inSampleSize = scale;
-            return BitmapFactory.decodeStream(new FileInputStream(f), null, o2);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
+        // Find the correct scale value. It should be the power of 2.
+        int scale = 1;
+        while (o.outWidth / scale / 2 >= REQUIRED_SIZE &&
+                o.outHeight / scale / 2 >= REQUIRED_SIZE) {
+            scale *= 2;
         }
-        return null;
+
+        // Decode with inSampleSize
+        BitmapFactory.Options o2 = new BitmapFactory.Options();
+        o2.inSampleSize = scale;
+        return BitmapFactory.decodeStream(new FileInputStream(f), null, o2);
     }
 
     public static File savePicPreviewToCache(String TAG, Context context, String fileName, String cacheDir, Bitmap bitmap) {
@@ -591,10 +571,10 @@ public class FileManager {
     }
     public static int checkRotationDegrees (String filePath)throws IOException
     {
-            ExifInterface exif = new ExifInterface(filePath);
-            int rotation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
-            int rotationInDegrees = exifToDegrees(rotation);
-            return rotationInDegrees;
+        ExifInterface exif = new ExifInterface(filePath);
+        int rotation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
+        int rotationInDegrees = exifToDegrees(rotation);
+        return rotationInDegrees;
     }
     private static int exifToDegrees(int exifOrientation) {
         if (exifOrientation == ExifInterface.ORIENTATION_ROTATE_90) { return 90; }

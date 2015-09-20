@@ -98,6 +98,7 @@
         <string name="editprofile_txt_setRating">Уровень игры</string>
         <string name="editprofile_hint_desc">Немного о себе</string>
         <string name="editprofile_saveError">Ошибка</string>
+        <string name="editprofile_pickImageError">Выберите другую картинку</string>
             <!-- menu -->
                 <string name="menu_save_profile">Сохранить</string>
             <!-- menu -->
