@@ -1,11 +1,13 @@
 package com.berezich.sportconnector.SpotInfo;
 
 import android.app.Activity;
+import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Layout;
 import android.util.Log;
 import android.util.Pair;
 import android.view.LayoutInflater;
@@ -14,26 +16,26 @@ import android.view.MenuInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ActionMenuView;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.RelativeLayout;
 import android.widget.TabHost;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.berezich.sportconnector.EndpointApi;
 import com.berezich.sportconnector.ErrorVisualizer;
+import com.berezich.sportconnector.FileManager;
 import com.berezich.sportconnector.GoogleMap.SpotsData;
 import com.berezich.sportconnector.LocalDataManager;
 import com.berezich.sportconnector.R;
 import com.berezich.sportconnector.backend.sportConnectorApi.model.Person;
-import com.berezich.sportconnector.backend.sportConnectorApi.model.RegionInfo;
+import com.berezich.sportconnector.backend.sportConnectorApi.model.Picture;
 import com.berezich.sportconnector.backend.sportConnectorApi.model.Spot;
-import com.berezich.sportconnector.backend.sportConnectorApi.model.UpdateSpotInfo;
 
-import java.io.IOException;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -102,7 +104,7 @@ public class SpotInfoFragment extends Fragment implements EndpointApi.GetListPer
                              Bundle savedInstanceState) {
         TextView txtView;
         TabHost tabHost;
-        ListView lstView;
+        LinearLayout linearLayout;
         ImageButton imgButton;
         spotInfoView = inflater.inflate(R.layout.fragment_spot_info, container, false);
         spotHashMap = SpotsData.get_allSpots();
@@ -120,6 +122,29 @@ public class SpotInfoFragment extends Fragment implements EndpointApi.GetListPer
                 imgButton.setOnTouchListener(new StarBtnOnTouchListener());
             }
 
+            if((linearLayout = (LinearLayout) spotInfoView.findViewById(R.id.spotInfo_list_photos))!=null)
+            {
+                List<Picture> picList = curSpot.getPictureLst();
+                if(picList!=null && picList.size()>0)
+                {
+                    Context ctx = getActivity().getBaseContext();
+                    ImageView imageView;
+                    for (Picture pic:picList)
+                    {
+                        imageView = new ImageView(ctx);
+                        linearLayout.addView(imageView);
+                        imageView.getLayoutParams().height = (int) getResources().getDimension(R.dimen.spotInfo_photos_heigt);
+                        imageView.getLayoutParams().width = (int) getResources().getDimension(R.dimen.spotInfo_photos_width);
+                        FileManager.providePhotoForImgView(ctx,imageView,pic,FileManager.SPOT_CACHE_DIR+"/"+curSpot.getId());
+                    }
+                    linearLayout.setVisibility(View.VISIBLE);
+
+                }
+                else {
+                    linearLayout.setVisibility(View.GONE);
+                }
+            }
+
             int coachesNum = SpotsData.getCoachIdsWithoutMe(curSpot).size(), partnersNum = SpotsData.getPartnerIdsWithoutMe(curSpot).size();
             if((partnersNum>0 || coachesNum>0)&&(tabHost = (TabHost) spotInfoView.findViewById(R.id.spotInfo_tabHost))!=null)
             {
@@ -133,8 +158,9 @@ public class SpotInfoFragment extends Fragment implements EndpointApi.GetListPer
                     // название вкладки
                     tabSpec.setIndicator(getString(R.string.spotinfo_tab1_title));
 
-                    lstView = (ListView) spotInfoView.findViewById(R.id.spotInfo_list_tab_partners);
-                    /*partnersAdapter = new ProfileItemLstAdapter(getActivity().getApplicationContext(),
+                    /*
+                    ListView lstView = (ListView) spotInfoView.findViewById(R.id.spotInfo_list_tab_partners);
+                    partnersAdapter = new ProfileItemLstAdapter(getActivity().getApplicationContext(),
                             new ArrayList<Person>(curSpot.getPartnerLst()));
                     lstView.setAdapter(partnersAdapter);*/
 

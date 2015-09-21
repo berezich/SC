@@ -21,6 +21,7 @@ import com.berezich.sportconnector.backend.sportConnectorApi.model.Person;
 import com.berezich.sportconnector.backend.sportConnectorApi.model.Picture;
 import com.berezich.sportconnector.backend.sportConnectorApi.model.Spot;
 import com.google.api.client.util.IOUtils;
+import com.google.gson.annotations.Expose;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -57,12 +58,18 @@ public class FileManager {
 
 
     public static class PicInfo {
+        @Expose
         private String name;
+        @Expose
         private String path;
         private Bitmap bitmap;
+        @Expose
         private Long size;
+        @Expose
         private Date date;
+        @Expose
         private String description;
+        @Expose
         private String mimeType;
 
         public PicInfo(Fragment fragment, String TAG, String fileUri) throws IOException{

@@ -41,6 +41,8 @@ import com.berezich.sportconnector.backend.sportConnectorApi.model.Person;
 import com.berezich.sportconnector.backend.sportConnectorApi.model.Picture;
 import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.client.util.DateTime;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import java.io.File;
 import java.io.IOException;
@@ -64,13 +66,19 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
     private final String fSex = "FEMALE";
     private final String tempPhotoName = "tempPhoto";
     private final String STATE_TEMP_PERSON = "tempPerson";
+    private final String STATE_PICINFO = "picInfo";
     public static final int PICK_IMAGE = 111;
     FileManager.PicInfo picInfo;
     View rootView;
     Person tempMyPerson = null;
     private static GsonFactory gsonFactory = new GsonFactory();
+    private static GsonBuilder gsonBuilder = new GsonBuilder();
+    private static Gson gson;
 
     public EditProfileFragment() {
+        gsonBuilder.setPrettyPrinting().serializeNulls().excludeFieldsWithoutExposeAnnotation();
+        gson = gsonBuilder.create();
+
     }
 
     @Override
@@ -109,12 +117,28 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
                     tempMyPerson = gsonFactory.fromString(tempPersonStr, Person.class);
                     Log.d(TAG, String.format("tempMyPerson got out of instanceState"));
                 }
-                else
+                else {
                     Log.d(TAG, String.format("instanceState.tempMyPerson == null"));
-            } catch (IOException e) {
+                }
+            } catch (Exception e) {
                 Log.e(TAG, String.format("tempMyPerson getting out of instanceState failed"));
                 e.printStackTrace();
             }
+            try {
+                String picInfoStr = savedInstanceState.getString(STATE_PICINFO);
+                picInfo = gson.fromJson(picInfoStr, FileManager.PicInfo.class);
+                if(picInfoStr!=null && !picInfoStr.equals("")) {
+                    picInfo = gsonFactory.fromString(picInfoStr, FileManager.PicInfo.class);
+                    Log.d(TAG, String.format("picInfo got out of instanceState"));
+                }
+                else {
+                    Log.d(TAG, String.format("instanceState.picInfo == null"));
+                }
+            } catch (Exception e) {
+                Log.e(TAG, String.format("picInfo getting out of instanceState failed"));
+                e.printStackTrace();
+            }
+
         }
         else
             Log.d(TAG, String.format("savedInstanceState == null"));
@@ -126,9 +150,10 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
         updateTempMyPerson();
         try {
             outState.putString(STATE_TEMP_PERSON,gsonFactory.toString(tempMyPerson));
-            Log.d(TAG, String.format("tempMyPerson saved to instanceState"));
-        } catch (IOException e) {
-            Log.e(TAG,String.format("tempMyPerson saving to instanceState failed"));
+            outState.putString(STATE_PICINFO, gson.toJson(picInfo));
+            Log.d(TAG, String.format("tempMyPerson and picInfo saved to instanceState"));
+        } catch (Exception e) {
+            Log.e(TAG, String.format("tempMyPerson or picInfo saving to instanceState failed"));
             e.printStackTrace();
         }
     }

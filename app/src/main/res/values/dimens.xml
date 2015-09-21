@@ -57,6 +57,11 @@
         <!-- changePass_dialog-->
     <!-- fragment_editProfile-->
 
+    <!-- fragment_spotInfo-->
+        <dimen name="spotInfo_photos_heigt">70dp</dimen>
+        <dimen name="spotInfo_photos_width">70dp</dimen>
+    <!-- fragment_spotInfo-->
+
     <!-- fragment_test_question-->
         <dimen name="testQuestion_block_left_right_offset">10dp</dimen>
         <dimen name="testQuestion_block_topBottom_offset">10dp</dimen>
