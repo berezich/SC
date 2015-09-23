@@ -2,6 +2,7 @@ package com.berezich.sportconnector.SpotInfo;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -30,12 +31,15 @@ import com.berezich.sportconnector.EndpointApi;
 import com.berezich.sportconnector.ErrorVisualizer;
 import com.berezich.sportconnector.FileManager;
 import com.berezich.sportconnector.GoogleMap.SpotsData;
+import com.berezich.sportconnector.ImgViewPagerActivity;
 import com.berezich.sportconnector.LocalDataManager;
 import com.berezich.sportconnector.R;
 import com.berezich.sportconnector.backend.sportConnectorApi.model.Person;
 import com.berezich.sportconnector.backend.sportConnectorApi.model.Picture;
 import com.berezich.sportconnector.backend.sportConnectorApi.model.Spot;
+import com.google.api.client.json.gson.GsonFactory;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -127,6 +131,7 @@ public class SpotInfoFragment extends Fragment implements EndpointApi.GetListPer
                 List<Picture> picList = curSpot.getPictureLst();
                 if(picList!=null && picList.size()>0)
                 {
+                    linearLayout.setOnClickListener(new OnImageClick());
                     Context ctx = getActivity().getBaseContext();
                     ImageView imageView;
                     for (Picture pic:picList)
@@ -400,6 +405,27 @@ public class SpotInfoFragment extends Fragment implements EndpointApi.GetListPer
 
         if((frameLayout = (FrameLayout) spotInfoView.findViewById(R.id.spotinfo_frg_frameLayout))!=null)
             ErrorVisualizer.showProgressBar(frameLayout);
+    }
+    private class OnImageClick implements View.OnClickListener{
+        @Override
+        public void onClick(View v) {
+            Intent intent = new Intent(getActivity(), ImgViewPagerActivity.class);
+            if(curSpot!=null) {
+                List<Picture> picLst = curSpot.getPictureLst();
+                if(picLst!=null) {
+                    GsonFactory gsonFactory = new GsonFactory();
+                    try {
+                        ArrayList<String> picList = new ArrayList<String>();
+                        for(Picture pic:picLst)
+                            picList.add(gsonFactory.toString(pic));
+                        intent.putStringArrayListExtra(ImgViewPagerActivity.PIC_LIST_EXTRAS, picList);
+                        startActivity(intent);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
     }
     private Fragment getFragmentRef()
     {

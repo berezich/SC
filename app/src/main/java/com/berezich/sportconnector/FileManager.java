@@ -227,9 +227,11 @@ public class FileManager {
         }
     }
 
-    public static void providePhotoForImgView(Context context, ImageView imageView, Picture photoInfo, String cacheDir) {
-        int height = (int) context.getResources().getDimension(R.dimen.personProfile_photoHeight);
-        int width = (int) context.getResources().getDimension(R.dimen.personProfile_photoWidth);
+    public static void providePhotoForImgView(Context context, ImageView imageView, Picture photoInfo, String cacheDir){
+        providePhotoForImgView(context,imageView,photoInfo,cacheDir,(int) context.getResources().getDimension(R.dimen.personProfile_photoHeight));
+    }
+    public static void providePhotoForImgView(Context context, ImageView imageView, Picture photoInfo, String cacheDir,int height) {
+        int width = height;
 
         if (photoInfo != null) {
             String photoId = UsefulFunctions.getDigest(photoInfo.getBlobKey());
@@ -238,13 +240,13 @@ public class FileManager {
             if (myFolder != null) {
                 File myPhoto = new File(myFolder, photoId);
                 if (myPhoto.exists()) {
-                    setPicToImageView(myPhoto, imageView, height, width);
+                    setPicToImageView(myPhoto, imageView, width, height);
                     isNeedLoad = false;
                 }
             }
             if (isNeedLoad) {
                 Log.d(TAG, "need to load myPhoto from server");
-                String dynamicUrl = String.format("%s=s%d-c", photoInfo.getServingUrl(), (int) context.getResources().getDimension(R.dimen.personProfile_photoHeight));
+                String dynamicUrl = String.format((height>0)?"%s=s%d-c":"%s=s%d", photoInfo.getServingUrl(), height);
                 Log.d(TAG, String.format("url for download image = %s", dynamicUrl));
                 new FileManager.DownloadImageTask(context, photoId, imageView, cacheDir).execute(dynamicUrl);
             }
@@ -319,7 +321,7 @@ public class FileManager {
                         return;
                     }
                     Log.d(TAG, "bitmap loaded from server");
-                    FileManager.savePicPreviewToCache(TAG, context, imgId, cacheDir, bitmap);
+                    FileManager.savePicToCache(TAG, context, imgId, cacheDir, bitmap, bitmap.getWidth(), bitmap.getHeight());
                     if (imageView != null) {
                         imageView.setImageBitmap(bitmap);
                     }
@@ -414,8 +416,19 @@ public class FileManager {
         return BitmapFactory.decodeStream(new FileInputStream(f), null, o2);
     }
 
+
     public static File savePicPreviewToCache(String TAG, Context context, String fileName, String cacheDir, Bitmap bitmap) {
-        if (fileName == null || fileName.equals("")) {
+        int photoHeight = (int) context.getResources().getDimension(R.dimen.personProfile_photoHeight);
+        int photoWidth = (int) context.getResources().getDimension(R.dimen.personProfile_photoWidth);
+        return savePicToCache(TAG, context, fileName, cacheDir, bitmap, photoWidth, photoHeight);
+    }
+    public static File savePicToCache(String TAG, Context context, String fileName, String cacheDir, Bitmap bitmap, int width, int height) {
+        return savePicToCache(TAG, context, fileName, cacheDir, bitmap, width, height,false);
+    }
+    public static File savePicToCache(String TAG, Context context, String fileName, String cacheDir,
+                                      Bitmap bitmap, int width, int height, boolean needCenterCrop) {
+
+                if (fileName == null || fileName.equals("")) {
             Log.e(TAG, "file name not valid");
             return null;
         }
@@ -432,11 +445,16 @@ public class FileManager {
                 file.delete();
             try {
                 FileOutputStream out = new FileOutputStream(file);
-                Bitmap endBitmap = cropCenterBitmap(bitmap);
-                int photoHeight = (int) context.getResources().getDimension(R.dimen.personProfile_photoHeight);
-                int photoWidth = (int) context.getResources().getDimension(R.dimen.personProfile_photoWidth);
-                Log.d(TAG, String.format("myPhoto preview size = %dx%d", photoWidth, photoHeight));
-                endBitmap = Bitmap.createScaledBitmap(endBitmap, photoWidth, photoHeight, false);
+                Bitmap endBitmap;
+                if(needCenterCrop) {
+                    endBitmap = cropCenterBitmap(bitmap);
+                    Log.d(TAG, String.format("photo cropped to square"));
+
+                }
+                else
+                    endBitmap = bitmap;
+                Log.d(TAG, String.format("photo preview size = %dx%d", width, height));
+                endBitmap = Bitmap.createScaledBitmap(endBitmap, width, height, false);
                 endBitmap.compress(Bitmap.CompressFormat.JPEG, FileManager.COMPRESS_QUALITY, out);
                 out.flush();
                 out.close();
@@ -450,7 +468,7 @@ public class FileManager {
         return null;
     }
 
-    public static void setPicToImageView(File imgFile, ImageView imgView, int height, int width) {
+    public static void setPicToImageView(File imgFile, ImageView imgView, int width, int height) {
         InputStream in = null;
         try {
             in = new BufferedInputStream(new FileInputStream(imgFile));
@@ -475,7 +493,10 @@ public class FileManager {
                 }
                 Bitmap bitmap = BitmapFactory.decodeByteArray(bos.toByteArray(), 0, bos.toByteArray().length);
                 if (bitmap != null && imgView != null) {
-                    imgView.setImageBitmap(Bitmap.createScaledBitmap(bitmap, width, height, false));
+                    if(height>0)
+                        imgView.setImageBitmap(Bitmap.createScaledBitmap(bitmap, width, height, false));
+                    else
+                        imgView.setImageBitmap(bitmap);
                 }
                 if (bos != null) {
                     try {

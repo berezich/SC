@@ -1,9 +1,7 @@
 package com.berezich.sportconnector.PersonProfile;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -19,9 +17,9 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.berezich.sportconnector.EndpointApi;
 import com.berezich.sportconnector.FileManager;
 import com.berezich.sportconnector.GoogleMap.SpotsData;
+import com.berezich.sportconnector.ImgViewPagerActivity;
 import com.berezich.sportconnector.LocalDataManager;
 import com.berezich.sportconnector.MainActivity;
 import com.berezich.sportconnector.R;
@@ -29,9 +27,12 @@ import com.berezich.sportconnector.UsefulFunctions;
 import com.berezich.sportconnector.backend.sportConnectorApi.model.Person;
 import com.berezich.sportconnector.backend.sportConnectorApi.model.Picture;
 import com.berezich.sportconnector.backend.sportConnectorApi.model.Spot;
-import com.google.api.client.util.DateTime;
+import com.google.api.client.json.gson.GsonFactory;
+import com.google.common.reflect.TypeToken;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
-import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -46,6 +47,8 @@ public class PersonProfileFragment extends Fragment {
     //FileManager.PicInfo picInfo;
     int _sectionNumber;
     View rootView;
+
+
     /**
      * Returns a new instance of this fragment for the given section
      * number.
@@ -102,7 +105,7 @@ public class PersonProfileFragment extends Fragment {
         if(myPersonInfo!=null && rootView!=null)
         {
             if((imageView = (ImageView) rootView.findViewById(R.id.profile_img_photo))!=null) {
-                //imageView.setOnClickListener(new ImageOnClick());
+                imageView.setOnClickListener(new OnImageClick());
                 Picture photoInfo = myPersonInfo.getPhoto();
                 FileManager.providePhotoForImgView(this.getActivity().getBaseContext(),imageView,
                         photoInfo,FileManager.PERSON_CACHE_DIR+"/"+ myPersonInfo.getId().toString());
@@ -257,6 +260,28 @@ public class PersonProfileFragment extends Fragment {
                 break;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private class OnImageClick implements View.OnClickListener{
+        @Override
+        public void onClick(View v) {
+            Intent intent = new Intent(getActivity(), ImgViewPagerActivity.class);
+            Person myPerson = LocalDataManager.getMyPersonInfo();
+            if(myPerson!=null) {
+                Picture picture = myPerson.getPhoto();
+                if(picture!=null) {
+                    GsonFactory gsonFactory = new GsonFactory();
+                    try {
+                        ArrayList<String> picList = new ArrayList<String>();
+                        picList.add(gsonFactory.toString(picture));
+                        intent.putStringArrayListExtra(ImgViewPagerActivity.PIC_LIST_EXTRAS, picList);
+                        startActivity(intent);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
     }
 
     public String getTAG() {
