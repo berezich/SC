@@ -55,15 +55,14 @@ import java.util.List;
  */
 public class SpotInfoFragment extends Fragment implements EndpointApi.GetListPersonByIdLstAsyncTask.OnAction,
                                                           /*EndpointApi.UpdateSpotAsyncTask.OnAction,*/
-                                                          EndpointApi.SetSpotAsFavoriteAsyncTask.OnAction
-{
+                                                          EndpointApi.SetSpotAsFavoriteAsyncTask.OnAction {
     private static final String ARG_SPOT_ID = "spotId";
-    private static final  String TAB_PARTNERS = "partners";
-    private static final  String TAB_COACHES = "coaches";
+    private static final String TAB_PARTNERS = "partners";
+    private static final String TAB_COACHES = "coaches";
     private static final String TAG = "MyLog_SpotInfoFragment";
     private Long spotId;
-    private boolean isFavoriteChanged=false;
-    private HashMap<Long,Spot> spotHashMap;
+    private boolean isFavoriteChanged = false;
+    private HashMap<Long, Spot> spotHashMap;
     private Spot curSpot;
     private View spotInfoView;
     private ProfileItemLstAdapter partnersAdapter;
@@ -75,9 +74,10 @@ public class SpotInfoFragment extends Fragment implements EndpointApi.GetListPer
     /**
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
-     *
+     * <p/>
      * //@param param1 Parameter 1.
      * //@param param2 Parameter 2.
+     *
      * @return A new instance of fragment BlankFragment.
      */
     public static SpotInfoFragment newInstance(Long spotId) {
@@ -112,52 +112,46 @@ public class SpotInfoFragment extends Fragment implements EndpointApi.GetListPer
         ImageButton imgButton;
         spotInfoView = inflater.inflate(R.layout.fragment_spot_info, container, false);
         spotHashMap = SpotsData.get_allSpots();
-        if((txtView = (TextView) spotInfoView.findViewById(R.id.spotinfo_frg_tryAgain_txtView))!=null)
+        if ((txtView = (TextView) spotInfoView.findViewById(R.id.spotinfo_frg_tryAgain_txtView)) != null)
             txtView.setOnClickListener(new TryAgainClickListener());
         curSpot = spotHashMap.get(spotId);
-        if(curSpot!=null)
-        {
-            if((txtView =(TextView) spotInfoView.findViewById(R.id.spotInfo_txt_name))!=null)
+        if (curSpot != null) {
+            if ((txtView = (TextView) spotInfoView.findViewById(R.id.spotInfo_txt_name)) != null)
                 txtView.setText(curSpot.getName());
-            if((txtView =(TextView) spotInfoView.findViewById(R.id.spotInfo_txt_adress))!=null)
+            if ((txtView = (TextView) spotInfoView.findViewById(R.id.spotInfo_txt_adress)) != null)
                 txtView.setText(curSpot.getAddress());
-            if((imgButton=(ImageButton) spotInfoView.findViewById(R.id.spotInfo_btnImg_favorite))!=null) {
-                imgButton.setPressed(LocalDataManager.isMyFavoriteSpot(curSpot));
+            if ((imgButton = (ImageButton) spotInfoView.findViewById(R.id.spotInfo_btnImg_favorite)) != null) {
                 imgButton.setOnTouchListener(new StarBtnOnTouchListener());
             }
 
-            if((linearLayout = (LinearLayout) spotInfoView.findViewById(R.id.spotInfo_list_photos))!=null)
-            {
+            if ((linearLayout = (LinearLayout) spotInfoView.findViewById(R.id.spotInfo_list_photos)) != null) {
                 List<Picture> picList = curSpot.getPictureLst();
-                if(picList!=null && picList.size()>0)
-                {
-                    linearLayout.setOnClickListener(new OnImageClick());
+                if (picList != null && picList.size() > 0) {
+                    //linearLayout.setOnClickListener(new OnImageClick());
                     Context ctx = getActivity().getBaseContext();
                     ImageView imageView;
-                    for (Picture pic:picList)
-                    {
+                    for (Picture pic : picList) {
                         imageView = new ImageView(ctx);
                         linearLayout.addView(imageView);
                         imageView.getLayoutParams().height = (int) getResources().getDimension(R.dimen.spotInfo_photos_heigt);
                         imageView.getLayoutParams().width = (int) getResources().getDimension(R.dimen.spotInfo_photos_width);
-                        FileManager.providePhotoForImgView(ctx,imageView,pic,FileManager.SPOT_CACHE_DIR+"/"+curSpot.getId());
+                        FileManager.providePhotoForImgView(ctx, imageView, pic, FileManager.SPOT_CACHE_DIR + "/" + curSpot.getId());
+                        imageView.setOnClickListener(new OnImageClick());
                     }
                     linearLayout.setVisibility(View.VISIBLE);
 
-                }
-                else {
+                } else {
                     linearLayout.setVisibility(View.GONE);
                 }
             }
 
             int coachesNum = SpotsData.getCoachIdsWithoutMe(curSpot).size(), partnersNum = SpotsData.getPartnerIdsWithoutMe(curSpot).size();
-            if((partnersNum>0 || coachesNum>0)&&(tabHost = (TabHost) spotInfoView.findViewById(R.id.spotInfo_tabHost))!=null)
-            {
+            if ((partnersNum > 0 || coachesNum > 0) && (tabHost = (TabHost) spotInfoView.findViewById(R.id.spotInfo_tabHost)) != null) {
                 // инициализация
                 tabHost.setup();
 
                 TabHost.TabSpec tabSpec;
-                if(partnersNum>0) {
+                if (partnersNum > 0) {
                     // создаем вкладку и указываем тег
                     tabSpec = tabHost.newTabSpec(TAB_PARTNERS);
                     // название вкладки
@@ -174,7 +168,7 @@ public class SpotInfoFragment extends Fragment implements EndpointApi.GetListPer
                     // добавляем в корневой элемент
                     tabHost.addTab(tabSpec);
                 }
-                if(coachesNum>0 ) {
+                if (coachesNum > 0) {
                     tabSpec = tabHost.newTabSpec(TAB_COACHES);
                     tabSpec.setIndicator(getString(R.string.spotinfo_tab2_title));
                     /*
@@ -195,8 +189,7 @@ public class SpotInfoFragment extends Fragment implements EndpointApi.GetListPer
                     }
                 });
     */
-            }
-            else {
+            } else {
                 setVisible(View.GONE, View.GONE, View.VISIBLE);
                 return spotInfoView;
             }
@@ -208,11 +201,11 @@ public class SpotInfoFragment extends Fragment implements EndpointApi.GetListPer
 
 
             personIdLst = new ArrayList<Long>();
-            if(curSpot.getCoachLst()!=null)
+            if (curSpot.getCoachLst() != null)
                 personIdLst.addAll(SpotsData.getCoachIdsWithoutMe(curSpot));
-            if(curSpot.getPartnerLst()!=null)
+            if (curSpot.getPartnerLst() != null)
                 personIdLst.addAll(SpotsData.getPartnerIdsWithoutMe(curSpot));
-            if(personIdLst.size()>0) {
+            if (personIdLst.size() > 0) {
                 setVisibleProgressBar();
                 new EndpointApi.GetListPersonByIdLstAsyncTask(this).execute(personIdLst);
 
@@ -225,6 +218,14 @@ public class SpotInfoFragment extends Fragment implements EndpointApi.GetListPer
         if (mListener != null) {
             mListener.onFragmentInteraction(uri);
         }
+    }
+
+    @Override
+    public void onResume(){
+        super.onResume();
+        ImageView imgButton;
+        if ((imgButton = (ImageButton) spotInfoView.findViewById(R.id.spotInfo_btnImg_favorite)) != null)
+            imgButton.setPressed(LocalDataManager.isMyFavoriteSpot(curSpot));
     }
 
     @Override
@@ -329,7 +330,7 @@ public class SpotInfoFragment extends Fragment implements EndpointApi.GetListPer
         }
         Log.e(TAG, "Error GetListPersonByIdLst");
         if(personLst==null)
-            Log.e(TAG,"personLst = null");
+            Log.e(TAG, "personLst = null");
 
         FrameLayout frameLayout;
         if((frameLayout = (FrameLayout) spotInfoView.findViewById(R.id.spotinfo_frg_frameLayout))!=null)
@@ -409,6 +410,8 @@ public class SpotInfoFragment extends Fragment implements EndpointApi.GetListPer
     private class OnImageClick implements View.OnClickListener{
         @Override
         public void onClick(View v) {
+            LinearLayout linearLayout = (LinearLayout) v.getParent();
+            int index = linearLayout.indexOfChild(v);
             Intent intent = new Intent(getActivity(), ImgViewPagerActivity.class);
             if(curSpot!=null) {
                 List<Picture> picLst = curSpot.getPictureLst();
@@ -419,6 +422,7 @@ public class SpotInfoFragment extends Fragment implements EndpointApi.GetListPer
                         for(Picture pic:picLst)
                             picList.add(gsonFactory.toString(pic));
                         intent.putStringArrayListExtra(ImgViewPagerActivity.PIC_LIST_EXTRAS, picList);
+                        intent.putExtra(ImgViewPagerActivity.PIC_INDEX_EXTRAS, index);
                         startActivity(intent);
                     } catch (IOException e) {
                         e.printStackTrace();

@@ -55,6 +55,9 @@ public class FileManager {
     private static final String TAG = "MyLog_fileManager";
     public static final String PERSON_CACHE_DIR = "Person";
     public static final String SPOT_CACHE_DIR = "Spot";
+    public static final String TEMP_DIR = "tempStore";
+    public static final String TEMP_FILE_POSTFIX = "_01spb";
+    private static final int MAX_TEMP_SIZE = 1024*1024;
 
 
     public static class PicInfo {
@@ -235,7 +238,13 @@ public class FileManager {
 
         if (photoInfo != null) {
             String photoId = UsefulFunctions.getDigest(photoInfo.getBlobKey());
-            File myFolder = FileManager.getAlbumStorageDir(TAG, context, cacheDir);
+            File myFolder;
+            if(cacheDir.equals(TEMP_DIR)) {
+                myFolder = context.getCacheDir();
+                photoId+=TEMP_FILE_POSTFIX;
+            }
+            else
+                myFolder = FileManager.getAlbumStorageDir(TAG, context, cacheDir);
             boolean isNeedLoad = true;
             if (myFolder != null) {
                 File myPhoto = new File(myFolder, photoId);
@@ -321,9 +330,13 @@ public class FileManager {
                         return;
                     }
                     Log.d(TAG, "bitmap loaded from server");
-                    FileManager.savePicToCache(TAG, context, imgId, cacheDir, bitmap, bitmap.getWidth(), bitmap.getHeight());
                     if (imageView != null) {
                         imageView.setImageBitmap(bitmap);
+                    if(cacheDir.equals(TEMP_DIR))
+                        FileManager.savePicToTempStore(TAG, context, imgId, bitmap, bitmap.getWidth(), bitmap.getHeight(),false);
+                    else
+                        FileManager.savePicToCache(TAG, context, imgId, cacheDir, bitmap, bitmap.getWidth(), bitmap.getHeight());
+
                     }
                 } else {
                     Log.e(TAG, "bitmap not loaded from server");
@@ -420,7 +433,7 @@ public class FileManager {
     public static File savePicPreviewToCache(String TAG, Context context, String fileName, String cacheDir, Bitmap bitmap) {
         int photoHeight = (int) context.getResources().getDimension(R.dimen.personProfile_photoHeight);
         int photoWidth = (int) context.getResources().getDimension(R.dimen.personProfile_photoWidth);
-        return savePicToCache(TAG, context, fileName, cacheDir, bitmap, photoWidth, photoHeight);
+        return savePicToCache(TAG, context, fileName, cacheDir, bitmap, photoWidth, photoHeight, true);
     }
     public static File savePicToCache(String TAG, Context context, String fileName, String cacheDir, Bitmap bitmap, int width, int height) {
         return savePicToCache(TAG, context, fileName, cacheDir, bitmap, width, height,false);
@@ -440,6 +453,64 @@ public class FileManager {
         File file = FileManager.getAlbumStorageDir(TAG, context, cacheDir);
         if (file != null) {
             Log.d(TAG, "filePath = " + file.getPath());
+            file = new File(file, fileName);
+            if (file.exists())
+                file.delete();
+            try {
+                FileOutputStream out = new FileOutputStream(file);
+                Bitmap endBitmap;
+                if(needCenterCrop) {
+                    endBitmap = cropCenterBitmap(bitmap);
+                    Log.d(TAG, String.format("photo cropped to square"));
+
+                }
+                else
+                    endBitmap = bitmap;
+                Log.d(TAG, String.format("photo preview size = %dx%d", width, height));
+                endBitmap = Bitmap.createScaledBitmap(endBitmap, width, height, false);
+                endBitmap.compress(Bitmap.CompressFormat.JPEG, FileManager.COMPRESS_QUALITY, out);
+                out.flush();
+                out.close();
+                return file;
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                return null;
+            }
+        }
+        return null;
+    }
+
+    public static File savePicToTempStore(String TAG, Context context, String fileName, Bitmap bitmap,
+                                          int width, int height, boolean needCenterCrop) {
+
+        if (fileName == null || fileName.equals("")) {
+            Log.e(TAG, "file name not valid");
+            return null;
+        }
+        File file = context.getCacheDir();
+        if (file != null) {
+            Log.d(TAG, "filePath for temp files= " + file.getPath());
+            int dirSize;
+            while (true){
+                dirSize =0;
+                File oldestFile = null;
+                for (File itemFile : file.listFiles())
+                    if(itemFile.getName().indexOf(TEMP_FILE_POSTFIX)>=0) {
+                        dirSize += itemFile.length();
+                        if(oldestFile==null || oldestFile.lastModified()>itemFile.lastModified())
+                            oldestFile = itemFile;
+                        }
+
+                Log.d(TAG,String.format("my tempFiles Size = %d",dirSize));
+                if(dirSize<MAX_TEMP_SIZE  || oldestFile==null || file.list().length==0)
+                    break;
+                Log.d(TAG,String.format("oldestFile = %s",oldestFile.getPath()));
+                if(oldestFile.delete())
+                    Log.d(TAG,"the oldest file deleted from temp store");
+                else
+                    Log.e(TAG, "the oldest file deleted from temp store failed");
+            }
             file = new File(file, fileName);
             if (file.exists())
                 file.delete();

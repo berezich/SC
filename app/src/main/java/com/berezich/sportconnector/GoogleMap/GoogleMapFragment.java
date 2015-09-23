@@ -50,6 +50,7 @@ public class GoogleMapFragment extends Fragment{
     private float curZoom = -1;
     private  MapView mapView;
     private  GoogleMap map;
+    private View rootView;
     //private static MapController mapController;
     //private OverlayManager overlayManager;
     //private Overlay overlay;
@@ -106,7 +107,7 @@ public class GoogleMapFragment extends Fragment{
             Log.e(TAG,"GoogleMapFragment isn't attached to any activity");
             return null;
         }
-        View rootView = inflater.inflate(R.layout.fragment_googlemap, container, false);
+        rootView = inflater.inflate(R.layout.fragment_googlemap, container, false);
 
         mapView = ((MapView) rootView.findViewById(R.id.mapview));
         if(mapView==null)
@@ -136,19 +137,15 @@ public class GoogleMapFragment extends Fragment{
         btn = (ImageButton) rootView.findViewById(R.id.map_btn_coach);
         btn.setOnClickListener(new btnClickListener());
         btn.setOnTouchListener(new btnOnTouchListener());
-        btn.setPressed(isCoaches);
         btn = (ImageButton) rootView.findViewById(R.id.map_btn_court);
         btn.setOnClickListener(new btnClickListener());
         btn.setOnTouchListener(new btnOnTouchListener());
-        btn.setPressed(isCourts);
         btn = (ImageButton) rootView.findViewById(R.id.map_btn_partner);
         btn.setOnClickListener(new btnClickListener());
         btn.setOnTouchListener(new btnOnTouchListener());
-        btn.setPressed(isPartners);
         btn = (ImageButton) rootView.findViewById(R.id.map_btn_star);
         btn.setOnClickListener(new btnClickListener());
         btn.setOnTouchListener(new btnOnTouchListener());
-        btn.setPressed(isFavorite);
 
         if(selectMarker!=null)
             setCameraToLocation(selectMarker.getPosition(),false,curZoom);
@@ -181,6 +178,15 @@ public class GoogleMapFragment extends Fragment{
         Log.d(TAG, "GoogleMapFragment on onResume");
         mapView.onResume();
         super.onResume();
+        ImageButton btn;
+        btn = (ImageButton) rootView.findViewById(R.id.map_btn_coach);
+        btn.setPressed(isCoaches);
+        btn = (ImageButton) rootView.findViewById(R.id.map_btn_court);
+        btn.setPressed(isCourts);
+        btn = (ImageButton) rootView.findViewById(R.id.map_btn_partner);
+        btn.setPressed(isPartners);
+        btn = (ImageButton) rootView.findViewById(R.id.map_btn_star);
+        btn.setPressed(isFavorite);
     }
 
     @Override
