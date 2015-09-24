@@ -12,12 +12,18 @@ import com.google.api.server.spi.config.ApiNamespace;
 import com.google.api.server.spi.config.ApiResourceProperty;
 import com.google.api.server.spi.response.BadRequestException;
 import com.google.api.server.spi.response.CollectionResponse;
+import com.google.api.server.spi.response.InternalServerErrorException;
 import com.google.api.server.spi.response.NotFoundException;
+import com.google.appengine.api.blobstore.BlobKey;
+import com.google.appengine.api.blobstore.BlobstoreInputStream;
 import com.google.appengine.api.datastore.Cursor;
 import com.google.appengine.api.datastore.QueryResultIterator;
+import com.google.appengine.api.files.FileServicePb;
 import com.googlecode.objectify.ObjectifyService;
 import com.googlecode.objectify.cmd.Query;
 
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -104,6 +110,89 @@ public class SpotEndpoint {
         setSpotUpdateInstance(spotRes);
         setFavoritePersonsSpot(spotRes,null);
         return spotRes;
+    }
+
+    /**
+     * Parses file with {@code blobKey} from blobStorage and inserts new spots to dataStore
+     */
+    @ApiMethod(
+            name = "uploadSpots",
+            path = "spot/parseFile",
+            httpMethod = ApiMethod.HttpMethod.POST)
+    public void uploadSpotsFromFile(@Named("blobKey") String blobKey) throws NotFoundException, BadRequestException, InternalServerErrorException{
+        final int BUFF_SIZE = 1024*500;
+        int length;
+        BlobKey blobKeyObj = null;
+        BlobstoreInputStream inputStream;
+        byte[] buff = new byte[BUFF_SIZE];
+        OAuth_2_0.check();
+        try {
+            blobKeyObj = new BlobKey(blobKey);
+            inputStream = new BlobstoreInputStream(blobKeyObj);
+
+        } catch (BlobstoreInputStream.BlobstoreIOException e) {
+            e.printStackTrace();
+            throw new BadRequestException (String.format("not valid blobKey exception: %s",e.getMessage()));
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            throw new InternalServerErrorException (String.format("can't open blobStoreInputStream exception: %s",e.getMessage()));
+        }
+        try {
+            length = inputStream.read(buff,0,BUFF_SIZE);
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new InternalServerErrorException(String.format("can't read data from blobStoreInputStream exception: %s",e.getMessage()));
+        }
+        int cnt=0;
+        String fileStr;
+        if(length>0)
+        {
+            try {
+                fileStr = new String(buff, "UTF-8");
+            } catch (Exception e) {
+                e.printStackTrace();
+                throw new InternalServerErrorException(String.format("convert byte to string failed exception: %s",e.getMessage()));
+            }
+            String[] courtsStr;
+            try {
+                courtsStr = fileStr.split("<endline>");
+            } catch (Exception e) {
+                e.printStackTrace();
+                throw new InternalServerErrorException(String.format("split <endline> failed exception: %s",e.getMessage()));
+            }
+            Spot spot=null;
+            List<Spot> spotList = new ArrayList<>();
+            for(String courtStr:courtsStr)
+            {
+                if(!courtStr.equals("")) {
+                    try {
+                        //logger.info("courtStr for parsing: "+courtStr);
+                        spot = new Spot(courtStr);
+                        cnt++;
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        logger.info("courtStr parsing failed str:"+courtStr);
+                    }
+                    if(spot!=null) {
+                        try {
+                            validateSpotProperties(spot);
+                        } catch (BadRequestException e) {
+                            e.printStackTrace();
+                            throw new InternalServerErrorException(String.format("validateSpotProperties() failed index spot: %d courtStr: %s \nexception: %s",cnt,courtStr,e.getMessage()));
+                        }
+                        spotList.add(spot);
+                    }
+                }
+            }
+            for (int i=0; i<16; i++)
+                insert(spotList.get(i));
+            logger.info(String.format("%d spots were inserted",cnt));
+        } else
+            logger.info("0 spots were inserted");
+
+
+
     }
 
     /**

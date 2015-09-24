@@ -6,12 +6,17 @@ import com.googlecode.objectify.annotation.Index;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
+
+import static java.util.logging.Logger.getLogger;
 
 /**
  * Created by berezkin on 25.06.2015.
  */
 @Entity
 public class Spot {
+    private static final Logger logger = getLogger(Spot.class.getName());
+    enum TYPE{OPEN,CLOSED,MIX,NONE}
     @Id Long id;
     @Index Long regionId;
     String name;
@@ -20,8 +25,12 @@ public class Spot {
     String price;
     String workHours;
     String contact;
+    String site;
     float rating;
     String description;
+    TYPE type;
+    int openPlayFieldNum;
+    int closedPlayFieldNum;
     List<Long> partnerLst;
     List<Long> coachLst;
     List<Picture> pictureLst;
@@ -29,6 +38,51 @@ public class Spot {
         pictureLst = new ArrayList<Picture>();
         coachLst = new ArrayList<Long>();
         partnerLst = new ArrayList<Long>();
+    }
+    public Spot(String spotStr)
+    {
+        int i=0;
+        String[] spotProps;
+        if(spotStr!=null && !spotStr.equals("")){
+            spotProps = spotStr.split("\t",13);
+            if(spotProps!=null && spotProps.length==13){
+                name = spotProps[i++].trim();
+                switch (spotProps[i++].trim()){
+                    case "Москва":
+                        regionId = new Long(1);
+                        break;
+                    default:
+                        regionId = new Long(1);
+                }
+                address = spotProps[i++].trim();
+                contact = spotProps[i++].trim();
+                site = spotProps[i++].trim();
+                float longtitude = Float.parseFloat(spotProps[i++].trim());
+                float latitude = Float.parseFloat(spotProps[i++].trim());
+                coords = new Coordinates(latitude,longtitude);
+                description = spotProps[i++].trim();
+                int type = Integer.parseInt(spotProps[i++].trim());
+                switch (type){
+                    case 1:
+                        this.type = TYPE.MIX;
+                        break;
+                    case 2:
+                        this.type = TYPE.OPEN;
+                        break;
+                    case 3:
+                        this.type = TYPE.CLOSED;
+                        break;
+                    default:
+                        this.type = TYPE.NONE;
+                }
+                openPlayFieldNum = Integer.parseInt(spotProps[i++].trim());
+                closedPlayFieldNum = Integer.parseInt(spotProps[i++].trim());
+                price = spotProps[i].trim();
+
+            }
+            else if(spotProps!=null)
+                logger.info(String.format("err spotPropertiesNum = %d spotStr = %s",spotProps.length,spotStr));
+        }
     }
     public Spot(Spot anotherSpot)
     {
@@ -44,7 +98,12 @@ public class Spot {
         price = anotherSpot.getPrice();
         workHours = anotherSpot.getWorkHours();
         contact = anotherSpot.getContact();
+        site = anotherSpot.getSite();
         description = anotherSpot.getDescription();
+        rating = anotherSpot.getRating();
+        type = anotherSpot.getType();
+        openPlayFieldNum = anotherSpot.getOpenPlayFieldNum();
+        closedPlayFieldNum = anotherSpot.getClosedPlayFieldNum();
         List<Long> longList;
         if((longList = anotherSpot.getPartnerLst())!=null)
             partnerLst = new ArrayList<Long>(longList);
@@ -96,12 +155,28 @@ public class Spot {
         return contact;
     }
 
+    public String getSite() {
+        return site;
+    }
+
     public String getDescription() {
         return description;
     }
 
     public float getRating() {
         return rating;
+    }
+
+    public TYPE getType() {
+        return type;
+    }
+
+    public int getOpenPlayFieldNum() {
+        return openPlayFieldNum;
+    }
+
+    public int getClosedPlayFieldNum() {
+        return closedPlayFieldNum;
     }
 
     public List<Long> getPartnerLst() {
@@ -152,12 +227,28 @@ public class Spot {
         this.contact = contact;
     }
 
+    public void setSite(String site) {
+        this.site = site;
+    }
+
     public void setDescription(String _description) {
         this.description = _description;
     }
 
     public void setRating(float rating) {
         this.rating = rating;
+    }
+
+    public void setType(TYPE type) {
+        this.type = type;
+    }
+
+    public void setOpenPlayFieldNum(int openPlayFieldNum) {
+        this.openPlayFieldNum = openPlayFieldNum;
+    }
+
+    public void setClosedPlayFieldNum(int closedPlayFieldNum) {
+        this.closedPlayFieldNum = closedPlayFieldNum;
     }
 
     public void setPartnerLst(List<Long> _partnerLst) {

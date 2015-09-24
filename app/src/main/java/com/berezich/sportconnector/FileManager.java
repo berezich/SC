@@ -488,30 +488,13 @@ public class FileManager {
             Log.e(TAG, "file name not valid");
             return null;
         }
-        File file = context.getCacheDir();
-        if (file != null) {
-            Log.d(TAG, "filePath for temp files= " + file.getPath());
-            int dirSize;
-            while (true){
-                dirSize =0;
-                File oldestFile = null;
-                for (File itemFile : file.listFiles())
-                    if(itemFile.getName().indexOf(TEMP_FILE_POSTFIX)>=0) {
-                        dirSize += itemFile.length();
-                        if(oldestFile==null || oldestFile.lastModified()>itemFile.lastModified())
-                            oldestFile = itemFile;
-                        }
+        File fileTempDir = context.getCacheDir();
+        File file;
+        if (fileTempDir != null) {
+            Log.d(TAG, "filePath for temp files= " + fileTempDir.getPath());
+            int dirSize, otherFilesSize;
 
-                Log.d(TAG,String.format("my tempFiles Size = %d",dirSize));
-                if(dirSize<MAX_TEMP_SIZE  || oldestFile==null || file.list().length==0)
-                    break;
-                Log.d(TAG,String.format("oldestFile = %s",oldestFile.getPath()));
-                if(oldestFile.delete())
-                    Log.d(TAG,"the oldest file deleted from temp store");
-                else
-                    Log.e(TAG, "the oldest file deleted from temp store failed");
-            }
-            file = new File(file, fileName);
+            file = new File(fileTempDir, fileName);
             if (file.exists())
                 file.delete();
             try {
@@ -529,12 +512,41 @@ public class FileManager {
                 endBitmap.compress(Bitmap.CompressFormat.JPEG, FileManager.COMPRESS_QUALITY, out);
                 out.flush();
                 out.close();
-                return file;
 
             } catch (Exception e) {
                 e.printStackTrace();
                 return null;
             }
+
+            while (true){
+                dirSize = 0;
+                otherFilesSize = 0;
+                File oldestFile = null;
+                int myFilesNum = 0;
+                for (File itemFile : fileTempDir.listFiles()) {
+                    if (itemFile.getName().indexOf(TEMP_FILE_POSTFIX) >= 0) {
+                        dirSize += itemFile.length();
+                        myFilesNum++;
+                        if (oldestFile == null || oldestFile.lastModified() > itemFile.lastModified())
+                            oldestFile = itemFile;
+                    }
+                    else
+                        otherFilesSize +=itemFile.length();
+                }
+
+                Log.d(TAG,String.format("not my tempFiles Size = %d", otherFilesSize));
+                Log.d(TAG,String.format("total tempFiles Size = %d", otherFilesSize + dirSize));
+                Log.d(TAG,String.format("my tempFiles Size = %d",dirSize));
+                Log.d(TAG,String.format("myFiles number = %d",myFilesNum));
+                if(otherFilesSize + dirSize <MAX_TEMP_SIZE  || oldestFile==null || myFilesNum<=2)
+                    break;
+                Log.d(TAG,String.format("oldestFile = %s",oldestFile.getPath()));
+                if(oldestFile.delete())
+                    Log.d(TAG,"the oldest file deleted from temp store");
+                else
+                    Log.e(TAG, "the oldest file deleted from temp store failed");
+            }
+            return file;
         }
         return null;
     }
