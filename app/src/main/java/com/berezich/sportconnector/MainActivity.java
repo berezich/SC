@@ -50,7 +50,7 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Log.d("TAG", "------SpotConnector started-------");
+        Log.d(TAG, "------SpotConnector started-------");
         LocalDataManager.init(this);
 
         DrawerLayout drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -95,7 +95,6 @@ public class MainActivity extends AppCompatActivity
     public void onBtnClickMF(Filters filter, int sectionNumber)
     {
         FragmentManager fragmentManager = getSupportFragmentManager();
-        //fragmentManager.beginTransaction().replace(R.id.container, new YaMapFragment().setArgs(sectionNumber,filter)).commit();
         fragmentManager.beginTransaction().replace(R.id.container, new GoogleMapFragment().setArgs(sectionNumber, filter)).addToBackStack("tr1").commit();
     }
 
@@ -114,8 +113,6 @@ public class MainActivity extends AppCompatActivity
         mNavigationDrawerFragment.selectItem(0);
         onSectionAttached(0);
         restoreActionBar();
-        //FragmentManager fragmentManager = getSupportFragmentManager();
-        //fragmentManager.beginTransaction().replace(R.id.container, new MainFragment().setArgs(0)).commit();
 
     }
 
@@ -199,14 +196,8 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onInfoWindowClickGMF(Long spotId) {
         FragmentManager fragmentManager = getSupportFragmentManager();
-        //fragmentManager.beginTransaction().replace(R.id.container, new YaMapFragment().setArgs(sectionNumber,filter)).commit();
-        //fragmentManager.beginTransaction().replace(R.id.container, new GoogleMapFragment().setArgs(sectionNumber,filter)).commit();
         fragmentManager.beginTransaction().replace(R.id.container, SpotInfoFragment.newInstance(spotId)).addToBackStack("tr2").commit();
 
-    }
-    private Activity getCurActivity()
-    {
-        return this;
     }
     public void setupUI(View view) {
 

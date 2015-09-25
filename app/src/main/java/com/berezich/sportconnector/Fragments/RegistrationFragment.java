@@ -35,7 +35,6 @@ public class RegistrationFragment extends Fragment implements EndpointApi.Regist
     private final String TAG = "MyLog_RegFragment";
     private String pass;
     View rootView;
-    private AlertDialogFragment dialog;
 
     RegFragmentAction listenerCreateAccount = null;
 
@@ -51,7 +50,6 @@ public class RegistrationFragment extends Fragment implements EndpointApi.Regist
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        EditText editTxt;
         rootView = inflater.inflate(R.layout.fragment_registration, container, false);
         if(rootView!=null)
         {
@@ -119,6 +117,7 @@ public class RegistrationFragment extends Fragment implements EndpointApi.Regist
 
     @Override
     public void onRegisterAccountAsyncTaskFinish(Pair<AccountForConfirmation, Exception> result) {
+        AlertDialogFragment dialog;
         AccountForConfirmation account = result.first;
         Exception error = result.second;
         if(getActivity()==null)
@@ -144,21 +143,18 @@ public class RegistrationFragment extends Fragment implements EndpointApi.Regist
 
         String dialogMsg;
         Pair<ErrorVisualizer.ERROR_CODE,String> errTxtCode = ErrorVisualizer.getTextCodeOfRespException(getActivity().getBaseContext(),error);
-        if(errTxtCode!=null && !errTxtCode.second.equals(""))
+        if(errTxtCode!=null && !errTxtCode.second.equals("")){
             dialogMsg = errTxtCode.second;
+            Log.d(TAG,"registrationError code = "+errTxtCode.first+" msg = "+errTxtCode.second);
+        }
         else
             dialogMsg = getString(R.string.server_unknow_err);
-        Log.d(TAG,"registrationError code = "+errTxtCode.first+" msg = "+errTxtCode.second);
+
         dialog = AlertDialogFragment.newInstance(dialogMsg, false);
         dialog.setTargetFragment(this, 0);
         FragmentManager ft = getFragmentManager();
         if(ft!=null)
             dialog.show(getFragmentManager(), "");
-
-        /*if((frameLayout = (FrameLayout) rootView.findViewById(R.id.spotinfo_frg_frameLayout))!=null)
-            ErrorVisualizer.showErrorAfterReq(getActivity().getBaseContext(), frameLayout,error,TAG);
-        setVisible(View.GONE,View.VISIBLE,View.GONE);*/
-
     }
 
     @Override
@@ -175,7 +171,9 @@ public class RegistrationFragment extends Fragment implements EndpointApi.Regist
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         menu.clear();
-        ((MainActivity) getActivity()).getSupportActionBar().setTitle(getString(R.string.registration_fragmentTitle));
+        android.support.v7.app.ActionBar actionBar = ((MainActivity) getActivity()).getSupportActionBar();
+        if(actionBar!=null)
+            actionBar.setTitle(getString(R.string.registration_fragmentTitle));
     }
 
     private Fragment getFragment(){

@@ -207,8 +207,6 @@ public class GoogleMapFragment extends Fragment{
         @Override
         public void onClick(View view) {
             //Log.d(TAG, "button onClick!!!");
-
-            return;
         }
     }
     class btnOnTouchListener implements View.OnTouchListener
@@ -262,27 +260,31 @@ public class GoogleMapFragment extends Fragment{
             return true;
         }
     }
-    static enum Buttons{ALL,COUCH,PARTNER,FAVORITE,COURT}
+    enum Buttons{ALL,COUCH,PARTNER,FAVORITE,COURT}
     private void activateButtons(Buttons buttonType,boolean b) {
         ImageButton btn;
-        if(buttonType == Buttons.ALL || buttonType == Buttons.COUCH) {
-            isCoaches = b;
-            btn = (ImageButton) getView().findViewById(R.id.map_btn_coach);
-            btn.setPressed(b);
-        }
-        if(buttonType == Buttons.ALL || buttonType == Buttons.PARTNER) {
-            isPartners = b;
-            btn = (ImageButton) getView().findViewById(R.id.map_btn_partner);
-            btn.setPressed(b);
-        }
-        if(buttonType == Buttons.ALL || buttonType == Buttons.PARTNER) {
-            btn = (ImageButton) getView().findViewById(R.id.map_btn_star);
-            btn.setPressed(b);
-        }
-        if(buttonType == Buttons.ALL || buttonType == Buttons.COURT) {
-            isCourts = b;
-            btn = (ImageButton) getView().findViewById(R.id.map_btn_court);
-            btn.setPressed(b);
+        View view = getView();
+        if(view!=null) {
+            if (buttonType == Buttons.ALL || buttonType == Buttons.COUCH) {
+                isCoaches = b;
+                btn = (ImageButton) view.findViewById(R.id.map_btn_coach);
+                btn.setPressed(b);
+            }
+            if (buttonType == Buttons.ALL || buttonType == Buttons.PARTNER) {
+                isPartners = b;
+                btn = (ImageButton) view.findViewById(R.id.map_btn_partner);
+                btn.setPressed(b);
+            }
+            if (buttonType == Buttons.ALL || buttonType == Buttons.FAVORITE) {
+                isFavorite = b;
+                btn = (ImageButton) view.findViewById(R.id.map_btn_star);
+                btn.setPressed(b);
+            }
+            if (buttonType == Buttons.ALL || buttonType == Buttons.COURT) {
+                isCourts = b;
+                btn = (ImageButton) view.findViewById(R.id.map_btn_court);
+                btn.setPressed(b);
+            }
         }
     }
 
@@ -366,25 +368,6 @@ public class GoogleMapFragment extends Fragment{
         return curFilter;
     }
 
-    public class Size
-    {
-        double _width;
-        double _height;
-
-        public Size(double _width, double _height) {
-            this._width = _width;
-            this._height = _height;
-        }
-
-        public double getWidth() {
-            return _width;
-        }
-
-        public double getHeight() {
-            return _height;
-        }
-    }
-
     public static interface OnActionListenerGMapFragment {
         void onInfoWindowClickGMF(Long spotId);
     }
@@ -393,7 +376,8 @@ public class GoogleMapFragment extends Fragment{
         menu.clear();
         super.onCreateOptionsMenu(menu, inflater);
         ActionBar actionBar =((AppCompatActivity) getActivity()).getSupportActionBar();
-        actionBar.setTitle(R.string.gmap_fragmentTitle);
+        if(actionBar!=null)
+            actionBar.setTitle(R.string.gmap_fragmentTitle);
     }
 }
 

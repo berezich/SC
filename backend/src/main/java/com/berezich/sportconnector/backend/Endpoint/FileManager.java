@@ -45,14 +45,6 @@ public class FileManager {
         return new FileUrl(blobstoreService.createUploadUrl("/upload_file"));
     }
 
-    /*@ApiMethod(
-            name = "deleteFile",
-            path = "fileManager",
-            httpMethod = ApiMethod.HttpMethod.DELETE)
-    public void deleteFile(@Named("blobKeyLst")List<String>... blobKeyLst) throws BadRequestException {
-        OAuth_2_0.check();
-    */
-
     protected void deleteFile(List<String> blobKeyLst) throws BadRequestException{
         BlobstoreService blobstoreService = BlobstoreServiceFactory.getBlobstoreService();
         BlobKey blobKey;

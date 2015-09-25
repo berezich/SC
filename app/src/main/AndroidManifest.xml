@@ -39,7 +39,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ImgViewPagerActivity"
+            android:name=".ImageViewer.ImgViewPagerActivity"
             android:label="@string/app_name">
         </activity>
 

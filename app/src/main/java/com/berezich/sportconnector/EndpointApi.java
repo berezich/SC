@@ -8,6 +8,8 @@ import android.util.Pair;
 
 import com.berezich.sportconnector.backend.sportConnectorApi.SportConnectorApi;
 import com.berezich.sportconnector.backend.sportConnectorApi.model.AccountForConfirmation;
+import com.berezich.sportconnector.backend.sportConnectorApi.model.CollectionResponseSpot;
+import com.berezich.sportconnector.backend.sportConnectorApi.model.CollectionResponseUpdateSpotInfo;
 import com.berezich.sportconnector.backend.sportConnectorApi.model.FileUrl;
 import com.berezich.sportconnector.backend.sportConnectorApi.model.Person;
 import com.berezich.sportconnector.backend.sportConnectorApi.model.RegionInfo;
@@ -16,6 +18,7 @@ import com.berezich.sportconnector.backend.sportConnectorApi.model.UpdateSpotInf
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.extensions.android.json.AndroidJsonFactory;
 import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
+import com.google.api.client.googleapis.services.AbstractGoogleClient;
 import com.google.api.client.googleapis.services.AbstractGoogleClientRequest;
 import com.google.api.client.googleapis.services.GoogleClientRequestInitializer;
 import com.google.api.client.http.HttpTransport;
@@ -43,8 +46,7 @@ public class EndpointApi {
     {
         setSrvApi(context, false);
     }
-    private static void setSrvApi(Context context, boolean isLocalhost)
-    {
+    private static void setSrvApi(Context context, boolean isLocalhost){
         if(srvApi == null) {  // Only do this once
             SportConnectorApi.Builder builder=null;
             if(isLocalhost) {
@@ -174,9 +176,28 @@ public class EndpointApi {
         @Override
         protected Pair<List<Spot>,Exception> doInBackground(Long... params) {
             Long regionId;
+            final int MAX_LIMIT=20;
             regionId = params[0];
+            String nextPageToken="";
+            List<Spot> spots = new ArrayList<>();
+            CollectionResponseSpot response;
             try {
-                return new Pair<>(srvApi.listSpotByRegId(regionId).execute().getItems(),null);
+                while (true) {
+                    if(nextPageToken == null || nextPageToken.equals(""))
+                        response = srvApi.listSpotByRegId(regionId).execute();
+                    else
+                        response = srvApi.listSpotByRegId(regionId).setCursor(nextPageToken).execute();
+                    if(response!=null) {
+                        if (response.getItems() != null && response.getItems().size()>0) {
+                            spots.addAll(response.getItems());
+                            nextPageToken = response.getNextPageToken();
+                            if (response.getItems().size() == MAX_LIMIT)
+                                continue;
+                        }
+                    }
+                    break;
+                }
+                return new Pair<>(spots,null);
             } catch (Exception e) {
                 return new Pair<>(null,e);
             }
@@ -193,7 +214,6 @@ public class EndpointApi {
         }
     }
 
-
     public static class GetUpdatedSpotListAsyncTask extends AsyncTask<Pair<Long,DateTime>, Void, Pair<List<UpdateSpotInfo>,Exception> >{
         private OnAction listener=null;
         private Context context = null;
@@ -209,12 +229,33 @@ public class EndpointApi {
         }
         @Override
         protected Pair<List<UpdateSpotInfo>,Exception> doInBackground(Pair<Long,DateTime>... params) {
+            int MAX_LIMIT = 20;
             Long regionId;
             DateTime lastUpdate;
             regionId = params[0].first;
             lastUpdate = params[0].second;
+            String nextPageToken="";
+            CollectionResponseUpdateSpotInfo response;
+            List<UpdateSpotInfo> spotInfos = new ArrayList<>();
             try {
-                return new Pair<>(srvApi.listUpdateSpotInfoByRegIdDate(lastUpdate, regionId).execute().getItems(),null);
+
+                while (true) {
+                    if(nextPageToken == null || nextPageToken.equals(""))
+                        response = srvApi.listUpdateSpotInfoByRegIdDate(lastUpdate, regionId).execute();
+                    else
+                        response = srvApi.listUpdateSpotInfoByRegIdDate(lastUpdate, regionId).setCursor(nextPageToken).execute();
+                    if(response!=null) {
+                        if (response.getItems() != null && response.getItems().size()>0) {
+                            spotInfos.addAll(response.getItems());
+                            nextPageToken = response.getNextPageToken();
+                            if (response.getItems().size() == MAX_LIMIT)
+                                continue;
+                        }
+                    }
+                    break;
+                }
+
+                return new Pair<>(spotInfos,null);
             } catch (Exception e) {
                 return new Pair<>(null,e);
             }
@@ -246,9 +287,18 @@ public class EndpointApi {
         }
         @Override
         protected Pair<List<Person>,Exception> doInBackground(List<Long>... params) {
+            int BATCH_SIZE = 20;
             List<Long> idLst = new ArrayList<>(params[0]) ;
+            List<Person> persons = new ArrayList<>();
+            List<Long> batchPersons;
+            int cur=0;
             try {
-                return new Pair<>(srvApi.listPersonByIdLst(idLst).execute().getItems(),null);
+                while (cur < idLst.size()) {
+                    batchPersons = idLst.subList(cur,(cur+BATCH_SIZE)<idLst.size() ? cur+BATCH_SIZE : idLst.size());
+                    persons.addAll(srvApi.listPersonByIdLst(batchPersons).execute().getItems());
+                    cur+=BATCH_SIZE;
+                }
+                return new Pair<>(persons,null);
             } catch (Exception e) {
                 return new Pair<>(null,e);
             }

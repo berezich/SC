@@ -19,7 +19,7 @@ import android.widget.TextView;
 
 import com.berezich.sportconnector.FileManager;
 import com.berezich.sportconnector.GoogleMap.SpotsData;
-import com.berezich.sportconnector.ImgViewPagerActivity;
+import com.berezich.sportconnector.ImageViewer.ImgViewPagerActivity;
 import com.berezich.sportconnector.LocalDataManager;
 import com.berezich.sportconnector.MainActivity;
 import com.berezich.sportconnector.R;
@@ -28,9 +28,6 @@ import com.berezich.sportconnector.backend.sportConnectorApi.model.Person;
 import com.berezich.sportconnector.backend.sportConnectorApi.model.Picture;
 import com.berezich.sportconnector.backend.sportConnectorApi.model.Spot;
 import com.google.api.client.json.gson.GsonFactory;
-import com.google.common.reflect.TypeToken;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 
 import java.io.IOException;
 import java.util.ArrayList;

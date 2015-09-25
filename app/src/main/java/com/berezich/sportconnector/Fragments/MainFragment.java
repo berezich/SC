@@ -242,7 +242,6 @@ public class MainFragment extends Fragment implements
             Log.e(TAG,"current fragment isn't attached to activity");
             return;
         }
-        List<Spot> spotLst = new ArrayList<Spot>();
         List<UpdateSpotInfo> updateSpotInfoLst = result.first;
 
         if(error == null && updateSpotInfoLst!=null)

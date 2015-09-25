@@ -185,9 +185,9 @@ public class SpotEndpoint {
                     }
                 }
             }
-            for (int i=0; i<16; i++)
+            for (int i=0; i<spotList.size(); i++)
                 insert(spotList.get(i));
-            logger.info(String.format("%d spots were inserted",cnt));
+            logger.info(String.format("%d spots were inserted",spotList.size()));
         } else
             logger.info("0 spots were inserted");
 

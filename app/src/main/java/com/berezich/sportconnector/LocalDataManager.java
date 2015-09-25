@@ -41,7 +41,6 @@ public class LocalDataManager {
     private static Activity activity = null;
 
 
-    //private static GsonBuilder builder = null;
     private static GsonFactory gsonFactory = new GsonFactory();
     public static void init(Activity activity)
     {
@@ -57,7 +56,7 @@ public class LocalDataManager {
         }
         SharedPreferences sp = activity.getPreferences(Context.MODE_PRIVATE);
         String regionInfoStr = sp.getString(RINFO_KEY, "");
-        if(regionInfoStr==null || regionInfoStr.equals("")) {
+        if(regionInfoStr.equals("")) {
             Log.d(TAG, "no regionInfo was fetched form Preferences");
             return false;
         }
@@ -82,9 +81,6 @@ public class LocalDataManager {
     }
     public static void saveRegionInfoToPref(RegionInfo regionInfo,Activity activity)throws IOException
     {
-        /*if(gsonFactory!=null)
-            gsonFactory = new GsonFactory();*/
-
         if(activity==null)
         {
             Log.e(TAG,"saveRegionInfoToPref failed activity == null");
@@ -208,7 +204,7 @@ public class LocalDataManager {
         }
         SharedPreferences sp = activity.getPreferences(Context.MODE_PRIVATE);
         String appPrefStr = sp.getString(APP_PREF_KEY, "");
-        if(appPrefStr == null || "".equals(appPrefStr)) {
+        if("".equals(appPrefStr)) {
             Log.d(TAG, "no AppPref was fetched from Preferences");
             return false;
         }
@@ -221,10 +217,6 @@ public class LocalDataManager {
             Log.e(TAG, "Error loading AppPref from Preferences");
             return false;
         }
-
-        /*myPersonInfo = new Person();
-        myPersonInfo.setType("PARTNER");
-        myPersonInfo.setId(new Long("5705241014042624"));*/
 
         return true;
     }
@@ -346,6 +338,7 @@ public class LocalDataManager {
     }
     public static void saveAllSpots(List<Spot> spotLst)
     {
+        // TODO: 25.09.2015 refactor this method to AsynkTask
         ContentValues cv;
         int cnt=0;
         Spot spot;
@@ -386,6 +379,7 @@ public class LocalDataManager {
     }
     public  static void setUpdateSpots(List<UpdateSpotInfo> updateSpotsLst)
     {
+        //TODO: refactor this method to AsynkTask
         Spot spot;
         Long spotId;
         int cnt = 0;
