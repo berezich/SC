@@ -9,57 +9,75 @@
         android:divider="@drawable/divider">
 
         <LinearLayout
-            android:orientation="horizontal"
+            android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:weightSum="6">
+            android:divider="@drawable/divider_thin"
+            android:showDividers="middle">
 
             <LinearLayout
-                android:orientation="vertical"
-                android:layout_width="fill_parent"
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1">
+                android:layout_gravity="center_horizontal"
+                android:weightSum="6">
 
-                <TextView
-                    android:layout_width="wrap_content"
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="textMultiLine"
-                    android:ems="10"
-                    android:id="@+id/spotInfo_txt_name"
-                    android:text="Название спота"
-                    android:layout_weight="1"
-                    android:layout_marginTop="10dp"
-                    android:layout_marginLeft="10dp"
-                    android:textSize="18dp" />
+                    android:layout_weight="1">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:inputType="textMultiLine"
-                    android:ems="10"
-                    android:id="@+id/spotInfo_txt_adress"
-                    android:text="Адрес спота"
-                    android:textSize="12dp"
-                    android:layout_weight="1"
-                    android:layout_marginLeft="10dp"
-                    android:layout_marginTop="10dp"
-                    android:layout_marginBottom="10dp" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:inputType="textMultiLine"
+                        android:ems="10"
+                        android:id="@+id/spotInfo_txt_name"
+                        android:text="Название спота"
+                        android:layout_weight="1"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginLeft="10dp"
+                        android:textSize="18dp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:inputType="textMultiLine"
+                        android:ems="10"
+                        android:id="@+id/spotInfo_txt_adress"
+                        android:text="Адрес спота"
+                        android:textSize="12dp"
+                        android:layout_weight="1"
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginBottom="10dp" />
+                </LinearLayout>
+
+                <RelativeLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="5">
+
+                    <ImageButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/spotInfo_btnImg_favorite"
+                        android:layout_centerInParent="true"
+                        android:background="@drawable/simple_btn_star" />
+                </RelativeLayout>
+
             </LinearLayout>
 
-            <RelativeLayout
-                android:layout_width="fill_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="5">
-
-                <ImageButton
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/spotInfo_btnImg_favorite"
-                    android:layout_centerInParent="true"
-                    android:background="@drawable/simple_btn_star" />
-            </RelativeLayout>
-
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="@string/spotinfo_details"
+                android:id="@+id/textView18"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="@dimen/spotInfo_text_vertical_offset"
+                android:layout_marginBottom="@dimen/spotInfo_text_vertical_offset" />
         </LinearLayout>
 
         <LinearLayout

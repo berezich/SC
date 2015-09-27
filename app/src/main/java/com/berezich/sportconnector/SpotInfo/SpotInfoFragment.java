@@ -131,7 +131,7 @@ public class SpotInfoFragment extends Fragment implements EndpointApi.GetListPer
                     for (Picture pic : picList) {
                         imageView = new ImageView(ctx);
                         linearLayout.addView(imageView);
-                        imageView.getLayoutParams().height = (int) getResources().getDimension(R.dimen.spotInfo_photos_heigt);
+                        imageView.getLayoutParams().height = (int) getResources().getDimension(R.dimen.spotInfo_photos_height);
                         imageView.getLayoutParams().width = (int) getResources().getDimension(R.dimen.spotInfo_photos_width);
                         FileManager.providePhotoForImgView(ctx, imageView, pic, FileManager.SPOT_CACHE_DIR + "/" + curSpot.getId());
                         imageView.setOnClickListener(new OnImageClick());

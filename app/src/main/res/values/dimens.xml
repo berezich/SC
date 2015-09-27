@@ -58,8 +58,11 @@
     <!-- fragment_editProfile-->
 
     <!-- fragment_spotInfo-->
-        <dimen name="spotInfo_photos_heigt">70dp</dimen>
+        <dimen name="spotInfo_text_vertical_offset">10dp</dimen>
+        <dimen name="spotInfo_photos_height">70dp</dimen>
         <dimen name="spotInfo_photos_width">70dp</dimen>
+        <dimen name="spotInfo_divider_thin_height">1dp</dimen>
+        <dimen name="spotInfo_divider_thin_left_right_offset">5dp</dimen>
     <!-- fragment_spotInfo-->
 
     <!-- fragment_test_question-->
