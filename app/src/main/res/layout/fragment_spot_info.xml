@@ -13,7 +13,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:divider="@drawable/divider_thin"
-            android:showDividers="middle">
+            android:showDividers="middle"
+            android:id="@+id/spotInfo_layout_details">
 
             <LinearLayout
                 android:orientation="horizontal"
@@ -29,29 +30,29 @@
                     android:layout_weight="1">
 
                     <TextView
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:inputType="textMultiLine"
                         android:ems="10"
                         android:id="@+id/spotInfo_txt_name"
                         android:text="Название спота"
                         android:layout_weight="1"
-                        android:layout_marginTop="10dp"
-                        android:layout_marginLeft="10dp"
-                        android:textSize="18dp" />
+                        android:layout_marginTop="@dimen/spotInfo_text_vertical_offset"
+                        android:layout_marginLeft="@dimen/spotInfo_contentArea_left_offset"
+                        android:textSize="18sp" />
 
                     <TextView
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:inputType="textMultiLine"
                         android:ems="10"
                         android:id="@+id/spotInfo_txt_adress"
                         android:text="Адрес спота"
-                        android:textSize="12dp"
+                        android:textSize="@dimen/spotInfo_text_verySmall_size"
                         android:layout_weight="1"
-                        android:layout_marginLeft="10dp"
-                        android:layout_marginTop="10dp"
-                        android:layout_marginBottom="10dp" />
+                        android:layout_marginLeft="@dimen/spotInfo_contentArea_left_offset"
+                        android:layout_marginTop="@dimen/spotInfo_text_vertical_offset"
+                        android:layout_marginBottom="@dimen/spotInfo_text_vertical_offset" />
                 </LinearLayout>
 
                 <RelativeLayout
@@ -72,12 +73,15 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textAppearance="?android:attr/textAppearanceSmall"
                 android:text="@string/spotinfo_details"
-                android:id="@+id/textView18"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginTop="@dimen/spotInfo_text_vertical_offset"
-                android:layout_marginBottom="@dimen/spotInfo_text_vertical_offset" />
+                android:id="@+id/spotInfo_txt_details"
+                android:layout_marginTop="@dimen/spotInfo_details_vertical_offset"
+                android:layout_marginBottom="@dimen/spotInfo_details_vertical_offset"
+                android:layout_gravity="right"
+                android:layout_marginRight="@dimen/spotInfo_contentArea_right_offset" />
+
+
         </LinearLayout>
 
         <LinearLayout
@@ -138,7 +142,7 @@
             android:id="@+id/spotInfo_txt_noPartersCoaches"
             android:visibility="gone"
             android:singleLine="false"
-            android:textSize="15dp"
+            android:textSize="15sp"
             android:textColor="@color/text_msg_error"
             android:textAlignment="center"
             android:gravity="center"
@@ -174,7 +178,7 @@
                     android:visibility="visible"
                     android:gravity="center_horizontal"
                     android:textAlignment="gravity"
-                    android:textSize="15dp"
+                    android:textSize="15sp"
                     android:textColor="@color/text_msg_error" />
 
                 <TextView
@@ -188,7 +192,7 @@
                     android:clickable="true"
                     android:background="@drawable/text_view_backgr_selector"
                     android:textColor="@color/txt_view_color_selector"
-                    android:textSize="18dp"
+                    android:textSize="18sp"
                     android:layout_marginTop="10dp" />
 
             </LinearLayout>

@@ -58,12 +58,23 @@
     <!-- fragment_editProfile-->
 
     <!-- fragment_spotInfo-->
+        <dimen name="spotInfo_contentArea_right_offset">10dp</dimen>
+        <dimen name="spotInfo_contentArea_left_offset">10dp</dimen>
         <dimen name="spotInfo_text_vertical_offset">10dp</dimen>
+        <dimen name="spotInfo_text_vertical_detailsItem_offset">7dp</dimen>
+        <dimen name="spotInfo_text_verySmall_size">12sp</dimen>
+        <dimen name="spotInfo_details_vertical_offset">6dp</dimen>
         <dimen name="spotInfo_photos_height">70dp</dimen>
         <dimen name="spotInfo_photos_width">70dp</dimen>
         <dimen name="spotInfo_divider_thin_height">1dp</dimen>
-        <dimen name="spotInfo_divider_thin_left_right_offset">5dp</dimen>
     <!-- fragment_spotInfo-->
+
+    <!-- list_person_item -->
+        <dimen name="personItem_text_top_offset">15dp</dimen>
+        <dimen name="personItem_ltext_left_offset">15dp</dimen>
+        <dimen name="personItem_ltext_right_offset">10dp</dimen>
+        <dimen name="personItem_rtext_right_offset">10dp</dimen>
+    <!-- list_person_item -->
 
     <!-- fragment_test_question-->
         <dimen name="testQuestion_block_left_right_offset">10dp</dimen>

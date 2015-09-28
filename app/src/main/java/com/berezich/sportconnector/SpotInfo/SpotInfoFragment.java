@@ -6,8 +6,10 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.util.AttributeSet;
 import android.util.Log;
 import android.util.Pair;
 import android.view.LayoutInflater;
@@ -41,6 +43,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.zip.Inflater;
 
 
 /**
@@ -118,6 +121,22 @@ public class SpotInfoFragment extends Fragment implements EndpointApi.GetListPer
                 txtView.setText(curSpot.getName());
             if ((txtView = (TextView) spotInfoView.findViewById(R.id.spotInfo_txt_adress)) != null)
                 txtView.setText(curSpot.getAddress());
+            if((linearLayout = (LinearLayout) spotInfoView.findViewById(R.id.spotInfo_layout_details))!=null)
+            {
+                String value;
+                if((value = curSpot.getSite())!=null && !value.equals(""))
+                    linearLayout.addView(getDetailItem(getContext(),getString(R.string.spotinfo_site),value));
+                if((value = curSpot.getContact())!=null && !value.equals(""))
+                    linearLayout.addView(getDetailItem(getContext(),getString(R.string.spotinfo_phone),value));
+                if((value = curSpot.getPrice())!=null && !value.equals(""))
+                    linearLayout.addView(getDetailItem(getContext(),getString(R.string.spotinfo_prices),value));
+//                if((value = curSpot.getSite())!=null && !value.equals(""))
+//                    linearLayout.addView(getDetailItem(getContext(),getString(R.string.spotinfo_courts),value));
+                if((value = curSpot.getDescription())!=null && !value.equals(""))
+                    linearLayout.addView(getDetailItem(getContext(),getString(R.string.spotinfo_description),value));
+
+            }
+
             if ((imgButton = (ImageButton) spotInfoView.findViewById(R.id.spotInfo_btnImg_favorite)) != null) {
                 imgButton.setOnTouchListener(new StarBtnOnTouchListener());
             }
@@ -440,5 +459,21 @@ public class SpotInfoFragment extends Fragment implements EndpointApi.GetListPer
         super.onCreateOptionsMenu(menu, inflater);
         ActionBar actionBar =((AppCompatActivity) getActivity()).getSupportActionBar();
         actionBar.setTitle(R.string.spotinfo_fragmentTitle);
+    }
+
+
+    private View getDetailItem(Context context,String name, String value) {
+        View itemView;
+        TextView txtView;
+        LayoutInflater lInflater;
+        if((lInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE))!=null)
+            if((itemView = lInflater.inflate(R.layout.spotinfo_detail_item, null))!=null) {
+                txtView = (TextView) itemView.findViewById(R.id.spotInfo_detailItem_title);
+                txtView.setText(name);
+                txtView = (TextView) itemView.findViewById(R.id.spotInfo_detailItem_value);
+                txtView.setText(value);
+                return itemView;
+            }
+        return null;
     }
 }

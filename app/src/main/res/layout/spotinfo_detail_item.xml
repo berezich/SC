@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingLeft="@dimen/spotInfo_contentArea_left_offset"
+    android:paddingRight="@dimen/spotInfo_contentArea_right_offset"
+    android:paddingTop="@dimen/spotInfo_details_vertical_offset"
+    android:paddingBottom="@dimen/spotInfo_details_vertical_offset">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text="Title"
+        android:id="@+id/spotInfo_detailItem_title"
+        android:textSize="@dimen/spotInfo_text_verySmall_size" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text="Text value"
+        android:id="@+id/spotInfo_detailItem_value" />
+
+</LinearLayout>
