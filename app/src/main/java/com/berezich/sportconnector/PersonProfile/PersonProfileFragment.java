@@ -272,7 +272,7 @@ public class PersonProfileFragment extends Fragment {
                         ArrayList<String> picList = new ArrayList<String>();
                         picList.add(gsonFactory.toString(picture));
                         intent.putStringArrayListExtra(ImgViewPagerActivity.PIC_LIST_EXTRAS, picList);
-                        startActivity(intent);
+                        getCurFragment().startActivity(intent);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -283,5 +283,8 @@ public class PersonProfileFragment extends Fragment {
 
     public String getTAG() {
         return TAG;
+    }
+    private Fragment getCurFragment(){
+        return this;
     }
 }

@@ -62,10 +62,14 @@
         <dimen name="spotInfo_contentArea_left_offset">10dp</dimen>
         <dimen name="spotInfo_text_vertical_offset">10dp</dimen>
         <dimen name="spotInfo_text_vertical_detailsItem_offset">7dp</dimen>
-        <dimen name="spotInfo_text_verySmall_size">12sp</dimen>
+        <dimen name="spotInfo_text_title_textSize">19sp</dimen>
+        <dimen name="spotInfo_details_textSize">17sp</dimen>
+        <dimen name="spotInfo_text_smallTitle_size">15sp</dimen>
         <dimen name="spotInfo_details_vertical_offset">6dp</dimen>
+        <dimen name="spotInfo_details_phone_offset">2dp</dimen>
         <dimen name="spotInfo_photos_height">70dp</dimen>
         <dimen name="spotInfo_photos_width">70dp</dimen>
+        <dimen name="spotInfo_noPersons_minHeight">175dp</dimen>
         <dimen name="spotInfo_divider_thin_height">1dp</dimen>
     <!-- fragment_spotInfo-->
 

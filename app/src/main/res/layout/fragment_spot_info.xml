@@ -1,6 +1,7 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
-    android:layout_height="match_parent" tools:context="com.berezich.sportconnector.SpotInfo.SpotInfoFragment">
+    android:layout_height="match_parent" tools:context="com.berezich.sportconnector.SpotInfo.SpotInfoFragment"
+    android:background="@color/divider_block">
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:orientation="vertical" android:layout_width="match_parent"
@@ -8,195 +9,225 @@
         android:showDividers="middle"
         android:divider="@drawable/divider">
 
-        <LinearLayout
-            android:orientation="vertical"
+        <ScrollView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:divider="@drawable/divider_thin"
-            android:showDividers="middle"
-            android:id="@+id/spotInfo_layout_details">
-
-            <LinearLayout
-                android:orientation="horizontal"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:weightSum="6">
-
-                <LinearLayout
-                    android:orientation="vertical"
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1">
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:inputType="textMultiLine"
-                        android:ems="10"
-                        android:id="@+id/spotInfo_txt_name"
-                        android:text="Название спота"
-                        android:layout_weight="1"
-                        android:layout_marginTop="@dimen/spotInfo_text_vertical_offset"
-                        android:layout_marginLeft="@dimen/spotInfo_contentArea_left_offset"
-                        android:textSize="18sp" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:inputType="textMultiLine"
-                        android:ems="10"
-                        android:id="@+id/spotInfo_txt_adress"
-                        android:text="Адрес спота"
-                        android:textSize="@dimen/spotInfo_text_verySmall_size"
-                        android:layout_weight="1"
-                        android:layout_marginLeft="@dimen/spotInfo_contentArea_left_offset"
-                        android:layout_marginTop="@dimen/spotInfo_text_vertical_offset"
-                        android:layout_marginBottom="@dimen/spotInfo_text_vertical_offset" />
-                </LinearLayout>
-
-                <RelativeLayout
-                    android:layout_width="fill_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="5">
-
-                    <ImageButton
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:id="@+id/spotInfo_btnImg_favorite"
-                        android:layout_centerInParent="true"
-                        android:background="@drawable/simple_btn_star" />
-                </RelativeLayout>
-
-            </LinearLayout>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceSmall"
-                android:text="@string/spotinfo_details"
-                android:id="@+id/spotInfo_txt_details"
-                android:layout_marginTop="@dimen/spotInfo_details_vertical_offset"
-                android:layout_marginBottom="@dimen/spotInfo_details_vertical_offset"
-                android:layout_gravity="right"
-                android:layout_marginRight="@dimen/spotInfo_contentArea_right_offset" />
-
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:orientation="horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:weightSum="1"
-            android:background="@color/divider_block"
-            android:divider="@drawable/devider_vertical"
-            android:showDividers="beginning|middle"
-            android:id="@+id/spotInfo_list_photos">
-
-        </LinearLayout>
-
-        <TabHost
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:id="@+id/spotInfo_tabHost"
-            android:layout_gravity="center_horizontal">
-
-            <LinearLayout
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
-                android:orientation="vertical">
-
-                <TabWidget
-                    android:id="@android:id/tabs"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:clickable="false"
-                    android:gravity="left"
-                    android:tabStripEnabled="false"></TabWidget>
-
-                <FrameLayout
-                    android:id="@android:id/tabcontent"
-                    android:layout_width="fill_parent"
-                    android:layout_height="fill_parent">
-
-                    <ListView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:id="@+id/spotInfo_list_tab_partners"/>
-
-                    <ListView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:id="@+id/spotInfo_list_tab_coaches" />
-
-                </FrameLayout>
-
-            </LinearLayout>
-        </TabHost>
-
-        <TextView
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:text="@string/spotinfo_no_partners_no_coaches"
-            android:id="@+id/spotInfo_txt_noPartersCoaches"
-            android:visibility="gone"
-            android:singleLine="false"
-            android:textSize="15sp"
-            android:textColor="@color/text_msg_error"
-            android:textAlignment="center"
-            android:gravity="center"
-            android:paddingLeft="25dp"
-            android:paddingRight="25dp"
-            android:autoText="false" />
-
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:id="@+id/spotinfo_frg_frameLayout"
-            android:visibility="gone">
-
-            <ProgressBar
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/spotinfo_frg_progressBar"
-                android:layout_gravity="center"
-                android:visibility="visible" />
+            android:id="@+id/scrollView2"
+            android:background="@color/background_material_light">
 
             <LinearLayout
                 android:orientation="vertical"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:visibility="gone">
+                android:divider="@drawable/divider_thin"
+                android:showDividers="middle">
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:weightSum="6">
+
+                    <LinearLayout
+                        android:orientation="vertical"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="textMultiLine"
+                            android:ems="10"
+                            android:id="@+id/spotInfo_txt_name"
+                            android:text="Название спота"
+                            android:layout_weight="1"
+                            android:layout_marginTop="@dimen/spotInfo_text_vertical_offset"
+                            android:layout_marginLeft="@dimen/spotInfo_contentArea_left_offset"
+                            android:textSize="@dimen/spotInfo_text_title_textSize"
+                            android:textColor="@color/blackColor" />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="textMultiLine"
+                            android:ems="10"
+                            android:id="@+id/spotInfo_txt_adress"
+                            android:text="Адрес спота"
+                            android:textSize="@dimen/spotInfo_details_textSize"
+                            android:layout_weight="1"
+                            android:layout_marginLeft="@dimen/spotInfo_contentArea_left_offset"
+                            android:layout_marginTop="@dimen/spotInfo_text_vertical_offset"
+                            android:layout_marginBottom="@dimen/spotInfo_text_vertical_offset" />
+                    </LinearLayout>
+
+                    <RelativeLayout
+                        android:layout_width="fill_parent"
+                        android:layout_height="match_parent"
+                        android:layout_weight="5">
+
+                        <ImageButton
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:id="@+id/spotInfo_btnImg_favorite"
+                            android:layout_centerInParent="true"
+                            android:background="@drawable/simple_btn_star" />
+                    </RelativeLayout>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:divider="@drawable/divider_thin"
+                    android:showDividers="middle"
+                    android:id="@+id/spotInfo_layout_details"
+                    android:visibility="gone">
+
+                </LinearLayout>
 
                 <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/spotinfo_frg_errMsg_txtView"
-                    android:layout_gravity="center"
-                    android:visibility="visible"
-                    android:gravity="center_horizontal"
-                    android:textAlignment="gravity"
-                    android:textSize="15sp"
-                    android:textColor="@color/text_msg_error" />
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:text="@string/spotinfo_details"
+                    android:id="@+id/spotInfo_txt_details"
+                    android:gravity="right"
+                    android:textColor="@color/blackColor"
+                    android:paddingTop="@dimen/spotInfo_details_vertical_offset"
+                    android:paddingBottom="@dimen/spotInfo_details_vertical_offset"
+                    android:paddingRight="@dimen/spotInfo_contentArea_right_offset" />
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/try_again"
-                    android:id="@+id/spotinfo_frg_tryAgain_txtView"
-                    android:layout_gravity="center"
-                    android:visibility="visible"
-                    android:linksClickable="true"
-                    android:clickable="true"
-                    android:background="@drawable/text_view_backgr_selector"
-                    android:textColor="@color/txt_view_color_selector"
-                    android:textSize="18sp"
-                    android:layout_marginTop="10dp" />
 
             </LinearLayout>
-        </FrameLayout>
+        </ScrollView>
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:divider="@drawable/divider"
+            android:showDividers="middle"
+            android:id="@+id/spotInfo_layout_toHide"
+            android:background="@color/background_material_light">
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/divider_block"
+                android:divider="@drawable/devider_vertical"
+                android:showDividers="beginning|middle"
+                android:id="@+id/spotInfo_list_photos"
+                android:visibility="gone">
+
+            </LinearLayout>
+
+            <TabHost
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/spotInfo_tabHost"
+                android:layout_gravity="center_horizontal">
+
+                <LinearLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    android:orientation="vertical">
+
+                    <TabWidget
+                        android:id="@android:id/tabs"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:clickable="false"
+                        android:gravity="left"
+                        android:tabStripEnabled="false"></TabWidget>
+
+                    <FrameLayout
+                        android:id="@android:id/tabcontent"
+                        android:layout_width="fill_parent"
+                        android:layout_height="fill_parent">
+
+                        <ListView
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:id="@+id/spotInfo_list_tab_partners"/>
+
+                        <ListView
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:id="@+id/spotInfo_list_tab_coaches" />
+
+                    </FrameLayout>
+
+                </LinearLayout>
+            </TabHost>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="@string/spotinfo_no_partners_no_coaches"
+                android:id="@+id/spotInfo_txt_noPartersCoaches"
+                android:visibility="gone"
+                android:singleLine="false"
+                android:textSize="15sp"
+                android:textColor="@color/text_msg_error"
+                android:textAlignment="center"
+                android:gravity="center"
+                android:paddingLeft="25dp"
+                android:paddingRight="25dp"
+                android:autoText="false"
+                android:layout_weight="1" />
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/spotinfo_frg_frameLayout"
+                android:visibility="gone">
+
+                <ProgressBar
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/spotinfo_frg_progressBar"
+                    android:layout_gravity="center"
+                    android:visibility="visible" />
+
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:visibility="gone">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/spotinfo_frg_errMsg_txtView"
+                        android:layout_gravity="center"
+                        android:visibility="visible"
+                        android:gravity="center_horizontal"
+                        android:textAlignment="gravity"
+                        android:textSize="15sp"
+                        android:textColor="@color/text_msg_error" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/try_again"
+                        android:id="@+id/spotinfo_frg_tryAgain_txtView"
+                        android:layout_gravity="center"
+                        android:visibility="visible"
+                        android:linksClickable="true"
+                        android:clickable="true"
+                        android:background="@drawable/text_view_backgr_selector"
+                        android:textColor="@color/txt_view_color_selector"
+                        android:textSize="18sp"
+                        android:layout_marginTop="10dp" />
+
+                </LinearLayout>
+            </FrameLayout>
+        </LinearLayout>
 
     </LinearLayout>
 

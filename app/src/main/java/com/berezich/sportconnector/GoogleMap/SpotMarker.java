@@ -3,6 +3,7 @@ package com.berezich.sportconnector.GoogleMap;
 import android.content.res.Resources;
 
 import com.berezich.sportconnector.R;
+import com.berezich.sportconnector.UsefulFunctions;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
@@ -11,7 +12,6 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.berezich.sportconnector.GoogleMap.Clustering.pluralPostfix;
 
 /**
  * Created by berezkin on 14.05.2015.
@@ -173,10 +173,10 @@ public class SpotMarker extends AbstractMarker {
         int num;
         if(filter == GoogleMapFragment.FiltersX.F1000 || filter == GoogleMapFragment.FiltersX.F1100 || filter == GoogleMapFragment.FiltersX.F1001 || filter == GoogleMapFragment.FiltersX.F1101 || filter == GoogleMapFragment.FiltersX.Fxx1x)
             if((num=_numPartners)>0)
-                description+= " \n"+String.valueOf(num)+" - спарринг партнер"+pluralPostfix(num);
+                description+= " \n"+String.valueOf(num)+" - спарринг партнер"+ UsefulFunctions.pluralPostfix(num);
         if(filter == GoogleMapFragment.FiltersX.F0100 || filter == GoogleMapFragment.FiltersX.F1100 || filter == GoogleMapFragment.FiltersX.F0101 || filter == GoogleMapFragment.FiltersX.F1101 || filter == GoogleMapFragment.FiltersX.Fxx1x)
             if((num=_numCoaches)>0)
-                description+= " \n"+String.valueOf(num)+" - тренер"+pluralPostfix(num);
+                description+= " \n"+String.valueOf(num)+" - тренер"+UsefulFunctions.pluralPostfix(num);
         if(filter == GoogleMapFragment.FiltersX.F0001 || filter == GoogleMapFragment.FiltersX.F1001 || filter == GoogleMapFragment.FiltersX.F0101 || filter == GoogleMapFragment.FiltersX.F1101 || filter == GoogleMapFragment.FiltersX.Fxx1x)
             if(_isFavorite)
                 description+= " \nмой спот";

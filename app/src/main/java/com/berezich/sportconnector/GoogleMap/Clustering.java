@@ -155,39 +155,19 @@ public class Clustering {
 
         if(numPartners>0 && numFavorites>0 && (filter == GoogleMapFragment.FiltersX.F1001 || (filter == GoogleMapFragment.FiltersX.F1101 || filter == GoogleMapFragment.FiltersX.Fxx1x) && numCoaches==0))
             return  R.drawable.gmap_cluster_red_purple;
-        //return  R.drawable.baloon_red;
 
         if(numPartners>0 && numCoaches>0 && (filter == GoogleMapFragment.FiltersX.F1100 || (filter == GoogleMapFragment.FiltersX.F1101 || filter == GoogleMapFragment.FiltersX.Fxx1x) && numFavorites==0))
             return  R.drawable.gmap_cluster_green_purple;
-        //return  R.drawable.baloon_green;
 
         if(numCoaches>0 && numFavorites>0 && (filter == GoogleMapFragment.FiltersX.F0101 || (filter == GoogleMapFragment.FiltersX.F1101 || filter == GoogleMapFragment.FiltersX.Fxx1x) && numPartners==0))
             return  R.drawable.gmap_cluster_green_red;
-        //return  R.drawable.baloon_green;
 
         if((filter == GoogleMapFragment.FiltersX.F1101 || filter == GoogleMapFragment.FiltersX.Fxx1x) && numPartners>0 && numCoaches>0 && numFavorites>0 )
             return  R.drawable.gmap_cluster_green_red_purple;
-        //return  R.drawable.baloon_red;
-
 
         return  R.drawable.gmap_cluster_blue;
     }
-    public static String pluralPostfix(int num){
-        if(num>=10 && num<=19)
-            return "ов";
-        int mod = num%10;
-        switch (mod)
-        {
-            case 1:
-                return "";
-            case 2:
-            case 3:
-            case 4:
-                return "a";
-            default:
-                return "ов";
-        }
-    }
+
     public static class CustomInfoWindow implements GoogleMap.InfoWindowAdapter {
     // Setting a custom info window adapter for the google map
 

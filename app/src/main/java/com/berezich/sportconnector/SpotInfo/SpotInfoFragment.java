@@ -6,12 +6,12 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.util.AttributeSet;
+import android.text.util.Linkify;
 import android.util.Log;
 import android.util.Pair;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -34,6 +34,7 @@ import com.berezich.sportconnector.GoogleMap.SpotsData;
 import com.berezich.sportconnector.ImageViewer.ImgViewPagerActivity;
 import com.berezich.sportconnector.LocalDataManager;
 import com.berezich.sportconnector.R;
+import com.berezich.sportconnector.UsefulFunctions;
 import com.berezich.sportconnector.backend.sportConnectorApi.model.Person;
 import com.berezich.sportconnector.backend.sportConnectorApi.model.Picture;
 import com.berezich.sportconnector.backend.sportConnectorApi.model.Spot;
@@ -43,7 +44,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.zip.Inflater;
 
 
 /**
@@ -63,6 +63,7 @@ public class SpotInfoFragment extends Fragment implements EndpointApi.GetListPer
     private static final String TAG = "MyLog_SpotInfoFragment";
     private Long spotId;
     private boolean isFavoriteChanged = false;
+    private boolean isDetailsShown = false;
     private HashMap<Long, Spot> spotHashMap;
     private Spot curSpot;
     private View spotInfoView;
@@ -124,16 +125,61 @@ public class SpotInfoFragment extends Fragment implements EndpointApi.GetListPer
             if((linearLayout = (LinearLayout) spotInfoView.findViewById(R.id.spotInfo_layout_details))!=null)
             {
                 String value;
-                if((value = curSpot.getSite())!=null && !value.equals(""))
-                    linearLayout.addView(getDetailItem(getContext(),getString(R.string.spotinfo_site),value));
-                if((value = curSpot.getContact())!=null && !value.equals(""))
-                    linearLayout.addView(getDetailItem(getContext(),getString(R.string.spotinfo_phone),value));
-                if((value = curSpot.getPrice())!=null && !value.equals(""))
-                    linearLayout.addView(getDetailItem(getContext(),getString(R.string.spotinfo_prices),value));
-//                if((value = curSpot.getSite())!=null && !value.equals(""))
-//                    linearLayout.addView(getDetailItem(getContext(),getString(R.string.spotinfo_courts),value));
-                if((value = curSpot.getDescription())!=null && !value.equals(""))
-                    linearLayout.addView(getDetailItem(getContext(),getString(R.string.spotinfo_description),value));
+                boolean enableDetails = false;
+                if ((value = curSpot.getSite()) != null && !value.equals("")) {
+                    linearLayout.addView(getDetailItem(getContext(), getString(R.string.spotinfo_site), value, TXT_TYPE.SITE));
+                    enableDetails = true;
+                }
+                if ((value = curSpot.getContact()) != null && !value.equals("")) {
+                    linearLayout.addView(getDetailItem(getContext(), getString(R.string.spotinfo_phone), value,TXT_TYPE.PHONE));
+                    enableDetails = true;
+                }
+                if ((value = curSpot.getPrice()) != null && !value.equals("")) {
+                    linearLayout.addView(getDetailItem(getContext(), getString(R.string.spotinfo_prices), value));
+                    enableDetails = true;
+                }
+                int numCourts;
+                value = "";
+                if((numCourts = curSpot.getOpenPlayFieldNum())>0) {
+                    value = String.format("%d %s%s %s%s", numCourts, getString(R.string.spotinfo_openCourts),
+                            UsefulFunctions.adjPluralPostfix(numCourts), getString(R.string.spotinfo_playField),
+                            UsefulFunctions.pluralPostfix(numCourts));
+                    enableDetails = true;
+                }
+                if((numCourts = curSpot.getClosedPlayFieldNum())>0){
+                    value += ((value.equals(""))?"":", ")+String.format("%d %s%s %s%s", numCourts,getString(R.string.spotinfo_closedCourts),
+                            UsefulFunctions.adjPluralPostfix(numCourts), getString(R.string.spotinfo_playField),
+                            UsefulFunctions.pluralPostfix(numCourts));
+                    enableDetails = true;
+                }
+                if(!value.equals(""))
+                    linearLayout.addView(getDetailItem(getContext(),getString(R.string.spotinfo_courts),value));
+
+                if ((value = curSpot.getDescription()) != null && !value.equals("")) {
+                    linearLayout.addView(getDetailItem(getContext(), getString(R.string.spotinfo_description), value));
+                    enableDetails = true;
+                }
+
+                txtView = (TextView) spotInfoView.findViewById(R.id.spotInfo_txt_details);
+
+                if(enableDetails)
+                    txtView.setVisibility(View.VISIBLE);
+                else
+                    txtView.setVisibility(View.GONE);
+
+                txtView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        isDetailsShown = !isDetailsShown;
+                        TextView textView = (TextView) spotInfoView.findViewById(R.id.spotInfo_txt_details);
+                        LinearLayout linearLayout = (LinearLayout) spotInfoView.findViewById(R.id.spotInfo_layout_details);
+                        linearLayout.setVisibility((isDetailsShown) ? View.VISIBLE : View.GONE);
+                        linearLayout = (LinearLayout) spotInfoView.findViewById(R.id.spotInfo_layout_toHide);
+                        linearLayout.setVisibility((isDetailsShown) ? View.GONE : View.VISIBLE);
+                        textView.setText((isDetailsShown) ? getString(R.string.spotinfo_details_hide) : getString(R.string.spotinfo_details));
+                    }
+                });
+
 
             }
 
@@ -462,7 +508,11 @@ public class SpotInfoFragment extends Fragment implements EndpointApi.GetListPer
     }
 
 
+    enum TXT_TYPE{SITE,PHONE,TEXT}
     private View getDetailItem(Context context,String name, String value) {
+        return getDetailItem(context,name,value,TXT_TYPE.TEXT);
+    }
+    private View getDetailItem(Context context,String name, String value, TXT_TYPE type) {
         View itemView;
         TextView txtView;
         LayoutInflater lInflater;
@@ -471,7 +521,49 @@ public class SpotInfoFragment extends Fragment implements EndpointApi.GetListPer
                 txtView = (TextView) itemView.findViewById(R.id.spotInfo_detailItem_title);
                 txtView.setText(name);
                 txtView = (TextView) itemView.findViewById(R.id.spotInfo_detailItem_value);
-                txtView.setText(value);
+                switch (type){
+                    case SITE:
+                        txtView.setText(value);
+                        Linkify.addLinks(txtView, Linkify.WEB_URLS);
+                        break;
+                    case PHONE:
+                        String[] phones = value.split(",");
+                        txtView.setText(phones[0].trim());
+                        float textSize = getResources().getDimensionPixelSize(R.dimen.spotInfo_details_textSize)/getResources().getDisplayMetrics().density;
+                        txtView.setTextSize(TypedValue.COMPLEX_UNIT_SP,textSize);
+                        ImageView imageView = (ImageView) itemView.findViewById(R.id.spotInfo_detailItem_image_phone);
+                        imageView.setVisibility(View.VISIBLE);
+                        LinearLayout linearLayout = (LinearLayout) itemView.findViewById(R.id.spotInfo_detailItem_layout_value);
+                        linearLayout.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                String phone_no= ((TextView)v.findViewById(R.id.spotInfo_detailItem_value)).getText().toString();
+                                Intent callIntent = new Intent(Intent.ACTION_CALL);
+                                callIntent.setData(Uri.parse("tel:"+phone_no));
+                                startActivity(callIntent);
+                            }
+                        });
+                        if(phones.length>1)
+                        {
+                            txtView = (TextView) itemView.findViewById(R.id.spotInfo_detailItem_value2);
+                            txtView.setText(phones[1].trim());
+                            linearLayout = (LinearLayout) itemView.findViewById(R.id.spotInfo_detailItem_layout_value2);
+                            linearLayout.setVisibility(View.VISIBLE);
+                            linearLayout.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    String phone_no = ((TextView) v.findViewById(R.id.spotInfo_detailItem_value2)).getText().toString();
+                                    Intent callIntent = new Intent(Intent.ACTION_CALL);
+                                    callIntent.setData(Uri.parse("tel:" + phone_no));
+                                    startActivity(callIntent);
+                                }
+                            });
+                        }
+
+                        break;
+                    case TEXT:
+                        txtView.setText(value);
+                }
                 return itemView;
             }
         return null;

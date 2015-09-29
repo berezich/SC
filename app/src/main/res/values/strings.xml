@@ -177,15 +177,19 @@
     <!--spotInfo_fragment begin-->
         <string name="spotinfo_fragmentTitle">Информация о корте</string>
         <string name="spotinfo_details">Подробнее...</string>
+        <string name="spotinfo_details_hide">Скрыть</string>
         <string name="spotinfo_site">Сайт</string>
         <string name="spotinfo_phone">Телефон</string>
         <string name="spotinfo_workTime">Время работы</string>
         <string name="spotinfo_courts">Типы кортов</string>
+        <string name="spotinfo_playField">корт</string>
+        <string name="spotinfo_openCourts">открыт</string>
+        <string name="spotinfo_closedCourts">крыт</string>
         <string name="spotinfo_prices">Цены</string>
         <string name="spotinfo_description">Описание</string>
         <string name="spotinfo_tab1_title">Спарринг партнеры</string>
         <string name="spotinfo_tab2_title">Тренеры</string>
-        <string name="spotinfo_no_partners_no_coaches">На данном корте пока нет зарегестрированных соперников и тренеров.</string>
+        <string name="spotinfo_no_partners_no_coaches">На данном корте пока нет зарегистрированных соперников и тренеров.</string>
         <string name="spotinfo_req_error_msg">Ошибка</string>
 
             <!-- spotInfo_fragment/list_person_item-->

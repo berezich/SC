@@ -95,4 +95,32 @@ public class UsefulFunctions {
             return false;
         return true;
     }
+    public static String pluralPostfix(int num){
+        if(num>=10 && num<=19)
+            return "ов";
+        int mod = num%10;
+        switch (mod)
+        {
+            case 1:
+                return "";
+            case 2:
+            case 3:
+            case 4:
+                return "a";
+            default:
+                return "ов";
+        }
+    }
+    public static String adjPluralPostfix(int num){
+        if(num == 11)
+            return "ых";
+        int mod = num%10;
+        switch (mod)
+        {
+            case 1:
+                return "ый";
+            default:
+                return "ых";
+        }
+    }
 }

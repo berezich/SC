@@ -13,6 +13,7 @@
 
     <!-- fragment_spotInfo-->
         <color name="text_msg_error">#AAAAAA</color>
+        <color name="divider_thin">#15000000</color>
     <!-- fragment_spotInfo-->
 
     <!-- fragment_personProfile-->
