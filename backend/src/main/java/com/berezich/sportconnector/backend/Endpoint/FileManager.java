@@ -6,12 +6,16 @@ import com.google.api.server.spi.config.ApiMethod;
 import com.google.api.server.spi.config.ApiNamespace;
 import com.google.api.server.spi.config.Named;
 import com.google.api.server.spi.response.BadRequestException;
+import com.google.appengine.api.blobstore.BlobInfo;
+import com.google.appengine.api.blobstore.BlobInfoFactory;
 import com.google.appengine.api.blobstore.BlobKey;
 import com.google.appengine.api.blobstore.BlobstoreFailureException;
 import com.google.appengine.api.blobstore.BlobstoreService;
 import com.google.appengine.api.blobstore.BlobstoreServiceFactory;
 import com.googlecode.objectify.ObjectifyService;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -60,5 +64,17 @@ public class FileManager {
                 }
             }
 
+    }
+    protected List<BlobInfo> getBlobInfos(){
+        List<BlobInfo> blobInfos = new ArrayList<>();
+        BlobInfoFactory infoFactory = new BlobInfoFactory();
+        BlobInfo blobInfo;
+        Iterator<BlobInfo> iterator=infoFactory.queryBlobInfos();
+        while (iterator.hasNext()){
+            blobInfo = iterator.next();
+            blobInfos.add(blobInfo);
+            iterator = infoFactory.queryBlobInfosAfter(blobInfo.getBlobKey());
+        }
+        return blobInfos;
     }
 }

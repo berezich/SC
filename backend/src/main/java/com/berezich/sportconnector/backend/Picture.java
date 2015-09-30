@@ -20,6 +20,7 @@ public class Picture {
         ImagesService imagesService = ImagesServiceFactory.getImagesService();
         ServingUrlOptions servingUrlOptions = ServingUrlOptions.Builder.withBlobKey(new BlobKey(blobKey));
         servingUrl = imagesService.getServingUrl(servingUrlOptions);
+
     }
 
     public String getName() {

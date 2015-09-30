@@ -2,14 +2,12 @@ package com.berezich.sportconnector.backend.Endpoint;
 
 import com.berezich.sportconnector.backend.Person;
 import com.berezich.sportconnector.backend.Picture;
-import com.berezich.sportconnector.backend.Spot;
 import com.berezich.sportconnector.backend.RegionInfo;
+import com.berezich.sportconnector.backend.Spot;
 import com.berezich.sportconnector.backend.UpdateSpotInfo;
-import com.google.api.server.spi.config.AnnotationBoolean;
 import com.google.api.server.spi.config.Api;
 import com.google.api.server.spi.config.ApiMethod;
 import com.google.api.server.spi.config.ApiNamespace;
-import com.google.api.server.spi.config.ApiResourceProperty;
 import com.google.api.server.spi.response.BadRequestException;
 import com.google.api.server.spi.response.CollectionResponse;
 import com.google.api.server.spi.response.InternalServerErrorException;
@@ -18,12 +16,10 @@ import com.google.appengine.api.blobstore.BlobKey;
 import com.google.appengine.api.blobstore.BlobstoreInputStream;
 import com.google.appengine.api.datastore.Cursor;
 import com.google.appengine.api.datastore.QueryResultIterator;
-import com.google.appengine.api.files.FileServicePb;
 import com.googlecode.objectify.ObjectifyService;
 import com.googlecode.objectify.cmd.Query;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -35,7 +31,7 @@ import javax.annotation.Nullable;
 import javax.inject.Named;
 
 import static com.googlecode.objectify.ObjectifyService.ofy;
-import static java.util.logging.Logger.*;
+import static java.util.logging.Logger.getLogger;
 
 /**
  * WARNING: This generated code is intended as a sample or starting point for using a
@@ -552,4 +548,5 @@ public class SpotEndpoint {
         if(spot.getCoords()==null)
             throw  new BadRequestException("Coordinates property must be initialized");
     }
+
 }
