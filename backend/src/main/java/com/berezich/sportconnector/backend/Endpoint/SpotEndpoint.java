@@ -171,8 +171,8 @@ public class SpotEndpoint {
                         cnt++;
                     } catch (Exception e) {
                         e.printStackTrace();
-                        logger.info("courtStr parsing failed str:"+courtStr);
-                        throw e;
+                        throw new InternalServerErrorException(String.format("courtStr parsing failed " +
+                                "index spot: %d courtStr: %s \nexception: %s",cnt,courtStr,e.getMessage()));
                     }
                     if(spot!=null) {
                         List<BlobInfo> blobInfos = FileManager.getBlobInfos();
