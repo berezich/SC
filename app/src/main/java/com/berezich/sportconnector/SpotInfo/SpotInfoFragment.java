@@ -527,7 +527,7 @@ public class SpotInfoFragment extends Fragment implements EndpointApi.GetListPer
                         Linkify.addLinks(txtView, Linkify.WEB_URLS);
                         break;
                     case PHONE:
-                        String[] phones = value.split(",");
+                        String[] phones = value.split(";");
                         txtView.setText(phones[0].trim());
                         float textSize = getResources().getDimensionPixelSize(R.dimen.spotInfo_details_textSize)/getResources().getDisplayMetrics().density;
                         txtView.setTextSize(TypedValue.COMPLEX_UNIT_SP,textSize);
@@ -539,7 +539,7 @@ public class SpotInfoFragment extends Fragment implements EndpointApi.GetListPer
                             public void onClick(View v) {
                                 String phone_no= ((TextView)v.findViewById(R.id.spotInfo_detailItem_value)).getText().toString();
                                 Intent callIntent = new Intent(Intent.ACTION_CALL);
-                                callIntent.setData(Uri.parse("tel:"+phone_no));
+                                callIntent.setData(Uri.parse("tel:"+phone_no.split("доб")[0]));
                                 startActivity(callIntent);
                             }
                         });
@@ -554,7 +554,7 @@ public class SpotInfoFragment extends Fragment implements EndpointApi.GetListPer
                                 public void onClick(View v) {
                                     String phone_no = ((TextView) v.findViewById(R.id.spotInfo_detailItem_value2)).getText().toString();
                                     Intent callIntent = new Intent(Intent.ACTION_CALL);
-                                    callIntent.setData(Uri.parse("tel:" + phone_no));
+                                    callIntent.setData(Uri.parse("tel:" + phone_no.split("доб")[0]));
                                     startActivity(callIntent);
                                 }
                             });

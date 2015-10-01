@@ -147,8 +147,8 @@ public class SpotEndpoint {
         {
             try {
 
-                fileStr = new String(buff, "windows-1251");
-                //fileStr = new String(buff, "UTF-8");
+                //fileStr = new String(buff, "windows-1251");
+                fileStr = new String(buff, "UTF-8");
             } catch (Exception e) {
                 e.printStackTrace();
                 throw new InternalServerErrorException(String.format("convert byte to string failed exception: %s",e.getMessage()));
@@ -156,12 +156,14 @@ public class SpotEndpoint {
             String[] courtsStr;
             try {
                 courtsStr = fileStr.split("<endline>");
+                logger.info( String.format("courts num = %d",courtsStr.length));
             } catch (Exception e) {
                 e.printStackTrace();
                 throw new InternalServerErrorException(String.format("split <endline> failed exception: %s",e.getMessage()));
             }
             Spot spot=null;
             List<Spot> spotList = new ArrayList<>();
+            List<BlobInfo> blobInfos = new FileManager().getBlobInfos();
             for(String courtStr:courtsStr)
             {
                 if(!courtStr.equals("")) {
@@ -175,7 +177,7 @@ public class SpotEndpoint {
                                 "index spot: %d courtStr: %s \nexception: %s",cnt,courtStr,e.getMessage()));
                     }
                     if(spot!=null) {
-                        List<BlobInfo> blobInfos = FileManager.getBlobInfos();
+
                         BlobInfo blobInfo;
                         List<Picture> pictures = spot.getPictureLst();
                         for (int k=0; k<pictures.size(); k++) {

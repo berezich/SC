@@ -65,7 +65,12 @@ public class FileManager {
             }
 
     }
-    protected static List<BlobInfo> getBlobInfos(){
+    @ApiMethod(
+            name = "getBlobInfos",
+            path = "fileManager/blobs",
+            httpMethod = ApiMethod.HttpMethod.GET)
+    public List<BlobInfo> getBlobInfos()throws BadRequestException{
+        OAuth_2_0.check();
         List<BlobInfo> blobInfos = new ArrayList<>();
         BlobInfoFactory infoFactory = new BlobInfoFactory();
         BlobInfo blobInfo;
@@ -73,7 +78,6 @@ public class FileManager {
         while (iterator.hasNext()){
             blobInfo = iterator.next();
             blobInfos.add(blobInfo);
-            iterator = infoFactory.queryBlobInfosAfter(blobInfo.getBlobKey());
         }
         return blobInfos;
     }
