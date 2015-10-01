@@ -65,7 +65,7 @@ public class FileManager {
             }
 
     }
-    protected List<BlobInfo> getBlobInfos(){
+    protected static List<BlobInfo> getBlobInfos(){
         List<BlobInfo> blobInfos = new ArrayList<>();
         BlobInfoFactory infoFactory = new BlobInfoFactory();
         BlobInfo blobInfo;
@@ -76,5 +76,13 @@ public class FileManager {
             iterator = infoFactory.queryBlobInfosAfter(blobInfo.getBlobKey());
         }
         return blobInfos;
+    }
+    protected static BlobInfo findBlobByFileName(List<BlobInfo> blobInfos, String fileName)
+    {
+        for (BlobInfo blobInfo:blobInfos) {
+            if(blobInfo.getFilename().toLowerCase().equals(fileName.toLowerCase()))
+                return blobInfo;
+        }
+        return null;
     }
 }

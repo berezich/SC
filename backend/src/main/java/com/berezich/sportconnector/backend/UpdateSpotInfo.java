@@ -40,7 +40,7 @@ public class UpdateSpotInfo {
     }
 
     public Spot getSpot() {
-        return spot.get();
+        return (spot!=null)?spot.get():null;
     }
 
     public void setId(Long id) {
@@ -55,6 +55,6 @@ public class UpdateSpotInfo {
     }
 
     public void setSpot(Spot spot) {
-        this.spot = Ref.create(spot);
+        this.spot = (spot!=null) ? Ref.create(spot) : null;
     }
 }

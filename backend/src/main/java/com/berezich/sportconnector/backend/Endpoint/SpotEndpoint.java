@@ -12,6 +12,7 @@ import com.google.api.server.spi.response.BadRequestException;
 import com.google.api.server.spi.response.CollectionResponse;
 import com.google.api.server.spi.response.InternalServerErrorException;
 import com.google.api.server.spi.response.NotFoundException;
+import com.google.appengine.api.blobstore.BlobInfo;
 import com.google.appengine.api.blobstore.BlobKey;
 import com.google.appengine.api.blobstore.BlobstoreInputStream;
 import com.google.appengine.api.datastore.Cursor;
@@ -145,7 +146,9 @@ public class SpotEndpoint {
         if(length>0)
         {
             try {
-                fileStr = new String(buff, "UTF-8");
+
+                fileStr = new String(buff, "windows-1251");
+                //fileStr = new String(buff, "UTF-8");
             } catch (Exception e) {
                 e.printStackTrace();
                 throw new InternalServerErrorException(String.format("convert byte to string failed exception: %s",e.getMessage()));
@@ -169,20 +172,35 @@ public class SpotEndpoint {
                     } catch (Exception e) {
                         e.printStackTrace();
                         logger.info("courtStr parsing failed str:"+courtStr);
+                        throw e;
                     }
                     if(spot!=null) {
+                        List<BlobInfo> blobInfos = FileManager.getBlobInfos();
+                        BlobInfo blobInfo;
+                        List<Picture> pictures = spot.getPictureLst();
+                        for (int k=0; k<pictures.size(); k++) {
+                            Picture pic = pictures.get(k);
+                            if ((blobInfo = FileManager.findBlobByFileName(blobInfos, pic.getName())) != null)
+                                pictures.set(k,new Picture(blobInfo.getBlobKey().getKeyString()));
+                            else
+                                throw new NotFoundException(String.format("picture: %s not found " +
+                                        "in blobStore index spot: %d courtStr: %s",pic.getName(),cnt,courtStr));
+                        }
                         try {
                             validateSpotProperties(spot);
                         } catch (BadRequestException e) {
                             e.printStackTrace();
-                            throw new InternalServerErrorException(String.format("validateSpotProperties() failed index spot: %d courtStr: %s \nexception: %s",cnt,courtStr,e.getMessage()));
+                            throw new InternalServerErrorException(String.format("validateSpotProperties() " +
+                                    "failed index spot: %d courtStr: %s \nexception: %s",cnt,courtStr,e.getMessage()));
                         }
                         spotList.add(spot);
                     }
                 }
             }
-            for (int i=0; i<spotList.size(); i++)
-                insert(spotList.get(i));
+
+            for (Spot spot1:spotList)
+                insert(spot1);
+
             logger.info(String.format("%d spots were inserted",spotList.size()));
         } else
             logger.info("0 spots were inserted");
@@ -353,6 +371,33 @@ public class SpotEndpoint {
         }
     }
 
+
+    @ApiMethod(
+            name = "removeAllSpots",
+            path = "spot/all",
+            httpMethod = ApiMethod.HttpMethod.DELETE)
+    public void removeAll() throws BadRequestException{
+        final int MAX_LIMIT = 30;
+        CollectionResponse<Spot> spotCollectionResponse;
+        OAuth_2_0.check();
+        String nextToken = "";
+        List<Spot> spots = new ArrayList<>();
+        while (true) {
+            spotCollectionResponse = list(nextToken, MAX_LIMIT);
+            nextToken = spotCollectionResponse.getNextPageToken();
+            spots.addAll(spotCollectionResponse.getItems());
+            if(spotCollectionResponse.getItems().size()<MAX_LIMIT)
+                break;
+        }
+        for(Spot spotItem:spots)
+            try {
+                remove(spotItem.getId());
+            } catch (NotFoundException e) {
+                logger.info(String.format("removing error spot (id = %s): not found",spotItem.getId()));
+                e.printStackTrace();
+            }
+    }
+
     /**
      * Deletes the specified {@code Spot}.
      *
@@ -387,6 +432,7 @@ public class SpotEndpoint {
         UpdateSpotInfo updateSpotInfo = ofy().load().type(UpdateSpotInfo.class).id(id).now();
         if(updateSpotInfo!=null) {
             updateSpotInfo.setUpdateDate(Calendar.getInstance().getTime());
+            updateSpotInfo.setSpot(null);
             ofy().save().entity(updateSpotInfo).now();
             RegionInfo regionInfo = ofy().load().type(RegionInfo.class).id(updateSpotInfo.getRegionId()).now();
             if(regionInfo!=null) {

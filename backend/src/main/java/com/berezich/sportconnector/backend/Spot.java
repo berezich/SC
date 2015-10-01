@@ -41,11 +41,13 @@ public class Spot {
     }
     public Spot(String spotStr)
     {
+        final int NUM_FIELDS = 15;
         int i=0;
         String[] spotProps;
+        pictureLst = new ArrayList<>();
         if(spotStr!=null && !spotStr.equals("")){
-            spotProps = spotStr.split("\t",13);
-            if(spotProps!=null && spotProps.length==13){
+            spotProps = spotStr.split("\t",NUM_FIELDS);
+            if(spotProps!=null && spotProps.length==NUM_FIELDS){
                 name = spotProps[i++].trim();
                 switch (spotProps[i++].trim()){
                     case "Москва":
@@ -57,6 +59,7 @@ public class Spot {
                 address = spotProps[i++].trim();
                 contact = spotProps[i++].trim();
                 site = spotProps[i++].trim();
+                String email = spotProps[i++].trim();
                 float longtitude = Float.parseFloat(spotProps[i++].trim());
                 float latitude = Float.parseFloat(spotProps[i++].trim());
                 coords = new Coordinates(latitude,longtitude);
@@ -77,8 +80,16 @@ public class Spot {
                 }
                 openPlayFieldNum = Integer.parseInt(spotProps[i++].trim());
                 closedPlayFieldNum = Integer.parseInt(spotProps[i++].trim());
-                price = spotProps[i].trim();
-
+                price = spotProps[i++].trim();
+                String metroStr = spotProps[i++].trim();
+                String picturesStr = spotProps[i].trim();
+                String[] picLstStr = picturesStr.split(",");
+                for (String item:picLstStr)
+                    if(!item.trim().equals("")) {
+                        Picture pic = new Picture();
+                        pic.setName(item.trim());
+                        pictureLst.add(pic);
+                    }
             }
             else if(spotProps!=null)
                 logger.info(String.format("err spotPropertiesNum = %d spotStr = %s",spotProps.length,spotStr));
