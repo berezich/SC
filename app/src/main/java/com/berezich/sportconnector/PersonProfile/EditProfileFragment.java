@@ -84,8 +84,9 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
-        setHasOptionsMenu(true);
         super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+        LocalDataManager.init(getActivity());
     }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -304,7 +305,7 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
                         new EndpointApi.UpdatePersonAsyncTask(this).execute(tempMyPerson);
                     }
                     else{
-                        FragmentManager fragmentManager = getFragmentManager();
+                        FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
                         if(fragmentManager!=null)
                             fragmentManager.popBackStack();
                     }
@@ -323,7 +324,7 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
             TextView txtView = (TextView) v;
             datePickerFragment.setArgs(txtView.getText().toString());
             datePickerFragment.setTargetFragment(getCurFragment(), -1);
-            datePickerFragment.show(getFragmentManager(), null);
+            datePickerFragment.show(getActivity().getSupportFragmentManager(), null);
         }
     }
     @Override
@@ -377,7 +378,7 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
     {
         @Override
         public void onClick(View v) {
-            FragmentManager fragmentManager = getFragmentManager();
+            FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
             Person myPersonInfo = LocalDataManager.getMyPersonInfo();
             ChangeEmailFragment changeEmailFragment = new ChangeEmailFragment().newInstance(myPersonInfo.getEmail());
             changeEmailFragment.setTargetFragment(getCurFragment(), 0);
@@ -419,16 +420,16 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
         }
         dialog = AlertDialogFragment.newInstance("",dialogMsg, false,false);
         dialog.setTargetFragment(this, 0);
-        ft = getFragmentManager();
+        ft = getActivity().getSupportFragmentManager();
         if (ft != null)
-            dialog.show(getFragmentManager(), "");
+            dialog.show(ft, "");
     }
 
     private class PassOnClickListener implements View.OnClickListener
     {
         @Override
         public void onClick(View v) {
-            FragmentManager fragmentManager = getFragmentManager();
+            FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
             Person myPersonInfo = LocalDataManager.getMyPersonInfo();
             ChangePassFragment changePassFragment = new ChangePassFragment().newInstance(myPersonInfo.getPass());
             changePassFragment.setTargetFragment(getCurFragment(),0);
@@ -490,9 +491,9 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
         }
         dialog = AlertDialogFragment.newInstance("",dialogMsg, false,false);
         dialog.setTargetFragment(this, 0);
-        ft = getFragmentManager();
+        ft = getActivity().getSupportFragmentManager();
         if (ft != null)
-            dialog.show(getFragmentManager(), "");
+            dialog.show(ft, "");
     }
 
     private class RatingInfoOnClickListener implements View.OnClickListener
@@ -508,7 +509,7 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
                     spinner.requestFocus();
             }
 
-            FragmentManager fragmentManager = getFragmentManager();
+            FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
             AlertDialogFragment dialog;
             String msgInfoId;
             if(tempMyPerson.getRating() == 1.0)
@@ -704,7 +705,7 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
                 updatedPerson.setPass(myPerson.getPass());
                 LocalDataManager.setMyPersonInfo(updatedPerson);
             }
-            FragmentManager fragmentManager = getFragmentManager();
+            FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
             if(fragmentManager!=null)
                 fragmentManager.popBackStack();
         }

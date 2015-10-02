@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -61,10 +62,10 @@ public class SpotInfoFragment extends Fragment implements EndpointApi.GetListPer
     private static final String TAB_PARTNERS = "partners";
     private static final String TAB_COACHES = "coaches";
     private static final String TAG = "MyLog_SpotInfoFragment";
-    private Long spotId;
     private boolean isFavoriteChanged = false;
     private boolean isDetailsShown = false;
     private HashMap<Long, Spot> spotHashMap;
+    private final String SPOT_ID = "spotId";
     private Spot curSpot;
     private View spotInfoView;
     private ProfileItemLstAdapter partnersAdapter;
@@ -99,10 +100,16 @@ public class SpotInfoFragment extends Fragment implements EndpointApi.GetListPer
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+        LocalDataManager.init(getActivity());
+        spotHashMap = SpotsData.get_allSpots();
         if (getArguments() != null) {
-            spotId = Long.valueOf(getArguments().getString(ARG_SPOT_ID));
-            //mParam2 = getArguments().getString(ARG_PARAM2);
+            Long spotId = Long.valueOf(getArguments().getString(ARG_SPOT_ID));
+            curSpot = spotHashMap.get(spotId);
+        }else if(savedInstanceState!=null) {
+            Long spotId = savedInstanceState.getLong(SPOT_ID);
+            curSpot = spotHashMap.get(spotId);
         }
+
     }
 
     @Override
@@ -113,10 +120,9 @@ public class SpotInfoFragment extends Fragment implements EndpointApi.GetListPer
         LinearLayout linearLayout;
         ImageButton imgButton;
         spotInfoView = inflater.inflate(R.layout.fragment_spot_info, container, false);
-        spotHashMap = SpotsData.get_allSpots();
+
         if ((txtView = (TextView) spotInfoView.findViewById(R.id.spotinfo_frg_tryAgain_txtView)) != null)
             txtView.setOnClickListener(new TryAgainClickListener());
-        curSpot = spotHashMap.get(spotId);
         if (curSpot != null) {
             if ((txtView = (TextView) spotInfoView.findViewById(R.id.spotInfo_txt_name)) != null)
                 txtView.setText(curSpot.getName());
@@ -289,6 +295,19 @@ public class SpotInfoFragment extends Fragment implements EndpointApi.GetListPer
         ImageView imgButton;
         if ((imgButton = (ImageButton) spotInfoView.findViewById(R.id.spotInfo_btnImg_favorite)) != null)
             imgButton.setPressed(LocalDataManager.isMyFavoriteSpot(curSpot));
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putLong(SPOT_ID, curSpot.getId());
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+
     }
 
     @Override

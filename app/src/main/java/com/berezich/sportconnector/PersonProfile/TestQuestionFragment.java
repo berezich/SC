@@ -6,6 +6,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -100,9 +101,12 @@ public class TestQuestionFragment extends Fragment {
         if(item!=null && item.getItemId()==R.id.menu_testQuestion)
         {
             TestEqualizerFragment testEqualizerFragment = new TestEqualizerFragment().setArgs(1,1);
-            FragmentManager fragmentManager = (FragmentManager) getFragmentManager();
-            if(fragmentManager!=null)
+            FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+            if(fragmentManager!=null) {
                 fragmentManager.beginTransaction().replace(R.id.container, testEqualizerFragment).commit();
+                Log.d(TAG, String.format("prev fragment replaced with %s", testEqualizerFragment.getClass().getName()));
+
+            }
             return true;
         }
         return super.onOptionsItemSelected(item);

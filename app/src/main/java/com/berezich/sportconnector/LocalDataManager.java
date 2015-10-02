@@ -225,6 +225,8 @@ public class LocalDataManager {
     public static boolean isMyFavoriteSpot(Spot spot)
     {
         boolean isFavorite = false;
+        if(myPersonInfo==null)
+            loadMyPersonInfoFromPref();
         String myType = myPersonInfo.getType();
         Long myPersonId = myPersonInfo.getId();
         if( myType.equals("COACH"))

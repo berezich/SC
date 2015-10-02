@@ -18,6 +18,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.berezich.sportconnector.FileManager;
+import com.berezich.sportconnector.Fragments.LoginFragment;
 import com.berezich.sportconnector.GoogleMap.SpotsData;
 import com.berezich.sportconnector.ImageViewer.ImgViewPagerActivity;
 import com.berezich.sportconnector.LocalDataManager;
@@ -64,8 +65,9 @@ public class PersonProfileFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
-        setHasOptionsMenu(true);
         super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+        LocalDataManager.init(getActivity());
         Person myPersonInfo = LocalDataManager.getMyPersonInfo();
         if(myPersonInfo!=null)
             new FileManager.RemoveOldPersonCache().execute(new Pair<>(getActivity().getBaseContext(),myPersonInfo));
@@ -251,9 +253,14 @@ public class PersonProfileFragment extends Fragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_edit_profile:
-                FragmentManager fragmentManager = getFragmentManager();
-                if(fragmentManager!=null)
-                    fragmentManager.beginTransaction().replace(R.id.container, new EditProfileFragment()).addToBackStack(null).commit();
+                FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+                if(fragmentManager!=null) {
+                    EditProfileFragment fragment = new EditProfileFragment();
+                    String name = fragment.getClass().getName();
+                    fragmentManager.beginTransaction().replace(R.id.container, fragment).addToBackStack(name).commit();
+                    Log.d(TAG, String.format("prev fragment replaced with %s", fragment.getClass().getName()));
+
+                }
                 break;
         }
         return super.onOptionsItemSelected(item);

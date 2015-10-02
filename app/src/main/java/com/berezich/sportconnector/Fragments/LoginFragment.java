@@ -148,12 +148,15 @@ public class LoginFragment extends Fragment implements EndpointApi.AuthorizePers
     {
         @Override
         public void onClick(View v) {
-            FragmentManager fragmentManager = getFragmentManager();
+            FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
             RegistrationFragment registrationFragment = new RegistrationFragment();
             registrationFragment.setTargetFragment(getFragment(),0);
-            if(fragmentManager!=null)
-                fragmentManager.beginTransaction().replace(R.id.container,registrationFragment)
-                        .addToBackStack(null).commit();
+            if(fragmentManager!=null) {
+                fragmentManager.beginTransaction().replace(R.id.container, registrationFragment)
+                        .addToBackStack(registrationFragment.getClass().getName()).commit();
+                Log.d(TAG, String.format("prev fragment replaced with %s", registrationFragment.getClass().getName()));
+
+            }
         }
     }
 
@@ -209,7 +212,7 @@ public class LoginFragment extends Fragment implements EndpointApi.AuthorizePers
         Log.e(TAG,"request error: "+ErrorVisualizer.getDebugMsgOfRespException(error));
         dialog = AlertDialogFragment.newInstance(dialogMsg, false);
         dialog.setTargetFragment(this, 0);
-        FragmentManager ft = getFragmentManager();
+        FragmentManager ft = getActivity().getSupportFragmentManager();
         if(ft!=null)
             dialog.show(ft, "");
 
@@ -235,14 +238,13 @@ public class LoginFragment extends Fragment implements EndpointApi.AuthorizePers
 
     @Override
     public void onCreateAccount(String msgResult) {
-        FragmentManager fragmentManager = getFragmentManager();
+        FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
         if(fragmentManager!=null)
         {
             fragmentManager.popBackStack();
             dialog = AlertDialogFragment.newInstance("",msgResult, false, false);
             dialog.setTargetFragment(this, 0);
-            FragmentManager ft = getFragmentManager();
-            dialog.show(getFragmentManager(), "");
+            dialog.show(fragmentManager, "");
         }
     }
 

@@ -16,6 +16,8 @@ public class SpotsData {
     private static HashMap<Long, Spot> _allSpots = new HashMap<Long, Spot>();
 
     public static HashMap<Long, Spot> get_allSpots() {
+        if(_allSpots.isEmpty())
+            loadSpotsFromCache();
         return _allSpots;
     }
 

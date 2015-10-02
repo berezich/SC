@@ -24,6 +24,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 
+import com.berezich.sportconnector.LocalDataManager;
 import com.berezich.sportconnector.MainActivity;
 import com.berezich.sportconnector.Fragments.MainFragment.Filters;
 import com.berezich.sportconnector.R;
@@ -61,6 +62,11 @@ public class GoogleMapFragment extends Fragment{
     private boolean isFavorite=false;
     private FiltersX curFilter;
 
+    private final String IS_COURTS = "isCourts_key";
+    private final String IS_COACHES = "isCoaches_key";
+    private final String IS_PARTNERS = "isPartners_key";
+    private final String IS_FAVORITE = "isFavorite_key";
+
     public static OnActionListenerGMapFragment listener;
 
     //список tiles уже отисованых на карте при данном масштабе
@@ -69,10 +75,9 @@ public class GoogleMapFragment extends Fragment{
     //private HashMap<String,Tile> curTiles = new HashMap<String,Tile>();
 
 
-    public GoogleMapFragment setArgs(int sectionNumber, Filters filter) {
+    public GoogleMapFragment setArgs(Filters filter) {
 
         Bundle args = new Bundle();
-        args.putInt(ARG_SECTION_NUMBER, sectionNumber);
         this.setArguments(args);
         if(filter == Filters.COUCH)
             isCoaches = true;
@@ -92,6 +97,7 @@ public class GoogleMapFragment extends Fragment{
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+        LocalDataManager.init(getActivity());
     }
 
     public GoogleMapFragment() {
@@ -127,7 +133,7 @@ public class GoogleMapFragment extends Fragment{
         map.getUiSettings().setZoomControlsEnabled(true);
         map.setMyLocationEnabled(true);
         Clustering.initClusterManager(this.getActivity().getApplicationContext(), map, this);
-        Clustering.addAllSpots(SpotsData.get_allSpots(), curFilter());
+
         map.setOnCameraChangeListener(Clustering.clusterManager);
         map.setInfoWindowAdapter(new Clustering.CustomInfoWindow());
         map.setOnMarkerClickListener(Clustering.clusterManager);
@@ -178,15 +184,30 @@ public class GoogleMapFragment extends Fragment{
         Log.d(TAG, "GoogleMapFragment on onResume");
         mapView.onResume();
         super.onResume();
-        ImageButton btn;
-        btn = (ImageButton) rootView.findViewById(R.id.map_btn_coach);
-        btn.setPressed(isCoaches);
-        btn = (ImageButton) rootView.findViewById(R.id.map_btn_court);
-        btn.setPressed(isCourts);
-        btn = (ImageButton) rootView.findViewById(R.id.map_btn_partner);
-        btn.setPressed(isPartners);
-        btn = (ImageButton) rootView.findViewById(R.id.map_btn_star);
-        btn.setPressed(isFavorite);
+        updateButtonsStates();
+        Clustering.addAllSpots(SpotsData.get_allSpots(), curFilter());
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBoolean(IS_COACHES, isCoaches);
+        outState.putBoolean(IS_PARTNERS, isPartners);
+        outState.putBoolean(IS_COURTS, isCourts);
+        outState.putBoolean(IS_FAVORITE,isFavorite);
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        if(savedInstanceState!=null){
+            isFavorite = savedInstanceState.getBoolean(IS_FAVORITE);
+            isCoaches = savedInstanceState.getBoolean(IS_COACHES);
+            isPartners = savedInstanceState.getBoolean(IS_PARTNERS);
+            isCourts = savedInstanceState.getBoolean(IS_COURTS);
+            setCurFilter();
+        }
+
     }
 
     @Override
@@ -287,7 +308,17 @@ public class GoogleMapFragment extends Fragment{
             }
         }
     }
-
+    private void updateButtonsStates(){
+        ImageButton btn;
+        btn = (ImageButton) rootView.findViewById(R.id.map_btn_coach);
+        btn.setPressed(isCoaches);
+        btn = (ImageButton) rootView.findViewById(R.id.map_btn_court);
+        btn.setPressed(isCourts);
+        btn = (ImageButton) rootView.findViewById(R.id.map_btn_partner);
+        btn.setPressed(isPartners);
+        btn = (ImageButton) rootView.findViewById(R.id.map_btn_star);
+        btn.setPressed(isFavorite);
+    }
     private void setCurFilter()
     {
         if(isCourts)

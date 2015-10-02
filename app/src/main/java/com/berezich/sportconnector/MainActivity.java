@@ -1,8 +1,10 @@
 package com.berezich.sportconnector;
 
 import android.app.Activity;
+import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v4.app.FragmentManager;
 import android.os.Bundle;
@@ -26,6 +28,8 @@ import com.berezich.sportconnector.Fragments.MainFragment.Filters;
 import com.berezich.sportconnector.PersonProfile.PersonProfileFragment;
 import com.berezich.sportconnector.SpotInfo.SpotInfoFragment;
 
+import java.util.List;
+
 
 public class MainActivity extends AppCompatActivity
         implements NavigationDrawerFragment.NavigationDrawerCallbacks,
@@ -43,11 +47,14 @@ public class MainActivity extends AppCompatActivity
      */
     private CharSequence mTitle;
     private static final String TAG = "MyLog_MainActivity";
-
+    private final String fragmentI = "fragment";
+    private boolean isRecover = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (savedInstanceState != null)
+            isRecover = true;
         setContentView(R.layout.activity_main);
 
         Log.d(TAG, "------SpotConnector started-------");
@@ -58,8 +65,71 @@ public class MainActivity extends AppCompatActivity
             drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
 
         FragmentManager fragmentManager = getSupportFragmentManager();
-        fragmentManager.beginTransaction().replace(R.id.container, new LoginFragment().setArgs(-1)).commit();
+        if (savedInstanceState != null) {
+            mNavigationDrawerFragment = (NavigationDrawerFragment)
+                    getSupportFragmentManager().findFragmentById(R.id.navigation_drawer);
+            // Set up the drawer.
+            mNavigationDrawerFragment.setUp(
+                    R.id.navigation_drawer,
+                    (DrawerLayout) findViewById(R.id.drawer_layout));
+            mNavigationDrawerFragment.setMenuVisibility(true);
+            mNavigationDrawerFragment.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
+            //Restore the fragment's instance
+            /*Fragment storeFragment;
+            android.support.v4.app.FragmentTransaction transaction = fragmentManager.beginTransaction();
+            int cnt=0;
+            boolean isFirst=true;
+            while (true){
+                storeFragment = fragmentManager.getFragment(savedInstanceState, fragmentI+cnt);
+                if(storeFragment!=null) {
+                    if (!storeFragment.getClass().getName().equals(NavigationDrawerFragment.class.getName())) {
+                        if(isFirst) {
+                            transaction.replace(R.id.container, storeFragment);
+                            //fragmentManager.beginTransaction().replace(R.id.container, storeFragment).commit();
+                            Log.d(TAG,String.format("prev fragment replaced with %s",storeFragment.getClass().getName()));
+                            isFirst=false;
+                        }
+                        else {
+                            transaction.replace(R.id.container, storeFragment).addToBackStack(storeFragment.getClass().getName());
+                            //fragmentManager.beginTransaction().replace(R.id.container, storeFragment).addToBackStack(storeFragment.getClass().getName()).commit();
+                            Log.d(TAG, String.format("prev fragment replaced with %s", storeFragment.getClass().getName()));
+
+                        }
+
+                    }
+                }
+                else{
+                    transaction.commit();
+                    break;
+                }
+                cnt++;
+            }*/
+
+        }
+        else {
+            fragmentManager.beginTransaction().replace(R.id.container, new LoginFragment().setArgs(-1)).commit();
+            Log.d(TAG, String.format("prev fragment replaced with %s", LoginFragment.class.getName()));
+
+        }
     }
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        /*FragmentManager fragmentManager = getSupportFragmentManager();
+        if(fragmentManager!=null) {
+            List<Fragment> fragments = fragmentManager.getFragments();
+            Fragment fragment=null;
+            for (int i=0; i<fragments.size(); i++) {
+                fragment = fragments.get(i);
+                if(fragment!=null)
+                    fragmentManager.putFragment(outState, fragmentI+i, fragment);
+                else
+                    break;
+            }
+
+        }*/
+    }
+
     @Override
     protected void onResume()
     {
@@ -69,7 +139,17 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onNavigationDrawerItemSelected(int position) {
         // update the main content by replacing fragments
+        /*if(isRecover)
+        {
+            isRecover=false;
+            return;
+        }*/
         FragmentManager fragmentManager = getSupportFragmentManager();
+        List<Fragment> fragments = fragmentManager.getFragments();
+        if(isRecover){
+            isRecover=false;
+            return;
+        }
         for(int i = 0; i < fragmentManager.getBackStackEntryCount(); ++i) {
             fragmentManager.popBackStack();
         }
@@ -78,16 +158,21 @@ public class MainActivity extends AppCompatActivity
                 fragmentManager.beginTransaction()
                         .replace(R.id.container, new MainFragment().setArgs(position))
                     .commit();
+                Log.d(TAG, String.format("prev fragment replaced with %s", MainFragment.class.getName()));
+
                 break;
             case 1:
                 fragmentManager.beginTransaction()
                         .replace(R.id.container, new PersonProfileFragment().setArgs(position))
                         .commit();
+                Log.d(TAG, String.format("prev fragment replaced with %s", PersonProfileFragment.class.getName()));
                 break;
             default:
                 fragmentManager.beginTransaction()
                         .replace(R.id.container, new LoginFragment().setArgs(position))
                         .commit();
+                Log.d(TAG, String.format("prev fragment replaced with %s", LoginFragment.class.getName()));
+
         }
 
     }
@@ -95,7 +180,10 @@ public class MainActivity extends AppCompatActivity
     public void onBtnClickMF(Filters filter, int sectionNumber)
     {
         FragmentManager fragmentManager = getSupportFragmentManager();
-        fragmentManager.beginTransaction().replace(R.id.container, new GoogleMapFragment().setArgs(sectionNumber, filter)).addToBackStack("tr1").commit();
+        GoogleMapFragment fragment = new GoogleMapFragment().setArgs(filter);
+        fragmentManager.beginTransaction().replace(R.id.container, fragment).addToBackStack(fragment.getClass().getName()).commit();
+        Log.d(TAG, String.format("prev fragment replaced with %s", fragment.getClass().getName()));
+
     }
 
     @Override
@@ -196,7 +284,10 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onInfoWindowClickGMF(Long spotId) {
         FragmentManager fragmentManager = getSupportFragmentManager();
-        fragmentManager.beginTransaction().replace(R.id.container, SpotInfoFragment.newInstance(spotId)).addToBackStack("tr2").commit();
+        SpotInfoFragment fragment = SpotInfoFragment.newInstance(spotId);
+        fragmentManager.beginTransaction().replace(R.id.container, fragment).addToBackStack(fragment.getClass().getName()).commit();
+        Log.d(TAG, String.format("prev fragment replaced with %s", fragment.getClass().getName()));
+
 
     }
     public void setupUI(View view) {

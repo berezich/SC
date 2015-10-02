@@ -152,9 +152,9 @@ public class RegistrationFragment extends Fragment implements EndpointApi.Regist
 
         dialog = AlertDialogFragment.newInstance(dialogMsg, false);
         dialog.setTargetFragment(this, 0);
-        FragmentManager ft = getFragmentManager();
+        FragmentManager ft = getActivity().getSupportFragmentManager();
         if(ft!=null)
-            dialog.show(getFragmentManager(), "");
+            dialog.show(ft, "");
     }
 
     @Override
