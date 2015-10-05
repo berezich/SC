@@ -69,8 +69,10 @@ public class PersonProfileFragment extends Fragment {
         setHasOptionsMenu(true);
         LocalDataManager.init(getActivity());
         Person myPersonInfo = LocalDataManager.getMyPersonInfo();
-        if(myPersonInfo!=null)
-            new FileManager.RemoveOldPersonCache().execute(new Pair<>(getActivity().getBaseContext(),myPersonInfo));
+        if(myPersonInfo!=null && savedInstanceState==null) {
+            Log.d(TAG,"run RemoveOldPersonCache");
+            new FileManager.RemoveOldPersonCache().execute(new Pair<>(getActivity().getBaseContext(), myPersonInfo));
+        }
     }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,

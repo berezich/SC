@@ -62,6 +62,8 @@ public class UsefulFunctions {
     public static String getDigest(String stringToEncrypt)
     {
         MessageDigest messageDigest;
+        if(stringToEncrypt==null)
+            return "";
         try {
             messageDigest = MessageDigest.getInstance("MD5");
         } catch (NoSuchAlgorithmException e) {

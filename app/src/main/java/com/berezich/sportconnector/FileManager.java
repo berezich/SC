@@ -100,8 +100,10 @@ public class FileManager {
         /**
          * @return compressed with jpeg and COMPRESS_QUALITY picture in byte[]
          */
-        public byte[] getCompressedPic() {
+        public byte[] getCompressedPic() throws FileNotFoundException{
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            if(bitmap==null)
+                bitmap = decodeFile(new File(path));
             bitmap.compress(Bitmap.CompressFormat.JPEG, COMPRESS_QUALITY, bos);
             return bos.toByteArray();
         }
@@ -355,6 +357,11 @@ public class FileManager {
         }
     }
 
+    public static boolean isExistsAlbumStorageDir(String LOG_TAG, Context context, String albumName) {
+        File file = new File(context.getExternalFilesDir(
+                Environment.DIRECTORY_PICTURES), albumName);
+        return (file==null)? false : file.exists();
+    }
     public static File getAlbumStorageDir(String LOG_TAG, Context context, String albumName) {
         // Get the directory for the user's public pictures directory.
         File file = new File(context.getExternalFilesDir(
@@ -632,28 +639,30 @@ public class FileManager {
             Log.e(TAG, "ExternalStorage not writable");
             return ;
         }
-        File file = FileManager.getAlbumStorageDir(TAG, context, folder);
-        if(file!=null)
-        {
-            if(usefulFileNameLst==null || usefulFileNameLst.size()==0) {
-                removeDirectory(file);
-                Log.d(TAG, String.format("Folder %s removed",file.getPath()));
-                return;
-            }
-            else {
-                File[] allFiles = file.listFiles();
-                String fileName="";
-                for (File item : allFiles) {
-                    if(item.isDirectory()) {
-                        removeDirectory(item);
-                        continue;
-                    }
-                    fileName = item.getName();
-                    if (!usefulFileNameLst.contains(fileName)) {
-                        if(item.delete())
-                            Log.d(TAG, "old cache file filePath = " + item.getPath() + " removed");
-                        else
-                            Log.e(TAG, "old cache file filePath = " + item.getPath() + "not removed");
+        if(isExistsAlbumStorageDir(TAG,context,folder)){
+            File file = FileManager.getAlbumStorageDir(TAG, context, folder);
+            if(file!=null)
+            {
+                if(usefulFileNameLst==null || usefulFileNameLst.isEmpty()) {
+                    removeDirectory(file);
+                    Log.d(TAG, String.format("Folder %s removed",file.getPath()));
+                    return;
+                }
+                else {
+                    File[] allFiles = file.listFiles();
+                    String fileName="";
+                    for (File item : allFiles) {
+                        if(item.isDirectory()) {
+                            removeDirectory(item);
+                            continue;
+                        }
+                        fileName = item.getName();
+                        if (!usefulFileNameLst.contains(fileName)) {
+                            if(item.delete())
+                                Log.d(TAG, "old cache file filePath = " + item.getPath() + " removed");
+                            else
+                                Log.e(TAG, "old cache file filePath = " + item.getPath() + "not removed");
+                        }
                     }
                 }
             }

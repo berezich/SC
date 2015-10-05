@@ -127,9 +127,9 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
             }
             try {
                 String picInfoStr = savedInstanceState.getString(STATE_PICINFO);
-                picInfo = gson.fromJson(picInfoStr, FileManager.PicInfo.class);
                 if(picInfoStr!=null && !picInfoStr.equals("")) {
-                    picInfo = gsonFactory.fromString(picInfoStr, FileManager.PicInfo.class);
+                    picInfo = gson.fromJson(picInfoStr, FileManager.PicInfo.class);
+                    //picInfo = gsonFactory.fromString(picInfoStr, FileManager.PicInfo.class);
                     Log.d(TAG, String.format("picInfo got out of instanceState"));
                 }
                 else {
@@ -176,6 +176,10 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
             if(tempMyPerson ==null) {
                 tempMyPerson = myPersonInfo.clone();
                 Log.d(TAG,"tempMyPerson cloned myPersonInfo");
+            }else{
+
+                if(tempMyPerson.getPhoto()!=null)
+                    Log.d(TAG,String.format("temp userPic = %s",UsefulFunctions.getDigest(tempMyPerson.getPhoto().getBlobKey())));
             }
             if((imageView = (ImageView) rootView.findViewById(R.id.editProfile_img_photo))!=null) {
                 Picture photoInfo = tempMyPerson.getPhoto();
