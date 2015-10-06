@@ -163,7 +163,7 @@ public class MainActivity extends AppCompatActivity
                 break;
             case 1:
                 fragmentManager.beginTransaction()
-                        .replace(R.id.container, new PersonProfileFragment().setArgs(position))
+                        .replace(R.id.container, new PersonProfileFragment().setArgs(position,true,null))
                         .commit();
                 Log.d(TAG, String.format("prev fragment replaced with %s", PersonProfileFragment.class.getName()));
                 break;

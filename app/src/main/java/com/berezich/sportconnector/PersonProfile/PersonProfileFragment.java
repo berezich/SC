@@ -18,12 +18,12 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.berezich.sportconnector.FileManager;
-import com.berezich.sportconnector.Fragments.LoginFragment;
 import com.berezich.sportconnector.GoogleMap.SpotsData;
 import com.berezich.sportconnector.ImageViewer.ImgViewPagerActivity;
 import com.berezich.sportconnector.LocalDataManager;
 import com.berezich.sportconnector.MainActivity;
 import com.berezich.sportconnector.R;
+import com.berezich.sportconnector.SpotInfo.SpotInfoFragment;
 import com.berezich.sportconnector.UsefulFunctions;
 import com.berezich.sportconnector.backend.sportConnectorApi.model.Person;
 import com.berezich.sportconnector.backend.sportConnectorApi.model.Picture;
@@ -40,20 +40,29 @@ import java.util.List;
  */
 public class PersonProfileFragment extends Fragment {
 
-    private static final String ARG_SECTION_NUMBER = "section_number";
-    private final String TAG = "MyLog_profileFragment";
-    //FileManager.PicInfo picInfo;
-    int _sectionNumber;
-    View rootView;
 
+    private static final String ARG_SECTION_NUMBER = "sectionNumber";
+    private static final String ARG_IS_MYPROFILE = "isMyProfile";
+    private static final String ARG_PERSON = "personId";
+    private final String TAG = "MyLog_profileFragment";
+    View rootView;
+    boolean isMyProfile = false;
+    Person person = null;
+    private static GsonFactory gsonFactory = new GsonFactory();
 
     /**
      * Returns a new instance of this fragment for the given section
      * number.
      */
-    public PersonProfileFragment setArgs(int sectionNumber) {
-        _sectionNumber = sectionNumber;
+    public PersonProfileFragment setArgs(int sectionNumber,boolean isMyProfile, Person person) {
         Bundle args = new Bundle();
+        args.putBoolean(ARG_IS_MYPROFILE, isMyProfile);
+        try {
+            args.putString(ARG_PERSON, gsonFactory.toString(person));
+        } catch (Exception e) {
+            Log.e(TAG,"exception occurred in personProfile setArgs");
+            e.printStackTrace();
+        }
         args.putInt(ARG_SECTION_NUMBER, sectionNumber);
         this.setArguments(args);
         return this;
@@ -67,11 +76,36 @@ public class PersonProfileFragment extends Fragment {
     {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+        Bundle args = getArguments();
+        if(args!=null){
+            isMyProfile = args.getBoolean(ARG_IS_MYPROFILE);
+            if(!isMyProfile){
+                String personStr = args.getString(ARG_PERSON);
+                try {
+                    person = gsonFactory.fromString(personStr,Person.class);
+                } catch (Exception e) {
+                    Log.e(TAG,"exception occurred in personProfile onCreate");
+                    e.printStackTrace();
+                }
+            }
+        }
+        if(savedInstanceState!=null){
+            isMyProfile = savedInstanceState.getBoolean(ARG_IS_MYPROFILE);
+            String personStr = savedInstanceState.getString(ARG_PERSON);
+            try {
+                person = gsonFactory.fromString(personStr,Person.class);
+            } catch (Exception e) {
+                Log.e(TAG,"exception occurred in personProfile onCreate");
+                e.printStackTrace();
+            }
+        }
         LocalDataManager.init(getActivity());
-        Person myPersonInfo = LocalDataManager.getMyPersonInfo();
-        if(myPersonInfo!=null && savedInstanceState==null) {
-            Log.d(TAG,"run RemoveOldPersonCache");
-            new FileManager.RemoveOldPersonCache().execute(new Pair<>(getActivity().getBaseContext(), myPersonInfo));
+        if(isMyProfile)
+            person =LocalDataManager.getMyPersonInfo();
+
+        if (person != null && savedInstanceState==null) {
+            Log.d(TAG, "run RemoveOldPersonCache");
+            new FileManager.RemoveOldPersonCache().execute(new Pair<>(getActivity().getBaseContext(), person));
         }
     }
     @Override
@@ -199,9 +233,14 @@ public class PersonProfileFragment extends Fragment {
                             txtView = (TextView) linearLayout.getChildAt(0);
                             linearLayout.removeAllViews();
                             linearLayout.addView(txtView);
-                            for (int i = 0; i < spotItemLstAdapter.getCount(); i++)
-                                linearLayout.addView(spotItemLstAdapter.getView(i, null, null));
+                            for (int i = 0; i < spotItemLstAdapter.getCount(); i++) {
+
+                                View view = spotItemLstAdapter.getView(i, null, null);
+                                view.setOnClickListener(new OnSpotClick());
+                                linearLayout.addView(view);
+                            }
                             isVisibleSpotLst = true;
+
                         }
                     }
 
@@ -242,6 +281,20 @@ public class PersonProfileFragment extends Fragment {
     }
     */
 
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBoolean(ARG_IS_MYPROFILE,isMyProfile);
+        if(!isMyProfile)
+            try {
+                outState.putString(ARG_PERSON, gsonFactory.toString(person));
+            } catch (IOException e) {
+                Log.e(TAG,"exception occurred in personProfile onSaveInstanceState");
+                e.printStackTrace();
+            }
+
+    }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
@@ -289,7 +342,25 @@ public class PersonProfileFragment extends Fragment {
             }
         }
     }
+    private class OnSpotClick implements View.OnClickListener{
+        @Override
+        public void onClick(View v) {
+            try {
+                int position = ((LinearLayout) v.getParent()).indexOfChild(v);
+                Person myPersonInfo = LocalDataManager.getMyPersonInfo();
+                Long spotId = myPersonInfo.getFavoriteSpotIdLst().get(position - 1);
+                FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+                SpotInfoFragment fragment = SpotInfoFragment.newInstance(spotId);
+                fragmentManager.beginTransaction().replace(R.id.container, fragment).addToBackStack(fragment.getClass().getName()).commit();
+                Log.d(TAG, String.format("prev fragment replaced with %s", fragment.getClass().getName()));
+            }
+            catch (Exception e){
+                Log.e(TAG,String.format("exception occurred while hitting spotItem"));
+                e.printStackTrace();
+            }
+        }
 
+    }
     public String getTAG() {
         return TAG;
     }
