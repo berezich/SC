@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.text.util.Linkify;
@@ -19,6 +20,7 @@ import android.view.MenuInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -34,6 +36,7 @@ import com.berezich.sportconnector.FileManager;
 import com.berezich.sportconnector.GoogleMap.SpotsData;
 import com.berezich.sportconnector.ImageViewer.ImgViewPagerActivity;
 import com.berezich.sportconnector.LocalDataManager;
+import com.berezich.sportconnector.PersonProfile.PersonProfileFragment;
 import com.berezich.sportconnector.R;
 import com.berezich.sportconnector.UsefulFunctions;
 import com.berezich.sportconnector.backend.sportConnectorApi.model.Person;
@@ -398,10 +401,12 @@ public class SpotInfoFragment extends Fragment implements EndpointApi.GetListPer
             coachesAdapter = new ProfileItemLstAdapter(getActivity().getApplicationContext(),
                     new ArrayList<Person>(coachLst));
             lstView.setAdapter(coachesAdapter);
+            lstView.setOnItemClickListener(new OnPersonClick(coachLst));
             lstView = (ListView) spotInfoView.findViewById(R.id.spotInfo_list_tab_partners);
             partnersAdapter = new ProfileItemLstAdapter(getActivity().getApplicationContext(),
                     new ArrayList<Person>(partnerLst));
             lstView.setAdapter(partnersAdapter);
+            lstView.setOnItemClickListener(new OnPersonClick(partnerLst));
 
             if(partnerLst.size()>0 || coachLst.size()>0)
                 setVisible(View.VISIBLE,View.GONE,View.GONE);
@@ -586,5 +591,28 @@ public class SpotInfoFragment extends Fragment implements EndpointApi.GetListPer
                 return itemView;
             }
         return null;
+    }
+    private class OnPersonClick implements AdapterView.OnItemClickListener{
+        List<Person> persons;
+        public OnPersonClick(List<Person> persons) {
+            this.persons = persons;
+        }
+
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            try {
+                Person person = persons.get(position);
+                FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+                fragmentManager.beginTransaction()
+                        .replace(R.id.container, new PersonProfileFragment().setArgs(position,false,person))
+                        .addToBackStack(PersonProfileFragment.class.getName())
+                        .commit();
+                Log.d(TAG, String.format("prev fragment replaced with %s", PersonProfileFragment.class.getName()));
+            }catch (Exception e){
+                Log.e(TAG,"exception occurred while hitting personItem in spotInfo");
+                e.printStackTrace();
+            }
+
+        }
     }
 }

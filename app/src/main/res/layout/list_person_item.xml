@@ -2,14 +2,18 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="horizontal" android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-    android:weightSum="1">
+    android:weightSum="1"
+    android:focusable="true"
+    android:clickable="true">
 
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/lstProfileItem_img_photo"
         android:src="@drawable/lst_profile_icon"
-        android:background="#ffbcbcbc" />
+        android:background="#ffbcbcbc"
+        android:focusable="false"
+        android:clickable="false" />
 
     <LinearLayout
         android:orientation="vertical"
@@ -18,7 +22,9 @@
         android:layout_weight="1"
         android:weightSum="2"
         android:layout_marginLeft="@dimen/personItem_ltext_left_offset"
-        android:layout_marginRight="@dimen/personItem_rtext_right_offset">
+        android:layout_marginRight="@dimen/personItem_rtext_right_offset"
+        android:focusable="false"
+        android:clickable="false">
 
         <TextView
             android:layout_width="fill_parent"
@@ -28,14 +34,18 @@
             android:layout_marginTop="@dimen/personItem_text_top_offset"
             android:layout_weight="1"
             android:textColor="@color/text_gray"
-            android:textSize="17dp" />
+            android:textSize="17dp"
+            android:focusable="false"
+            android:clickable="false" />
 
         <LinearLayout
             android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:weightSum="2"
-            android:layout_weight="1">
+            android:layout_weight="1"
+            android:focusable="false"
+            android:clickable="false">
 
             <TextView
                 android:layout_width="fill_parent"
@@ -45,7 +55,9 @@
                 android:layout_marginTop="@dimen/personItem_text_top_offset"
                 android:layout_weight="1"
                 android:textColor="@color/text_gray"
-                android:layout_marginRight="@dimen/personItem_ltext_right_offset" />
+                android:layout_marginRight="@dimen/personItem_ltext_right_offset"
+                android:focusable="false"
+                android:clickable="false" />
 
             <TextView
                 android:layout_width="fill_parent"
@@ -55,7 +67,9 @@
                 android:layout_marginTop="@dimen/personItem_text_top_offset"
                 android:layout_weight="1"
                 android:textColor="@color/text_gray"
-                android:gravity="right" />
+                android:gravity="right"
+                android:focusable="false"
+                android:clickable="false" />
         </LinearLayout>
 
     </LinearLayout>

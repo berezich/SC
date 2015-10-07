@@ -147,17 +147,20 @@
                     <FrameLayout
                         android:id="@android:id/tabcontent"
                         android:layout_width="fill_parent"
-                        android:layout_height="fill_parent">
+                        android:layout_height="fill_parent"
+                        android:clickable="true">
 
                         <ListView
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:id="@+id/spotInfo_list_tab_partners"/>
+                            android:id="@+id/spotInfo_list_tab_partners"
+                            android:clickable="true" />
 
                         <ListView
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:id="@+id/spotInfo_list_tab_coaches" />
+                            android:id="@+id/spotInfo_list_tab_coaches"
+                            android:clickable="true" />
 
                     </FrameLayout>
 
