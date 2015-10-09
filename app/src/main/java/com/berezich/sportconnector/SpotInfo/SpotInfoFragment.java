@@ -600,7 +600,9 @@ public class SpotInfoFragment extends Fragment implements EndpointApi.GetListPer
 
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            Toast.makeText(getContext(),String.format("person clicked pos = %d",position),Toast.LENGTH_SHORT).show();
             try {
+
                 Person person = persons.get(position);
                 FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
                 fragmentManager.beginTransaction()
