@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="horizontal" android:layout_width="fill_parent"
+    android:orientation="horizontal" android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:weightSum="1">
 
@@ -13,16 +13,16 @@
 
     <LinearLayout
         android:orientation="vertical"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:layout_weight="1"
         android:weightSum="2"
         android:layout_marginLeft="@dimen/personItem_ltext_left_offset"
         android:layout_marginRight="@dimen/personItem_rtext_right_offset">
 
         <TextView
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:text="Name"
             android:id="@+id/lstProfileItem_name"
             android:layout_marginTop="@dimen/personItem_text_top_offset"
@@ -38,8 +38,8 @@
             android:layout_weight="1">
 
             <TextView
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 android:text="Description1"
                 android:id="@+id/lstProfileItem_desc1"
                 android:layout_marginTop="@dimen/personItem_text_top_offset"
@@ -48,8 +48,8 @@
                 android:layout_marginRight="@dimen/personItem_ltext_right_offset" />
 
             <TextView
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 android:text="Description2"
                 android:id="@+id/lstProfileItem_desc2"
                 android:layout_marginTop="@dimen/personItem_text_top_offset"

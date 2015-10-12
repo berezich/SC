@@ -1,7 +1,6 @@
 package com.berezich.sportconnector.Fragments;
 
 import android.support.v4.app.FragmentManager;
-import android.support.v7.app.ActionBarActivity;
 import android.app.Activity;
 import android.support.v7.app.ActionBar;
 import android.support.v4.app.Fragment;
@@ -23,7 +22,6 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import com.berezich.sportconnector.MainActivity;
 import com.berezich.sportconnector.R;
@@ -112,7 +110,7 @@ public class NavigationDrawerFragment extends Fragment {
                 android.R.id.text1,
                 new String[]{
                         getString(R.string.mainSearch_fragmentTitle),
-                        getString(R.string.personprofile_fragmentTitle),
+                        getString(R.string.personprofile_myProfile_fragmentTitle),
                         /*getString(R.string.frame_msg_title),
                         getString(R.string.frame_friends_title),
                         getString(R.string.frame_photo_title),*/

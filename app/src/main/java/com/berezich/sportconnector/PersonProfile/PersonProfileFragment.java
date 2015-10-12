@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.util.Pair;
 import android.view.LayoutInflater;
@@ -91,12 +93,14 @@ public class PersonProfileFragment extends Fragment {
         }
         if(savedInstanceState!=null){
             isMyProfile = savedInstanceState.getBoolean(ARG_IS_MYPROFILE);
-            String personStr = savedInstanceState.getString(ARG_PERSON);
-            try {
-                person = gsonFactory.fromString(personStr,Person.class);
-            } catch (Exception e) {
-                Log.e(TAG,"exception occurred in personProfile onCreate");
-                e.printStackTrace();
+            if(!isMyProfile) {
+                String personStr = savedInstanceState.getString(ARG_PERSON);
+                try {
+                    person = gsonFactory.fromString(personStr, Person.class);
+                } catch (Exception e) {
+                    Log.e(TAG, "exception occurred in personProfile onCreate");
+                    e.printStackTrace();
+                }
             }
         }
         LocalDataManager.init(getActivity());
@@ -120,7 +124,8 @@ public class PersonProfileFragment extends Fragment {
     public void onAttach(Activity activity) {
         super.onAttach(activity);
 
-        ((MainActivity) activity).onSectionAttached(getArguments().getInt(ARG_SECTION_NUMBER));
+        if(isMyProfile)
+            ((MainActivity) activity).onSectionAttached(getArguments().getInt(ARG_SECTION_NUMBER));
     }
 
     @Override
@@ -135,40 +140,38 @@ public class PersonProfileFragment extends Fragment {
         super.onResume();
         TextView txtView;
         ImageView imageView;
-        getActivity().setTitle(R.string.personprofile_fragmentTitle);
-        Person myPersonInfo = LocalDataManager.getMyPersonInfo();
-        if(myPersonInfo!=null && rootView!=null)
+        if(person!=null && rootView!=null)
         {
             if((imageView = (ImageView) rootView.findViewById(R.id.profile_img_photo))!=null) {
                 imageView.setOnClickListener(new OnImageClick());
-                Picture photoInfo = myPersonInfo.getPhoto();
-                FileManager.providePhotoForImgView(this.getActivity().getBaseContext(),imageView,
-                        photoInfo,FileManager.PERSON_CACHE_DIR+"/"+ myPersonInfo.getId().toString());
+                Picture photoInfo = person.getPhoto();
+                FileManager.providePhotoForImgView(this.getActivity().getBaseContext(), imageView,
+                        photoInfo, FileManager.PERSON_CACHE_DIR + "/" + person.getId().toString());
             }
             if((txtView = (TextView) rootView.findViewById(R.id.profile_txt_name))!=null) {
-                String name = myPersonInfo.getName(), surname = myPersonInfo.getSurname();
+                String name = person.getName(), surname = person.getSurname();
                 txtView.setText( ((name!=null && !name.equals("")) ? name :"") + ((surname!=null && !surname.equals("")) ? " "+surname :""));
             }
             if((txtView = (TextView) rootView.findViewById(R.id.profile_txt_typeAge))!=null) {
-                String str = myPersonInfo.getType().equals("PARTNER")? getString(R.string.personprofile_type_partner):getString(R.string.personprofile_type_coach);
-                int age = UsefulFunctions.calcPersonAge(myPersonInfo.getBirthday());
+                String str = person.getType().equals("PARTNER")? getString(R.string.personprofile_type_partner):getString(R.string.personprofile_type_coach);
+                int age = UsefulFunctions.calcPersonAge(person.getBirthday());
                 if(age>=0)
                     str += ", "+age ;
                 txtView.setText(str);
             }
             if((txtView = (TextView) rootView.findViewById(R.id.profile_txt_raiting))!=null) {
                 String ratings = getString(R.string.ratingInfo_ratingValLst);
-                if(myPersonInfo.getRating()<1.0 && ratings!=null) {
+                if(person.getRating()<1.0 && ratings!=null) {
                     String ratingArr[] = ratings.split(",");
                     if(ratingArr.length>0)
                     txtView.setText(getString(R.string.personprofile_rating) + " " + ratingArr[0]);
                 }
                 else
-                    txtView.setText(getString(R.string.personprofile_rating) + " " + myPersonInfo.getRating());
+                    txtView.setText(getString(R.string.personprofile_rating) + " " + person.getRating());
             }
 
             //contacts block
-            String email = myPersonInfo.getEmail(),phone = myPersonInfo.getPhone();
+            String email = person.getEmail(),phone = person.getPhone();
             LinearLayout linearLayout = (LinearLayout) rootView.findViewById(R.id.profile_contactsBlock);
             LinearLayout propertyLstLayout = (LinearLayout) rootView.findViewById(R.id.profile_linearlayout_propertyLst);
             LinearLayout propertyLayout;
@@ -196,7 +199,7 @@ public class PersonProfileFragment extends Fragment {
             }
 
             //description block
-            String desc = myPersonInfo.getDescription();
+            String desc = person.getDescription();
             linearLayout = (LinearLayout) rootView.findViewById(R.id.profile_descBlock);
             if(linearLayout!=null) {
                 linearLayout.setVisibility(View.GONE);
@@ -211,7 +214,7 @@ public class PersonProfileFragment extends Fragment {
             //favorite spots lst
             boolean isVisibleSpotLst = false;
             if((linearLayout = (LinearLayout) rootView.findViewById(R.id.profile_linearLayout_favoriteSpotLst))!=null) {
-                List<Long> spotLst = myPersonInfo.getFavoriteSpotIdLst();
+                List<Long> spotLst = person.getFavoriteSpotIdLst();
                 if(spotLst!=null && spotLst.size()>0) {
                     Spot spot;
                     HashMap<Long,Spot> hshMapSpot = SpotsData.get_allSpots();
@@ -221,13 +224,6 @@ public class PersonProfileFragment extends Fragment {
                             spots.add(spot);
 
                     if(spots.size()>0) {
-                        /*ListView lstView = (ListView) rootView.findViewById(R.id.profile_lstView_favoriteSpots);
-                        if(lstView!=null) {
-
-                            SpotItemLstAdapter spotItemLstAdapter = new SpotItemLstAdapter(getActivity().getApplicationContext(),spots);
-                            lstView.setAdapter(spotItemLstAdapter);
-                            lstView.setScrollContainer(false);
-                        }*/
                         SpotItemLstAdapter spotItemLstAdapter = new SpotItemLstAdapter(getActivity().getApplicationContext(),spots);
                         if( linearLayout.getChildAt(0) instanceof TextView) {
                             txtView = (TextView) linearLayout.getChildAt(0);
@@ -250,38 +246,6 @@ public class PersonProfileFragment extends Fragment {
         }
     }
 
-
-
-    /*
-    @Override
-    public void onDownloadFileFinish(Bitmap bitmap,String imgId,Exception exception) {
-        if (exception==null) {
-            if(bitmap==null) {
-                Log.e(TAG, "bitmap not loaded from server cause: bitmap == null");
-                Toast.makeText(getActivity().getBaseContext(),getString(R.string.personprofile_reqError),Toast.LENGTH_SHORT).show();
-                return;
-            }
-            Log.d(TAG, "bitmap loaded from server");
-            if(rootView!=null) {
-                ImageView imageView = (ImageView) rootView.findViewById(R.id.profile_img_photo);
-                imageView.setImageBitmap(bitmap);
-                Person myPresonInfo = LocalDataManager.getMyPersonInfo();
-                if(myPresonInfo!=null) {
-                    FileManager.savePicPreviewToCache(TAG, getActivity().getBaseContext(), imgId, myPresonInfo.getId(), bitmap);
-                }
-            }
-        }
-        else {
-            Log.e(TAG,"bitmap not loaded from server");
-            Log.e(TAG, exception.getMessage());
-            exception.printStackTrace();
-            Toast.makeText(getActivity().getBaseContext(),getString(R.string.personprofile_reqError),Toast.LENGTH_SHORT).show();
-            return;
-        }
-    }
-    */
-
-
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
@@ -298,10 +262,16 @@ public class PersonProfileFragment extends Fragment {
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        Log.d(TAG,"onCreateOptionsMenu");
+        Log.d(TAG, "onCreateOptionsMenu");
         menu.clear();
         super.onCreateOptionsMenu(menu, inflater);
-        inflater.inflate(R.menu.fragment_person_profile, menu);
+        ActionBar actionBar =((AppCompatActivity) getActivity()).getSupportActionBar();
+        if(isMyProfile) {
+            inflater.inflate(R.menu.fragment_person_profile, menu);
+            actionBar.setTitle(R.string.personprofile_myProfile_fragmentTitle);
+        }
+        else
+            actionBar.setTitle(R.string.personprofile_profile_fragmentTitle);
     }
 
     @Override
@@ -314,7 +284,6 @@ public class PersonProfileFragment extends Fragment {
                     String name = fragment.getClass().getName();
                     fragmentManager.beginTransaction().replace(R.id.container, fragment).addToBackStack(name).commit();
                     Log.d(TAG, String.format("prev fragment replaced with %s", fragment.getClass().getName()));
-
                 }
                 break;
         }

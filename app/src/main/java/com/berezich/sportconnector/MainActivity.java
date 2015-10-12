@@ -1,7 +1,6 @@
 package com.berezich.sportconnector;
 
 import android.app.Activity;
-import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.support.v4.app.Fragment;
@@ -210,7 +209,7 @@ public class MainActivity extends AppCompatActivity
                 mTitle = getString(R.string.mainSearch_fragmentTitle);
                 break;
             case 1:
-                mTitle = getString(R.string.personprofile_fragmentTitle);
+                mTitle = getString(R.string.personprofile_myProfile_fragmentTitle);
                 break;
             case 2:
                 mTitle = getString(R.string.frame_msg_title);

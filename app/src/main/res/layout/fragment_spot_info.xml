@@ -152,23 +152,13 @@
 
                         <ListView
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:id="@+id/spotInfo_list_tab_partners"
-                            android:clickable="true"
-                            android:focusable="true"
-                            android:descendantFocusability="blocksDescendants"
-                            android:choiceMode="singleChoice"
-                            android:focusableInTouchMode="true" />
+                            android:layout_height="wrap_content"
+                            android:id="@+id/spotInfo_list_tab_partners" />
 
                         <ListView
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:id="@+id/spotInfo_list_tab_coaches"
-                            android:clickable="true"
-                            android:focusable="true"
-                            android:descendantFocusability="blocksDescendants"
-                            android:choiceMode="singleChoice"
-                            android:focusableInTouchMode="true" />
+                            android:layout_height="wrap_content"
+                            android:id="@+id/spotInfo_list_tab_coaches" />
 
                     </FrameLayout>
 

@@ -61,7 +61,8 @@
     <!--gmap_fragment end-->
 
     <!--personProfile_fragment begin-->
-        <string name="personprofile_fragmentTitle">Моя страница</string>
+        <string name="personprofile_myProfile_fragmentTitle">Моя страница</string>
+        <string name="personprofile_profile_fragmentTitle">Старница пользователя</string>
         <string name="personprofile_type_coach">тренер</string>
         <string name="personprofile_type_partner">спарринг-партнер</string>
         <string name="personprofile_rating">Уровень игры</string>

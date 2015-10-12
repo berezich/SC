@@ -397,16 +397,22 @@ public class SpotInfoFragment extends Fragment implements EndpointApi.GetListPer
                 if(person.getType().equals("PARTNER"))
                     partnerLst.add(person);
             }
-            lstView = (ListView) spotInfoView.findViewById(R.id.spotInfo_list_tab_coaches);
-            coachesAdapter = new ProfileItemLstAdapter(getActivity().getApplicationContext(),
-                    new ArrayList<Person>(coachLst));
-            lstView.setAdapter(coachesAdapter);
-            lstView.setOnItemClickListener(new OnPersonClick(coachLst));
-            lstView = (ListView) spotInfoView.findViewById(R.id.spotInfo_list_tab_partners);
-            partnersAdapter = new ProfileItemLstAdapter(getActivity().getApplicationContext(),
-                    new ArrayList<Person>(partnerLst));
-            lstView.setAdapter(partnersAdapter);
-            lstView.setOnItemClickListener(new OnPersonClick(partnerLst));
+            if(coachLst.size()>0) {
+                lstView = (ListView) spotInfoView.findViewById(R.id.spotInfo_list_tab_coaches);
+                lstView.getLayoutParams().height = android.app.ActionBar.LayoutParams.MATCH_PARENT;
+                coachesAdapter = new ProfileItemLstAdapter(getActivity().getApplicationContext(),
+                        new ArrayList<Person>(coachLst));
+                lstView.setAdapter(coachesAdapter);
+                lstView.setOnItemClickListener(new OnPersonClick(coachLst));
+            }
+            if(partnerLst.size()>0) {
+                lstView = (ListView) spotInfoView.findViewById(R.id.spotInfo_list_tab_partners);
+                lstView.getLayoutParams().height = android.app.ActionBar.LayoutParams.MATCH_PARENT;
+                partnersAdapter = new ProfileItemLstAdapter(getActivity().getApplicationContext(),
+                        new ArrayList<Person>(partnerLst));
+                lstView.setAdapter(partnersAdapter);
+                lstView.setOnItemClickListener(new OnPersonClick(partnerLst));
+            }
 
             if(partnerLst.size()>0 || coachLst.size()>0)
                 setVisible(View.VISIBLE,View.GONE,View.GONE);
@@ -600,7 +606,6 @@ public class SpotInfoFragment extends Fragment implements EndpointApi.GetListPer
 
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            Toast.makeText(getContext(),String.format("person clicked pos = %d",position),Toast.LENGTH_SHORT).show();
             try {
 
                 Person person = persons.get(position);
