@@ -30,6 +30,14 @@
         <dimen name="left_right_offset">4dp</dimen>
         <dimen name="personProfile_photoHeight">100dp</dimen>
         <dimen name="personProfile_photoWidth">100dp</dimen>
+        <!--spotInfo list item-->
+            <dimen name="spotItem_leftRightOffset">7dp</dimen>
+            <dimen name="spotItem_topOffset">3dp</dimen>
+            <dimen name="spotItem_bottomOffset">3dp</dimen>
+            <dimen name="spotItem_address_topOffset">0dp</dimen>
+            <dimen name="spotItem_rating_topOffset">0dp</dimen>
+            <dimen name="spotItem_rating_rightOffset">10dp</dimen>
+        <!--spotInfo list item-->
     <!-- fragment_personProfile-->
 
     <!-- fragment_editProfile-->

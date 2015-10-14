@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.ActionBar;
@@ -62,8 +61,8 @@ public class SpotInfoFragment extends Fragment implements EndpointApi.GetListPer
                                                           /*EndpointApi.UpdateSpotAsyncTask.OnAction,*/
                                                           EndpointApi.SetSpotAsFavoriteAsyncTask.OnAction {
     private static final String ARG_SPOT_ID = "spotId";
-    private static final String TAB_PARTNERS = "partners";
-    private static final String TAB_COACHES = "coaches";
+    private static final String PARTNERS = "partners";
+    private static final String COACHES = "coaches";
     private static final String TAG = "MyLog_SpotInfoFragment";
     private boolean isFavoriteChanged = false;
     private boolean isDetailsShown = false;
@@ -71,9 +70,10 @@ public class SpotInfoFragment extends Fragment implements EndpointApi.GetListPer
     private final String SPOT_ID = "spotId";
     private Spot curSpot;
     private View spotInfoView;
-    private ProfileItemLstAdapter partnersAdapter;
-    private ProfileItemLstAdapter coachesAdapter;
+
     private ArrayList<Long> personIdLst;
+    List<Person> coachLst = null;
+    List<Person> partnerLst = null;
 
     private OnFragmentInteractionListener mListener;
 
@@ -225,7 +225,7 @@ public class SpotInfoFragment extends Fragment implements EndpointApi.GetListPer
                 TabHost.TabSpec tabSpec;
                 if (partnersNum > 0) {
                     // создаем вкладку и указываем тег
-                    tabSpec = tabHost.newTabSpec(TAB_PARTNERS);
+                    tabSpec = tabHost.newTabSpec(PARTNERS);
                     // название вкладки
                     tabSpec.setIndicator(getString(R.string.spotinfo_tab1_title));
 
@@ -241,7 +241,7 @@ public class SpotInfoFragment extends Fragment implements EndpointApi.GetListPer
                     tabHost.addTab(tabSpec);
                 }
                 if (coachesNum > 0) {
-                    tabSpec = tabHost.newTabSpec(TAB_COACHES);
+                    tabSpec = tabHost.newTabSpec(COACHES);
                     tabSpec.setIndicator(getString(R.string.spotinfo_tab2_title));
                     /*
                     lstView = (ListView) spotInfoView.findViewById(R.id.spotInfo_list_tab_coaches);
@@ -251,7 +251,7 @@ public class SpotInfoFragment extends Fragment implements EndpointApi.GetListPer
                     tabSpec.setContent(R.id.spotInfo_list_tab_coaches);
                     tabHost.addTab(tabSpec);
                 }
-                //tabHost.setCurrentTabByTag(TAB_PARTNERS);
+                //tabHost.setCurrentTabByTag(PARTNERS);
 
     /*
                 // обработчик переключения вкладок
@@ -272,15 +272,26 @@ public class SpotInfoFragment extends Fragment implements EndpointApi.GetListPer
             }*/
 
 
-            personIdLst = new ArrayList<Long>();
-            if (curSpot.getCoachLst() != null)
-                personIdLst.addAll(SpotsData.getCoachIdsWithoutMe(curSpot));
-            if (curSpot.getPartnerLst() != null)
-                personIdLst.addAll(SpotsData.getPartnerIdsWithoutMe(curSpot));
-            if (personIdLst.size() > 0) {
-                setVisibleProgressBar();
-                new EndpointApi.GetListPersonByIdLstAsyncTask(this).execute(personIdLst);
+            if(coachLst!=null && partnerLst!=null){
+                int personCount=0;
+                personCount+=fillPersonsList(coachLst,COACHES);
+                personCount+=fillPersonsList(partnerLst,PARTNERS);
+                if(personCount>0)
+                    setVisible(View.VISIBLE,View.GONE,View.GONE);
+                else
+                    setVisible(View.GONE,View.GONE,View.VISIBLE);
+            }
+            else {
+                personIdLst = new ArrayList<Long>();
+                if (curSpot.getCoachLst() != null)
+                    personIdLst.addAll(SpotsData.getCoachIdsWithoutMe(curSpot));
+                if (curSpot.getPartnerLst() != null)
+                    personIdLst.addAll(SpotsData.getPartnerIdsWithoutMe(curSpot));
+                if (personIdLst.size() > 0) {
+                    setVisibleProgressBar();
+                    new EndpointApi.GetListPersonByIdLstAsyncTask(this).execute(personIdLst);
 
+                }
             }
         }
         return spotInfoView;
@@ -379,10 +390,8 @@ public class SpotInfoFragment extends Fragment implements EndpointApi.GetListPer
     public void onGetListPersonByIdLstFinish(Pair<List<Person>, Exception> result) {
         List<Person> personLst = result.first;
         Exception error = result.second;
-        ListView lstView;
         Person person;
-        List<Person> coachLst = new ArrayList<>();
-        List<Person> partnerLst = new ArrayList<>();
+
         if(getActivity()==null)
         {
             Log.e(TAG,"current fragment isn't attached to activity");
@@ -390,6 +399,8 @@ public class SpotInfoFragment extends Fragment implements EndpointApi.GetListPer
         }
         if(error == null && personLst!=null)
         {
+            coachLst = new ArrayList<>();
+            partnerLst = new ArrayList<>();
             for (int i = 0; i <personLst.size() ; i++) {
                 person = personLst.get(i);
                 if(person.getType().equals("COACH"))
@@ -397,27 +408,12 @@ public class SpotInfoFragment extends Fragment implements EndpointApi.GetListPer
                 if(person.getType().equals("PARTNER"))
                     partnerLst.add(person);
             }
-            if(coachLst.size()>0) {
-                lstView = (ListView) spotInfoView.findViewById(R.id.spotInfo_list_tab_coaches);
-                lstView.getLayoutParams().height = android.app.ActionBar.LayoutParams.MATCH_PARENT;
-                coachesAdapter = new ProfileItemLstAdapter(getActivity().getApplicationContext(),
-                        new ArrayList<Person>(coachLst));
-                lstView.setAdapter(coachesAdapter);
-                lstView.setOnItemClickListener(new OnPersonClick(coachLst));
-            }
-            if(partnerLst.size()>0) {
-                lstView = (ListView) spotInfoView.findViewById(R.id.spotInfo_list_tab_partners);
-                lstView.getLayoutParams().height = android.app.ActionBar.LayoutParams.MATCH_PARENT;
-                partnersAdapter = new ProfileItemLstAdapter(getActivity().getApplicationContext(),
-                        new ArrayList<Person>(partnerLst));
-                lstView.setAdapter(partnersAdapter);
-                lstView.setOnItemClickListener(new OnPersonClick(partnerLst));
-            }
-
+            fillPersonsList(coachLst, COACHES);
+            fillPersonsList(partnerLst,PARTNERS);
             if(partnerLst.size()>0 || coachLst.size()>0)
                 setVisible(View.VISIBLE,View.GONE,View.GONE);
             else
-                setVisible(View.GONE,View.GONE,View.VISIBLE);
+                setVisible(View.GONE, View.GONE, View.VISIBLE);
 
             return;
         }
@@ -432,6 +428,24 @@ public class SpotInfoFragment extends Fragment implements EndpointApi.GetListPer
 
     }
 
+    private int fillPersonsList(List<Person> personList, String typeOfPerson)
+    {
+        ListView listView=null;
+        if(personList==null || personList.isEmpty())
+            return 0;
+        if(typeOfPerson.equals(COACHES))
+            listView = (ListView) spotInfoView.findViewById(R.id.spotInfo_list_tab_coaches);
+        else if(typeOfPerson.equals(PARTNERS))
+            listView = (ListView) spotInfoView.findViewById(R.id.spotInfo_list_tab_partners);
+        else
+            assert true;
+        listView.getLayoutParams().height = android.app.ActionBar.LayoutParams.MATCH_PARENT;
+        ProfileItemLstAdapter partnersAdapter = new ProfileItemLstAdapter(getActivity().getApplicationContext(),
+                new ArrayList<>(personList));
+        listView.setAdapter(partnersAdapter);
+        listView.setOnItemClickListener(new OnPersonClick(personList));
+        return personList.size();
+    }
     /*@Override
     public void onUpdateSpotFinish(Pair<Spot, Exception> result) {
         Spot spot = result.first;

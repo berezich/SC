@@ -19,37 +19,41 @@
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_weight="1">
+        android:layout_weight="1"
+        android:paddingLeft="@dimen/spotItem_leftRightOffset"
+        android:paddingRight="@dimen/spotItem_leftRightOffset"
+        android:paddingTop="@dimen/spotItem_topOffset"
+        android:paddingBottom="@dimen/spotItem_bottomOffset">
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:text=""
             android:id="@+id/lstSpotItem_name"
-            android:layout_marginLeft="15dp"
-            android:layout_marginTop="15dp"
-            android:layout_weight="1"
             android:textColor="@color/text_gray"
-            android:textSize="17dp" />
+            android:textSize="17dp"
+            android:layout_weight="1" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:text=""
             android:id="@+id/lstSpotItem_address"
-            android:layout_marginLeft="17dp"
-            android:layout_weight="1"
-            android:textColor="@color/text_gray" />
+            android:textColor="@color/text_gray"
+            android:layout_marginTop="@dimen/spotItem_address_topOffset"
+            android:layout_weight="1.13" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:text=""
             android:id="@+id/lstSpotItem_raiting"
-            android:layout_weight="1"
             android:textColor="@color/text_gray"
-            android:layout_gravity="right"
-            android:layout_marginRight="15dp" />
+            android:layout_gravity="bottom|right"
+            android:gravity="bottom"
+            android:layout_marginTop="@dimen/spotItem_rating_topOffset"
+            android:layout_marginRight="@dimen/spotItem_rating_rightOffset"
+            android:layout_weight="1.41" />
 
     </LinearLayout>
 

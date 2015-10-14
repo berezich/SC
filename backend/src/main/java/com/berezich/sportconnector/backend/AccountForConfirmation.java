@@ -5,6 +5,7 @@ import com.googlecode.objectify.annotation.Id;
 import com.googlecode.objectify.annotation.Index;
 
 import java.util.Date;
+import java.util.UUID;
 
 /**
  * Created by Sashka on 15.08.2015.
@@ -17,6 +18,7 @@ public class AccountForConfirmation {
     private String name;
     private Person.TYPE type;
     private Date registerDate;
+    private String uuid;
 
     public AccountForConfirmation() {
     }
@@ -27,6 +29,7 @@ public class AccountForConfirmation {
         this.name = name;
         this.type = type;
         this.registerDate = registerDate;
+        this.uuid = UUID.randomUUID().toString();
     }
 
     public String getEmail() {
@@ -47,6 +50,14 @@ public class AccountForConfirmation {
 
     public Date getRegisterDate() {
         return registerDate;
+    }
+
+    public String getUuid() {
+        return uuid;
+    }
+
+    public void setUuid() {
+        this.uuid = UUID.randomUUID().toString();
     }
 
     public void setPass(String pass) {

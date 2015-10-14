@@ -99,6 +99,7 @@ public class PersonEndpoint {
         //
         // If your client provides the ID then you should probably use PUT instead.
         OAuth_2_0.check();
+        account.setUuid();
         validateAccountProperties(account);
         //Person samePerson = ofy().load().type(Person.class).id(account.getId()).now();
         Query<Person> query = ofy().load().type(Person.class).filter("email", account.getEmail());
@@ -121,7 +122,7 @@ public class PersonEndpoint {
             String msgBody =msgBodyAccountConfirmation;
             sendMail(account.getEmail(),subject,String.format(msgBody,
                     URLEncoder.encode(account.getEmail(), "UTF-8"), URLEncoder.encode(
-                            getHshForConfirmAccount(account), "UTF-8")));
+                            account.getUuid(), "UTF-8")));
         } catch (UnsupportedEncodingException e) {
             throw new BadRequestException("createConfirmMsg@: msg for confirmation account didn't send");
         }
@@ -139,8 +140,7 @@ public class PersonEndpoint {
             x = URLDecoder.decode(x,"UTF-8");
             AccountForConfirmation account = ofy().load().type(AccountForConfirmation.class).id(id).now();
             if (account != null) {
-                String hshDB = getHshForConfirmAccount(account);
-                if(x!="" && x.equals(hshDB)) {
+                if(x.equals(account.getUuid())) {
                     logger.info(String.format("account: %s has been activated", id));
                     Person person = new Person(account);
                     insertPerson(person);
@@ -161,10 +161,7 @@ public class PersonEndpoint {
             throw new BadRequestException(String.format(ERROR_CONFIRM,id));
         }
     }
-    private String getHshForConfirmAccount(AccountForConfirmation account)
-    {
-        return msgDigest(account.getEmail() + account.getRegisterDate());
-    }
+
     @ApiMethod(
             name = "authorizePerson",
             path = "authorizePerson",
@@ -179,7 +176,7 @@ public class PersonEndpoint {
             person = queryIterator.next();
         if (person != null) {
             String encPass = msgDigest(pass);
-            if(encPass!="" && person.getPass().equals(encPass)) {
+            if(!encPass.equals("") && person.getPass().equals(encPass)) {
                 person.setPass("");
                 return person;
             }
@@ -274,7 +271,7 @@ public class PersonEndpoint {
                     String msgBody =msgBodyConfirmEmail;
                     sendMail(reqChangeEmail.getNewEmail(),subject,String.format(msgBody,
                             URLEncoder.encode(reqChangeEmail.getEmail(), "UTF-8"), URLEncoder.encode(
-                                    getHshForChangeEmail(reqChangeEmail),"UTF-8")));
+                                    reqChangeEmail.getUuid(),"UTF-8")));
                 } catch (UnsupportedEncodingException e) {
                     throw new BadRequestException("createConfirmEmailMsg@: msg for confirm email didn't send");
                 }
@@ -294,8 +291,7 @@ public class PersonEndpoint {
             x = URLDecoder.decode(x, "UTF-8");
             ReqChangeEmail reqChangeEmail = ofy().load().type(ReqChangeEmail.class).id(oldEmail).now();
             if (reqChangeEmail != null) {
-                String hshDB = getHshForChangeEmail(reqChangeEmail);
-                if(x!="" && x.equals(hshDB)) {
+                if(x.equals(reqChangeEmail.getUuid())) {
                     Person person = ofy().load().type(Person.class).id(reqChangeEmail.getPersonId()).now();
                     person.setEmail(reqChangeEmail.getNewEmail());
                     ofy().save().entity(person).now();
@@ -316,10 +312,6 @@ public class PersonEndpoint {
         } catch (UnsupportedEncodingException e) {
             throw new BadRequestException(String.format(ERROR_CONFIRM_EMAIL,oldEmail));
         }
-    }
-    private String getHshForChangeEmail(ReqChangeEmail reqChangeEmail)
-    {
-        return msgDigest(reqChangeEmail.getEmail()+reqChangeEmail.getNewEmail() + reqChangeEmail.getRegisterDate());
     }
     /**
      * Change password of an existing person.
@@ -480,7 +472,7 @@ public class PersonEndpoint {
             query = query.startAt(Cursor.fromWebSafeString(cursor));
         }
         QueryResultIterator<Person> queryIterator = query.iterator();
-        List<Person> personList = new ArrayList<Person>(limit);
+        List<Person> personList = new ArrayList<>(limit);
         while (queryIterator.hasNext()) {
             personList.add(queryIterator.next());
         }
@@ -544,13 +536,15 @@ public class PersonEndpoint {
             throw new BadRequestException("nameNull@:Name property must be initialized");
         if(accountForConfirmation.getType()==null)
             throw new BadRequestException("typeNull@:Type property must be 'PARTNER' or 'COACH'");
+        if(accountForConfirmation.getUuid()==null || accountForConfirmation.getUuid().equals(""))
+            throw new BadRequestException("uuidNull@:Uuid property must be initialized");
     }
 
     //update lists of partners and coaches of some spots since a person was updated
     private void setSpotCoachesPartners(Person person, Person oldPerson) throws BadRequestException
     {
-        List<Long> addSpotLst = new ArrayList<Long>();
-        List<Long> removeSpotLst = new ArrayList<Long>();
+        List<Long> addSpotLst = null;
+        List<Long> removeSpotLst = new ArrayList<>();
 
         List<Long> oldies = new ArrayList<Long>();
         List<Long> news = new ArrayList<Long>();
@@ -561,11 +555,9 @@ public class PersonEndpoint {
         if(person!=null) {
             id = person.getId();
             type = person.getType();
+            if (person.getFavoriteSpotIdLst() != null)
+                news.addAll(person.getFavoriteSpotIdLst());
         }
-
-
-        if (person.getFavoriteSpotIdLst() != null)
-            news.addAll(person.getFavoriteSpotIdLst());
 
 
         if(oldPerson !=null) {

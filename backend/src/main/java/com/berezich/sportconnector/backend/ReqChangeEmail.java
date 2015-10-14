@@ -4,6 +4,7 @@ import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
 
 import java.util.Date;
+import java.util.UUID;
 
 /**
  * Created by berezkin on 27.08.2015.
@@ -15,6 +16,7 @@ public class ReqChangeEmail {
     private String newEmail;
     private Date registerDate;
     long personId;
+    private String uuid;
 
     public ReqChangeEmail() {
     }
@@ -24,6 +26,7 @@ public class ReqChangeEmail {
         this.email = email;
         this.newEmail = newEmail;
         this.registerDate = registerDate;
+        this.uuid = UUID.randomUUID().toString();
     }
 
     public long getPersonId() {
@@ -42,6 +45,10 @@ public class ReqChangeEmail {
         return registerDate;
     }
 
+    public String getUuid() {
+        return uuid;
+    }
+
     public void setPersonId(long personId) {
         this.personId = personId;
     }
@@ -57,4 +64,5 @@ public class ReqChangeEmail {
     public void setRegisterDate(Date registerDate) {
         this.registerDate = registerDate;
     }
+
 }
