@@ -4,11 +4,10 @@ import com.berezich.sportconnector.backend.AccountForConfirmation;
 import com.berezich.sportconnector.backend.Person;
 import com.berezich.sportconnector.backend.Picture;
 import com.berezich.sportconnector.backend.ReqChangeEmail;
-import com.google.api.server.spi.config.AnnotationBoolean;
+import com.berezich.sportconnector.backend.ReqResetPass;
 import com.google.api.server.spi.config.Api;
 import com.google.api.server.spi.config.ApiMethod;
 import com.google.api.server.spi.config.ApiNamespace;
-import com.google.api.server.spi.config.ApiResourceProperty;
 import com.google.api.server.spi.response.BadRequestException;
 import com.google.api.server.spi.response.CollectionResponse;
 import com.google.api.server.spi.response.NotFoundException;
@@ -78,6 +77,10 @@ public class PersonEndpoint {
     private static String subjectConfirmEmail = "change Email SportConnector";
     private static String msgBodyConfirmEmail = "Для смены email перейдите по ссылке: " +
             "https://sportconnector-981.appspot.com/email.html?id=%s&x=%s";
+    private static String subjectResetPass = "reset Password SportConnector";
+    private static String msgBodyResetPass = "Для смены пароля перейдите по ссылке, приведенной ниже," +
+            "и следуйте инструкциям: " +
+            "https://sportconnector-981.appspot.com/pass.html?x=%s";
 
 
     static {
@@ -85,6 +88,7 @@ public class PersonEndpoint {
         ObjectifyService.register(Person.class);
         ObjectifyService.register(AccountForConfirmation.class);
         ObjectifyService.register(ReqChangeEmail.class);
+        ObjectifyService.register(ReqResetPass.class);
     }
 
 
@@ -313,6 +317,33 @@ public class PersonEndpoint {
             throw new BadRequestException(String.format(ERROR_CONFIRM_EMAIL,oldEmail));
         }
     }
+    /**
+    * reset pass of an existing person
+     */
+    @ApiMethod(
+            name = "resetPass",
+            path = "person/resetPass",
+            httpMethod = ApiMethod.HttpMethod.PUT)
+    public void resetPass(@Named("id") Long id)
+            throws NotFoundException, BadRequestException {
+        OAuth_2_0.check();
+        Person person = ofy().load().type(Person.class).id(id).now();
+        if(person==null)
+            throw new NotFoundException("Person with id:" + id + " not found");
+        ReqResetPass reqResetPass = new ReqResetPass(person.getId());
+        ofy().save().entity(reqResetPass).now();
+        reqResetPass = ofy().load().type(ReqResetPass.class).id(id).now();
+        if(reqResetPass!=null) {
+            try {
+                logger.info("ReqResetPass was created: " + reqResetPass);
+                sendMail(person.getEmail(),subjectResetPass,String.format(msgBodyResetPass,
+                        URLEncoder.encode(reqResetPass.getUuid(),"UTF-8")));
+            } catch (UnsupportedEncodingException e) {
+                throw new BadRequestException("createResetPassMsg@: msg for reset password didn't send");
+            }
+        }
+    }
+
     /**
      * Change password of an existing person.
      */

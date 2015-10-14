@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="windows-1251">
+    <meta name=viewport content="width=device-width, initial-scale=1">
+    <title>Подтверждение Email</title>
+    <script src="/js/base.js"></script>
+    <style>
+        body {
+        padding-top: 40px;
+        padding-bottom: 40px;
+        background-color: #f5f5f5;
+        font-size: 16px;
+        }
+        .msgArea {
+        margin-left: 2%;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+
+    <form action="" method="post" enctype="multipart/form-data">
+        <input type="text" name="foo">
+        <input type="file" name="myFile" multiple>
+        <input type="submit" value="Submit">
+    </form>
+    <div class="msgArea" hidden>
+        <div id="msg" ></div>
+        <div id="wait" >Подождите выполняется запрос на сервер...</div>
+        </br>
+        <a id="intent" href="intent://main_page/#Intent;scheme=sportConnector;package=com.berezich.sportconnector;S.browser_fallback_url=http%3A%2F%2Fplay.google.com%2Fstore%2Fsearch%3Fq%3Dsportconnector;end" hidden >Перейти в приложение SportConnector</a>
+    </div>
+    <script>
+        function init() {
+            google.appengine.sportconnector.confirmEmail.init('//' + window.location.host + '/_ah/api');
+        }
+    </script>
+    <script src="https://apis.google.com/js/client.js?onload=init"></script>
+</div>
+</body>
+</html>
