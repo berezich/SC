@@ -9,6 +9,7 @@ google.appengine = google.appengine || {};
 google.appengine.sportconnector = google.appengine.sportconnector || {};
 google.appengine.sportconnector.confirmAccount = google.appengine.sportconnector.confirmAccount || {};
 google.appengine.sportconnector.confirmEmail = google.appengine.sportconnector.confirmEmail || {};
+google.appengine.sportconnector.resetPass = google.appengine.sportconnector.resetPass || {};
 
 
 function getParams () {
@@ -123,3 +124,54 @@ google.appengine.sportconnector.confirmEmail.execute = function() {
 };
 
 google.appengine.sportconnector.confirmEmail.print = google.appengine.sportconnector.confirmAccount.print;
+
+/**
+ * Initializes the application.
+ * @param {string} apiRoot Root of the API's path.
+ */
+google.appengine.sportconnector.resetPass.init = function(apiRoot) {
+  // Loads the OAuth and helloworld APIs asynchronously, and triggers login
+  // when they have completed.
+  var apisToLoad;
+  var callback = function() {
+    if (--apisToLoad == 0) {
+        google.appengine.sportconnector.resetPass.enableButton();
+    }
+  }
+
+  apisToLoad = 1; // must match number of calls to gapi.client.load()
+  gapi.client.load('sportConnectorApi', 'v1', callback, apiRoot);
+};
+
+
+/**
+ * Execute confirmation via the API.
+ * @param {string} id ID of the greeting.
+ */
+google.appengine.sportconnector.resetPass.execute = function() {
+  var params = getParams();
+  if(typeof params['id'] === "string" && typeof params['x'] === "string")
+    gapi.client.sportConnectorApi.resetPass({'id':params['id'],'x':params['x']}).execute(
+        function(resp) {
+          if (!resp.code)
+            google.appengine.sportconnector.resetPass.print('Ваша почта изменена!');
+          else
+            google.appengine.sportconnector.resetPass.print(resp.message);
+        });
+  else
+    google.appengine.sportconnector.resetPass.print("Ошибка! Ваша почта не подтверждена!");
+};
+
+/**
+ * Enables the button callbacks in the UI.
+ */
+google.appengine.sportconnector.resetPass.enableButton = function() {
+  var getGreeting = document.querySelector('#resetPass');
+  getGreeting.addEventListener('click', function(e) {
+    google.appengine.sportconnector.resetPass.execute(
+        document.querySelector('#pass').value, document.querySelector('#confirmPass').value);
+  });
+
+};
+
+google.appengine.sportconnector.resetPass.print = google.appengine.sportconnector.confirmAccount.print;

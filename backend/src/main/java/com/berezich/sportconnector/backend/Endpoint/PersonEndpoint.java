@@ -330,9 +330,9 @@ public class PersonEndpoint {
         Person person = ofy().load().type(Person.class).id(id).now();
         if(person==null)
             throw new NotFoundException("Person with id:" + id + " not found");
-        ReqResetPass reqResetPass = new ReqResetPass(person.getId());
+        ReqResetPass reqResetPass = new ReqResetPass(id);
         ofy().save().entity(reqResetPass).now();
-        reqResetPass = ofy().load().type(ReqResetPass.class).id(id).now();
+        reqResetPass = ofy().load().type(ReqResetPass.class).id(reqResetPass.getUuid()).now();
         if(reqResetPass!=null) {
             try {
                 logger.info("ReqResetPass was created: " + reqResetPass);
@@ -342,6 +342,8 @@ public class PersonEndpoint {
                 throw new BadRequestException("createResetPassMsg@: msg for reset password didn't send");
             }
         }
+        else
+            throw new BadRequestException("createResetPassMsg@: ReqResetPass construction error");
     }
 
     /**
