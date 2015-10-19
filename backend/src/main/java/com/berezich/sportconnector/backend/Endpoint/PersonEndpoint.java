@@ -17,6 +17,7 @@ import com.google.appengine.repackaged.com.google.api.client.util.Base64;
 import com.googlecode.objectify.ObjectifyService;
 import com.googlecode.objectify.cmd.Query;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
@@ -77,6 +78,8 @@ public class PersonEndpoint {
     private static String subjectConfirmEmail = "change Email SportConnector";
     private static String msgBodyConfirmEmail = "Для смены email перейдите по ссылке: " +
             "https://sportconnector-981.appspot.com/email.html?id=%s&x=%s";
+    private static String ERROR_CONFIRM_RESET_PASS_NOTFOUND = "Ошибка! Повторите процедуру восстановления пароля.";
+    private static String ERROR_CONFIRM_RESET_PASS = "Ошибка! Ваш пароль не изменен!";
     private static String subjectResetPass = "reset Password SportConnector";
     private static String msgBodyResetPass = "Для смены пароля перейдите по ссылке, приведенной ниже," +
             "и следуйте инструкциям: " +
@@ -324,13 +327,18 @@ public class PersonEndpoint {
             name = "resetPass",
             path = "person/resetPass",
             httpMethod = ApiMethod.HttpMethod.PUT)
-    public void resetPass(@Named("id") Long id)
+    public void resetPass(@Named("email") String email)
             throws NotFoundException, BadRequestException {
         OAuth_2_0.check();
-        Person person = ofy().load().type(Person.class).id(id).now();
-        if(person==null)
-            throw new NotFoundException("Person with id:" + id + " not found");
-        ReqResetPass reqResetPass = new ReqResetPass(id);
+        Person person;
+        Query<Person> query = ofy().load().type(Person.class).filter("email", email);
+        if(!(query!=null && query.count()>0))
+        {
+            throw new NotFoundException("emailNotExists@:Person with email:" + email + " not found");
+        }
+        person = query.list().get(0);
+
+        ReqResetPass reqResetPass = new ReqResetPass(person.getId());
         ofy().save().entity(reqResetPass).now();
         reqResetPass = ofy().load().type(ReqResetPass.class).id(reqResetPass.getUuid()).now();
         if(reqResetPass!=null) {
@@ -344,6 +352,35 @@ public class PersonEndpoint {
         }
         else
             throw new BadRequestException("createResetPassMsg@: ReqResetPass construction error");
+    }
+
+    /**
+     * confirmation reset pass of an existing person via email
+     */
+    @ApiMethod(
+            name = "resetPassConfirmation",
+            path = "person/resetPassConfirmation",
+            httpMethod = ApiMethod.HttpMethod.DELETE)
+    public void resetPassConfirmation(@Named("x") String x, @Named("pass") String pass)
+            throws NotFoundException, BadRequestException {
+        ReqResetPass reqResetPass = ofy().load().type(ReqResetPass.class).id(x).now();
+        if(reqResetPass==null)
+            throw new NotFoundException(ERROR_CONFIRM_RESET_PASS_NOTFOUND);
+        else {
+            Person person = ofy().load().type(Person.class).id(reqResetPass.getPersonId()).now();
+            String digPass = msgDigest(pass);
+            if(digPass.equals(""))
+                throw new BadRequestException("Server error");
+            person.setPass(digPass);
+            ofy().save().entity(person).now();
+            logger.info("Updated Person pass: " + person);
+            ofy().delete().type(ReqResetPass.class).id(x).now();
+            logger.info(String.format("Deleted ReqResetPass with ID: %s personId: %d",
+                    reqResetPass.getUuid(), reqResetPass.getPersonId()));
+            return;
+        }
+
+
     }
 
     /**

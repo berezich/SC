@@ -15,14 +15,14 @@ public class ReqResetPass {
     @Id
     private String uuid;
     private Date registerDate;
-    long personId;
+    private long personId;
 
     public ReqResetPass() {
     }
 
     public ReqResetPass(Long personId) {
         this.personId = personId;
-        setUuid();
+        setUuid(UUID.randomUUID().toString());
         registerDate = Calendar.getInstance().getTime();
     }
 
@@ -47,7 +47,7 @@ public class ReqResetPass {
         this.personId = personId;
     }
 
-    public void setUuid() {
-        this.uuid = UUID.randomUUID().toString();
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
     }
 }

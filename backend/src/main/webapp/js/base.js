@@ -38,13 +38,21 @@ function getParams () {
 /**
  * Shows a message for user.
  */
-google.appengine.sportconnector.confirmAccount.print = function(msg) {
+google.appengine.sportconnector.confirmAccount.print = function(msg, isShowIntent) {
+
+  if(arguments.length==1)
+    isShowIntent = true;
   var element = document.getElementById("msg");
   element.innerHTML = msg;
   element = document.getElementById("wait");
-    element.hidden = true;
-  element = document.getElementById("intent");
-  element.hidden = false;
+  element.hidden = true;
+  if(isShowIntent){
+    element = document.getElementById("intent");
+    element.hidden = false;
+  }
+
+  var msgArea = document.querySelector(".msgArea");
+    msgArea.hidden = false;
 };
 
 /**
@@ -148,18 +156,28 @@ google.appengine.sportconnector.resetPass.init = function(apiRoot) {
  * Execute confirmation via the API.
  * @param {string} id ID of the greeting.
  */
-google.appengine.sportconnector.resetPass.execute = function() {
+google.appengine.sportconnector.resetPass.execute = function(pass, confirmPass) {
+  if(pass==''){
+    google.appengine.sportconnector.resetPass.print("Пароль не может быть пустым!",false);
+    return
+  }
+  else if(pass!=confirmPass){
+    google.appengine.sportconnector.resetPass.print("Ваши пароли не совпадают!",false);
+    return;
+  }
   var params = getParams();
-  if(typeof params['id'] === "string" && typeof params['x'] === "string")
-    gapi.client.sportConnectorApi.resetPass({'id':params['id'],'x':params['x']}).execute(
+  if(typeof params['x'] === "string"){
+    google.appengine.sportconnector.resetPass.print("Подождите, ваш запрос выполняется...",false);
+    gapi.client.sportConnectorApi.resetPassConfirmation({'x':params['x'],'pass':pass}).execute(
         function(resp) {
           if (!resp.code)
-            google.appengine.sportconnector.resetPass.print('Ваша почта изменена!');
+            google.appengine.sportconnector.resetPass.print('Ваш пароль изменен!');
           else
             google.appengine.sportconnector.resetPass.print(resp.message);
         });
+  }
   else
-    google.appengine.sportconnector.resetPass.print("Ошибка! Ваша почта не подтверждена!");
+    google.appengine.sportconnector.resetPass.print("Ошибка! Ресурс не найден!");
 };
 
 /**

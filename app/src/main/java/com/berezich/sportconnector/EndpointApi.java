@@ -479,6 +479,41 @@ public class EndpointApi {
         }
     }
 
+    public static class ResetPassAsyncTask extends AsyncTask<String, Void, Exception>{
+        private OnAction listener=null;
+        private Context context = null;
+        public ResetPassAsyncTask(Fragment fragment)
+        {
+            context = fragment.getActivity().getBaseContext();
+            setSrvApi(context);
+            try {
+                listener = (OnAction) fragment;
+            } catch (ClassCastException e) {
+                throw new ClassCastException(fragment.toString() + " must implement OnAction for RegisterPersonAsyncTask");
+            }
+        }
+        @Override
+        protected Exception doInBackground(String... params) {
+            String email = params[0];
+            try {
+                srvApi.resetPass(email).execute();
+                return null;
+            } catch (Exception e) {
+                return e;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(Exception result) {
+            listener.onResetPassAsyncTaskFinish(result);
+        }
+
+        public static interface OnAction
+        {
+            void onResetPassAsyncTaskFinish(Exception result);
+        }
+    }
+
     public static class UpdatePersonAsyncTask extends AsyncTask< Person, Void, Pair<Person,Exception> >{
         private OnAction listener=null;
         private Context context = null;

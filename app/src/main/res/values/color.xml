@@ -6,10 +6,10 @@
         <color name="login_background">#CCBBBBBB</color>
     <!-- fragment_login-->
 
-    <!-- fragment_registration-->
+    <!-- fragment_registration/fragment_resetPass-->
         <color name="registration_line">#555555</color>
         <color name="registration_background">#CCBBBBBB</color>
-    <!-- fragment_registration-->
+    <!-- fragment_registration/fragment_resetPass-->
 
     <!-- fragment_spotInfo-->
         <color name="text_msg_error">#AAAAAA</color>

@@ -33,7 +33,8 @@ import java.io.IOException;
  */
 public class LoginFragment extends Fragment implements EndpointApi.AuthorizePersonAsyncTask.OnAction,
         AlertDialogFragment.OnActionDialogListener,
-        RegistrationFragment.RegFragmentAction {
+        RegistrationFragment.RegFragmentAction,
+        ResetPassFragment.ResetPassFragmentAction {
 
     private static final String ARG_SECTION_NUMBER = "section_number";
     private final String TAG = "MyLog_LoginFragment";
@@ -238,6 +239,15 @@ public class LoginFragment extends Fragment implements EndpointApi.AuthorizePers
 
     @Override
     public void onCreateAccount(String msgResult) {
+        showDialog(msgResult);
+    }
+
+    @Override
+    public void onResetPass(String msgResult) {
+        showDialog(msgResult);
+    }
+
+    private void showDialog(String msgResult){
         FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
         if(fragmentManager!=null)
         {

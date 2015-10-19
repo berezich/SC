@@ -43,13 +43,15 @@
             </br>
             <div><input id="resetPass" type="submit" value="Сменить пароль"></div>
         </form>
-    </center>
-    <div class="msgArea" hidden>
-        <div id="msg" ></div>
-        <div id="wait" >Подождите выполняется запрос на сервер...</div>
         </br>
-        <a id="intent" href="intent://main_page/#Intent;scheme=sportConnector;package=com.berezich.sportconnector;S.browser_fallback_url=http%3A%2F%2Fplay.google.com%2Fstore%2Fsearch%3Fq%3Dsportconnector;end" hidden >Перейти в приложение SportConnector</a>
-    </div>
+        </br>
+        <div class="msgArea" hidden>
+            <div id="msg" ></div>
+            <div id="wait" >Подождите выполняется запрос на сервер...</div>
+            </br>
+            <a id="intent" href="intent://main_page/#Intent;scheme=sportConnector;package=com.berezich.sportconnector;S.browser_fallback_url=http%3A%2F%2Fplay.google.com%2Fstore%2Fsearch%3Fq%3Dsportconnector;end" hidden >Перейти в приложение SportConnector</a>
+        </div>
+    </center>
     <script>
         function init() {
             google.appengine.sportconnector.resetPass.init('//' + window.location.host + '/_ah/api');

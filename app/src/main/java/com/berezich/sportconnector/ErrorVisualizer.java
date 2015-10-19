@@ -98,6 +98,10 @@ public class ErrorVisualizer {
                         errMsg = context.getString(R.string.registration_err_passNull);
                         error_code = ERROR_CODE.REGISTRATION_FAILED;
                     }
+                    else if(errExceptMsg.indexOf("emailNotExists@:")==0) {
+                        errMsg = context.getString(R.string.resetPass_err_loginNotExists);
+                        error_code = ERROR_CODE.REGISTRATION_FAILED;
+                    }
 
                 }
         } finally {

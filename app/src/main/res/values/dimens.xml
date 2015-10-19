@@ -3,7 +3,7 @@
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
 
-    <!-- fragment_registration-->
+    <!-- fragment_registration/fragment_resetPass-->
         <dimen name="registration_leftRightOffset">35dp</dimen>
         <dimen name="registration_txtPropName_leftRightOffset">5dp</dimen>
         <dimen name="registration_txtPropVal_leftRightOffset">5dp</dimen>
@@ -11,7 +11,7 @@
         <dimen name="registration_propLine_topOffset">10dp</dimen>
         <dimen name="registration_btn_topOffset">15dp</dimen>
         <dimen name="registration_btn_rightOffset">15dp</dimen>
-    <!-- fragment_registration-->
+    <!-- fragment_registration/fragment_resetPass-->
 
     <!-- fragment_login-->
         <dimen name="login_leftRightOffset">35dp</dimen>

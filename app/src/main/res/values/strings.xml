@@ -34,6 +34,16 @@
 
     <!--login_fragment end-->
 
+    <!--resetPass_fragment begin-->
+        <string name="resetPass_fragmentTitle">Сброс пароля</string>
+        <string name="resetPass_login">E-mail:</string>
+        <string name="resetPass_btnOk_txt">Продолжить</string>
+        <string name="resetPass_btnCancel_txt">Отмена</string>
+        <string name="resetPass_err_title">Внимание</string>
+        <string name="resetPass_err_loginNotExists">Пользователя с таким email не существует</string>
+        <string name="resetPass_msgReqResetPass">Вам на почту отправлено письмо. Для установки нового пароля следуйте инструкциям, описанным в письме.</string>
+    <!--resetPass_fragment end-->
+
     <!--registration_fragment begin-->
         <string name="registration_fragmentTitle">Регистрация</string>
         <string name="registration_login">E-mail:</string>
