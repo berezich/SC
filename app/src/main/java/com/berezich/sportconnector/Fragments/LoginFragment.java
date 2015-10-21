@@ -16,6 +16,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.TextView;
 
 import com.berezich.sportconnector.AlertDialogFragment;
 import com.berezich.sportconnector.AppPref;
@@ -83,6 +84,14 @@ public class LoginFragment extends Fragment implements EndpointApi.AuthorizePers
             btn = (Button) rootView.findViewById(R.id.loginRegister_btn);
             if(btn!=null)
                 btn.setOnClickListener(new OnClickRegistrationListener());
+            /*
+            btn = (Button) rootView.findViewById(R.id.loginForgotPass);
+            if(btn!=null)
+                btn.setOnClickListener(new OnClickForgotPassListener());
+            */
+            TextView textView = (TextView) rootView.findViewById(R.id.login_text_forgotPass);
+            if(textView!=null)
+                textView.setOnClickListener(new OnClickForgotPassListener());
 
             if(( myPersonInfo = LocalDataManager.getMyPersonInfo())!=null) {
 
@@ -117,8 +126,6 @@ public class LoginFragment extends Fragment implements EndpointApi.AuthorizePers
             throw new ClassCastException(activity.toString() + " must implement OnActionListener for LoginFragment");
         }
 
-
-
     }
     @Override
     public void onResume()
@@ -151,11 +158,27 @@ public class LoginFragment extends Fragment implements EndpointApi.AuthorizePers
         public void onClick(View v) {
             FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
             RegistrationFragment registrationFragment = new RegistrationFragment();
-            registrationFragment.setTargetFragment(getFragment(),0);
+            registrationFragment.setTargetFragment(getFragment(), 0);
             if(fragmentManager!=null) {
                 fragmentManager.beginTransaction().replace(R.id.container, registrationFragment)
                         .addToBackStack(registrationFragment.getClass().getName()).commit();
                 Log.d(TAG, String.format("prev fragment replaced with %s", registrationFragment.getClass().getName()));
+
+            }
+        }
+    }
+
+    private class OnClickForgotPassListener implements View.OnClickListener
+    {
+        @Override
+        public void onClick(View v) {
+            FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+            ResetPassFragment resetPassFragment = new ResetPassFragment();
+            resetPassFragment.setTargetFragment(getFragment(), 0);
+            if(fragmentManager!=null) {
+                fragmentManager.beginTransaction().replace(R.id.container, resetPassFragment)
+                        .addToBackStack(resetPassFragment.getClass().getName()).commit();
+                Log.d(TAG, String.format("prev fragment replaced with %s", resetPassFragment.getClass().getName()));
 
             }
         }

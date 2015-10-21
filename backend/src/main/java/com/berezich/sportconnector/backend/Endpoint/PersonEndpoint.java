@@ -79,10 +79,9 @@ public class PersonEndpoint {
     private static String msgBodyConfirmEmail = "Для смены email перейдите по ссылке: " +
             "https://sportconnector-981.appspot.com/email.html?id=%s&x=%s";
     private static String ERROR_CONFIRM_RESET_PASS_NOTFOUND = "Ошибка! Повторите процедуру восстановления пароля.";
-    private static String ERROR_CONFIRM_RESET_PASS = "Ошибка! Ваш пароль не изменен!";
     private static String subjectResetPass = "reset Password SportConnector";
-    private static String msgBodyResetPass = "Для смены пароля перейдите по ссылке, приведенной ниже," +
-            "и следуйте инструкциям: " +
+    private static String msgBodyResetPass = "Для смены пароля перейдите по ссылке " +
+            "и следуйте дальнейшим инструкциям.\n" +
             "https://sportconnector-981.appspot.com/pass.html?x=%s";
 
 

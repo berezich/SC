@@ -18,8 +18,10 @@ import android.widget.EditText;
 import com.berezich.sportconnector.AlertDialogFragment;
 import com.berezich.sportconnector.EndpointApi;
 import com.berezich.sportconnector.ErrorVisualizer;
+import com.berezich.sportconnector.LocalDataManager;
 import com.berezich.sportconnector.MainActivity;
 import com.berezich.sportconnector.R;
+import com.berezich.sportconnector.backend.sportConnectorApi.model.Person;
 
 import java.io.IOException;
 
@@ -30,8 +32,8 @@ public class ResetPassFragment extends Fragment implements EndpointApi.ResetPass
         AlertDialogFragment.OnActionDialogListener {
 
     private final String TAG = "MyLog_RPassFragment";
-    private String pass;
     View rootView;
+    private Person myPersonInfo;
 
     ResetPassFragmentAction listenerResetPass = null;
 
@@ -47,7 +49,12 @@ public class ResetPassFragment extends Fragment implements EndpointApi.ResetPass
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        EditText editTxt;
         rootView = inflater.inflate(R.layout.fragment_reset_pass, container, false);
+        if(( myPersonInfo = LocalDataManager.getMyPersonInfo())!=null)
+            if ((editTxt = (EditText) rootView.findViewById(R.id.resetPass_email_value)) != null) {
+                editTxt.setText(myPersonInfo.getEmail());
+            }
         if(rootView!=null)
         {
             Button btn = (Button) rootView.findViewById(R.id.resetPass_btn_ok);
@@ -85,7 +92,6 @@ public class ResetPassFragment extends Fragment implements EndpointApi.ResetPass
         @Override
         public void onClick(View v) {
             String email="", name="";
-            pass = "";
             EditText editTxt;
             if((editTxt = (EditText) rootView.findViewById(R.id.resetPass_email_value))!=null) {
                 email = editTxt.getText().toString();

@@ -27,6 +27,7 @@
         <string name="login_checkBox_txt">Автоматический вход</string>
         <string name="login_btn_txt_login">Войти</string>
         <string name="login_btn_txt_registration">Зарегистрироваться</string>
+        <string name="login_btn_txt_forgotPass">Забыли пароль?</string>
         <string name="login_err_title">Внимание</string>
         <string name="login_err_hint">Login must be not less then 6 symbols</string>
         <string name="login_pass_err_hint">Login must be not less then 8 symbols</string>
