@@ -71,7 +71,7 @@ public class PersonEndpoint {
     private static String ERROR_CONFIRM_NOTFOUND = "Ошибка! Ваша учетная запись %s не найдена!";
     private static String subjectAccountConfirmation = "registration SportConnector";
     private static String msgBodyAccountConfirmation = "Для активации вашей учетной записи перейдите по ссылке: " +
-            "https://sportconnector-981.appspot.com/?id=%s&x=%s";
+            "https://sportconnector-981.appspot.com/confirm.html?id=%s&x=%s";
     private static String ERROR_CONFIRM_EMAIL = "Ошибка! Ваш email %s не изменен!";
     private static String ERROR_CONFIRM_EMAIL_ALREADY = "Ваш старый email %s уже изменен!";
     private static String ERROR_CONFIRM_EMAIL_NOTFOUND = "Ошибка! Ваша учетная запись %s не найдена!";

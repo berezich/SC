@@ -18,6 +18,7 @@
         <!-- main/fiends frame begin-->
         <string name="frame_friends_title">Мои друзья</string>
         <!-- main/fiends frame end-->
+        <string name="drawer_bottom_logout">Выход</string>
     <!-- main end -->
 
     <!--login_fragment begin-->

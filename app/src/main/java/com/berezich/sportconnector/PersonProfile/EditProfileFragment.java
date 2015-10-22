@@ -76,7 +76,7 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
     private static Gson gson;
 
     public EditProfileFragment() {
-        gsonBuilder.setPrettyPrinting().serializeNulls().excludeFieldsWithoutExposeAnnotation();
+        gsonBuilder.serializeNulls().excludeFieldsWithoutExposeAnnotation();
         gson = gsonBuilder.create();
 
     }
@@ -707,7 +707,11 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
                             + "/" + updatedPerson.getId() + "/" + tempFileName, newFileName);
                 }
                 updatedPerson.setPass(myPerson.getPass());
-                LocalDataManager.setMyPersonInfo(updatedPerson);
+                try {
+                    LocalDataManager.saveMyPersonInfoToPref(updatedPerson, getActivity());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
             FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
             if(fragmentManager!=null)

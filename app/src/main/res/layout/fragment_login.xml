@@ -15,18 +15,27 @@
         android:layout_height="match_parent"
         android:background="@color/login_background">
 
+        <View
+            android:id="@+id/login_centerAnchor"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_centerInParent="true" />
+
         <LinearLayout
             android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center"
             android:layout_gravity="center"
             android:visibility="visible"
             android:id="@+id/loginFragment_linearLayout"
             android:paddingLeft="@dimen/login_leftRightOffset"
             android:paddingRight="@dimen/login_leftRightOffset"
             android:clickable="true"
-            android:layout_centerInParent="true">
+            android:gravity="center_horizontal"
+            android:layout_centerHorizontal="true"
+            android:layout_alignParentBottom="false"
+            android:layout_below="@+id/login_centerAnchor"
+            android:layout_marginTop="@dimen/login_centerOffset">
 
             <FrameLayout
                 android:layout_width="match_parent"
@@ -154,6 +163,16 @@
                 android:background="@drawable/btn_register"
                 android:textColor="@color/btn_text" />
 
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:layout_marginTop="15dp"
+                android:text="@string/login_btn_txt_forgotPass"
+                android:id="@+id/login_text_forgotPass"
+                android:layout_below="@+id/loginFragment_linearLayout"
+                android:layout_centerHorizontal="true" />
+
             <!--
             <Button
                 android:layout_width="match_parent"
@@ -167,15 +186,6 @@
 
         </LinearLayout>
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:layout_marginTop="15dp"
-            android:text="@string/login_btn_txt_forgotPass"
-            android:id="@+id/login_text_forgotPass"
-            android:layout_below="@+id/loginFragment_linearLayout"
-            android:layout_centerHorizontal="true" />
     </RelativeLayout>
 
     <FrameLayout
@@ -183,8 +193,7 @@
         android:layout_height="match_parent"
         android:layout_gravity="center"
         android:id="@+id/loginFragment_frameLayout"
-        android:visibility="gone"
-        android:background="@color/login_background">
+        android:visibility="gone">
 
         <ProgressBar
             android:layout_width="wrap_content"

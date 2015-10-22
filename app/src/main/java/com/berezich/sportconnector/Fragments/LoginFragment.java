@@ -47,10 +47,6 @@ public class LoginFragment extends Fragment implements EndpointApi.AuthorizePers
     private AlertDialogFragment dialog;
 
     OnActionListenerLoginFragment listenerLoginFragment = null;
-    /**
-     * Returns a new instance of this fragment for the given section
-     * number.
-     */
     public LoginFragment setArgs(int sectionNumber) {
         _sectionNumber = sectionNumber;
         Bundle args = new Bundle();
@@ -60,8 +56,6 @@ public class LoginFragment extends Fragment implements EndpointApi.AuthorizePers
     }
 
     public LoginFragment() {
-
-
     }
 
     @Override
@@ -101,11 +95,13 @@ public class LoginFragment extends Fragment implements EndpointApi.AuthorizePers
                 if ((editTxt = (EditText) rootView.findViewById(R.id.login_pass_value)) != null) {
                     editTxt.setText(myPersonInfo.getPass());
 
-                    if ((appPref = LocalDataManager.getAppPref()) != null) {
-                        if ((appPref != null) && appPref.isAutoLogin()) {
-                            new EndpointApi.AuthorizePersonAsyncTask(this).execute(myPersonInfo.getId().toString(), myPersonInfo.getPass());
+                    if ((appPref = LocalDataManager.getAppPref()) == null) {
+                        AppPref appPref = new AppPref(false);
+                        try {
+                            LocalDataManager.saveAppPref(appPref,getActivity());
+                        } catch (IOException e) {
+                            e.printStackTrace();
                         }
-
                     }
                 }
             }
@@ -132,6 +128,12 @@ public class LoginFragment extends Fragment implements EndpointApi.AuthorizePers
     {
         super.onResume();
 
+        if ((appPref = LocalDataManager.getAppPref()) != null) {
+            if (appPref.isAutoLogin() && myPersonInfo.getPass()!=null && !myPersonInfo.getPass().equals("")) {
+                setVisibleProgressBar(true);
+                new EndpointApi.AuthorizePersonAsyncTask(this).execute(myPersonInfo.getEmail().toString(), (pass=myPersonInfo.getPass()));
+            }
+        }
     }
 
     private class OnClickLoginListener implements View.OnClickListener
@@ -141,12 +143,11 @@ public class LoginFragment extends Fragment implements EndpointApi.AuthorizePers
             String login="";
             pass = "";
             EditText editTxt;
-            if((editTxt = (EditText) rootView.findViewById(R.id.login_email_value))!=null) {
+            if((editTxt = (EditText) rootView.findViewById(R.id.login_email_value))!=null)
                 login = editTxt.getText().toString();
-            }
-            if((editTxt = (EditText) rootView.findViewById(R.id.login_pass_value))!=null) {
+            if((editTxt = (EditText) rootView.findViewById(R.id.login_pass_value))!=null)
                 pass = editTxt.getText().toString();
-            }
+            
             setVisibleProgressBar(true);
             new EndpointApi.AuthorizePersonAsyncTask(getFragment()).execute(login,pass);
         }
@@ -217,6 +218,12 @@ public class LoginFragment extends Fragment implements EndpointApi.AuthorizePers
             try {
                 person.setPass(pass);
                 LocalDataManager.saveMyPersonInfoToPref(person, getActivity());
+                AppPref appPref = LocalDataManager.getAppPref();
+                if( appPref==null)
+                    appPref = new AppPref(true);
+                else
+                    appPref.setIsAutoLogin(true);
+                LocalDataManager.saveAppPref(appPref,getActivity());
                 listenerLoginFragment.onAuthorized();
             } catch (IOException e) {
                 e.printStackTrace();

@@ -5,21 +5,20 @@ package com.berezich.sportconnector;
  */
 public class AppPref {
     private boolean isAutoLogin;
-    private String passHsh;
+
+    public AppPref(boolean isAutoLogin) {
+        this.isAutoLogin = isAutoLogin;
+    }
 
     public boolean isAutoLogin() {
         return isAutoLogin;
     }
 
-    public String getPassHsh() {
-        return passHsh;
-    }
+    public boolean getIsAutoLogin(){return isAutoLogin();}
+
 
     public void setIsAutoLogin(boolean isAutoLogin) {
         this.isAutoLogin = isAutoLogin;
     }
 
-    public void setPassHsh(String passHsh) {
-        this.passHsh = passHsh;
-    }
 }

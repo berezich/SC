@@ -10,86 +10,97 @@
         android:src="@drawable/foto1"
         android:scaleType="centerCrop" />
 
-    <LinearLayout
-        android:orientation="vertical"
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/registration_background"
-        android:gravity="center"
-        android:layout_gravity="center"
-        android:visibility="visible"
-        android:id="@+id/resetPass_linearLayout"
-        android:paddingLeft="35dp"
-        android:paddingRight="35dp">
+        android:background="@color/registration_background">
 
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="50dp">
-
-            <LinearLayout
-                android:orientation="horizontal"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="bottom"
-                android:layout_marginBottom="@dimen/registration_propLine_topOffset">
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:text="@string/resetPass_login"
-                    android:id="@+id/resetPass_email_title"
-                    android:layout_gravity="center_horizontal|left"
-                    android:gravity="left"
-                    android:paddingLeft="@dimen/registration_txtPropName_leftRightOffset"
-                    android:paddingRight="@dimen/registration_txtPropName_leftRightOffset"
-                    android:layout_weight="2.4" />
-
-                <EditText
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:id="@+id/resetPass_email_value"
-                    android:gravity="center_horizontal"
-                    android:paddingRight="@dimen/registration_txtPropVal_leftRightOffset"
-                    android:background="#00FFFFFF"
-                    android:inputType="textNoSuggestions"
-                    android:layout_weight="1" />
-            </LinearLayout>
-
-            <View
-                android:layout_width="fill_parent"
-                android:layout_height="@dimen/property_line_width"
-                android:background="@color/registration_line"
-                android:paddingLeft="0dp"
-                android:paddingRight="0dp"
-                android:padding="0dp"
-                android:paddingTop="0dp"
-                android:layout_gravity="bottom"
-                android:layout_marginBottom="5dp" />
-
-        </FrameLayout>
-
-        <Button
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_centerInParent="true"
+            android:id="@+id/resetPass_centerAnchor" />
+        <LinearLayout
+            android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/resetPass_btnOk_txt"
-            android:id="@+id/resetPass_btn_ok"
-            android:layout_marginTop="@dimen/registration_btn_topOffset"
-            android:background="@drawable/btn_main"
-            android:textColor="@color/btn_text"
-            />
+            android:layout_gravity="center"
+            android:visibility="visible"
+            android:id="@+id/resetPass_linearLayout"
+            android:paddingLeft="35dp"
+            android:paddingRight="35dp"
+            android:gravity="center_horizontal"
+            android:layout_below="@+id/resetPass_centerAnchor"
+            android:layout_marginTop="@dimen/login_centerOffset">
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="50dp">
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom"
+                    android:layout_marginBottom="@dimen/registration_propLine_topOffset">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:text="@string/resetPass_login"
+                        android:id="@+id/resetPass_email_title"
+                        android:layout_gravity="center_horizontal|left"
+                        android:gravity="left"
+                        android:paddingLeft="@dimen/registration_txtPropName_leftRightOffset"
+                        android:paddingRight="@dimen/registration_txtPropName_leftRightOffset"
+                        android:layout_weight="2.4" />
+
+                    <EditText
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:id="@+id/resetPass_email_value"
+                        android:gravity="center_horizontal"
+                        android:paddingRight="@dimen/registration_txtPropVal_leftRightOffset"
+                        android:background="#00FFFFFF"
+                        android:inputType="textNoSuggestions"
+                        android:layout_weight="1" />
+                </LinearLayout>
+
+                <View
+                    android:layout_width="fill_parent"
+                    android:layout_height="@dimen/property_line_width"
+                    android:background="@color/registration_line"
+                    android:paddingLeft="0dp"
+                    android:paddingRight="0dp"
+                    android:padding="0dp"
+                    android:paddingTop="0dp"
+                    android:layout_gravity="bottom"
+                    android:layout_marginBottom="5dp" />
+
+            </FrameLayout>
+
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/resetPass_btnOk_txt"
+                android:id="@+id/resetPass_btn_ok"
+                android:layout_marginTop="@dimen/registration_btn_topOffset"
+                android:background="@drawable/btn_main"
+                android:textColor="@color/btn_text"
+                />
 
 
-    </LinearLayout>
+        </LinearLayout>
+    </RelativeLayout>
 
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_gravity="center"
         android:id="@+id/resetPass_frameLayout"
-        android:visibility="gone"
-        android:background="@color/registration_background">
+        android:visibility="gone">
 
         <ProgressBar
             android:layout_width="wrap_content"

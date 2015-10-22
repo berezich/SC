@@ -15,6 +15,8 @@ import com.berezich.sportconnector.backend.sportConnectorApi.model.RegionInfo;
 import com.berezich.sportconnector.backend.sportConnectorApi.model.Spot;
 import com.berezich.sportconnector.backend.sportConnectorApi.model.UpdateSpotInfo;
 import com.google.api.client.json.gson.GsonFactory;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -42,10 +44,16 @@ public class LocalDataManager {
 
 
     private static GsonFactory gsonFactory = new GsonFactory();
+    private static GsonBuilder gsonBuilder = new GsonBuilder();
+    private static Gson gson;
+
+
     public static void init(Activity activity)
     {
         LocalDataManager.activity = activity;
         LocalDataManager.context = activity.getBaseContext();
+        gsonBuilder.serializeNulls();
+        gson = gsonBuilder.create();
     }
     private static boolean loadRegionInfoFromPref()
     {
@@ -190,7 +198,8 @@ public class LocalDataManager {
         }
         SharedPreferences sp = activity.getPreferences(Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sp.edit();
-        editor.putString(APP_PREF_KEY, gsonFactory.toString(appPref));
+        String appStr = gson.toJson(appPref);
+        editor.putString(APP_PREF_KEY, appStr);
         editor.apply();
 
     }
@@ -209,7 +218,8 @@ public class LocalDataManager {
             return false;
         }
         try {
-            appPref = gsonFactory.fromString(appPrefStr,AppPref.class);
+            appPref = gson.fromJson(appPrefStr, AppPref.class);
+
             Log.d(TAG, "AppPref was fetched from Preferences");
             Log.d(TAG, "AppPref: "+appPrefStr);
         } catch (Exception e) {

@@ -14,6 +14,7 @@
     <!-- fragment_registration/fragment_resetPass-->
 
     <!-- fragment_login-->
+        <dimen name="login_centerOffset">-45dp</dimen>
         <dimen name="login_leftRightOffset">35dp</dimen>
         <dimen name="login_txtPropName_leftRightOffset">5dp</dimen>
         <dimen name="login_txtPropVal_leftRightOffset">5dp</dimen>
@@ -131,4 +132,5 @@
     <!-- Per the design guidelines, navigation drawers should be between 240dp and 320dp:
          https://developer.android.com/design/patterns/navigation-drawer.html -->
     <dimen name="navigation_drawer_width">240dp</dimen>
+    <dimen name="drawer_menuItem_iconText__leftOffset">5dp</dimen>
 </resources>

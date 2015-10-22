@@ -21,6 +21,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ListView;
 
 import com.berezich.sportconnector.MainActivity;
@@ -56,6 +57,8 @@ public class NavigationDrawerFragment extends Fragment {
 
     private DrawerLayout mDrawerLayout;
     private ListView mDrawerListView;
+    private ListView mDrawerBottomListView;
+    private FrameLayout mDrawerLinearLayout;
     private View mFragmentContainerView;
 
     private int mCurrentSelectedPosition = 0;
@@ -96,8 +99,32 @@ public class NavigationDrawerFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        mDrawerListView = (ListView) inflater.inflate(
+        /*mDrawerListView = (ListView) inflater.inflate(
                 R.layout.fragment_navigation_drawer, container, false);
+        mDrawerListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                selectItem(position);
+            }
+        });
+        mDrawerListView.setAdapter(new ArrayAdapter<String>(
+                getActionBar().getThemedContext(),
+                android.R.layout.simple_list_item_activated_1,
+                android.R.id.text1,
+                new String[]{
+                        getString(R.string.mainSearch_fragmentTitle),
+                        getString(R.string.personprofile_myProfile_fragmentTitle),
+                        *//*getString(R.string.frame_msg_title),
+                        getString(R.string.frame_friends_title),
+                        getString(R.string.frame_photo_title),*//*
+                }));
+        mDrawerListView.setItemChecked(mCurrentSelectedPosition, true);*/
+
+
+        mDrawerLinearLayout = (FrameLayout) inflater.inflate(
+                R.layout.fragment_navigation_drawer, container, false);
+
+        mDrawerListView = (ListView) mDrawerLinearLayout.findViewById(R.id.mDrawer_headerList);
         mDrawerListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -117,7 +144,35 @@ public class NavigationDrawerFragment extends Fragment {
                 }));
         mDrawerListView.setItemChecked(mCurrentSelectedPosition, true);
 
-        return mDrawerListView;
+        mDrawerBottomListView = (ListView) mDrawerLinearLayout.findViewById(R.id.mDrawer_bottomList);
+        mDrawerBottomListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                if (mDrawerListView != null) {
+                    mDrawerListView.clearChoices();
+                    mDrawerListView.requestLayout();
+                }
+                if (mDrawerLayout != null) {
+                    mDrawerLayout.closeDrawer(mFragmentContainerView);
+                }
+                if (mCallbacks != null) {
+                    mCallbacks.onNavigationDrawerBottomItemSelected(position);
+                }
+            }
+        });
+        mDrawerBottomListView.setAdapter(new ArrayAdapter<String>(
+                getActionBar().getThemedContext(),
+                R.layout.drawer_menu_logout_item,
+                R.id.drawer_item_txt,
+                new String[]{
+                        getString(R.string.drawer_bottom_logout),
+                        /*getString(R.string.frame_msg_title),
+                        getString(R.string.frame_friends_title),
+                        getString(R.string.frame_photo_title),*/
+                }));
+        mDrawerBottomListView.setItemChecked(0, false);
+
+        return mDrawerLinearLayout;
     }
 
     public boolean isDrawerOpen() {
@@ -198,6 +253,10 @@ public class NavigationDrawerFragment extends Fragment {
     }
 
     public void selectItem(int position) {
+        if(mDrawerBottomListView!=null) {
+            mDrawerBottomListView.clearChoices();
+            mDrawerBottomListView.requestLayout();
+        }
         mCurrentSelectedPosition = position;
         if (mDrawerListView != null) {
             mDrawerListView.setItemChecked(position, true);
@@ -209,6 +268,7 @@ public class NavigationDrawerFragment extends Fragment {
             mCallbacks.onNavigationDrawerItemSelected(position);
         }
     }
+
 
     @Override
     public void onAttach(Activity activity) {
@@ -302,5 +362,6 @@ public class NavigationDrawerFragment extends Fragment {
          * Called when an item in the navigation drawer is selected.
          */
         void onNavigationDrawerItemSelected(int position);
+        void onNavigationDrawerBottomItemSelected(int position);
     }
 }

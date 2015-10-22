@@ -140,6 +140,8 @@ public class PersonProfileFragment extends Fragment {
         super.onResume();
         TextView txtView;
         ImageView imageView;
+        if(isMyProfile)
+            person = LocalDataManager.getMyPersonInfo();
         if(person!=null && rootView!=null)
         {
             if((imageView = (ImageView) rootView.findViewById(R.id.profile_img_photo))!=null) {

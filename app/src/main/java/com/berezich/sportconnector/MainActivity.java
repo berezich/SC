@@ -27,6 +27,7 @@ import com.berezich.sportconnector.Fragments.MainFragment.Filters;
 import com.berezich.sportconnector.PersonProfile.PersonProfileFragment;
 import com.berezich.sportconnector.SpotInfo.SpotInfoFragment;
 
+import java.io.IOException;
 import java.util.List;
 
 
@@ -46,7 +47,6 @@ public class MainActivity extends AppCompatActivity
      */
     private CharSequence mTitle;
     private static final String TAG = "MyLog_MainActivity";
-    private final String fragmentI = "fragment";
     private boolean isRecover = false;
 
     @Override
@@ -175,6 +175,32 @@ public class MainActivity extends AppCompatActivity
         }
 
     }
+
+    @Override
+    public void onNavigationDrawerBottomItemSelected(int position) {
+        switch (position){
+            case 0://logout
+                AppPref appPref = LocalDataManager.getAppPref();
+                if( appPref==null)
+                    appPref = new AppPref(false);
+                else
+                    appPref.setIsAutoLogin(false);
+                try {
+                    LocalDataManager.saveAppPref(appPref,this);
+                    LocalDataManager.saveMyPersonInfoToPref(LocalDataManager.getMyPersonInfo().setPass(""), this);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                mNavigationDrawerFragment.setMenuVisibility(false);
+                mNavigationDrawerFragment.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+                getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+                FragmentManager fragmentManager = getSupportFragmentManager();
+                fragmentManager.beginTransaction().replace(R.id.container, new LoginFragment().setArgs(-1)).commit();
+                break;
+        }
+
+    }
+
     @Override
     public void onBtnClickMF(Filters filter, int sectionNumber)
     {
