@@ -8,18 +8,27 @@ import com.google.appengine.api.oauth.OAuthServiceFailureException;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.logging.Logger;
+
+import sun.rmi.runtime.Log;
 
 /**
  * Created by berezkin on 14.08.2015.
  */
 public class OAuth_2_0 {
-    public static void check() throws BadRequestException
+    enum PERMISSIONS{ANDROID_APP,ADMIN}
+    public static void check(PERMISSIONS permissions) throws BadRequestException
     {
         OAuthService oauth = OAuthServiceFactory.getOAuthService();
         String scope = "https://www.googleapis.com/auth/userinfo.email";
         Set<String> allowedClients = new HashSet<>();
-        allowedClients.add("182489181232-bbiekce9fgm6gtelunr9lp82gmdk3uju.apps.googleusercontent.com");
-        allowedClients.add("292824132082.apps.googleusercontent.com");
+        //all Google accounts
+        //allowedClients.add("292824132082.apps.googleusercontent.com");
+        //allowedClients.add("berezaman@gmail.com");
+        //service account for Android app
+        if(permissions == PERMISSIONS.ANDROID_APP)
+            allowedClients.add("182489181232-bbiekce9fgm6gtelunr9lp82gmdk3uju.apps.googleusercontent.com");
+
 
         if(true)
             try {
@@ -27,7 +36,7 @@ public class OAuth_2_0 {
                 String tokenAudience = oauth.getClientId(scope);
                 if (!allowedClients.contains(tokenAudience)) {
                     throw new OAuthRequestException("audience of token '" + tokenAudience
-                            + "' is not in allowed list " + allowedClients);
+                            + "' is not in allowed list");
                 }
                 // proceed with authenticated user
                 // ...

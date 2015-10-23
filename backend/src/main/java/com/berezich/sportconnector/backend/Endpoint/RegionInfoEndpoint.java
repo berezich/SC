@@ -57,7 +57,7 @@ public class RegionInfoEndpoint {
             path = "storeDataInfo/{id}",
             httpMethod = ApiMethod.HttpMethod.GET)
     public RegionInfo get(@Named("id") Long id) throws NotFoundException, BadRequestException {
-        OAuth_2_0.check();
+        OAuth_2_0.check(OAuth_2_0.PERMISSIONS.ANDROID_APP);
         logger.info("Getting StoreDataInfo with ID: " + id);
         RegionInfo regionInfo = ofy().load().type(RegionInfo.class).id(id).now();
         if (regionInfo == null) {
@@ -73,13 +73,13 @@ public class RegionInfoEndpoint {
             name = "insertRegionInfo",
             path = "storeDataInfo",
             httpMethod = ApiMethod.HttpMethod.POST)
-    public RegionInfo insert(RegionInfo regionInfo) throws InstanceAlreadyExists, BadRequestException {
+    protected RegionInfo insert(RegionInfo regionInfo) throws InstanceAlreadyExists, BadRequestException {
         // Typically in a RESTful API a POST does not have a known ID (assuming the ID is used in the resource path).
         // You should validate that storeDataInfo.getId has not been set. If the ID type is not supported by the
         // Objectify ID generator, e.g. long or String, then you should generate the unique ID yourself prior to saving.
         //
         // If your client provides the ID then you should probably use PUT instead.
-        OAuth_2_0.check();
+        //OAuth_2_0.check(OAuth_2_0.PERMISSIONS.ADMIN);
         validateRegionInfoProperties(regionInfo);
         try {
             checkExists(regionInfo.getId());
@@ -113,7 +113,7 @@ public class RegionInfoEndpoint {
             httpMethod = ApiMethod.HttpMethod.PUT)
     */
     protected RegionInfo update(Long id, RegionInfo regionInfo) throws NotFoundException, BadRequestException {
-        OAuth_2_0.check();
+        //OAuth_2_0.check(OAuth_2_0.PERMISSIONS.ANDROID_APP);
         checkExists(id);
         validateRegionInfoProperties(regionInfo);
         ofy().save().entity(regionInfo).now();

@@ -315,7 +315,7 @@ public class EndpointApi {
         }
     }
 
-    public static class UpdateSpotAsyncTask extends AsyncTask< Spot, Void, Pair<Spot,Exception> >{
+    /*public static class UpdateSpotAsyncTask extends AsyncTask< Spot, Void, Pair<Spot,Exception> >{
         private OnAction listener=null;
         private Context context = null;
         public UpdateSpotAsyncTask(Fragment fragment)
@@ -350,7 +350,7 @@ public class EndpointApi {
             void onUpdateSpotFinish(Pair<Spot,Exception> result);
         }
     }
-
+*/
     public static class SetSpotAsFavoriteAsyncTask extends AsyncTask< Pair<Long,String>, Void, Pair<Boolean ,Exception> >{
         private OnAction listener=null;
         private Context context = null;

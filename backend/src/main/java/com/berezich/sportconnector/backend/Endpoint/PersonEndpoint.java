@@ -104,7 +104,7 @@ public class PersonEndpoint {
         // Objectify ID generator, e.g. long or String, then you should generate the unique ID yourself prior to saving.
         //
         // If your client provides the ID then you should probably use PUT instead.
-        OAuth_2_0.check();
+        OAuth_2_0.check(OAuth_2_0.PERMISSIONS.ANDROID_APP);
         account.setUuid();
         validateAccountProperties(account);
         //Person samePerson = ofy().load().type(Person.class).id(account.getId()).now();
@@ -173,7 +173,7 @@ public class PersonEndpoint {
             path = "authorizePerson",
             httpMethod = ApiMethod.HttpMethod.GET)
     public Person authorizePerson(@Named("email") String email, @Named("pass") String pass) throws NotFoundException,BadRequestException {
-        OAuth_2_0.check();
+        OAuth_2_0.check(OAuth_2_0.PERMISSIONS.ANDROID_APP);
         logger.info("Getting Person with ID: " + email);
         Person person = null;
         Query<Person> query = ofy().load().type(Person.class).filter("email", email);
@@ -202,7 +202,7 @@ public class PersonEndpoint {
             path = "person/{id}",
             httpMethod = ApiMethod.HttpMethod.GET)
     public Person get(@Named("id") Long id) throws NotFoundException,BadRequestException {
-        OAuth_2_0.check();
+        OAuth_2_0.check(OAuth_2_0.PERMISSIONS.ADMIN);
         logger.info("Getting Person with ID: " + id);
         Person person = ofy().load().type(Person.class).id(id).now();
         if (person == null) {
@@ -226,7 +226,7 @@ public class PersonEndpoint {
         //
         // If your client provides the ID then you should probably use PUT instead.
         String digPass;
-        OAuth_2_0.check();
+        OAuth_2_0.check(OAuth_2_0.PERMISSIONS.ADMIN);
         validatePersonProperties(person);
         digPass  = msgDigest(person.getPass());
         if(digPass.equals("")) {
@@ -261,7 +261,7 @@ public class PersonEndpoint {
             httpMethod = ApiMethod.HttpMethod.PUT)
     public void changeEmail(@Named("id") Long id, @Named("oldEmail") String oldEmail, @Named("newEmail") String newEmail)
             throws NotFoundException, BadRequestException {
-        OAuth_2_0.check();
+        OAuth_2_0.check(OAuth_2_0.PERMISSIONS.ANDROID_APP);
         Person person = ofy().load().type(Person.class).id(id).now();
         if(person==null)
             throw new NotFoundException("Person with id:" + id + " not found");
@@ -328,7 +328,7 @@ public class PersonEndpoint {
             httpMethod = ApiMethod.HttpMethod.PUT)
     public void resetPass(@Named("email") String email)
             throws NotFoundException, BadRequestException {
-        OAuth_2_0.check();
+        OAuth_2_0.check(OAuth_2_0.PERMISSIONS.ANDROID_APP);
         Person person;
         Query<Person> query = ofy().load().type(Person.class).filter("email", email);
         if(!(query!=null && query.count()>0))
@@ -391,7 +391,7 @@ public class PersonEndpoint {
             httpMethod = ApiMethod.HttpMethod.GET)
     public void changePass(@Named("id") Long id, @Named("oldPass") String oldPass, @Named("newPass") String newPass)
             throws NotFoundException, BadRequestException {
-        OAuth_2_0.check();
+        OAuth_2_0.check(OAuth_2_0.PERMISSIONS.ANDROID_APP);
         Person person = ofy().load().type(Person.class).id(id).now();
         if(person==null)
             throw  new NotFoundException("Person with id:" + id + " not found");
@@ -421,8 +421,9 @@ public class PersonEndpoint {
             name = "updatePerson",
             path = "person/{id}",
             httpMethod = ApiMethod.HttpMethod.PUT)
+    //TODO: check pass of user
     public Person update(@Named("id") Long id, Person person) throws NotFoundException, BadRequestException {
-        OAuth_2_0.check();
+        OAuth_2_0.check(OAuth_2_0.PERMISSIONS.ANDROID_APP);
         Person oldPerson = ofy().load().type(Person.class).id(id).now();
         if(oldPerson==null)
             throw  new NotFoundException("Person with id:" + id + " not found");
@@ -441,8 +442,9 @@ public class PersonEndpoint {
         return personRes;
     }
 
+    //TODO: check pass of user
     protected void addPersonsFavoriteSpot(List<Long> idLst,Long spotId) throws BadRequestException{
-        OAuth_2_0.check();
+        OAuth_2_0.check(OAuth_2_0.PERMISSIONS.ANDROID_APP);
         Person person;
         for (int i = 0; i < idLst.size(); i++) {
             Long id = idLst.get(i);
@@ -462,7 +464,7 @@ public class PersonEndpoint {
 
 
     protected void removePersonsFavoriteSpot(List<Long> idLst, Long spotId) throws BadRequestException{
-        OAuth_2_0.check();
+        OAuth_2_0.check(OAuth_2_0.PERMISSIONS.ANDROID_APP);
         Person person;
         if(idLst!=null)
             for (int i = 0; i < idLst.size(); i++) {
@@ -502,7 +504,7 @@ public class PersonEndpoint {
             path = "person/{id}",
             httpMethod = ApiMethod.HttpMethod.DELETE)
     public void remove(@Named("id") Long id) throws NotFoundException,BadRequestException {
-        OAuth_2_0.check();
+        OAuth_2_0.check(OAuth_2_0.PERMISSIONS.ADMIN);
         checkExists(id);
         Person person = ofy().load().type(Person.class).id(id).now();
         if(person!=null) {
@@ -534,7 +536,7 @@ public class PersonEndpoint {
             path = "person",
             httpMethod = ApiMethod.HttpMethod.GET)
     public CollectionResponse<Person> list(@Nullable @Named("cursor") String cursor, @Nullable @Named("limit") Integer limit) throws BadRequestException{
-        OAuth_2_0.check();
+        OAuth_2_0.check(OAuth_2_0.PERMISSIONS.ADMIN);
         limit = limit == null ? DEFAULT_LIST_LIMIT : limit;
         Query<Person> query = ofy().load().type(Person.class).limit(limit);
         if (cursor != null) {
@@ -553,7 +555,7 @@ public class PersonEndpoint {
             path = "personByIdLst",
             httpMethod = ApiMethod.HttpMethod.GET)
     public CollectionResponse<Person> listByIdLst(@Named("idLst") ArrayList<Long>idLst) throws BadRequestException{
-        OAuth_2_0.check();
+        OAuth_2_0.check(OAuth_2_0.PERMISSIONS.ANDROID_APP);
         Map<Long,Person> personMap = ofy().load().type(Person.class).ids(idLst);
         if(personMap==null)
             return null;

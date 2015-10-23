@@ -1,11 +1,9 @@
 package com.berezich.sportconnector.backend.Endpoint;
 
 import com.berezich.sportconnector.backend.UpdateSpotInfo;
-import com.google.api.server.spi.config.AnnotationBoolean;
 import com.google.api.server.spi.config.Api;
 import com.google.api.server.spi.config.ApiMethod;
 import com.google.api.server.spi.config.ApiNamespace;
-import com.google.api.server.spi.config.ApiResourceProperty;
 import com.google.api.server.spi.config.Nullable;
 import com.google.api.server.spi.response.BadRequestException;
 import com.google.api.server.spi.response.CollectionResponse;
@@ -64,7 +62,7 @@ public class UpdateSpotInfoEndpoint {
             path = "updateSpotInfo/{id}",
             httpMethod = ApiMethod.HttpMethod.GET)
     public UpdateSpotInfo get(@Named("id") Long id) throws NotFoundException,BadRequestException {
-        OAuth_2_0.check();
+        OAuth_2_0.check(OAuth_2_0.PERMISSIONS.ADMIN);
         logger.info("Getting UpdateSpotInfo with ID: " + id);
         UpdateSpotInfo updateSpotInfo = ofy().load().type(UpdateSpotInfo.class).id(id).now();
         if (updateSpotInfo == null) {
@@ -80,7 +78,7 @@ public class UpdateSpotInfoEndpoint {
         // Objectify ID generator, e.g. long or String, then you should generate the unique ID yourself prior to saving.
         //
         // If your client provides the ID then you should probably use PUT instead.
-        OAuth_2_0.check();
+        //OAuth_2_0.check(OAuth_2_0.PERMISSIONS.ANDROID_APP);
         validateUpdateSpotInfoProperties(updateSpotInfo);
         if(updateSpotInfo.getUpdateDate()==null)
             updateSpotInfo.setUpdateDate(new Date());
@@ -91,7 +89,7 @@ public class UpdateSpotInfoEndpoint {
     }
 
     protected UpdateSpotInfo update(Long id, UpdateSpotInfo updateSpotInfo) throws NotFoundException, BadRequestException {
-        OAuth_2_0.check();
+        //OAuth_2_0.check(OAuth_2_0.PERMISSIONS.ANDROID_APP);
         checkExists(id);
         validateUpdateSpotInfoProperties(updateSpotInfo);
         if(updateSpotInfo.getUpdateDate()==null)
@@ -100,29 +98,7 @@ public class UpdateSpotInfoEndpoint {
         logger.info("Updated UpdateSpotInfo: " + updateSpotInfo);
         return ofy().load().entity(updateSpotInfo).now();
     }
-    /**
-     * Deletes the specified {@code UpdateSpotInfo}.
-     *
-     * @param id the ID of the entity to delete
-     * @throws NotFoundException if the {@code _id} does not correspond to an existing
-     *                           {@code UpdateSpotInfo}
 
-    @ApiMethod(
-            name = "remove",
-            path = "updateSpotInfo/{getId}",
-            httpMethod = ApiMethod.HttpMethod.DELETE)
-    public void remove(@Named("getId") Long getId) throws NotFoundException {
-        checkExists(_id);
-        ofy().delete().type(UpdateSpotInfo.class).getId(getId).now();
-        logger.info("Deleted UpdateSpotInfo with ID: " + getId);
-    }
-
-     * List all entities.
-     *
-     * @param cursor used for pagination to determine which page to return
-     * @param limit  the maximum number of entries to return
-     * @return a response that encapsulates the result list and the next page token/cursor
-     */
     @ApiMethod(
             name = "listUpdateSpotInfoByRegIdDate",
             path = "updateSpotInfo",
@@ -131,7 +107,7 @@ public class UpdateSpotInfoEndpoint {
                                                    @Named("date") Date lastUpdate,
                                                    @Nullable @Named("cursor") String cursor,
                                                    @Nullable @Named("limit") Integer limit) throws BadRequestException{
-        OAuth_2_0.check();
+        OAuth_2_0.check(OAuth_2_0.PERMISSIONS.ANDROID_APP);
         limit = limit == null ? DEFAULT_LIST_LIMIT : limit;
         Query<UpdateSpotInfo> query = ofy().load().type(UpdateSpotInfo.class).filter("regionId",regionId).filter("updateDate >",lastUpdate).limit(limit);
         if (cursor != null) {
