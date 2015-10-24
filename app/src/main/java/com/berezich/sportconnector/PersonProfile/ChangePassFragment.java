@@ -8,6 +8,8 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.berezich.sportconnector.ErrorVisualizer;
+import com.berezich.sportconnector.InputValuesValidation;
 import com.berezich.sportconnector.R;
 
 /**
@@ -74,18 +76,31 @@ public class ChangePassFragment extends DialogFragment {
                             if (edtOld!=null)
                                 edtOld.setError(getString( R.string.changePass_errOld));
                             return;
-                        }else if(newPassStr.equals("") && newPassStr2.equals("") ) {
-                            if (edtNew!=null)
-                                edtNew.setError(getString( R.string.changePass_errNew_empty));
-                            return;
                         }
-                        else if(!newPassStr.equals(newPassStr2))
-                        {
+                        InputValuesValidation.PASS_ERROR pass_error = InputValuesValidation.
+                                isValidPass(getContext(), newPassStr, newPassStr2);
+                        switch (pass_error){
+                            case EMPTY:
+                                if (edtNew!=null)
+                                    edtNew.setError(getString( R.string.changePass_errNew_empty));
+                                return;
+                            case NOT_MATCH:
+                                if (edtNew2!=null)
+                                    edtNew2.setError(getString( R.string.changePass_errNew_notMatch));
+                                return;
+                            case TOO_SHORT:
+                                if (edtNew!=null)
+                                    edtNew.setError(String.format(getString( R.string.changePass_errNew_tooShort),
+                                            getResources().getInteger(R.integer.changePass_minPassLength)));
+                                return;
 
-                            if (edtNew2!=null)
-                                edtNew2.setError(getString( R.string.changePass_errNew_notMatch));
+                        }
+                        if(newPassStr.equals(oldPass)){
+                            if (edtNew!=null)
+                                edtNew.setError(getString(R.string.changePass_errNewOld_match));
                             return;
                         }
+
                         listener.onChangePassClick(edtNew.getText().toString());
                     }
                     dismiss();

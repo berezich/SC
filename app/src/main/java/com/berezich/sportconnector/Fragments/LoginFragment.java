@@ -223,7 +223,7 @@ public class LoginFragment extends Fragment implements EndpointApi.AuthorizePers
                     appPref = new AppPref(true);
                 else
                     appPref.setIsAutoLogin(true);
-                LocalDataManager.saveAppPref(appPref,getActivity());
+                LocalDataManager.saveAppPref(appPref, getActivity());
                 listenerLoginFragment.onAuthorized();
             } catch (IOException e) {
                 e.printStackTrace();
@@ -243,6 +243,7 @@ public class LoginFragment extends Fragment implements EndpointApi.AuthorizePers
         Log.e(TAG,"request error: "+ErrorVisualizer.getDebugMsgOfRespException(error));
         dialog = AlertDialogFragment.newInstance(dialogMsg, false);
         dialog.setTargetFragment(this, 0);
+        dialog.setCancelable(false);
         FragmentManager ft = getActivity().getSupportFragmentManager();
         if(ft!=null)
             dialog.show(ft, "");
@@ -257,6 +258,11 @@ public class LoginFragment extends Fragment implements EndpointApi.AuthorizePers
 
     @Override
     public void onNegativeClick() {
+        setVisibleProgressBar(false);
+    }
+
+    @Override
+    public void onCancelDialog() {
         setVisibleProgressBar(false);
     }
 
@@ -282,7 +288,7 @@ public class LoginFragment extends Fragment implements EndpointApi.AuthorizePers
         if(fragmentManager!=null)
         {
             fragmentManager.popBackStack();
-            dialog = AlertDialogFragment.newInstance("",msgResult, false, false);
+            dialog = AlertDialogFragment.newInstance("",msgResult, false, true);
             dialog.setTargetFragment(this, 0);
             dialog.show(fragmentManager, "");
         }

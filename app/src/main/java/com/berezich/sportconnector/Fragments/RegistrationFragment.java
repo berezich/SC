@@ -18,6 +18,7 @@ import android.widget.EditText;
 import com.berezich.sportconnector.AlertDialogFragment;
 import com.berezich.sportconnector.EndpointApi;
 import com.berezich.sportconnector.ErrorVisualizer;
+import com.berezich.sportconnector.InputValuesValidation;
 import com.berezich.sportconnector.LocalDataManager;
 import com.berezich.sportconnector.MainActivity;
 import com.berezich.sportconnector.R;
@@ -34,6 +35,7 @@ public class RegistrationFragment extends Fragment implements EndpointApi.Regist
 
     private final String TAG = "MyLog_RegFragment";
     private String pass;
+    private String email="";
     View rootView;
 
     RegFragmentAction listenerCreateAccount = null;
@@ -87,17 +89,40 @@ public class RegistrationFragment extends Fragment implements EndpointApi.Regist
     {
         @Override
         public void onClick(View v) {
-            String email="", name="";
+            String errorStr="";
+            String name="";
             pass = "";
             EditText editTxt;
             if((editTxt = (EditText) rootView.findViewById(R.id.registration_email_value))!=null) {
-                email = editTxt.getText().toString();
+                email = editTxt.getText().toString().trim();
+                if(!InputValuesValidation.isValidEmail(email))
+                    errorStr = getString(R.string.changeEmail_errNew_invalid);
             }
-            if((editTxt = (EditText) rootView.findViewById(R.id.registration_name_value))!=null) {
+            if(errorStr.isEmpty() && (editTxt = (EditText) rootView.findViewById(R.id.registration_name_value))!=null) {
                 name = editTxt.getText().toString();
             }
-            if((editTxt = (EditText) rootView.findViewById(R.id.registration_pass_value))!=null) {
+            if(errorStr.isEmpty() && (editTxt = (EditText) rootView.findViewById(R.id.registration_pass_value))!=null) {
                 pass = editTxt.getText().toString();
+                InputValuesValidation.PASS_ERROR pass_error = InputValuesValidation.
+                        isValidPass(getContext(), pass);
+                switch (pass_error){
+                    case EMPTY:
+                        errorStr=getString( R.string.registration_err_pass_empty);
+                        break;
+                    case TOO_SHORT:
+                        errorStr=String.format(getString( R.string.registration_err_pass_tooShort),
+                                    getResources().getInteger(R.integer.changePass_minPassLength));
+                        break;
+                }
+            }
+            if(!errorStr.isEmpty()){
+                AlertDialogFragment dialog;
+                dialog = AlertDialogFragment.newInstance(errorStr, false);
+                dialog.setTargetFragment(getFragment(), 0);
+                FragmentManager ft = getActivity().getSupportFragmentManager();
+                if(ft!=null)
+                    dialog.show(ft, "");
+                return;
             }
             setVisibleProgressBar(true);
             new EndpointApi.RegisterPersonAsyncTask(getFragment()).execute(email,name,pass,"PARTNER");
@@ -132,7 +157,8 @@ public class RegistrationFragment extends Fragment implements EndpointApi.Regist
                 account.setPass(pass);
 
                 LocalDataManager.saveMyPersonInfoToPref(UsefulFunctions.createPerson(account), getActivity());
-                listenerCreateAccount.onCreateAccount(getString(R.string.registration_msgCreateAccount));
+                String msg = String.format(getString(R.string.registration_msgCreateAccount),email);
+                listenerCreateAccount.onCreateAccount( msg);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -142,7 +168,8 @@ public class RegistrationFragment extends Fragment implements EndpointApi.Regist
         Log.d(TAG,"person = null");
 
         String dialogMsg;
-        Pair<ErrorVisualizer.ERROR_CODE,String> errTxtCode = ErrorVisualizer.getTextCodeOfRespException(getActivity().getBaseContext(),error);
+        Pair<ErrorVisualizer.ERROR_CODE,String> errTxtCode =
+                ErrorVisualizer.getTextCodeOfRespException(getActivity().getBaseContext(), error);
         if(errTxtCode!=null && !errTxtCode.second.equals("")){
             dialogMsg = errTxtCode.second;
             Log.d(TAG,"registrationError code = "+errTxtCode.first+" msg = "+errTxtCode.second);
@@ -152,6 +179,7 @@ public class RegistrationFragment extends Fragment implements EndpointApi.Regist
 
         dialog = AlertDialogFragment.newInstance(dialogMsg, false);
         dialog.setTargetFragment(this, 0);
+        dialog.setCancelable(false);
         FragmentManager ft = getActivity().getSupportFragmentManager();
         if(ft!=null)
             dialog.show(ft, "");
@@ -164,6 +192,11 @@ public class RegistrationFragment extends Fragment implements EndpointApi.Regist
 
     @Override
     public void onNegativeClick() {
+        setVisibleProgressBar(false);
+    }
+
+    @Override
+    public void onCancelDialog() {
         setVisibleProgressBar(false);
     }
 

@@ -107,7 +107,6 @@ public class PersonEndpoint {
         OAuth_2_0.check(OAuth_2_0.PERMISSIONS.ANDROID_APP);
         account.setUuid();
         validateAccountProperties(account);
-        //Person samePerson = ofy().load().type(Person.class).id(account.getId()).now();
         Query<Person> query = ofy().load().type(Person.class).filter("email", account.getEmail());
         if(query!=null && query.count()>0)
         {

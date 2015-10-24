@@ -72,7 +72,6 @@ public class FileManager {
             path = "fileManager/blobs",
             httpMethod = ApiMethod.HttpMethod.GET)
     public List<BlobInfo> getBlobInfos()throws BadRequestException{
-        Endpoint 
         OAuth_2_0.check(OAuth_2_0.PERMISSIONS.ADMIN);
         List<BlobInfo> blobInfos = new ArrayList<>();
         BlobInfoFactory infoFactory = new BlobInfoFactory();

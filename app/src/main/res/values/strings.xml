@@ -43,7 +43,7 @@
         <string name="resetPass_btnCancel_txt">Отмена</string>
         <string name="resetPass_err_title">Внимание</string>
         <string name="resetPass_err_loginNotExists">Пользователя с таким email не существует</string>
-        <string name="resetPass_msgReqResetPass">Вам на почту отправлено письмо. Для установки нового пароля следуйте инструкциям, описанным в письме.</string>
+        <string name="resetPass_msgReqResetPass">Вам на почту %s отправлено письмо. В нем описаны инструкции для установки нового пароля.</string>
     <!--resetPass_fragment end-->
 
     <!--registration_fragment begin-->
@@ -57,8 +57,9 @@
         <string name="registration_err_loginExists">Пользователь с таким email уже существует</string>
         <string name="registration_err_idNull">Введите ваш E-mail</string>
         <string name="registration_err_nameNull">Введите ваше имя</string>
-        <string name="registration_err_passNull">Введите пароль</string>
-        <string name="registration_msgCreateAccount">Вам на почту отправлено письмо. Для завершения регистрации следуйте инструкциям, описанным в письме.</string>
+        <string name="registration_err_pass_empty">Введите пароль</string>
+        <string name="registration_err_pass_tooShort">Мин. длина пароля %d символов</string>
+        <string name="registration_msgCreateAccount">Вам на почту %s отправлено письмо. В нем описаны инструкции для завершения регистрации.</string>
     <!--registration_fragment end-->
 
     <!-- main_search_fragment -->
@@ -123,18 +124,21 @@
                 <string name="changePass_btnOk">Продолжить</string>
                 <string name="changePass_btnCancel">Отмена</string>
                 <string name="changePass_errOld">Вы ввели неверный старый пароль</string>
+                <string name="changePass_errNewOld_match">Старый и новый пароли совпадают</string>
                 <string name="changePass_errNew_empty">Введите новый пароль</string>
                 <string name="changePass_errNew_notMatch">Новые пароли не совпадают</string>
+                <string name="changePass_errNew_tooShort">Мин. длина %d символов</string>
                 <string name="changePass_msgChangePass">Ваш пароль изменен.</string>
             <!--changePass_dialog end-->
             <!--changePass_dialog begin-->
                 <string name="changeEmail_dialogTitle">Смена Email</string>
                 <string name="changeEmail_old_hint">Старый Email</string>
                 <string name="changeEmail_new_hint">Новый Email</string>
-                <string name="changeEmail_errNew_empty">Введите новый Email</string>
+                <string name="changeEmail_errNew_invalid">Введите корректный Email</string>
+                <string name="changeEmail_errOldNew_matches">Новый Email должен отличаться</string>
                 <string name="changeEmail_btnOk">Продолжить</string>
                 <string name="changeEmail_btnCancel">Отмена</string>
-                <string name="changeEmail_msgChangeEmail">Вам на почту отправлено письмо. Для подтверждения почты следуйте инструкциям, описанным в письме.</string>
+                <string name="changeEmail_msgChangeEmail">Вам на почту %s отправлено письмо. В нем описаны инструкции для подтверждения почты.</string>
                 <string name="changeEmail_err_oldEmailErr">Введите пароль</string>
             <!--changePass_dialog end-->
 

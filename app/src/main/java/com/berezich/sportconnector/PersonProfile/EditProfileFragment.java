@@ -71,6 +71,7 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
     FileManager.PicInfo picInfo;
     View rootView;
     Person tempMyPerson = null;
+    String newEmail ="";
     private static GsonFactory gsonFactory = new GsonFactory();
     private static GsonBuilder gsonBuilder = new GsonBuilder();
     private static Gson gson;
@@ -394,6 +395,7 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
     @Override
     public void onChangeEmailClick(String newEmail) {
         try {
+            this.newEmail = newEmail;
             setVisibleProgressBar(true);
             new EndpointApi.ChangeEmailAsyncTask(this).execute(new Pair<Long, String>(tempMyPerson.getId(), tempMyPerson.getEmail()), new Pair<Long, String>(null, newEmail));
         }
@@ -411,7 +413,7 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
         String dialogMsg;
         setVisibleProgressBar(false);
         if(error==null)
-            dialogMsg = getString(R.string.changeEmail_msgChangeEmail);
+            dialogMsg = String.format(getString(R.string.changeEmail_msgChangeEmail),newEmail);
         else {
 
             Pair<ErrorVisualizer.ERROR_CODE, String> errTxtCode = ErrorVisualizer.getTextCodeOfRespException(getActivity().getBaseContext(), error);

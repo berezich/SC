@@ -95,7 +95,7 @@ public class ErrorVisualizer {
                         error_code = ERROR_CODE.REGISTRATION_FAILED;
                     }
                     else if(errExceptMsg.indexOf("passNull@:")==0) {
-                        errMsg = context.getString(R.string.registration_err_passNull);
+                        errMsg = context.getString(R.string.registration_err_pass_empty);
                         error_code = ERROR_CODE.REGISTRATION_FAILED;
                     }
                     else if(errExceptMsg.indexOf("emailNotExists@:")==0) {

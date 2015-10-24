@@ -8,13 +8,13 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.berezich.sportconnector.InputValuesValidation;
 import com.berezich.sportconnector.R;
 
 /**
  * Created by berezkin on 24.08.2015.
  */
 public class ChangeEmailFragment extends DialogFragment {
-    private static final String TAG = "MyLog_EmailDialogFragment";
     private static final String EMAIL = "oldEmail";
     private OnActionEmailDialogListener listener;
     private View rootView;
@@ -57,7 +57,7 @@ public class ChangeEmailFragment extends DialogFragment {
             rootView.findViewById(R.id.changeEmail_btnOk).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    EditText edtNew=null, edtOld;
+                    EditText edtNew=null,edtOld;
                     String newEmailStr ="";
                     if(rootView!=null) {
 
@@ -65,9 +65,16 @@ public class ChangeEmailFragment extends DialogFragment {
                             newEmailStr = edtNew.getText().toString();
                             edtNew.setError(null);
                         }
-                        else if(newEmailStr.equals("") ) {
+                        if((edtOld = (EditText) rootView.findViewById(R.id.changeEmail_txtEdt_old))!=null) {
+                            if(edtOld.getText()!=null)
+                                if (newEmailStr.equals(edtOld.getText().toString())) {
+                                    edtNew.setError(getString(R.string.changeEmail_errOldNew_matches));
+                                    return;
+                                }
+                        }
+                        if(!InputValuesValidation.isValidEmail(newEmailStr)) {
                             if (edtNew!=null)
-                                edtNew.setError(getString( R.string.changeEmail_errNew_empty));
+                                edtNew.setError(getString( R.string.changeEmail_errNew_invalid));
                             return;
                         }
                         listener.onChangeEmailClick(edtNew.getText().toString());

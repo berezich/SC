@@ -18,6 +18,7 @@ import android.widget.EditText;
 import com.berezich.sportconnector.AlertDialogFragment;
 import com.berezich.sportconnector.EndpointApi;
 import com.berezich.sportconnector.ErrorVisualizer;
+import com.berezich.sportconnector.InputValuesValidation;
 import com.berezich.sportconnector.LocalDataManager;
 import com.berezich.sportconnector.MainActivity;
 import com.berezich.sportconnector.R;
@@ -34,6 +35,7 @@ public class ResetPassFragment extends Fragment implements EndpointApi.ResetPass
     private final String TAG = "MyLog_RPassFragment";
     View rootView;
     private Person myPersonInfo;
+    String email="";
 
     ResetPassFragmentAction listenerResetPass = null;
 
@@ -91,10 +93,19 @@ public class ResetPassFragment extends Fragment implements EndpointApi.ResetPass
     {
         @Override
         public void onClick(View v) {
-            String email="", name="";
             EditText editTxt;
             if((editTxt = (EditText) rootView.findViewById(R.id.resetPass_email_value))!=null) {
-                email = editTxt.getText().toString();
+                email = editTxt.getText().toString().trim();
+                if(!InputValuesValidation.isValidEmail(email)){
+                    AlertDialogFragment dialog;
+                    dialog = AlertDialogFragment.newInstance(getString(R.string.changeEmail_errNew_invalid), false);
+                    dialog.setTargetFragment(getFragment(), 0);
+                    FragmentManager ft = getActivity().getSupportFragmentManager();
+                    if(ft!=null)
+                        dialog.show(ft, "");
+                    return;
+                }
+
             }
             setVisibleProgressBar(true);
             new EndpointApi.ResetPassAsyncTask(getFragment()).execute(email);
@@ -125,7 +136,8 @@ public class ResetPassFragment extends Fragment implements EndpointApi.ResetPass
         {
             Log.d(TAG, "ResetPassReq was created");
             try {
-                listenerResetPass.onResetPass(getString(R.string.resetPass_msgReqResetPass));
+                String msg = String.format( getString(R.string.resetPass_msgReqResetPass),email);
+                listenerResetPass.onResetPass(msg);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -134,7 +146,8 @@ public class ResetPassFragment extends Fragment implements EndpointApi.ResetPass
         Log.d(TAG,"error != null");
 
         String dialogMsg;
-        Pair<ErrorVisualizer.ERROR_CODE,String> errTxtCode = ErrorVisualizer.getTextCodeOfRespException(getActivity().getBaseContext(),error);
+        Pair<ErrorVisualizer.ERROR_CODE,String> errTxtCode =
+                ErrorVisualizer.getTextCodeOfRespException(getActivity().getBaseContext(),error);
         if(errTxtCode!=null && !errTxtCode.second.equals("")){
             dialogMsg = errTxtCode.second;
             Log.d(TAG,"resetPassError code = "+errTxtCode.first+" msg = "+errTxtCode.second);
@@ -144,6 +157,7 @@ public class ResetPassFragment extends Fragment implements EndpointApi.ResetPass
 
         dialog = AlertDialogFragment.newInstance(dialogMsg, false);
         dialog.setTargetFragment(this, 0);
+        dialog.setCancelable(false);
         FragmentManager ft = getActivity().getSupportFragmentManager();
         if(ft!=null)
             dialog.show(ft, "");
@@ -156,6 +170,11 @@ public class ResetPassFragment extends Fragment implements EndpointApi.ResetPass
 
     @Override
     public void onNegativeClick() {
+        setVisibleProgressBar(false);
+    }
+
+    @Override
+    public void onCancelDialog() {
         setVisibleProgressBar(false);
     }
 

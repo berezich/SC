@@ -6,6 +6,9 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
+import android.view.KeyEvent;
+
+import java.security.Key;
 
 /**
  * Created by berezkin on 22.07.2015.
@@ -51,13 +54,13 @@ public class AlertDialogFragment extends DialogFragment {
             builder.setMessage(msg);
 
         builder.setPositiveButton(R.string.alert_dialog_ok,
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int whichButton) {
-                                dismiss();
-                                if(listener!=null)
-                                    listener.onPositiveClick();
-                            }
-                        }
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        dismiss();
+                        if (listener != null)
+                            listener.onPositiveClick();
+                    }
+                }
         );
 
         if (isNegativeBtn)
@@ -70,12 +73,24 @@ public class AlertDialogFragment extends DialogFragment {
                         }
                     }
             );
-
+        builder.setOnKeyListener(new DialogInterface.OnKeyListener() {
+            @Override
+            public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {
+                if(keyCode == KeyEvent.KEYCODE_BACK) {
+                    dismiss();
+                    if (listener != null)
+                        listener.onCancelDialog();
+                    return true;
+                }
+                return false;
+            }
+        });
         return builder.create();
     }
     public static interface OnActionDialogListener
     {
         void onPositiveClick();
         void onNegativeClick();
+        void onCancelDialog();
     }
 }
