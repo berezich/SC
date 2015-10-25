@@ -24,6 +24,7 @@ import com.berezich.sportconnector.GoogleMap.SpotsData;
 import com.berezich.sportconnector.ImageViewer.ImgViewPagerActivity;
 import com.berezich.sportconnector.LocalDataManager;
 import com.berezich.sportconnector.MainActivity;
+import com.berezich.sportconnector.PhoneMaskUtil;
 import com.berezich.sportconnector.R;
 import com.berezich.sportconnector.SpotInfo.SpotInfoFragment;
 import com.berezich.sportconnector.UsefulFunctions;
@@ -191,8 +192,10 @@ public class PersonProfileFragment extends Fragment {
 
                 if((propertyLayout = (LinearLayout) rootView.findViewById(R.id.profile_linearlayout_phone))!=null && propertyLstLayout!=null)
                     if (phone != null && !phone.equals("")) {
-                        if((txtView = (TextView) rootView.findViewById(R.id.profile_txt_phoneValue))!=null)
-                            txtView.setText(phone);
+                        if((txtView = (TextView) rootView.findViewById(R.id.profile_txt_phoneValue))!=null){
+                            phone = PhoneMaskUtil.unmask(phone);
+                            txtView.setText(PhoneMaskUtil.setMask(phone));
+                        }
                         propertyLayout.setVisibility(View.VISIBLE);
                         linearLayout.setVisibility(View.VISIBLE);
                     }
