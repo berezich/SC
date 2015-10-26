@@ -1,5 +1,7 @@
 package com.berezich.sportconnector;
 
+import android.text.InputFilter;
+import android.text.Spanned;
 import android.util.Log;
 
 import com.berezich.sportconnector.backend.sportConnectorApi.model.AccountForConfirmation;
@@ -123,6 +125,17 @@ public class UsefulFunctions {
                 return "ый";
             default:
                 return "ых";
+        }
+    }
+    public static class NameSurnameInputFilter implements InputFilter{
+        public CharSequence filter(CharSequence source, int start, int end,
+        Spanned dest, int dstart, int dend) {
+            for (int i = start; i < end; i++) {
+                if (!(Character.isLetter(source.charAt(i)) || source.charAt(i)==' ')) {
+                    return "";
+                }
+            }
+            return null;
         }
     }
 }

@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -70,6 +71,7 @@ public class SpotInfoFragment extends Fragment implements EndpointApi.GetListPer
     private final String SPOT_ID = "spotId";
     private Spot curSpot;
     private View spotInfoView;
+    private FragmentActivity activity;
 
     private ArrayList<Long> personIdLst;
     List<Person> coachLst = null;
@@ -200,7 +202,7 @@ public class SpotInfoFragment extends Fragment implements EndpointApi.GetListPer
                 List<Picture> picList = curSpot.getPictureLst();
                 if (picList != null && picList.size() > 0) {
                     //linearLayout.setOnClickListener(new OnImageClick());
-                    Context ctx = getActivity().getBaseContext();
+                    Context ctx = getContext();
                     ImageView imageView;
                     for (Picture pic : picList) {
                         imageView = new ImageView(ctx);
@@ -229,12 +231,6 @@ public class SpotInfoFragment extends Fragment implements EndpointApi.GetListPer
                     // название вкладки
                     tabSpec.setIndicator(getString(R.string.spotinfo_tab1_title));
 
-                    /*
-                    ListView lstView = (ListView) spotInfoView.findViewById(R.id.spotInfo_list_tab_partners);
-                    partnersAdapter = new ProfileItemLstAdapter(getActivity().getApplicationContext(),
-                            new ArrayList<Person>(curSpot.getPartnerLst()));
-                    lstView.setAdapter(partnersAdapter);*/
-
                     // указываем id компонента из FrameLayout, он и станет содержимым
                     tabSpec.setContent(R.id.spotInfo_list_tab_partners);
                     // добавляем в корневой элемент
@@ -243,16 +239,9 @@ public class SpotInfoFragment extends Fragment implements EndpointApi.GetListPer
                 if (coachesNum > 0) {
                     tabSpec = tabHost.newTabSpec(COACHES);
                     tabSpec.setIndicator(getString(R.string.spotinfo_tab2_title));
-                    /*
-                    lstView = (ListView) spotInfoView.findViewById(R.id.spotInfo_list_tab_coaches);
-                    coachesAdapter = new ProfileItemLstAdapter(getActivity().getApplicationContext(),
-                            new ArrayList<Person>(curSpot.getCoachLst()));
-                    lstView.setAdapter(coachesAdapter);*/
                     tabSpec.setContent(R.id.spotInfo_list_tab_coaches);
                     tabHost.addTab(tabSpec);
                 }
-                //tabHost.setCurrentTabByTag(PARTNERS);
-
     /*
                 // обработчик переключения вкладок
                 tabHost.setOnTabChangedListener(new OnTabChangeListener() {
@@ -327,6 +316,7 @@ public class SpotInfoFragment extends Fragment implements EndpointApi.GetListPer
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
+        this.activity = getActivity();
         /*try {
             mListener = (OnFragmentInteractionListener) activity;
         } catch (ClassCastException e) {
@@ -423,7 +413,7 @@ public class SpotInfoFragment extends Fragment implements EndpointApi.GetListPer
 
         FrameLayout frameLayout;
         if((frameLayout = (FrameLayout) spotInfoView.findViewById(R.id.spotinfo_frg_frameLayout))!=null)
-            ErrorVisualizer.showErrorAfterReq(getActivity().getBaseContext(), frameLayout, error, TAG);
+            ErrorVisualizer.showErrorAfterReq(getContext(), frameLayout, error, TAG);
         setVisible(View.GONE,View.VISIBLE,View.GONE);
 
     }
@@ -440,7 +430,7 @@ public class SpotInfoFragment extends Fragment implements EndpointApi.GetListPer
         else
             assert true;
         listView.getLayoutParams().height = android.app.ActionBar.LayoutParams.MATCH_PARENT;
-        ProfileItemLstAdapter partnersAdapter = new ProfileItemLstAdapter(getActivity().getApplicationContext(),
+        ProfileItemLstAdapter partnersAdapter = new ProfileItemLstAdapter(activity.getApplicationContext(),
                 new ArrayList<>(personList));
         listView.setAdapter(partnersAdapter);
         listView.setOnItemClickListener(new OnPersonClick(personList));
@@ -477,7 +467,13 @@ public class SpotInfoFragment extends Fragment implements EndpointApi.GetListPer
                     if(btn.isPressed()==isFavorite)
                         btn.setPressed(!isFavorite);
                     SpotsData.setSpotFavorite(curSpot.getId(), !isFavorite);
-                    Toast.makeText(getActivity().getBaseContext(), R.string.spotinfo_req_error_msg, Toast.LENGTH_SHORT).show();
+                    if(activity!=null)
+                        Toast.makeText(activity.getBaseContext(), R.string.spotinfo_req_error_msg, Toast.LENGTH_SHORT).show();
+                    else{
+                        Log.e(TAG, "current fragment isn't attached to activity");
+                        return;
+                    }
+
                 }
             }
         }
@@ -519,7 +515,7 @@ public class SpotInfoFragment extends Fragment implements EndpointApi.GetListPer
         public void onClick(View v) {
             LinearLayout linearLayout = (LinearLayout) v.getParent();
             int index = linearLayout.indexOfChild(v);
-            Intent intent = new Intent(getActivity(), ImgViewPagerActivity.class);
+            Intent intent = new Intent(activity, ImgViewPagerActivity.class);
             if(curSpot!=null) {
                 List<Picture> picLst = curSpot.getPictureLst();
                 if(picLst!=null) {
@@ -547,7 +543,7 @@ public class SpotInfoFragment extends Fragment implements EndpointApi.GetListPer
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         menu.clear();
         super.onCreateOptionsMenu(menu, inflater);
-        ActionBar actionBar =((AppCompatActivity) getActivity()).getSupportActionBar();
+        ActionBar actionBar =((AppCompatActivity) activity).getSupportActionBar();
         actionBar.setTitle(R.string.spotinfo_fragmentTitle);
     }
 
@@ -623,7 +619,7 @@ public class SpotInfoFragment extends Fragment implements EndpointApi.GetListPer
             try {
 
                 Person person = persons.get(position);
-                FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+                FragmentManager fragmentManager = activity.getSupportFragmentManager();
                 fragmentManager.beginTransaction()
                         .replace(R.id.container, new PersonProfileFragment().setArgs(position,false,person))
                         .addToBackStack(PersonProfileFragment.class.getName())

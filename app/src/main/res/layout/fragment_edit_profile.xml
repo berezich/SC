@@ -77,7 +77,7 @@
                     android:id="@+id/editProfile_txtEdt_name"
                     style="@style/EditProfile_TxtPropField"
                     android:hint="@string/editprofile_hint_name"
-                    android:inputType="textPersonName" />
+                     />
 
 
                 <EditText

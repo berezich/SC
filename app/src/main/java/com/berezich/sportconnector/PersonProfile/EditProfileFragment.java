@@ -6,11 +6,13 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.telephony.PhoneNumberFormattingTextWatcher;
 import android.text.Editable;
+import android.text.InputFilter;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.util.Pair;
@@ -52,6 +54,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.logging.Logger;
 
 /**
  * Created by Sashka on 25.07.2015.
@@ -79,6 +82,8 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
     private static GsonFactory gsonFactory = new GsonFactory();
     private static GsonBuilder gsonBuilder = new GsonBuilder();
     private static Gson gson;
+    private FragmentActivity activity;
+    private PersonProfileFragment personProfileFragment;
 
     public EditProfileFragment() {
         gsonBuilder.serializeNulls().excludeFieldsWithoutExposeAnnotation();
@@ -92,6 +97,13 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
         LocalDataManager.init(getActivity());
+        try {
+            personProfileFragment = (PersonProfileFragment) getTargetFragment();
+        }
+        catch (Exception ex){
+            Log.e(TAG,"For EditProfileFragment there is no targetFragment PersonProfileFragment!");
+            ex.printStackTrace();
+        }
     }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -105,6 +117,7 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
 
     @Override
     public void onAttach(Activity activity) {
+        this.activity = getActivity();
         super.onAttach(activity);
     }
 
@@ -190,15 +203,19 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
             }
             if((imageView = (ImageView) rootView.findViewById(R.id.editProfile_img_photo))!=null) {
                 Picture photoInfo = tempMyPerson.getPhoto();
-                FileManager.providePhotoForImgView(this.getActivity().getBaseContext(), imageView,
+                FileManager.providePhotoForImgView(activity.getBaseContext(), imageView,
                         photoInfo, FileManager.PERSON_CACHE_DIR + "/" + tempMyPerson.getId().toString());
             }
             if((frameLayout=(FrameLayout) rootView.findViewById(R.id.editProfile_frame_changePhoto))!=null)
                 frameLayout.setOnClickListener(new ImageOnClick());
-            if ((txtEdt = (EditText) rootView.findViewById(R.id.editProfile_txtEdt_name)) != null)
+            if ((txtEdt = (EditText) rootView.findViewById(R.id.editProfile_txtEdt_name)) != null) {
                 txtEdt.setText(tempMyPerson.getName());
-            if ((txtEdt = (EditText) rootView.findViewById(R.id.editProfile_txtEdt_surname)) != null)
+                txtEdt.setFilters(new InputFilter[]{new UsefulFunctions.NameSurnameInputFilter()});
+            }
+            if ((txtEdt = (EditText) rootView.findViewById(R.id.editProfile_txtEdt_surname)) != null) {
                 txtEdt.setText(tempMyPerson.getSurname());
+                txtEdt.setFilters(new InputFilter[]{new UsefulFunctions.NameSurnameInputFilter()});
+            }
             if ((txtView = (TextView) rootView.findViewById(R.id.editProfile_txtView_birthday)) != null) {
                 Date date;
                 if ((birthday = tempMyPerson.getBirthday()) != null)
@@ -234,14 +251,14 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
             }
 
             if ((txtView = (TextView) rootView.findViewById(R.id.editProfile_txtView_setRating)) != null) {
-                txtView.setText(getString(R.string.personprofile_rating));
+                txtView.setText(activity.getString(R.string.personprofile_rating));
             }
 
             if ((spinner = (Spinner) rootView.findViewById(R.id.editProfile_spinner_rating)) != null) {
-                String ratings = getString(R.string.ratingInfo_ratingValLst);
+                String ratings = activity.getString(R.string.ratingInfo_ratingValLst);
                 if(ratings!=null) {
                     final String ratingArr[] = ratings.split(",");
-                    ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item, ratingArr);
+                    ArrayAdapter<String> adapter = new ArrayAdapter<>(activity, android.R.layout.simple_spinner_item, ratingArr);
                     adapter.setDropDownViewResource(android.R.layout.simple_spinner_item);
                     spinner.setAdapter(adapter);
                     int pos = (int)(this.tempMyPerson.getRating()/0.5-2);
@@ -278,8 +295,8 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
             if ((txtView = (TextView) rootView.findViewById(R.id.editProfile_txtEdt_desc)) != null)
                 txtView.setText(tempMyPerson.getDescription());
 
-            if(getActivity()!=null)
-                ((MainActivity)getActivity()).setupUI(rootView);
+            if(activity!=null)
+                ((MainActivity)activity).setupUI(rootView);
         }
     }
     private Fragment getCurFragment(){
@@ -291,20 +308,25 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
         menu.clear();
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.fragment_edit_profile, menu);
-        ActionBar actionBar =((AppCompatActivity) getActivity()).getSupportActionBar();
+        ActionBar actionBar =((AppCompatActivity) activity).getSupportActionBar();
         if(actionBar!=null)
             actionBar.setTitle(R.string.editprofile_fragmentTitle);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        ((MainActivity) getActivity()).hideSoftKeyboard();
-        Context ctx = getActivity().getBaseContext();
+        ((MainActivity) activity).hideSoftKeyboard();
+        Context ctx = activity.getBaseContext();
         switch (item.getItemId())
         {
             case R.id.menu_save_profile:
                 Person myPersonInfo = LocalDataManager.getMyPersonInfo();
-                updateTempMyPerson();
+                String validationErr = updateTempMyPerson();
+                if(!validationErr.isEmpty()) {
+                    showWarnDialog(validationErr);
+                    break;
+                }
+
                 if(myPersonInfo!=null && tempMyPerson!=null) {
                     if (picInfo != null) {
                         item.setVisible(false);
@@ -317,13 +339,13 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
                         new EndpointApi.UpdatePersonAsyncTask(this).execute(tempMyPerson);
                     }
                     else{
-                        FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+                        FragmentManager fragmentManager = activity.getSupportFragmentManager();
                         if(fragmentManager!=null)
                             fragmentManager.popBackStack();
                     }
                 }
                 else
-                    Toast.makeText(ctx, getString(R.string.editprofile_saveError), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ctx, activity.getString(R.string.editprofile_saveError), Toast.LENGTH_SHORT).show();
                 break;
         }
         return super.onOptionsItemSelected(item);
@@ -334,9 +356,10 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
         public void onClick(View v) {
             DatePickerFragment datePickerFragment = new DatePickerFragment();
             TextView txtView = (TextView) v;
+
             datePickerFragment.setArgs(txtView.getText().toString());
             datePickerFragment.setTargetFragment(getCurFragment(), -1);
-            datePickerFragment.show(getActivity().getSupportFragmentManager(), null);
+            datePickerFragment.show(activity.getSupportFragmentManager(), null);
         }
     }
     @Override
@@ -346,18 +369,25 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
             if((textView = (TextView) rootView.findViewById(R.id.editProfile_txtView_birthday))!=null)
             {
                 textView.setText(String.format("%02d",day)+ "." + String.format("%02d",month+1) + "." + year);
-                textView.setTextColor( getResources().getColor(R.color.blackColor));
+                textView.setTextColor( activity.getResources().getColor(R.color.blackColor));
             }
     }
 
-    private void updateTempMyPerson(){
+    private String updateTempMyPerson(){
         EditText txtEdt;
         TextView txtView;
+        String validationError = "";
         RadioGroup radioGroup;
-        if((txtEdt = (EditText) rootView.findViewById(R.id.editProfile_txtEdt_name))!=null)
-            tempMyPerson.setName(txtEdt.getText().toString());
-        if((txtEdt = (EditText) rootView.findViewById(R.id.editProfile_txtEdt_surname))!=null)
-            tempMyPerson.setSurname(txtEdt.getText().toString());
+        if((txtEdt = (EditText) rootView.findViewById(R.id.editProfile_txtEdt_name))!=null){
+            String name = txtEdt.getText().toString().trim();
+            if(validationError.isEmpty() &&( name==null || name.isEmpty()))
+                validationError = activity.getString(R.string.registration_err_nameNull);
+            tempMyPerson.setName(name);
+        }
+        if((txtEdt = (EditText) rootView.findViewById(R.id.editProfile_txtEdt_surname))!=null) {
+            String surname = txtEdt.getText().toString().trim();
+            tempMyPerson.setSurname(surname);
+        }
         if((txtView = (TextView) rootView.findViewById(R.id.editProfile_txtView_birthday))!=null) {
             DateTime dtBirthday = UsefulFunctions.parseDateTime(txtView.getText().toString());
             if(dtBirthday!=null)
@@ -374,23 +404,29 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
                 case R.id.editProfile_radio_female:
                     tempMyPerson.setSex(fSex);
                     break;
+                default:
+                    if(validationError.isEmpty()){
+                        validationError = activity.getString(R.string.editprofile_invalidSex);
+                    }
             }
 
-        //middle block
-        if((txtView = (TextView) rootView.findViewById(R.id.editProfile_txtEdt_email))!=null)
-            tempMyPerson.setEmail(txtView.getText().toString());
-        if((txtView = (TextView) rootView.findViewById(R.id.editProfile_txtEdt_phone))!=null)
+        if((txtView = (TextView) rootView.findViewById(R.id.editProfile_txtEdt_phone))!=null) {
+            String phone = txtView.getText().toString();
+            if(validationError.isEmpty() && !PhoneMaskUtil.validate(phone))
+                validationError = activity.getString(R.string.editprofile_invalidPhone);
             tempMyPerson.setPhone(txtView.getText().toString());
+        }
 
         if((txtEdt = (EditText) rootView.findViewById(R.id.editProfile_txtEdt_desc))!=null)
             tempMyPerson.setDescription(txtEdt.getText().toString());
+        return validationError;
     }
 
     private class EmailOnClickListener implements View.OnClickListener
     {
         @Override
         public void onClick(View v) {
-            FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+            FragmentManager fragmentManager = activity.getSupportFragmentManager();
             Person myPersonInfo = LocalDataManager.getMyPersonInfo();
             ChangeEmailFragment changeEmailFragment = new ChangeEmailFragment().newInstance(myPersonInfo.getEmail());
             changeEmailFragment.setTargetFragment(getCurFragment(), 0);
@@ -415,39 +451,32 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
 
     @Override
     public void onChangeEmailFinish(Exception error) {
-        AlertDialogFragment dialog;
-        FragmentManager ft;
         String dialogMsg;
         setVisibleProgressBar(false);
         if(error==null)
-            dialogMsg = String.format(getString(R.string.changeEmail_msgChangeEmail),newEmail);
+            dialogMsg = String.format(activity.getString(R.string.changeEmail_msgChangeEmail),newEmail);
         else {
 
-            Pair<ErrorVisualizer.ERROR_CODE, String> errTxtCode = ErrorVisualizer.getTextCodeOfRespException(getActivity().getBaseContext(), error);
+            Pair<ErrorVisualizer.ERROR_CODE, String> errTxtCode = ErrorVisualizer.getTextCodeOfRespException(activity.getBaseContext(), error);
             if (errTxtCode != null && !errTxtCode.second.equals(""))
                 dialogMsg = errTxtCode.second;
             else
-                dialogMsg = getString(R.string.server_unknow_err);
+                dialogMsg = activity.getString(R.string.server_unknow_err);
             Log.d(TAG, "registrationError code = " + errTxtCode.first + " msg = " + errTxtCode.second);
 
         }
-        dialog = AlertDialogFragment.newInstance("",dialogMsg, false,false);
-        dialog.setTargetFragment(this, 0);
-        ft = getActivity().getSupportFragmentManager();
-        if (ft != null)
-            dialog.show(ft, "");
+        showWarnDialog(dialogMsg);
     }
 
     private class PassOnClickListener implements View.OnClickListener
     {
         @Override
         public void onClick(View v) {
-            FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+            FragmentManager fragmentManager = activity.getSupportFragmentManager();
             Person myPersonInfo = LocalDataManager.getMyPersonInfo();
             ChangePassFragment changePassFragment = new ChangePassFragment().newInstance(myPersonInfo.getPass());
-            changePassFragment.setTargetFragment(getCurFragment(),0);
-            changePassFragment.show(fragmentManager,null);
-
+            changePassFragment.setTargetFragment(getCurFragment(), 0);
+            changePassFragment.show(fragmentManager, null);
         }
     }
 
@@ -470,8 +499,6 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
 
     @Override
     public void onChangePassFinish(Exception error) {
-        AlertDialogFragment dialog;
-        FragmentManager ft;
         String dialogMsg;
         setVisibleProgressBar(false);
         if(error==null)
@@ -485,7 +512,7 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
                     LocalDataManager.setMyPersonInfo(myPersonInfo);
                 }
             }
-            dialogMsg = getString(R.string.changePass_msgChangePass);
+            dialogMsg = activity.getString(R.string.changePass_msgChangePass);
         }
         else {
             if(tempMyPerson!=null)
@@ -494,19 +521,15 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
                 if(myPersonInfo!=null)
                     tempMyPerson.setPass(myPersonInfo.getPass());
             }
-            Pair<ErrorVisualizer.ERROR_CODE, String> errTxtCode = ErrorVisualizer.getTextCodeOfRespException(getActivity().getBaseContext(), error);
+            Pair<ErrorVisualizer.ERROR_CODE, String> errTxtCode = ErrorVisualizer.getTextCodeOfRespException(activity.getBaseContext(), error);
             if (errTxtCode != null && !errTxtCode.second.equals(""))
                 dialogMsg = errTxtCode.second;
             else
-                dialogMsg = getString(R.string.server_unknow_err);
+                dialogMsg = activity.getString(R.string.server_unknow_err);
             Log.d(TAG, "registrationError code = " + errTxtCode.first + " msg = " + errTxtCode.second);
 
         }
-        dialog = AlertDialogFragment.newInstance("",dialogMsg, false,false);
-        dialog.setTargetFragment(this, 0);
-        ft = getActivity().getSupportFragmentManager();
-        if (ft != null)
-            dialog.show(ft, "");
+        showWarnDialog(dialogMsg);
     }
 
     private class RatingInfoOnClickListener implements View.OnClickListener
@@ -522,42 +545,38 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
                     spinner.requestFocus();
             }
 
-            FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
-            AlertDialogFragment dialog;
             String msgInfoId;
             if(tempMyPerson.getRating() == 1.0)
-                msgInfoId = getString(R.string.ratingInfo_1_0);
+                msgInfoId = activity.getString(R.string.ratingInfo_1_0);
             else if(tempMyPerson.getRating() == 1.5)
-                msgInfoId = getString(R.string.ratingInfo_1_5);
+                msgInfoId = activity.getString(R.string.ratingInfo_1_5);
             else if(tempMyPerson.getRating() == 2.0)
-                msgInfoId = getString(R.string.ratingInfo_2_0);
+                msgInfoId = activity.getString(R.string.ratingInfo_2_0);
             else if(tempMyPerson.getRating() == 2.5)
-                msgInfoId = getString(R.string.ratingInfo_2_5);
+                msgInfoId = activity.getString(R.string.ratingInfo_2_5);
             else if(tempMyPerson.getRating() == 3.0)
-                msgInfoId = getString(R.string.ratingInfo_3_0);
+                msgInfoId = activity.getString(R.string.ratingInfo_3_0);
             else if(tempMyPerson.getRating() == 3.5)
-                msgInfoId = getString(R.string.ratingInfo_3_5);
+                msgInfoId = activity.getString(R.string.ratingInfo_3_5);
             else if(tempMyPerson.getRating() == 4.0)
-                msgInfoId = getString(R.string.ratingInfo_4_0);
+                msgInfoId = activity.getString(R.string.ratingInfo_4_0);
             else if(tempMyPerson.getRating() == 4.5)
-                msgInfoId = getString(R.string.ratingInfo_4_5);
+                msgInfoId = activity.getString(R.string.ratingInfo_4_5);
             else if(tempMyPerson.getRating() == 5.0)
-                msgInfoId = getString(R.string.ratingInfo_5_0);
+                msgInfoId = activity.getString(R.string.ratingInfo_5_0);
             else if(tempMyPerson.getRating() == 5.5)
-                msgInfoId = getString(R.string.ratingInfo_5_5);
+                msgInfoId = activity.getString(R.string.ratingInfo_5_5);
             else if(tempMyPerson.getRating() == 6.0)
-                msgInfoId = getString(R.string.ratingInfo_6_0);
+                msgInfoId = activity.getString(R.string.ratingInfo_6_0);
             else if(tempMyPerson.getRating() == 6.5)
-                msgInfoId = getString(R.string.ratingInfo_6_5);
+                msgInfoId = activity.getString(R.string.ratingInfo_6_5);
             else if(tempMyPerson.getRating() == 7.0)
-                msgInfoId = getString(R.string.ratingInfo_7_0);
+                msgInfoId = activity.getString(R.string.ratingInfo_7_0);
             else
                 msgInfoId="";
 
             if(!msgInfoId.equals("")) {
-                dialog = AlertDialogFragment.newInstance(getString(R.string.ratingInfo_title) + " "+tempMyPerson.getRating(), msgInfoId, false, false);
-                dialog.setTargetFragment(getCurFragment(), 0);
-                dialog.show(fragmentManager, "");
+                showWarnDialog(activity.getString(R.string.ratingInfo_title) + " " + tempMyPerson.getRating(), msgInfoId);
             }
         }
     }
@@ -578,7 +597,7 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
         if (resultCode != Activity.RESULT_OK) {
             Log.d(TAG, "resultCode !=  Activity.RESULT_OK");
         } else if (requestCode == PICK_IMAGE) {
-            Context context = getActivity().getBaseContext();
+            Context context = activity.getBaseContext();
             // Get the file's content URI from the incoming Intent
             Uri returnUri = returnIntent.getData();
             try {
@@ -586,19 +605,19 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
             } catch (IOException e) {
                 Log.e(TAG, String.format("PicInfo constructor exception %s", e.getMessage()));
                 e.printStackTrace();
-                Toast.makeText(context, getString(R.string.editprofile_pickImageError), Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, activity.getString(R.string.editprofile_pickImageError), Toast.LENGTH_SHORT).show();
                 return;
             }
             if(tempPicInfo!=null) {
                 if (tempPicInfo.getPath()==null) {
                     Log.e(TAG, String.format("PICK_IMAGE returned not valid URI"));
-                    Toast.makeText(context, getString(R.string.editprofile_pickImageError), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, activity.getString(R.string.editprofile_pickImageError), Toast.LENGTH_SHORT).show();
                     return;
                 }
                 File pickedFile = new File(tempPicInfo.getPath());
                 if (!pickedFile.exists()){
                     Log.e(TAG, String.format("PICK_IMAGE %s not exist",tempPicInfo.getPath()));
-                    Toast.makeText(context, getString(R.string.editprofile_pickImageError), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, activity.getString(R.string.editprofile_pickImageError), Toast.LENGTH_SHORT).show();
                     return;
                 }
 
@@ -620,20 +639,20 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
         String urlForUpload = result.first;
         Exception ex = result.second;
         String replaceBlob = "";
-        Context ctx = getActivity().getBaseContext();
+        Context ctx = activity.getBaseContext();
         if(ex!=null)
         {
             Log.e(TAG,String.format("getUrlForUpload error %s", ErrorVisualizer.getDebugMsgOfRespException(ex)));
             ex.printStackTrace();
             setVisibleProgressBar(false);
-            Toast.makeText(ctx,getString(R.string.editprofile_saveError),Toast.LENGTH_SHORT).show();
+            Toast.makeText(ctx,activity.getString(R.string.editprofile_saveError),Toast.LENGTH_SHORT).show();
             return;
         }
         if(urlForUpload==null || urlForUpload.equals(""))
         {
             Log.e(TAG, String.format("getUrlForUpload error urlForUpload not valid"));
             setVisibleProgressBar(false);
-            Toast.makeText(ctx, getString(R.string.editprofile_saveError), Toast.LENGTH_SHORT).show();
+            Toast.makeText(ctx, activity.getString(R.string.editprofile_saveError), Toast.LENGTH_SHORT).show();
             return;
         }
         Person myPersonInfo = LocalDataManager.getMyPersonInfo();
@@ -648,7 +667,7 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
             Log.e(TAG, String.format("UploadFile failed: %s", exception.getMessage()));
             exception.printStackTrace();
             setVisibleProgressBar(false);
-            Toast.makeText(getActivity().getBaseContext(),getString(R.string.editprofile_saveError),
+            Toast.makeText(activity.getBaseContext(),activity.getString(R.string.editprofile_saveError),
                     Toast.LENGTH_SHORT).show();
         }
         else {
@@ -676,8 +695,8 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
                         ImageView imageView = (ImageView) rootView.findViewById(R.id.editProfile_img_photo);
                         if(imageView!=null)
                         {
-                            int height = (int)getResources().getDimension(R.dimen.personProfile_photoHeight);
-                            int width = (int)getResources().getDimension(R.dimen.personProfile_photoWidth);
+                            int height = (int)activity.getResources().getDimension(R.dimen.personProfile_photoHeight);
+                            int width = (int)activity.getResources().getDimension(R.dimen.personProfile_photoWidth);
                             FileManager.setPicToImageView(cacheImage, imageView,height,width);
                         }
                     }
@@ -686,6 +705,18 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
         }
 
     }*/
+
+    private void showWarnDialog(String dialogMsg){
+        showWarnDialog("", dialogMsg);
+    }
+    private void showWarnDialog(String title, String dialogMsg){
+        AlertDialogFragment dialog = AlertDialogFragment.newInstance(title, dialogMsg, false, false);
+        dialog.setTargetFragment(this, 0);
+        FragmentManager ft = activity.getSupportFragmentManager();
+        if (ft != null)
+            dialog.show(ft, "");
+    }
+
     private void setVisibleProgressBar(boolean isVisible)
     {
         View view;
@@ -696,7 +727,7 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
                 view.setVisibility(isVisible ? View.VISIBLE : View.GONE);
         }
         if(!isVisible)
-            getActivity().invalidateOptionsMenu();
+            activity.invalidateOptionsMenu();
     }
 
     @Override
@@ -712,17 +743,19 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
                 if(newPic!=null &&(oldPic==null || !newPic.getBlobKey().equals(oldPic.getBlobKey()))) {
                     String tempFileName = UsefulFunctions.getDigest(tempPhotoName);
                     String newFileName = UsefulFunctions.getDigest(newPic.getBlobKey());
-                    FileManager.renameFile(TAG, getActivity().getBaseContext(), FileManager.PERSON_CACHE_DIR
+                    FileManager.renameFile(TAG, activity.getBaseContext(), FileManager.PERSON_CACHE_DIR
                             + "/" + updatedPerson.getId() + "/" + tempFileName, newFileName);
                 }
                 updatedPerson.setPass(myPerson.getPass());
                 try {
-                    LocalDataManager.saveMyPersonInfoToPref(updatedPerson, getActivity());
+                    LocalDataManager.saveMyPersonInfoToPref(updatedPerson, activity);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+                if(personProfileFragment!=null && personProfileFragment.isResumed())
+                    personProfileFragment.onResume();
             }
-            FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+            FragmentManager fragmentManager = activity.getSupportFragmentManager();
             if(fragmentManager!=null)
                 fragmentManager.popBackStack();
         }
@@ -733,7 +766,7 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
                 Log.e(TAG, debugMsg);
 
             setVisibleProgressBar(false);
-            Toast.makeText(getActivity().getBaseContext(), getString(R.string.editprofile_saveError), Toast.LENGTH_LONG).show();
+            Toast.makeText(activity.getBaseContext(), activity.getString(R.string.editprofile_saveError), Toast.LENGTH_LONG).show();
         }
     }
 

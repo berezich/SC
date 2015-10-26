@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <integer name="changePass_minPassLength">6</integer>
+    <integer name="editProfile_minAge">12</integer>
+    <integer name="editProfile_maxAge">99</integer>
 </resources>

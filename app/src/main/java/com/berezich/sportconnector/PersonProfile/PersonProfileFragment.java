@@ -286,6 +286,7 @@ public class PersonProfileFragment extends Fragment {
                 FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
                 if(fragmentManager!=null) {
                     EditProfileFragment fragment = new EditProfileFragment();
+                    fragment.setTargetFragment(this,0);
                     String name = fragment.getClass().getName();
                     fragmentManager.beginTransaction().replace(R.id.container, fragment).addToBackStack(name).commit();
                     Log.d(TAG, String.format("prev fragment replaced with %s", fragment.getClass().getName()));

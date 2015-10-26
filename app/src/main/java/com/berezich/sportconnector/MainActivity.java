@@ -48,6 +48,7 @@ public class MainActivity extends AppCompatActivity
     private CharSequence mTitle;
     private static final String TAG = "MyLog_MainActivity";
     private boolean isRecover = false;
+    private boolean isInstanceStateSaved = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -114,6 +115,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
+        isInstanceStateSaved = true;
         /*FragmentManager fragmentManager = getSupportFragmentManager();
         if(fragmentManager!=null) {
             List<Fragment> fragments = fragmentManager.getFragments();
@@ -133,7 +135,7 @@ public class MainActivity extends AppCompatActivity
     protected void onResume()
     {
         super.onResume();
-
+        isInstanceStateSaved = false;
     }
     @Override
     public void onNavigationDrawerItemSelected(int position) {
@@ -143,8 +145,9 @@ public class MainActivity extends AppCompatActivity
             isRecover=false;
             return;
         }*/
+        if(isInstanceStateSaved)
+            return;
         FragmentManager fragmentManager = getSupportFragmentManager();
-        List<Fragment> fragments = fragmentManager.getFragments();
         if(isRecover){
             isRecover=false;
             return;

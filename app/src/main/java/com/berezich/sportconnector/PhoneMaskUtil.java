@@ -10,12 +10,19 @@ import android.widget.EditText;
 public class PhoneMaskUtil {
     private static final String prefix = "+7";
     private static final String mask10 = "(###)###-##-##";
-    private static final String mask11 = "(####)###-##-##";
+    //private static final String mask11 = "(####)###-##-##";
     private static final String mask8 = "####-####";
     private static final String mask9 = "#####-####";
 
     public static String unmask(String s) {
         return s.replaceAll("^\\"+prefix+"*|[^0-9]*", "");
+    }
+
+    public static boolean validate(String phone){
+        phone = unmask(phone);
+        if(phone.length()==10 || phone.isEmpty())
+            return true;
+        return false;
     }
 
     public static TextWatcher insert(final EditText editText) {
@@ -49,23 +56,21 @@ public class PhoneMaskUtil {
 
     private static String getDefaultMask(String str) {
         String defaultMask = mask10;
-        if (str.length() > 11){
+        /*if (str.length() > 11){
             defaultMask = mask11;
-        }
+        }*/
         return defaultMask;
     }
     private static String getMask(String str){
         String mask;
         String defaultMask = getDefaultMask(str);
         switch (str.length()) {
-            case 11:
-                mask =prefix+ mask11;
+            /*case 11:
+                mask =prefix + mask11;
                 break;
-            case 10:
-                mask =prefix+ mask10;
-                break;
+            */
             default:
-                mask = prefix+ defaultMask;
+                mask = prefix + defaultMask;
                 break;
         }
         return mask;

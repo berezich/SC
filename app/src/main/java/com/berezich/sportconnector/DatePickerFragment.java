@@ -49,8 +49,13 @@ public class DatePickerFragment extends DialogFragment
             throw new ClassCastException(getTargetFragment().toString() + " must implement OnActionDialogListener for AlertDialogFragment");
         }
 
-        // Create a new instance of DatePickerDialog and return it
-        return new DatePickerDialog(getTargetFragment().getActivity(), this, year, month, day);
+        DatePickerDialog pickerDialog = new DatePickerDialog(getTargetFragment().getActivity(), this, year, month, day);
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.YEAR,calendar.get(Calendar.YEAR)-getResources().getInteger(R.integer.editProfile_minAge));
+        pickerDialog.getDatePicker().setMaxDate(calendar.getTimeInMillis());
+        calendar.set(Calendar.YEAR, calendar.get(Calendar.YEAR) - getResources().getInteger(R.integer.editProfile_maxAge));
+        pickerDialog.getDatePicker().setMinDate(calendar.getTimeInMillis());
+        return pickerDialog;
     }
 
     public void onDateSet(DatePicker view, int year, int month, int day) {

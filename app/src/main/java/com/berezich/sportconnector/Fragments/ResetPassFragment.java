@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.util.Log;
 import android.util.Pair;
@@ -36,7 +37,7 @@ public class ResetPassFragment extends Fragment implements EndpointApi.ResetPass
     View rootView;
     private Person myPersonInfo;
     String email="";
-
+    private FragmentActivity activity;
     ResetPassFragmentAction listenerResetPass = null;
 
     public ResetPassFragment() {
@@ -72,6 +73,7 @@ public class ResetPassFragment extends Fragment implements EndpointApi.ResetPass
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
+        this.activity = getActivity();
         Fragment targetFragment = getTargetFragment();
         if(targetFragment==null) {
             Log.e(TAG,"targetFragment should be set");
@@ -98,9 +100,9 @@ public class ResetPassFragment extends Fragment implements EndpointApi.ResetPass
                 email = editTxt.getText().toString().trim();
                 if(!InputValuesValidation.isValidEmail(email)){
                     AlertDialogFragment dialog;
-                    dialog = AlertDialogFragment.newInstance(getString(R.string.changeEmail_errNew_invalid), false);
+                    dialog = AlertDialogFragment.newInstance(activity.getString(R.string.changeEmail_errNew_invalid), false);
                     dialog.setTargetFragment(getFragment(), 0);
-                    FragmentManager ft = getActivity().getSupportFragmentManager();
+                    FragmentManager ft = activity.getSupportFragmentManager();
                     if(ft!=null)
                         dialog.show(ft, "");
                     return;
@@ -127,16 +129,11 @@ public class ResetPassFragment extends Fragment implements EndpointApi.ResetPass
     public void onResetPassAsyncTaskFinish(Exception result) {
         AlertDialogFragment dialog;
         Exception error = result;
-        if(getActivity()==null)
-        {
-            Log.e(TAG, "current fragment isn't attached to activity");
-            return;
-        }
         if(error == null)
         {
             Log.d(TAG, "ResetPassReq was created");
             try {
-                String msg = String.format( getString(R.string.resetPass_msgReqResetPass),email);
+                String msg = String.format( activity.getString(R.string.resetPass_msgReqResetPass),email);
                 listenerResetPass.onResetPass(msg);
             } catch (Exception e) {
                 e.printStackTrace();
@@ -147,18 +144,18 @@ public class ResetPassFragment extends Fragment implements EndpointApi.ResetPass
 
         String dialogMsg;
         Pair<ErrorVisualizer.ERROR_CODE,String> errTxtCode =
-                ErrorVisualizer.getTextCodeOfRespException(getActivity().getBaseContext(),error);
+                ErrorVisualizer.getTextCodeOfRespException(activity.getBaseContext(),error);
         if(errTxtCode!=null && !errTxtCode.second.equals("")){
             dialogMsg = errTxtCode.second;
             Log.d(TAG,"resetPassError code = "+errTxtCode.first+" msg = "+errTxtCode.second);
         }
         else
-            dialogMsg = getString(R.string.server_unknow_err);
+            dialogMsg = activity.getString(R.string.server_unknow_err);
 
         dialog = AlertDialogFragment.newInstance(dialogMsg, false);
         dialog.setTargetFragment(this, 0);
         dialog.setCancelable(false);
-        FragmentManager ft = getActivity().getSupportFragmentManager();
+        FragmentManager ft = activity.getSupportFragmentManager();
         if(ft!=null)
             dialog.show(ft, "");
     }
@@ -182,9 +179,9 @@ public class ResetPassFragment extends Fragment implements EndpointApi.ResetPass
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         menu.clear();
-        android.support.v7.app.ActionBar actionBar = ((MainActivity) getActivity()).getSupportActionBar();
+        android.support.v7.app.ActionBar actionBar = ((MainActivity) activity).getSupportActionBar();
         if(actionBar!=null)
-            actionBar.setTitle(getString(R.string.resetPass_fragmentTitle));
+            actionBar.setTitle(activity.getString(R.string.resetPass_fragmentTitle));
     }
 
     private Fragment getFragment(){

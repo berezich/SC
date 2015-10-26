@@ -4,7 +4,9 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
+import android.text.InputFilter;
 import android.util.Log;
 import android.util.Pair;
 import android.view.LayoutInflater;
@@ -37,6 +39,7 @@ public class RegistrationFragment extends Fragment implements EndpointApi.Regist
     private String pass;
     private String email="";
     View rootView;
+    private FragmentActivity activity;
 
     RegFragmentAction listenerCreateAccount = null;
 
@@ -55,6 +58,9 @@ public class RegistrationFragment extends Fragment implements EndpointApi.Regist
         rootView = inflater.inflate(R.layout.fragment_registration, container, false);
         if(rootView!=null)
         {
+            EditText txtEdt = (EditText) rootView.findViewById(R.id.registration_name_value);
+            if(txtEdt!=null)
+                txtEdt.setFilters(new InputFilter[]{new UsefulFunctions.NameSurnameInputFilter()});
             Button btn = (Button) rootView.findViewById(R.id.registration_btn_ok);
             if(btn!=null)
                 btn.setOnClickListener(new OnClickRegisterListener());
@@ -68,6 +74,7 @@ public class RegistrationFragment extends Fragment implements EndpointApi.Regist
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
+        this.activity = (FragmentActivity) activity;
         Fragment targetFragment = getTargetFragment();
         if(targetFragment==null) {
             Log.e(TAG,"targetFragment should be set");
@@ -96,10 +103,12 @@ public class RegistrationFragment extends Fragment implements EndpointApi.Regist
             if((editTxt = (EditText) rootView.findViewById(R.id.registration_email_value))!=null) {
                 email = editTxt.getText().toString().trim();
                 if(!InputValuesValidation.isValidEmail(email))
-                    errorStr = getString(R.string.changeEmail_errNew_invalid);
+                    errorStr = activity.getString(R.string.changeEmail_errNew_invalid);
             }
             if(errorStr.isEmpty() && (editTxt = (EditText) rootView.findViewById(R.id.registration_name_value))!=null) {
-                name = editTxt.getText().toString();
+                name = editTxt.getText().toString().trim();
+                if(name!=null && name.isEmpty())
+                    errorStr = activity.getString(R.string.registration_err_nameNull);
             }
             if(errorStr.isEmpty() && (editTxt = (EditText) rootView.findViewById(R.id.registration_pass_value))!=null) {
                 pass = editTxt.getText().toString();
@@ -107,11 +116,11 @@ public class RegistrationFragment extends Fragment implements EndpointApi.Regist
                         isValidPass(getContext(), pass);
                 switch (pass_error){
                     case EMPTY:
-                        errorStr=getString( R.string.registration_err_pass_empty);
+                        errorStr=activity.getString(R.string.registration_err_pass_empty);
                         break;
                     case TOO_SHORT:
-                        errorStr=String.format(getString( R.string.registration_err_pass_tooShort),
-                                    getResources().getInteger(R.integer.changePass_minPassLength));
+                        errorStr=String.format(activity.getString(R.string.registration_err_pass_tooShort),
+                                activity.getResources().getInteger(R.integer.changePass_minPassLength));
                         break;
                 }
             }
@@ -119,7 +128,7 @@ public class RegistrationFragment extends Fragment implements EndpointApi.Regist
                 AlertDialogFragment dialog;
                 dialog = AlertDialogFragment.newInstance(errorStr, false);
                 dialog.setTargetFragment(getFragment(), 0);
-                FragmentManager ft = getActivity().getSupportFragmentManager();
+                FragmentManager ft = activity.getSupportFragmentManager();
                 if(ft!=null)
                     dialog.show(ft, "");
                 return;
@@ -145,19 +154,14 @@ public class RegistrationFragment extends Fragment implements EndpointApi.Regist
         AlertDialogFragment dialog;
         AccountForConfirmation account = result.first;
         Exception error = result.second;
-        if(getActivity()==null)
-        {
-            Log.e(TAG, "current fragment isn't attached to activity");
-            return;
-        }
         if(error == null && account!=null)
         {
             Log.d(TAG, "Account for registration was created");
             try {
                 account.setPass(pass);
 
-                LocalDataManager.saveMyPersonInfoToPref(UsefulFunctions.createPerson(account), getActivity());
-                String msg = String.format(getString(R.string.registration_msgCreateAccount),email);
+                LocalDataManager.saveMyPersonInfoToPref(UsefulFunctions.createPerson(account), activity);
+                String msg = String.format(activity.getString(R.string.registration_msgCreateAccount),email);
                 listenerCreateAccount.onCreateAccount( msg);
             } catch (IOException e) {
                 e.printStackTrace();
@@ -169,18 +173,18 @@ public class RegistrationFragment extends Fragment implements EndpointApi.Regist
 
         String dialogMsg;
         Pair<ErrorVisualizer.ERROR_CODE,String> errTxtCode =
-                ErrorVisualizer.getTextCodeOfRespException(getActivity().getBaseContext(), error);
+                ErrorVisualizer.getTextCodeOfRespException(activity.getBaseContext(), error);
         if(errTxtCode!=null && !errTxtCode.second.equals("")){
             dialogMsg = errTxtCode.second;
             Log.d(TAG,"registrationError code = "+errTxtCode.first+" msg = "+errTxtCode.second);
         }
         else
-            dialogMsg = getString(R.string.server_unknow_err);
+            dialogMsg = activity.getString(R.string.server_unknow_err);
 
         dialog = AlertDialogFragment.newInstance(dialogMsg, false);
         dialog.setTargetFragment(this, 0);
         dialog.setCancelable(false);
-        FragmentManager ft = getActivity().getSupportFragmentManager();
+        FragmentManager ft = activity.getSupportFragmentManager();
         if(ft!=null)
             dialog.show(ft, "");
     }
@@ -204,9 +208,9 @@ public class RegistrationFragment extends Fragment implements EndpointApi.Regist
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         menu.clear();
-        android.support.v7.app.ActionBar actionBar = ((MainActivity) getActivity()).getSupportActionBar();
+        android.support.v7.app.ActionBar actionBar = ((MainActivity) activity).getSupportActionBar();
         if(actionBar!=null)
-            actionBar.setTitle(getString(R.string.registration_fragmentTitle));
+            actionBar.setTitle(activity.getString(R.string.registration_fragmentTitle));
     }
 
     private Fragment getFragment(){

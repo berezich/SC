@@ -120,7 +120,7 @@ public class EndpointApi {
         private Context context = null;
         public GetRegionAsyncTask(Fragment fragment)
         {
-            context = fragment.getActivity().getBaseContext();
+            context = fragment.getContext();
             setSrvApi(context);
             try {
                 listener = (OnGetRegionAsyncTaskAction) fragment;
@@ -165,7 +165,7 @@ public class EndpointApi {
         private Context context = null;
         public GetSpotListAsyncTask(Fragment fragment)
         {
-            context = fragment.getActivity().getBaseContext();
+            context = fragment.getContext();
             setSrvApi(context);
             try {
                 listener = (OnAction) fragment;
@@ -219,7 +219,7 @@ public class EndpointApi {
         private Context context = null;
         public GetUpdatedSpotListAsyncTask(Fragment fragment)
         {
-            context = fragment.getActivity().getBaseContext();
+            context = fragment.getContext();
             setSrvApi(context);
             try {
                 listener = (OnAction) fragment;
@@ -277,7 +277,7 @@ public class EndpointApi {
         private Context context = null;
         public GetListPersonByIdLstAsyncTask(Fragment fragment)
         {
-            context = fragment.getActivity().getBaseContext();
+            context = fragment.getContext();
             setSrvApi(context);
             try {
                 listener = (OnAction) fragment;
@@ -320,7 +320,7 @@ public class EndpointApi {
         private Context context = null;
         public UpdateSpotAsyncTask(Fragment fragment)
         {
-            context = fragment.getActivity().getBaseContext();
+            context = fragment.getContext();
             setSrvApi(context);
             try {
                 listener = (OnAction) fragment;
@@ -356,7 +356,7 @@ public class EndpointApi {
         private Context context = null;
         public SetSpotAsFavoriteAsyncTask(Fragment fragment)
         {
-            context = fragment.getActivity().getBaseContext();
+            context = fragment.getContext();
             setSrvApi(context);
             try {
                 listener = (OnAction) fragment;
@@ -398,7 +398,7 @@ public class EndpointApi {
         private Context context = null;
         public AuthorizePersonAsyncTask(Fragment fragment)
         {
-            context = fragment.getActivity().getBaseContext();
+            context = fragment.getContext();
             setSrvApi(context);
             try {
                 listener = (OnAction) fragment;
@@ -445,7 +445,7 @@ public class EndpointApi {
         private Context context = null;
         public RegisterPersonAsyncTask(Fragment fragment)
         {
-            context = fragment.getActivity().getBaseContext();
+            context = fragment.getContext();
             setSrvApi(context);
             try {
                 listener = (OnAction) fragment;
@@ -484,7 +484,7 @@ public class EndpointApi {
         private Context context = null;
         public ResetPassAsyncTask(Fragment fragment)
         {
-            context = fragment.getActivity().getBaseContext();
+            context = fragment.getContext();
             setSrvApi(context);
             try {
                 listener = (OnAction) fragment;
@@ -519,7 +519,7 @@ public class EndpointApi {
         private Context context = null;
         public UpdatePersonAsyncTask(Fragment fragment)
         {
-            context = fragment.getActivity().getBaseContext();
+            context = fragment.getContext();
             setSrvApi(context);
             try {
                 listener = (OnAction) fragment;
@@ -555,7 +555,7 @@ public class EndpointApi {
         private Context context = null;
         public ChangePassAsyncTask(Fragment fragment)
         {
-            context = fragment.getActivity().getBaseContext();
+            context = fragment.getContext();
             setSrvApi(context);
             try {
                 listener = (OnAction) fragment;
@@ -592,7 +592,7 @@ public class EndpointApi {
         private Context context = null;
         public ChangeEmailAsyncTask(Fragment fragment)
         {
-            context = fragment.getActivity().getBaseContext();
+            context = fragment.getContext();
             setSrvApi(context);
             try {
                 listener = (OnAction) fragment;
@@ -630,7 +630,7 @@ public class EndpointApi {
         private Context context = null;
         public GetUrlForUploadAsyncTask(Fragment fragment)
         {
-            context = fragment.getActivity().getBaseContext();
+            context = fragment.getContext();
             setSrvApi(context);
             try {
                 listener = (OnAction) fragment;
