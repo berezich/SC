@@ -1,6 +1,7 @@
 package com.berezich.sportconnector.PersonProfile;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -15,6 +16,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -177,30 +179,38 @@ public class PersonProfileFragment extends Fragment {
             String email = person.getEmail(),phone = person.getPhone();
             LinearLayout linearLayout = (LinearLayout) rootView.findViewById(R.id.profile_contactsBlock);
             LinearLayout propertyLstLayout = (LinearLayout) rootView.findViewById(R.id.profile_linearlayout_propertyLst);
-            LinearLayout propertyLayout;
+            propertyLstLayout.removeAllViews();
+            //LinearLayout propertyLayout;
             if(linearLayout!=null ) {
                 linearLayout.setVisibility(View.GONE);
-                if((propertyLayout = (LinearLayout) rootView.findViewById(R.id.profile_linearlayout_email))!=null && propertyLstLayout!=null)
+                //if((propertyLayout = (LinearLayout) rootView.findViewById(R.id.profile_linearlayout_email))!=null && propertyLstLayout!=null)
                     if (email != null && !email.equals("")) {
-                        if((txtView = (TextView) rootView.findViewById(R.id.profile_txt_emailValue))!=null)
+                        /*if((txtView = (TextView) rootView.findViewById(R.id.profile_txt_emailValue))!=null)
                             txtView.setText(email);
-                        propertyLayout.setVisibility(View.VISIBLE);
+                        propertyLayout.setVisibility(View.VISIBLE);*/
                         linearLayout.setVisibility(View.VISIBLE);
+                        View view = getProfileDetailItem(getContext(),getString(R.string.personprofile_email),email);
+                        if(view!=null)
+                            propertyLstLayout.addView(view);
                     }
-                    else
-                        propertyLstLayout.removeView(propertyLayout);
+                    /*else
+                        propertyLstLayout.removeView(propertyLayout);*/
 
-                if((propertyLayout = (LinearLayout) rootView.findViewById(R.id.profile_linearlayout_phone))!=null && propertyLstLayout!=null)
+                //if((propertyLayout = (LinearLayout) rootView.findViewById(R.id.profile_linearlayout_phone))!=null && propertyLstLayout!=null)
                     if (phone != null && !phone.equals("")) {
-                        if((txtView = (TextView) rootView.findViewById(R.id.profile_txt_phoneValue))!=null){
+                        /*if((txtView = (TextView) rootView.findViewById(R.id.profile_txt_phoneValue))!=null){
                             phone = PhoneMaskUtil.unmask(phone);
                             txtView.setText(PhoneMaskUtil.setMask(phone));
                         }
-                        propertyLayout.setVisibility(View.VISIBLE);
+                        propertyLayout.setVisibility(View.VISIBLE);*/
+
                         linearLayout.setVisibility(View.VISIBLE);
+                        View view = getProfileDetailItem(getContext(),getString(R.string.personprofile_phone),phone);
+                        if(view!=null)
+                            propertyLstLayout.addView(view);
                     }
-                    else
-                        propertyLstLayout.removeView(propertyLayout);
+                    /*else
+                        propertyLstLayout.removeView(propertyLayout);*/
             }
 
             //description block
@@ -341,5 +351,19 @@ public class PersonProfileFragment extends Fragment {
     }
     private Fragment getCurFragment(){
         return this;
+    }
+    private View getProfileDetailItem(Context context, String title, String value){
+        LayoutInflater lInflater;
+        View itemView=null;
+        if((lInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE))!=null)
+            if((itemView = lInflater.inflate(R.layout.profile_detail_item, null))!=null){
+                TextView textView = (TextView) itemView.findViewById(R.id.profile_txt_itemTitle);
+                if(textView!=null)
+                    textView.setText(title);
+                textView = (TextView) itemView.findViewById(R.id.profile_txt_itemValue);
+                if(textView!=null)
+                    textView.setText(value);
+            }
+        return itemView;
     }
 }
