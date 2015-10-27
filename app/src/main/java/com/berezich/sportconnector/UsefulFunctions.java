@@ -128,12 +128,21 @@ public class UsefulFunctions {
         }
     }
     public static class NameSurnameInputFilter implements InputFilter{
+        int maxLength;
+        public NameSurnameInputFilter(int maxLength){
+            this.maxLength = maxLength;
+        }
         public CharSequence filter(CharSequence source, int start, int end,
         Spanned dest, int dstart, int dend) {
+            String resultPastString="";
             for (int i = start; i < end; i++) {
-                if (!(Character.isLetter(source.charAt(i)) || source.charAt(i)==' ')) {
-                    return "";
-                }
+                if (!(Character.isLetter(source.charAt(i)) || source.charAt(i)==' '||
+                        source.charAt(i)=='_'|| source.charAt(i)=='-'))
+                    return resultPastString;
+                int resultLength = (dest.length()-(dend-dstart))+resultPastString.length();
+                if(resultLength==maxLength)
+                    return resultPastString;
+                resultPastString += source.charAt(i);
             }
             return null;
         }

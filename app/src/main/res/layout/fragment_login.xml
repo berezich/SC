@@ -58,7 +58,7 @@
                         android:gravity="left"
                         android:paddingLeft="@dimen/login_txtPropName_leftRightOffset"
                         android:paddingRight="@dimen/login_txtPropName_leftRightOffset"
-                        android:layout_weight="2.4" />
+                        android:layout_weight="@integer/loginPropertyTitleWeight" />
 
                     <EditText
                         android:layout_width="match_parent"
@@ -69,7 +69,8 @@
                         android:paddingRight="@dimen/login_txtPropVal_leftRightOffset"
                         android:background="#00FFFFFF"
                         android:inputType="textEmailAddress"
-                        android:layout_weight="1" />
+                        android:maxLength="@integer/emailMaxLength_edtTxt"
+                        android:layout_weight="@integer/loginPropertyValueWeight" />
                 </LinearLayout>
 
                 <View
@@ -107,7 +108,7 @@
                         android:gravity="left"
                         android:paddingLeft="@dimen/login_txtPropName_leftRightOffset"
                         android:paddingRight="@dimen/login_txtPropName_leftRightOffset"
-                        android:layout_weight="2.4" />
+                        android:layout_weight="@integer/loginPropertyTitleWeight" />
 
                     <EditText
                         android:layout_width="match_parent"
@@ -119,7 +120,8 @@
                         android:background="#00FFFFFF"
                         android:password="true"
                         android:inputType="textPassword"
-                        android:layout_weight="1" />
+                        android:maxLength="@integer/passMaxLength_edtTxt"
+                        android:layout_weight="@integer/loginPropertyValueWeight" />
                 </LinearLayout>
 
                 <View
@@ -135,15 +137,6 @@
                     android:layout_marginBottom="@dimen/login_propLine_bottomOffset" />
 
             </FrameLayout>
-
-            <!--<CheckBox
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/login_checkBox_txt"
-                android:id="@+id/checkBox"
-                android:layout_gravity="left"
-                android:layout_marginTop="@dimen/login_checkBox_topOffset"
-                android:checked="true" />-->
 
             <Button
                 android:layout_width="match_parent"
@@ -173,16 +166,6 @@
                 android:layout_below="@+id/loginFragment_linearLayout"
                 android:layout_centerHorizontal="true" />
 
-            <!--
-            <Button
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/login_btn_txt_forgotPass"
-                android:id="@+id/loginForgotPass"
-                android:layout_marginTop="15dp"
-                android:background="@drawable/btn_register"
-                android:textColor="@color/btn_text" />
-                -->
 
         </LinearLayout>
 

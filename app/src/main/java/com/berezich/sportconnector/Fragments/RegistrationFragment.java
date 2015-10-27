@@ -60,7 +60,8 @@ public class RegistrationFragment extends Fragment implements EndpointApi.Regist
         {
             EditText txtEdt = (EditText) rootView.findViewById(R.id.registration_name_value);
             if(txtEdt!=null)
-                txtEdt.setFilters(new InputFilter[]{new UsefulFunctions.NameSurnameInputFilter()});
+                txtEdt.setFilters(new InputFilter[]{new UsefulFunctions.NameSurnameInputFilter(
+                        activity.getResources().getInteger(R.integer.nameMaxLength_edtTxt))});
             Button btn = (Button) rootView.findViewById(R.id.registration_btn_ok);
             if(btn!=null)
                 btn.setOnClickListener(new OnClickRegisterListener());

@@ -22,12 +22,13 @@
         android:layout_height="wrap_content">
 
         <EditText
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/changePass_txtEdt_old"
-                android:hint="@string/changePass_old_hint"
-                android:inputType="textPassword"
-            android:singleLine="true" />
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/changePass_txtEdt_old"
+            android:hint="@string/changePass_old_hint"
+            android:inputType="textPassword"
+            android:singleLine="true"
+            android:maxLength="@integer/passMaxLength_edtTxt"/>
 
     </android.support.design.widget.TextInputLayout>
 
@@ -41,7 +42,8 @@
             android:id="@+id/changePass_txtEdt_new"
             android:hint="@string/changePass_new_hint"
             android:inputType="textPassword"
-            android:singleLine="true" />
+            android:singleLine="true"
+            android:maxLength="@integer/passMaxLength_edtTxt"/>
 
     </android.support.design.widget.TextInputLayout>
 
@@ -55,7 +57,8 @@
             android:id="@+id/changePass_txtEdt_new2"
             android:hint="@string/changePass_new2_hint"
             android:inputType="textPassword"
-            android:singleLine="true" />
+            android:singleLine="true"
+            android:maxLength="@integer/passMaxLength_edtTxt"/>
 
     </android.support.design.widget.TextInputLayout>
 

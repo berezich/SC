@@ -54,7 +54,7 @@
                         android:gravity="left"
                         android:paddingLeft="@dimen/registration_txtPropName_leftRightOffset"
                         android:paddingRight="@dimen/registration_txtPropName_leftRightOffset"
-                        android:layout_weight="2.4" />
+                        android:layout_weight="@integer/loginPropertyTitleWeight" />
 
                     <EditText
                         android:layout_width="match_parent"
@@ -65,7 +65,8 @@
                         android:paddingRight="@dimen/registration_txtPropVal_leftRightOffset"
                         android:background="#00FFFFFF"
                         android:inputType="textNoSuggestions"
-                        android:layout_weight="1" />
+                        android:maxLength="@integer/emailMaxLength_edtTxt"
+                        android:layout_weight="@integer/loginPropertyValueWeight" />
                 </LinearLayout>
 
                 <View
@@ -102,7 +103,7 @@
                         android:gravity="left"
                         android:paddingLeft="@dimen/registration_txtPropName_leftRightOffset"
                         android:paddingRight="@dimen/registration_txtPropName_leftRightOffset"
-                        android:layout_weight="2.4" />
+                        android:layout_weight="@integer/loginPropertyTitleWeight" />
 
                     <EditText
                         android:layout_width="match_parent"
@@ -114,7 +115,8 @@
                         android:background="#00FFFFFF"
                         android:password="false"
                         android:inputType="textPersonName"
-                        android:layout_weight="1" />
+                        android:maxLength="@integer/nameMaxLength_edtTxt"
+                        android:layout_weight="@integer/loginPropertyValueWeight" />
                 </LinearLayout>
 
                 <View
@@ -151,7 +153,7 @@
                         android:gravity="left"
                         android:paddingLeft="@dimen/registration_txtPropName_leftRightOffset"
                         android:paddingRight="@dimen/registration_txtPropName_leftRightOffset"
-                        android:layout_weight="2.4" />
+                        android:layout_weight="@integer/loginPropertyTitleWeight" />
 
                     <EditText
                         android:layout_width="match_parent"
@@ -163,7 +165,8 @@
                         android:background="#00FFFFFF"
                         android:password="true"
                         android:inputType="textPassword"
-                        android:layout_weight="1" />
+                        android:maxLength="@integer/passMaxLength_edtTxt"
+                        android:layout_weight="@integer/loginPropertyValueWeight" />
                 </LinearLayout>
 
                 <View

@@ -77,14 +77,16 @@
                     android:id="@+id/editProfile_txtEdt_name"
                     style="@style/EditProfile_TxtPropField"
                     android:hint="@string/editprofile_hint_name"
-                     />
+                    android:inputType="textPersonName"
+                    android:maxLength="@integer/nameMaxLength_edtTxt"/>
 
 
                 <EditText
                     android:id="@+id/editProfile_txtEdt_surname"
                     style="@style/EditProfile_TxtPropField"
                     android:hint="@string/editprofile_hint_surname"
-                    android:inputType="textPersonName" />
+                    android:inputType="textPersonName"
+                    android:maxLength="@integer/surnameMaxLength_edtTxt"/>
 
                 <TextView
                     style="@style/EditProfile_TxtPropField"
@@ -231,6 +233,7 @@
                 <EditText
                     android:id="@+id/editProfile_txtEdt_desc"
                     style="@style/EditProfile_TxtPropField"
+                    android:maxLength="@integer/detailsAboutMyselfMaxLength_edtTxt"
                     android:hint="@string/editprofile_hint_desc" />
 
             </LinearLayout>

@@ -56,7 +56,7 @@
             android:inputType="textEmailAddress"
             android:editable="true"
             android:enabled="true"
-             />
+            android:maxLength="@integer/emailMaxLength_edtTxt"/>
 
     </android.support.design.widget.TextInputLayout>
 

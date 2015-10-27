@@ -210,11 +210,13 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
                 frameLayout.setOnClickListener(new ImageOnClick());
             if ((txtEdt = (EditText) rootView.findViewById(R.id.editProfile_txtEdt_name)) != null) {
                 txtEdt.setText(tempMyPerson.getName());
-                txtEdt.setFilters(new InputFilter[]{new UsefulFunctions.NameSurnameInputFilter()});
+                txtEdt.setFilters(new InputFilter[]{new UsefulFunctions.NameSurnameInputFilter(
+                        activity.getResources().getInteger(R.integer.nameMaxLength_edtTxt))});
             }
             if ((txtEdt = (EditText) rootView.findViewById(R.id.editProfile_txtEdt_surname)) != null) {
                 txtEdt.setText(tempMyPerson.getSurname());
-                txtEdt.setFilters(new InputFilter[]{new UsefulFunctions.NameSurnameInputFilter()});
+                txtEdt.setFilters(new InputFilter[]{new UsefulFunctions.NameSurnameInputFilter(
+                        activity.getResources().getInteger(R.integer.surnameMaxLength_edtTxt))});
             }
             if ((txtView = (TextView) rootView.findViewById(R.id.editProfile_txtView_birthday)) != null) {
                 Date date;

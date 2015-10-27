@@ -93,69 +93,6 @@
                     android:showDividers="middle|end"
                     android:id="@+id/profile_linearlayout_propertyLst">
 
-                    <!--<LinearLayout
-                        android:orientation="horizontal"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="bottom"
-                        android:layout_marginBottom="5dp"
-                        android:layout_marginTop="5dp"
-                        android:id="@+id/profile_linearlayout_email"
-                        android:visibility="visible">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textAppearance="?android:attr/textAppearanceMedium"
-                            android:text="@string/personprofile_email"
-                            android:id="@+id/profile_txt_emailTitle"
-                            android:layout_gravity="center_horizontal|left"
-                            android:gravity="left"
-                            android:paddingLeft="5dp"
-                            android:paddingRight="5dp" />
-
-                        <TextView
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:textAppearance="?android:attr/textAppearanceMedium"
-                            android:text=""
-                            android:id="@+id/profile_txt_emailValue"
-                            android:gravity="center_horizontal"
-                            android:paddingLeft="5dp"
-                            android:paddingRight="5dp" />
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:orientation="horizontal"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="5dp"
-                        android:layout_marginTop="5dp"
-                        android:id="@+id/profile_linearlayout_phone"
-                        android:visibility="visible">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textAppearance="?android:attr/textAppearanceMedium"
-                            android:text="@string/personprofile_phone"
-                            android:id="@+id/profile_txt_phoneTitle"
-                            android:layout_gravity="center_horizontal|left"
-                            android:gravity="left"
-                            android:paddingLeft="5dp"
-                            android:paddingRight="5dp" />
-
-                        <TextView
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:textAppearance="?android:attr/textAppearanceMedium"
-                            android:text=""
-                            android:id="@+id/profile_txt_phoneValue"
-                            android:gravity="center_horizontal"
-                            android:paddingLeft="5dp"
-                            android:paddingRight="5dp" />
-                    </LinearLayout>-->
-
                 </LinearLayout>
 
             </LinearLayout>

@@ -198,6 +198,8 @@ public class MainActivity extends AppCompatActivity
                 mNavigationDrawerFragment.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
                 getSupportActionBar().setDisplayHomeAsUpEnabled(false);
                 FragmentManager fragmentManager = getSupportFragmentManager();
+                for(int i = 0; i < fragmentManager.getBackStackEntryCount(); ++i)
+                    fragmentManager.popBackStack();
                 fragmentManager.beginTransaction().replace(R.id.container, new LoginFragment().setArgs(-1)).commit();
                 break;
         }
