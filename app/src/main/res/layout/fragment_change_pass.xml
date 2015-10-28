@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+    android:orientation="vertical" android:layout_width="wrap_content"
     android:layout_height="match_parent"
     android:visibility="visible"
     android:paddingLeft="@dimen/changePass_leftRightOffset"
     android:paddingRight="@dimen/changePass_leftRightOffset"
     android:paddingBottom="@dimen/changePass_bottomOffset"
-    android:paddingTop="@dimen/changePass_topOffset">
+    android:paddingTop="@dimen/changePass_topOffset"
+    android:minWidth="@dimen/changePass_Email_dialog_minWidth">
 
     <TextView
         android:layout_width="wrap_content"

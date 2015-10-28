@@ -6,14 +6,20 @@ package com.berezich.sportconnector.GoogleMap;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -45,17 +51,12 @@ public class GoogleMapFragment extends Fragment{
     public static enum FiltersX {F0000,F1000,F0100,F0001,F1100,F1001,F0101,F1101,Fxx1x}
     private static final String ARG_SECTION_NUMBER = "section_number";
     private static final String TAG = "MyLog_GoogleMapFragment";
-    private final int MARKER_OFFSET = 50;
     private final LatLng MOSCOW_loc = new LatLng(55.754357, 37.620035);
     private SpotMarker selectMarker = null;
     private float curZoom = -1;
     private  MapView mapView;
     private  GoogleMap map;
     private View rootView;
-    //private static MapController mapController;
-    //private OverlayManager overlayManager;
-    //private Overlay overlay;
-    private Resources res;
     private boolean isCourts=false;
     private boolean isCoaches=false;
     private boolean isPartners=false;
@@ -67,13 +68,12 @@ public class GoogleMapFragment extends Fragment{
     private final String IS_PARTNERS = "isPartners_key";
     private final String IS_FAVORITE = "isFavorite_key";
 
+    private AlertDialog dialog;
+    enum GMAPS_STATE{NEED_UPDATE,NEED_INSTALL,OK}
+    private GMAPS_STATE gmapState = GMAPS_STATE.OK;
+
     public static OnActionListenerGMapFragment listener;
-
-    //список tiles уже отисованых на карте при данном масштабе
-    //private HashMap<String,Tile> loadedTiles = new HashMap<String,Tile>();
-    //список tiles в зоне видимости
-    //private HashMap<String,Tile> curTiles = new HashMap<String,Tile>();
-
+    private MainActivity mainActivity;
 
     public GoogleMapFragment setArgs(Filters filter) {
 
@@ -97,7 +97,7 @@ public class GoogleMapFragment extends Fragment{
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-        LocalDataManager.init(getActivity());
+        //LocalDataManager.init(getActivity());
     }
 
     public GoogleMapFragment() {
@@ -114,78 +114,97 @@ public class GoogleMapFragment extends Fragment{
             return null;
         }
         rootView = inflater.inflate(R.layout.fragment_googlemap, container, false);
+        if(isGoogleMapsInstalled()) {
+            mapView = ((MapView) rootView.findViewById(R.id.mapview));
+            if (mapView == null) {
+                Log.e(TAG, "Error mapView = NULL");
+                return null;
+            }
+            mapView.onCreate(savedInstanceState);
 
-        mapView = ((MapView) rootView.findViewById(R.id.mapview));
-        if(mapView==null)
-        {
-            Log.e(TAG,"Error mapView = NULL");
-            return null;
+            // Gets to GoogleMap from the MapView and does initialization stuff
+            map = mapView.getMap();
+            if (map == null) {
+                Log.e(TAG, "Error map = NULL");
+                gmapState = GMAPS_STATE.NEED_UPDATE;
+                return null;
+            }
+            map.getUiSettings().setMyLocationButtonEnabled(true);
+            map.getUiSettings().setZoomControlsEnabled(true);
+            map.setMyLocationEnabled(true);
+            Clustering.initClusterManager(getContext(), map, this);
+
+            map.setOnCameraChangeListener(Clustering.clusterManager);
+            map.setInfoWindowAdapter(new Clustering.CustomInfoWindow());
+            map.setOnMarkerClickListener(Clustering.clusterManager);
+            map.setOnInfoWindowClickListener(Clustering.clusterManager);
+
+            ImageButton btn;
+            btn = (ImageButton) rootView.findViewById(R.id.map_btn_coach);
+            btn.setOnClickListener(new btnClickListener());
+            btn.setOnTouchListener(new btnOnTouchListener());
+            btn = (ImageButton) rootView.findViewById(R.id.map_btn_court);
+            btn.setOnClickListener(new btnClickListener());
+            btn.setOnTouchListener(new btnOnTouchListener());
+            btn = (ImageButton) rootView.findViewById(R.id.map_btn_partner);
+            btn.setOnClickListener(new btnClickListener());
+            btn.setOnTouchListener(new btnOnTouchListener());
+            btn = (ImageButton) rootView.findViewById(R.id.map_btn_star);
+            btn.setOnClickListener(new btnClickListener());
+            btn.setOnTouchListener(new btnOnTouchListener());
+
+            if (selectMarker != null)
+                setCameraToLocation(selectMarker.getPosition(), false, curZoom);
+            else
+                setCameraToCurLocation();
+
+            // Needs to call MapsInitializer before doing any CameraUpdateFactory calls
+            try {
+                MapsInitializer.initialize(getActivity());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
-        mapView.onCreate(savedInstanceState);
-
-        // Gets to GoogleMap from the MapView and does initialization stuff
-        map = mapView.getMap();
-        if (map == null) {
-            Log.e(TAG,"Error map = NULL");
-            return null;
+        else{
+            gmapState = GMAPS_STATE.NEED_INSTALL;
         }
-        map.getUiSettings().setMyLocationButtonEnabled(true);
-        map.getUiSettings().setZoomControlsEnabled(true);
-        map.setMyLocationEnabled(true);
-        Clustering.initClusterManager(this.getActivity().getApplicationContext(), map, this);
-
-        map.setOnCameraChangeListener(Clustering.clusterManager);
-        map.setInfoWindowAdapter(new Clustering.CustomInfoWindow());
-        map.setOnMarkerClickListener(Clustering.clusterManager);
-        map.setOnInfoWindowClickListener(Clustering.clusterManager);
-
-        ImageButton btn;
-        btn = (ImageButton) rootView.findViewById(R.id.map_btn_coach);
-        btn.setOnClickListener(new btnClickListener());
-        btn.setOnTouchListener(new btnOnTouchListener());
-        btn = (ImageButton) rootView.findViewById(R.id.map_btn_court);
-        btn.setOnClickListener(new btnClickListener());
-        btn.setOnTouchListener(new btnOnTouchListener());
-        btn = (ImageButton) rootView.findViewById(R.id.map_btn_partner);
-        btn.setOnClickListener(new btnClickListener());
-        btn.setOnTouchListener(new btnOnTouchListener());
-        btn = (ImageButton) rootView.findViewById(R.id.map_btn_star);
-        btn.setOnClickListener(new btnClickListener());
-        btn.setOnTouchListener(new btnOnTouchListener());
-
-        if(selectMarker!=null)
-            setCameraToLocation(selectMarker.getPosition(),false,curZoom);
-        else
-            setCameraToCurLocation();
-
-        // Needs to call MapsInitializer before doing any CameraUpdateFactory calls
-        try {
-            MapsInitializer.initialize(this.getActivity());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
         return rootView;
     }
 
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
+        mainActivity = (MainActivity) activity;
         try {
-            listener = (OnActionListenerGMapFragment) activity;
+            listener = (OnActionListenerGMapFragment) mainActivity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString() + " must implement OnActionListenerGMapFragment for GoogleMapFragment");
         }
-        ((MainActivity) activity).onSectionAttached(
+        LocalDataManager.init(mainActivity);
+        mainActivity.onSectionAttached(
                 getArguments().getInt(ARG_SECTION_NUMBER));
+        mainActivity.setmTitle(activity.getString(R.string.gmap_fragmentTitle));
+
     }
     @Override
     public void onResume() {
         Log.d(TAG, "GoogleMapFragment on onResume");
         mapView.onResume();
         super.onResume();
-        updateButtonsStates();
-        Clustering.addAllSpots(SpotsData.get_allSpots(), curFilter());
+        switch (gmapState) {
+            case OK:
+                updateButtonsStates();
+                Clustering.addAllSpots(SpotsData.get_allSpots(), curFilter());
+                break;
+            case NEED_INSTALL:
+                showDialog(getContext(), getString(R.string.gmap_dialog_needInstall_msg),
+                        getString(R.string.gmap_dialog_needInstall_btn));
+                break;
+            case NEED_UPDATE:
+                showDialog(getContext(), getString(R.string.gmap_dialog_needUpdate_msg),
+                        getString(R.string.gmap_dialog_needUpdate_btn));
+                break;
+        }
     }
 
     @Override
@@ -406,9 +425,48 @@ public class GoogleMapFragment extends Fragment{
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         menu.clear();
         super.onCreateOptionsMenu(menu, inflater);
-        ActionBar actionBar =((AppCompatActivity) getActivity()).getSupportActionBar();
-        if(actionBar!=null)
-            actionBar.setTitle(R.string.gmap_fragmentTitle);
+    }
+    public boolean isGoogleMapsInstalled()
+    {
+        try
+        {
+            ApplicationInfo info = mainActivity.getPackageManager().getApplicationInfo("com.google.android.apps.maps", 0 );
+            return true;
+        }
+        catch(PackageManager.NameNotFoundException e)
+        {
+            return false;
+        }
+    }
+    public DialogInterface.OnClickListener getGoogleMapsListener()
+    {
+        return new DialogInterface.OnClickListener()
+        {
+            @Override
+            public void onClick(DialogInterface dialog, int which)
+            {
+                try {
+                    try {
+                        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=com.google.android.apps.maps")));
+                    } catch (android.content.ActivityNotFoundException anfe) {
+                        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=com.google.android.apps.maps")));
+                    }
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+            }
+        };
+    }
+    private void showDialog(Context ctx, String msg, String btn){
+        if(dialog==null || !dialog.isShowing()) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(ctx);
+            builder.setMessage(msg);
+            builder.setPositiveButton(btn, getGoogleMapsListener());
+            dialog = builder.create();
+            dialog.show();
+        }
     }
 }
 

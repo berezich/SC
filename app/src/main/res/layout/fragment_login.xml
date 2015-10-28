@@ -58,7 +58,8 @@
                         android:gravity="left"
                         android:paddingLeft="@dimen/login_txtPropName_leftRightOffset"
                         android:paddingRight="@dimen/login_txtPropName_leftRightOffset"
-                        android:layout_weight="@integer/loginPropertyTitleWeight" />
+                        android:layout_weight="@integer/loginPropertyTitleWeight"
+                        android:maxLines="1" />
 
                     <EditText
                         android:layout_width="match_parent"
@@ -108,7 +109,8 @@
                         android:gravity="left"
                         android:paddingLeft="@dimen/login_txtPropName_leftRightOffset"
                         android:paddingRight="@dimen/login_txtPropName_leftRightOffset"
-                        android:layout_weight="@integer/loginPropertyTitleWeight" />
+                        android:layout_weight="@integer/loginPropertyTitleWeight"
+                        android:maxLines="1" />
 
                     <EditText
                         android:layout_width="match_parent"

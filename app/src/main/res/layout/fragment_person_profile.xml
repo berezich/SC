@@ -42,15 +42,18 @@
                     android:layout_weight="1">
 
                     <TextView
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:text="Андрей Петров"
                         android:id="@+id/profile_txt_name"
                         android:layout_marginLeft="15dp"
                         android:layout_marginTop="15dp"
                         android:textColor="@color/text_gray"
+                        android:ellipsize="end"
                         android:textSize="17dp"
-                        android:layout_weight="0.95" />
+                        android:layout_weight="0.95"
+                        android:maxLines="1"
+                        android:layout_marginRight="15dp" />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -60,7 +63,8 @@
                         android:id="@+id/profile_txt_typeAge"
                         android:textColor="@color/text_gray"
                         android:layout_marginLeft="16dp"
-                        android:layout_weight="1" />
+                        android:layout_weight="1"
+                        android:maxLines="1" />
 
                     <TextView
                         android:layout_width="wrap_content"

@@ -28,7 +28,9 @@
             android:layout_marginTop="@dimen/personItem_text_top_offset"
             android:layout_weight="1"
             android:textColor="@color/text_gray"
-            android:textSize="17dp" />
+            android:textSize="17dp"
+            android:ellipsize="end"
+            android:maxLines="1" />
 
         <LinearLayout
             android:orientation="horizontal"

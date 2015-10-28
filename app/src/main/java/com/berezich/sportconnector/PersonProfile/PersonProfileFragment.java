@@ -54,6 +54,7 @@ public class PersonProfileFragment extends Fragment {
     boolean isMyProfile = false;
     Person person = null;
     private static GsonFactory gsonFactory = new GsonFactory();
+    MainActivity activity;
 
     /**
      * Returns a new instance of this fragment for the given section
@@ -126,9 +127,14 @@ public class PersonProfileFragment extends Fragment {
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
+        this.activity = (MainActivity)activity;
+        if(isMyProfile)
+            this.activity.onSectionAttached(getArguments().getInt(ARG_SECTION_NUMBER));
 
         if(isMyProfile)
-            ((MainActivity) activity).onSectionAttached(getArguments().getInt(ARG_SECTION_NUMBER));
+            this.activity.setmTitle(activity.getString(R.string.personprofile_myProfile_fragmentTitle));
+        else
+            this.activity.setmTitle(activity.getString(R.string.personprofile_profile_fragmentTitle));
     }
 
     @Override
@@ -280,13 +286,8 @@ public class PersonProfileFragment extends Fragment {
         Log.d(TAG, "onCreateOptionsMenu");
         menu.clear();
         super.onCreateOptionsMenu(menu, inflater);
-        ActionBar actionBar =((AppCompatActivity) getActivity()).getSupportActionBar();
-        if(isMyProfile) {
+        if(isMyProfile)
             inflater.inflate(R.menu.fragment_person_profile, menu);
-            actionBar.setTitle(R.string.personprofile_myProfile_fragmentTitle);
-        }
-        else
-            actionBar.setTitle(R.string.personprofile_profile_fragmentTitle);
     }
 
     @Override

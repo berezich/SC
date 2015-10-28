@@ -1,10 +1,13 @@
 package com.berezich.sportconnector.PersonProfile;
 
+import android.app.Dialog;
 import android.support.v4.app.DialogFragment;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -37,7 +40,18 @@ public class ChangeEmailFragment extends DialogFragment {
             throw new ClassCastException(getTargetFragment().toString() + " must implement OnActionEmailDialogListener for ChangeEmailFragment");
         }
         final String oldEmail = getArguments().getString(EMAIL);
-        getDialog().setTitle(R.string.changeEmail_dialogTitle);
+        Dialog dialog = getDialog();
+        dialog.setTitle(R.string.changeEmail_dialogTitle);
+
+        //Grab the window of the dialog, and change the width
+        /*WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
+        Window window = dialog.getWindow();
+        lp.copyFrom(window.getAttributes());
+        //This makes the dialog take up the full width
+        lp.width = 900;
+        lp.height = 600;
+        window.setAttributes(lp);*/
+
         rootView = inflater.inflate(R.layout.fragment_change_email, null);
         if(rootView!=null) {
             TextView txtView = (TextView) rootView.findViewById(R.id.changeEmail_txtEdt_old);

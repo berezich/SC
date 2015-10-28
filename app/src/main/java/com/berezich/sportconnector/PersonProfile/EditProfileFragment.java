@@ -119,6 +119,7 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
     public void onAttach(Activity activity) {
         this.activity = getActivity();
         super.onAttach(activity);
+        ((MainActivity)this.activity).setmTitle(activity.getString(R.string.editprofile_fragmentTitle));
     }
 
     @Override
@@ -310,9 +311,6 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
         menu.clear();
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.fragment_edit_profile, menu);
-        ActionBar actionBar =((AppCompatActivity) activity).getSupportActionBar();
-        if(actionBar!=null)
-            actionBar.setTitle(R.string.editprofile_fragmentTitle);
     }
 
     @Override
@@ -679,35 +677,7 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
         }
 
     }
-    /*@Override
-    public void onGetListPersonByIdLstFinish(Pair<List<Person>, Exception> result) {
-        Exception exception = result.second;
-        List<Person> personList = result.first;
-        File cacheImage;
-        if(exception==null && personList.size()>0)
-        {
-            Person myPersonInfoOld = LocalDataManager.getMyPersonInfo();
-            if(myPersonInfoOld!=null) {
-                Person myPersonInfo = personList.get(0);
-                LocalDataManager.setMyPersonInfo(myPersonInfo.setPass(myPersonInfo.getPass()));
-                Picture pic = myPersonInfo.getPhoto();
-                if(pic!=null){
-                    cacheImage = picInfo.savePicPreviewToCache(TAG, getActivity().getBaseContext(),
-                            UsefulFunctions.getDigest(myPersonInfo.getPhoto().getBlobKey()), FileManager.PERSON_CACHE_DIR + "/" + myPersonInfo.getId());
-                    if(cacheImage!=null && rootView!=null) {
-                        ImageView imageView = (ImageView) rootView.findViewById(R.id.editProfile_img_photo);
-                        if(imageView!=null)
-                        {
-                            int height = (int)activity.getResources().getDimension(R.dimen.personProfile_photoHeight);
-                            int width = (int)activity.getResources().getDimension(R.dimen.personProfile_photoWidth);
-                            FileManager.setPicToImageView(cacheImage, imageView,height,width);
-                        }
-                    }
-                }
-            }
-        }
 
-    }*/
 
     private void showWarnDialog(String dialogMsg){
         showWarnDialog("", dialogMsg);

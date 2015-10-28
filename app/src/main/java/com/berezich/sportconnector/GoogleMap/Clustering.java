@@ -46,23 +46,24 @@ public class Clustering {
         Set<Long> keys = spots.keySet();
         Spot spot;
         int cnt=0;
-        Person myPersonInfo = LocalDataManager.getMyPersonInfo();
-        clusterManager.clearItems();
-        // Loop over String keys.
-        for (Long key : keys) {
-            spot = spots.get(key);
+        if(clusterManager!=null) {
+            clusterManager.clearItems();
+            // Loop over String keys.
+            for (Long key : keys) {
+                spot = spots.get(key);
 
-            spotMarker = new SpotMarker(spot.getId(),spot.getName(),spot.getCoords().getLat(),spot.getCoords().getLongt(),
-                    SpotsData.getPartnerIdsWithoutMe(spot).size(),SpotsData.getCoachIdsWithoutMe(spot).size(), LocalDataManager.isMyFavoriteSpot(spot));
-            if(spotMarker.isAppropriate(filter)) {
-                spotMarker.setSpotIcon(filter);
-                spotMarker.setDescription(filter);
-                clusterManager.addItem(spotMarker);
-                cnt++;
+                spotMarker = new SpotMarker(spot.getId(), spot.getName(), spot.getCoords().getLat(), spot.getCoords().getLongt(),
+                        SpotsData.getPartnerIdsWithoutMe(spot).size(), SpotsData.getCoachIdsWithoutMe(spot).size(), LocalDataManager.isMyFavoriteSpot(spot));
+                if (spotMarker.isAppropriate(filter)) {
+                    spotMarker.setSpotIcon(filter);
+                    spotMarker.setDescription(filter);
+                    clusterManager.addItem(spotMarker);
+                    cnt++;
+                }
             }
+            Log.d(TAG, cnt + " spotMarkers (that are appropriate for filter = " + filter + ") were added to clusterManager");
+            clusterManager.cluster();
         }
-        Log.d(TAG, cnt + " spotMarkers (that are appropriate for filter = "+filter+") were added to clusterManager");
-        clusterManager.cluster();
 
     }
     public static class OwnIconRendered extends DefaultClusterRenderer<AbstractMarker> {

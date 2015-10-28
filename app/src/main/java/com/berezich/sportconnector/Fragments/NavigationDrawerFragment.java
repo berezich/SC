@@ -65,9 +65,6 @@ public class NavigationDrawerFragment extends Fragment {
     private boolean mFromSavedInstanceState;
     private boolean mUserLearnedDrawer;
 
-    private Button btn;
-
-
     public NavigationDrawerFragment() {
     }
 
@@ -165,10 +162,7 @@ public class NavigationDrawerFragment extends Fragment {
                 R.layout.drawer_menu_logout_item,
                 R.id.drawer_item_txt,
                 new String[]{
-                        getString(R.string.drawer_bottom_logout),
-                        /*getString(R.string.frame_msg_title),
-                        getString(R.string.frame_friends_title),
-                        getString(R.string.frame_photo_title),*/
+                        getString(R.string.drawer_bottom_logout)
                 }));
         mDrawerBottomListView.setItemChecked(0, false);
 
@@ -310,7 +304,7 @@ public class NavigationDrawerFragment extends Fragment {
         // showGlobalContextActionBar, which controls the top-left area of the action bar.
         if (mDrawerLayout != null && isDrawerOpen()) {
             inflater.inflate(R.menu.global, menu);
-            //showGlobalContextActionBar();
+            showGlobalContextActionBar();
         }
         super.onCreateOptionsMenu(menu, inflater);
     }

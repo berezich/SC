@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+    android:orientation="vertical" android:layout_width="wrap_content"
     android:layout_height="match_parent"
     android:visibility="visible"
     android:paddingLeft="@dimen/changeEmail_leftRightOffset"
     android:paddingRight="@dimen/changeEmail_leftRightOffset"
     android:paddingBottom="@dimen/changeEmail_bottomOffset"
-    android:paddingTop="@dimen/changeEmail_topOffset">
+    android:paddingTop="@dimen/changeEmail_topOffset"
+    android:minWidth="@dimen/changePass_Email_dialog_minWidth">
 
     <android.support.design.widget.TextInputLayout
         android:layout_width="match_parent"
@@ -14,7 +15,7 @@
         android:paddingBottom="@dimen/changeEmail_oldEmail_bottomOffset">
 
         <EditText
-            android:layout_width="fill_parent"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/changeEmail_txtEdt_old"
             android:hint="@string/changeEmail_old_hint"
@@ -48,7 +49,7 @@
         android:layout_height="wrap_content">
 
         <EditText
-            android:layout_width="fill_parent"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/changeEmail_txtEdt_new"
             android:hint="@string/changeEmail_new_hint"

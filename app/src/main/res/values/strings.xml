@@ -71,6 +71,10 @@
 
     <!--gmap_fragment begin-->
         <string name="gmap_fragmentTitle">Поиск кортов</string>
+        <string name="gmap_dialog_needUpdate_msg">Обновите приложение Google карты</string>
+        <string name="gmap_dialog_needUpdate_btn">Обновить</string>
+        <string name="gmap_dialog_needInstall_msg">Установите приложение Google карты</string>
+        <string name="gmap_dialog_needInstall_btn">Установить</string>
     <!--gmap_fragment end-->
 
     <!--personProfile_fragment begin-->

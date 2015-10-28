@@ -4,7 +4,7 @@
     <integer name="editProfile_minAge">12</integer>
     <integer name="editProfile_maxAge">99</integer>
 
-    <integer name="loginPropertyTitleWeight">28</integer>
+    <integer name="loginPropertyTitleWeight">26</integer>
     <integer name="loginPropertyValueWeight">10</integer>
     <integer name="nameMaxLength_edtTxt">15</integer>
     <integer name="surnameMaxLength_edtTxt">20</integer>

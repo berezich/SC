@@ -74,37 +74,6 @@ public class MainActivity extends AppCompatActivity
                     (DrawerLayout) findViewById(R.id.drawer_layout));
             mNavigationDrawerFragment.setMenuVisibility(true);
             mNavigationDrawerFragment.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
-            //Restore the fragment's instance
-            /*Fragment storeFragment;
-            android.support.v4.app.FragmentTransaction transaction = fragmentManager.beginTransaction();
-            int cnt=0;
-            boolean isFirst=true;
-            while (true){
-                storeFragment = fragmentManager.getFragment(savedInstanceState, fragmentI+cnt);
-                if(storeFragment!=null) {
-                    if (!storeFragment.getClass().getName().equals(NavigationDrawerFragment.class.getName())) {
-                        if(isFirst) {
-                            transaction.replace(R.id.container, storeFragment);
-                            //fragmentManager.beginTransaction().replace(R.id.container, storeFragment).commit();
-                            Log.d(TAG,String.format("prev fragment replaced with %s",storeFragment.getClass().getName()));
-                            isFirst=false;
-                        }
-                        else {
-                            transaction.replace(R.id.container, storeFragment).addToBackStack(storeFragment.getClass().getName());
-                            //fragmentManager.beginTransaction().replace(R.id.container, storeFragment).addToBackStack(storeFragment.getClass().getName()).commit();
-                            Log.d(TAG, String.format("prev fragment replaced with %s", storeFragment.getClass().getName()));
-
-                        }
-
-                    }
-                }
-                else{
-                    transaction.commit();
-                    break;
-                }
-                cnt++;
-            }*/
-
         }
         else {
             fragmentManager.beginTransaction().replace(R.id.container, new LoginFragment().setArgs(-1)).commit();
@@ -293,6 +262,8 @@ public class MainActivity extends AppCompatActivity
             restoreActionBar();
             return true;
         }
+        else
+            restoreActionBar();
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -355,5 +326,9 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    public void setmTitle(String title){
+        mTitle = title;
     }
 }

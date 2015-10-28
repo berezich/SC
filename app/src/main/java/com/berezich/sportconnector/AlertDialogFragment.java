@@ -43,7 +43,8 @@ public class AlertDialogFragment extends DialogFragment {
             try {
                 listener = (OnActionDialogListener)getTargetFragment();
             } catch (ClassCastException e) {
-                throw new ClassCastException(getTargetFragment().toString() + " must implement OnActionDialogListener for AlertDialogFragment");
+                throw new ClassCastException(getTargetFragment().toString() +
+                        " must implement OnActionDialogListener for AlertDialogFragment");
             }
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
                 //.setIcon(R.drawable.alert_dialog_icon)

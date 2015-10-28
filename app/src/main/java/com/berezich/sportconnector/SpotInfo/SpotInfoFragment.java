@@ -36,6 +36,7 @@ import com.berezich.sportconnector.FileManager;
 import com.berezich.sportconnector.GoogleMap.SpotsData;
 import com.berezich.sportconnector.ImageViewer.ImgViewPagerActivity;
 import com.berezich.sportconnector.LocalDataManager;
+import com.berezich.sportconnector.MainActivity;
 import com.berezich.sportconnector.PersonProfile.PersonProfileFragment;
 import com.berezich.sportconnector.R;
 import com.berezich.sportconnector.UsefulFunctions;
@@ -317,6 +318,7 @@ public class SpotInfoFragment extends Fragment implements EndpointApi.GetListPer
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         this.activity = getActivity();
+        ((MainActivity)activity).setmTitle(activity.getString(R.string.spotinfo_fragmentTitle));
         /*try {
             mListener = (OnFragmentInteractionListener) activity;
         } catch (ClassCastException e) {
@@ -543,8 +545,6 @@ public class SpotInfoFragment extends Fragment implements EndpointApi.GetListPer
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         menu.clear();
         super.onCreateOptionsMenu(menu, inflater);
-        ActionBar actionBar =((AppCompatActivity) activity).getSupportActionBar();
-        actionBar.setTitle(R.string.spotinfo_fragmentTitle);
     }
 
 
