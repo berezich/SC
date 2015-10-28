@@ -287,9 +287,15 @@ public class SpotEndpoint {
     //TODO: check user pass
     public void setAsFavorite(@Named("idSpot") Long idSpot,
                               @Named("idPerson") Long idPerson,
+                              @Named("pass") String pass,
                               @Named("isFavorite") boolean isFavorite,
                               @Named("typePerson")Person.TYPE type) throws NotFoundException, BadRequestException {
         OAuth_2_0.check(OAuth_2_0.PERMISSIONS.ANDROID_APP);
+        Person person = ofy().load().type(Person.class).id(idPerson).now();
+        if(!person.getPass().equals(PersonEndpoint.msgDigest(pass))){
+            logger.severe(String.format("Warning!!! Attempt of setting spot as favorite for person (id:%d) with not valid password", person.getId()));
+            throw new BadRequestException("Setting spto as favorite error");
+        }
         Spot oldSpot;
         Spot spot = ofy().load().type(Spot.class).id(idSpot).now();
         if(spot==null) {

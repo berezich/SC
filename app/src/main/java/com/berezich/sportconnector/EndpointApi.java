@@ -23,6 +23,7 @@ import com.google.api.client.googleapis.services.AbstractGoogleClientRequest;
 import com.google.api.client.googleapis.services.GoogleClientRequestInitializer;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.util.DateTime;
+import com.google.maps.android.geometry.Bounds;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -351,7 +352,7 @@ public class EndpointApi {
         }
     }
 */
-    public static class SetSpotAsFavoriteAsyncTask extends AsyncTask< Pair<Long,String>, Void, Pair<Boolean ,Exception> >{
+    public static class SetSpotAsFavoriteAsyncTask extends AsyncTask< Pair<Pair<Pair<Long,Boolean>,Pair<Long,String>>,String>, Void, Pair<Boolean ,Exception> >{
         private OnAction listener=null;
         private Context context = null;
         public SetSpotAsFavoriteAsyncTask(Fragment fragment)
@@ -365,14 +366,15 @@ public class EndpointApi {
             }
         }
         @Override
-        protected Pair<Boolean,Exception> doInBackground(Pair<Long,String>... params) {
-            Long spot = params[0].first;
-            String person = params[0].second;
-            boolean isFavorite = (params[1].first!=0);
+        protected Pair<Boolean,Exception> doInBackground(Pair<Pair<Pair<Long,Boolean>,Pair<Long,String>>,String>... params) {
+            Long spot = params[0].first.first.first;
+            Long person = params[0].first.second.first;
+            String pass = params[0].first.second.second;
+            boolean isFavorite = params[0].first.first.second;
             String personType = params[1].second;
             if(spot!=null && person!=null)
             try {
-                srvApi.setSpotAsFavorite( Long.valueOf(person),spot,isFavorite,personType).execute();
+                srvApi.setSpotAsFavorite( person,spot,isFavorite,pass,personType).execute();
             } catch (IOException e) {
                 return new Pair<Boolean,Exception>(isFavorite,e);
             } catch (Exception e)
@@ -587,7 +589,7 @@ public class EndpointApi {
         }
     }
 
-    public static class ChangeEmailAsyncTask extends AsyncTask< Pair<Long,String>, Void, Exception >{
+    public static class ChangeEmailAsyncTask extends AsyncTask< Pair<Pair<Long,String>,Pair<String,String>>, Void, Exception >{
         private OnAction listener=null;
         private Context context = null;
         public ChangeEmailAsyncTask(Fragment fragment)
@@ -601,12 +603,13 @@ public class EndpointApi {
             }
         }
         @Override
-        protected Exception doInBackground(Pair<Long,String>... params) {
-            Long id = params[0].first;
-            String oldEmail = params[0].second;
-            String newEmail = params[1].second;
+        protected Exception doInBackground(Pair<Pair<Long,String>,Pair<String,String>>... params) {
+            Long id = params[0].first.first;
+            String pass = params[0].first.second;
+            String oldEmail = params[0].second.first;
+            String newEmail = params[0].second.second;
             try {
-                srvApi.changeEmail(id, newEmail, oldEmail).execute();
+                srvApi.changeEmail(id, newEmail, oldEmail,pass).execute();
                 return null;
             } catch (Exception e) {
                 return e;

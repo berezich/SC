@@ -442,7 +442,8 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
         try {
             this.newEmail = newEmail;
             setVisibleProgressBar(true);
-            new EndpointApi.ChangeEmailAsyncTask(this).execute(new Pair<Long, String>(tempMyPerson.getId(), tempMyPerson.getEmail()), new Pair<Long, String>(null, newEmail));
+            new EndpointApi.ChangeEmailAsyncTask(this).execute(new Pair<>(new Pair<>(tempMyPerson.getId(),tempMyPerson.getPass()),new Pair<>(tempMyPerson.getEmail(),newEmail)));
+
         }
         catch (Exception ex)
         {

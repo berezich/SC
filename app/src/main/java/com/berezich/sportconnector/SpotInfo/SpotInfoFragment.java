@@ -367,8 +367,8 @@ public class SpotInfoFragment extends Fragment implements EndpointApi.GetListPer
                 btn.setPressed(!btn.isPressed());
                 isFavoriteChanged = !isFavoriteChanged;
                 SpotsData.setSpotFavorite(curSpot.getId(), btn.isPressed());
-                new EndpointApi.SetSpotAsFavoriteAsyncTask(getFragmentRef()).execute(new Pair<Long, String>(curSpot.getId(),
-                        LocalDataManager.getMyPersonInfo().getId().toString()),new Pair<Long, String>(btn.isPressed()? new Long(1) :new Long(0),
+                new EndpointApi.SetSpotAsFavoriteAsyncTask(getFragmentRef()).execute(new Pair<>(new Pair<>( new Pair<>(curSpot.getId(),btn.isPressed()),
+                        new Pair<>( LocalDataManager.getMyPersonInfo().getId(),LocalDataManager.getMyPersonInfo().getPass())),
                         LocalDataManager.getMyPersonInfo().getType()));
                 return true;
             }

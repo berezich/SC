@@ -258,14 +258,24 @@ public class PersonEndpoint {
             name = "changeEmail",
             path = "personEmail",
             httpMethod = ApiMethod.HttpMethod.PUT)
-    public void changeEmail(@Named("id") Long id, @Named("oldEmail") String oldEmail, @Named("newEmail") String newEmail)
+    public void changeEmail(@Named("id") Long id, @Named("pass") String pass, @Named("oldEmail") String oldEmail, @Named("newEmail") String newEmail)
             throws NotFoundException, BadRequestException {
         OAuth_2_0.check(OAuth_2_0.PERMISSIONS.ANDROID_APP);
         Person person = ofy().load().type(Person.class).id(id).now();
         if(person==null)
             throw new NotFoundException("Person with id:" + id + " not found");
+        if(!person.getPass().equals(msgDigest(pass))) {
+            logger.severe(String.format("Warning!!! Attempt of changing person (id:%d) email with not valid password", person.getId()));
+            throw new BadRequestException("Changing person email error");
+        }
         if(oldEmail.equals(person.getEmail()))
         {
+            Query<Person> query = ofy().load().type(Person.class).filter("email", newEmail);
+            if(query!=null && query.count()>0)
+            {
+                throw new BadRequestException("loginExists@:Person with the same login already exists");
+            }
+
             ReqChangeEmail reqChangeEmail = new ReqChangeEmail(oldEmail,newEmail,person.getId(),Calendar.getInstance().getTime());
             ofy().save().entity(reqChangeEmail).now();
             reqChangeEmail = ofy().load().type(ReqChangeEmail.class).id(oldEmail).now();
@@ -408,7 +418,7 @@ public class PersonEndpoint {
     }
 
     /**
-     * Updates an existing {@code Person} except EMAIL, PASSWORD, PHOTO.
+     * Updates an existing {@code Person} except EMAIL, PASSWORD, PHOTO, TYPE.
      *
      * @param id    the ID of the entity to be updated
      * @param person the desired state of the entity
@@ -420,7 +430,6 @@ public class PersonEndpoint {
             name = "updatePerson",
             path = "person/{id}",
             httpMethod = ApiMethod.HttpMethod.PUT)
-    //TODO: check pass of user
     public Person update(@Named("id") Long id, Person person) throws NotFoundException, BadRequestException {
         OAuth_2_0.check(OAuth_2_0.PERMISSIONS.ANDROID_APP);
         Person oldPerson = ofy().load().type(Person.class).id(id).now();
@@ -428,6 +437,10 @@ public class PersonEndpoint {
             throw  new NotFoundException("Person with id:" + id + " not found");
         if(oldPerson.getType()!=person.getType())
             throw new BadRequestException("Person with id:" + id + " has already another type = "+oldPerson.getType());
+        if(!oldPerson.getPass().equals(msgDigest(person.getPass()))) {
+            logger.warning(String.format("Warning!!! Attempt of updating person (id:%d) with not valid password",person.getId()));
+            throw new BadRequestException("Person update error");
+        }
         person.setId(id);
         person.setPass(oldPerson.getPass());
         person.setEmail(oldPerson.getEmail());
@@ -441,9 +454,7 @@ public class PersonEndpoint {
         return personRes;
     }
 
-    //TODO: check pass of user
     protected void addPersonsFavoriteSpot(List<Long> idLst,Long spotId) throws BadRequestException{
-        OAuth_2_0.check(OAuth_2_0.PERMISSIONS.ANDROID_APP);
         Person person;
         for (int i = 0; i < idLst.size(); i++) {
             Long id = idLst.get(i);
@@ -463,7 +474,6 @@ public class PersonEndpoint {
 
 
     protected void removePersonsFavoriteSpot(List<Long> idLst, Long spotId) throws BadRequestException{
-        OAuth_2_0.check(OAuth_2_0.PERMISSIONS.ANDROID_APP);
         Person person;
         if(idLst!=null)
             for (int i = 0; i < idLst.size(); i++) {
@@ -482,7 +492,6 @@ public class PersonEndpoint {
             }
     }
     protected void setPersonPhoto(Long id, String photoKey) throws BadRequestException,NotFoundException{
-        //OAuth_2_0.check();
         Person person;
         checkExists(id);
         person = ofy().load().type(Person.class).id(id).now();
@@ -654,7 +663,7 @@ public class PersonEndpoint {
         else
             new BadRequestException("setSpotCoachesPartners person && oldPerson == null ");
     }
-    private String msgDigest(String stringToEncrypt)
+    protected static String msgDigest(String stringToEncrypt)
     {
         MessageDigest messageDigest;
         try {
