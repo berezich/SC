@@ -59,7 +59,6 @@ public class MainFragment extends Fragment implements
     OnActionListenerMainFragment listener;
     private static Long regionId = new Long(1);
     private RegionInfo regionInfo=null, localRegionInfo = null;
-    private boolean isSpotsLoaded = false;
     private ReqState reqState = ReqState.REQ_REGINFO;
     /**
      * Returns a new instance of this fragment for the given section
@@ -111,6 +110,9 @@ public class MainFragment extends Fragment implements
     {
         super.onResume();
         Log.d(TAG, "onResume reqState = " + reqState);
+        ((MainActivity)activity).setmTitle(activity.getString(R.string.mainSearch_fragmentTitle));
+        ((MainActivity)activity).getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_drawer);
+        ((MainActivity)activity).restoreActionBar();
         if(reqState==ReqState.EVERYTHING_LOADED)
             setVisibleLayouts(true,false);
         else {
@@ -319,5 +321,6 @@ public class MainFragment extends Fragment implements
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         menu.clear();
+
     }
 }

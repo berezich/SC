@@ -296,6 +296,9 @@ public class SpotInfoFragment extends Fragment implements EndpointApi.GetListPer
     @Override
     public void onResume(){
         super.onResume();
+        ((MainActivity)activity).setmTitle(activity.getString(R.string.spotinfo_fragmentTitle));
+        ((MainActivity)activity).getSupportActionBar().setHomeAsUpIndicator(null);
+        ((MainActivity)activity).restoreActionBar();
         ImageView imgButton;
         if ((imgButton = (ImageButton) spotInfoView.findViewById(R.id.spotInfo_btnImg_favorite)) != null)
             imgButton.setPressed(LocalDataManager.isMyFavoriteSpot(curSpot));
@@ -318,7 +321,7 @@ public class SpotInfoFragment extends Fragment implements EndpointApi.GetListPer
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         this.activity = getActivity();
-        ((MainActivity)activity).setmTitle(activity.getString(R.string.spotinfo_fragmentTitle));
+
         /*try {
             mListener = (OnFragmentInteractionListener) activity;
         } catch (ClassCastException e) {
@@ -545,6 +548,7 @@ public class SpotInfoFragment extends Fragment implements EndpointApi.GetListPer
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         menu.clear();
         super.onCreateOptionsMenu(menu, inflater);
+
     }
 
 

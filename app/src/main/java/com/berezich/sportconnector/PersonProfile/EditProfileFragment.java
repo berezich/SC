@@ -119,7 +119,8 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
     public void onAttach(Activity activity) {
         this.activity = getActivity();
         super.onAttach(activity);
-        ((MainActivity)this.activity).setmTitle(activity.getString(R.string.editprofile_fragmentTitle));
+
+
     }
 
     @Override
@@ -190,6 +191,10 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
         Spinner spinner;
         ImageView imageView;
         FrameLayout frameLayout;
+
+        ((MainActivity)this.activity).setmTitle(activity.getString(R.string.editprofile_fragmentTitle));
+        ((MainActivity)this.activity).getSupportActionBar().setHomeAsUpIndicator(null);
+        ((MainActivity)this.activity).restoreActionBar();
 
         final Person myPersonInfo = LocalDataManager.getMyPersonInfo();
         RadioGroup radioGroup;
@@ -311,6 +316,7 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
         menu.clear();
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.fragment_edit_profile, menu);
+
     }
 
     @Override

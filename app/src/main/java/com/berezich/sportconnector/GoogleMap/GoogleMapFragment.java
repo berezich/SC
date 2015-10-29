@@ -183,7 +183,8 @@ public class GoogleMapFragment extends Fragment{
         LocalDataManager.init(mainActivity);
         mainActivity.onSectionAttached(
                 getArguments().getInt(ARG_SECTION_NUMBER));
-        mainActivity.setmTitle(activity.getString(R.string.gmap_fragmentTitle));
+
+
 
     }
     @Override
@@ -205,6 +206,9 @@ public class GoogleMapFragment extends Fragment{
                         getString(R.string.gmap_dialog_needUpdate_btn));
                 break;
         }
+        mainActivity.setmTitle(mainActivity.getString(R.string.gmap_fragmentTitle));
+        mainActivity.getSupportActionBar().setHomeAsUpIndicator(null);
+        mainActivity.restoreActionBar();
     }
 
     @Override
@@ -425,6 +429,7 @@ public class GoogleMapFragment extends Fragment{
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         menu.clear();
         super.onCreateOptionsMenu(menu, inflater);
+
     }
     public boolean isGoogleMapsInstalled()
     {

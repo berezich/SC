@@ -131,10 +131,7 @@ public class PersonProfileFragment extends Fragment {
         if(isMyProfile)
             this.activity.onSectionAttached(getArguments().getInt(ARG_SECTION_NUMBER));
 
-        if(isMyProfile)
-            this.activity.setmTitle(activity.getString(R.string.personprofile_myProfile_fragmentTitle));
-        else
-            this.activity.setmTitle(activity.getString(R.string.personprofile_profile_fragmentTitle));
+
     }
 
     @Override
@@ -151,6 +148,16 @@ public class PersonProfileFragment extends Fragment {
         ImageView imageView;
         if(isMyProfile)
             person = LocalDataManager.getMyPersonInfo();
+        if(isMyProfile) {
+            this.activity.setmTitle(activity.getString(R.string.personprofile_myProfile_fragmentTitle));
+            this.activity.getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_drawer);
+        }
+        else {
+            this.activity.setmTitle(activity.getString(R.string.personprofile_profile_fragmentTitle));
+            this.activity.getSupportActionBar().setHomeAsUpIndicator(null);
+        }
+        this.activity.restoreActionBar();
+
         if(person!=null && rootView!=null)
         {
             if((imageView = (ImageView) rootView.findViewById(R.id.profile_img_photo))!=null) {
@@ -288,6 +295,7 @@ public class PersonProfileFragment extends Fragment {
         super.onCreateOptionsMenu(menu, inflater);
         if(isMyProfile)
             inflater.inflate(R.menu.fragment_person_profile, menu);
+
     }
 
     @Override

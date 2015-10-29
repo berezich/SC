@@ -145,7 +145,6 @@ public class MainActivity extends AppCompatActivity
                 Log.d(TAG, String.format("prev fragment replaced with %s", LoginFragment.class.getName()));
 
         }
-
     }
 
     @Override
