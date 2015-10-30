@@ -360,4 +360,12 @@ public class NavigationDrawerFragment extends Fragment {
         void onNavigationDrawerItemSelected(int position);
         void onNavigationDrawerBottomItemSelected(int position);
     }
+    public boolean close() {
+        if (isDrawerOpen()) {
+            mDrawerLayout.closeDrawer(mFragmentContainerView);
+            return true;
+        } else {
+            return false;
+        }
+    }
 }

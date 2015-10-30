@@ -335,6 +335,14 @@ public class MainActivity extends AppCompatActivity
         super.onActivityResult(requestCode, resultCode, data);
     }
 
+    @Override
+    public void onBackPressed() {
+        if(mNavigationDrawerFragment.isDrawerOpen())
+            mNavigationDrawerFragment.close();
+        else
+            super.onBackPressed();
+    }
+
     public void setmTitle(String title){
         mTitle = title;
     }
