@@ -7,7 +7,7 @@
 
     <style name="ClusterIcon.TextAppearance" parent="android:TextAppearance">
         <item name="android:textColor">#ffffffff</item>
-        <item name="android:textSize">10sp</item>
+        <item name="android:textSize">10dp</item>
         <item name="android:textStyle">normal</item>
     </style>
 
@@ -61,6 +61,7 @@
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:textAppearance">?android:attr/textAppearanceMedium</item>
+        <item name="android:textSize">@dimen/textMediumSize</item>
         <item name="android:layout_marginTop">@dimen/editprofile_text_top_offset</item>
         <item name="android:layout_marginBottom">@dimen/editprofile_text_bottom_offset</item>
         <item name="android:paddingLeft">12dp</item>

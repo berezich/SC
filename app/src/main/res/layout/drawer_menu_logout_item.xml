@@ -14,10 +14,11 @@
         android:background="@drawable/ic_exit_to_app_white_24dp"
         android:layout_gravity="center_vertical" />
     <TextView
-        android:id="@+id/drawer_item_txt"
+        android:id="@+id/drawer_bottomItem_txt"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceListItemSmall"
+        android:textSize="@dimen/textMediumSize"
         android:gravity="center_vertical"
         android:paddingLeft="?android:attr/listPreferredItemPaddingLeft"
         android:paddingRight="?android:attr/listPreferredItemPaddingRight"

@@ -18,6 +18,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/changeEmail_txtEdt_old"
+            android:textSize="@dimen/textMediumSize"
             android:hint="@string/changeEmail_old_hint"
             android:singleLine="true"
             android:editable="false"
@@ -25,24 +26,6 @@
             android:inputType="textEmailAddress" />
 
     </android.support.design.widget.TextInputLayout>
-   <!-- <TextView
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/changeEmail_title_old"
-        android:text="@string/changeEmail_old_hint"
-        android:singleLine="false"
-        android:paddingBottom="@dimen/changeEmail_oldEmailTitle_bottomOffset"
-        style="@style/Base.TextAppearance.AppCompat.Small" />
-
-    <TextView
-        style="@style/Base.TextAppearance.AppCompat.Medium"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/changeEmail_txtEdt_old"
-        android:text="@string/changeEmail_old_hint"
-        android:singleLine="false"
-        android:paddingBottom="@dimen/changeEmail_oldEmail_bottomOffset"
-        android:enabled="false" />-->
 
     <android.support.design.widget.TextInputLayout
         android:layout_width="match_parent"
@@ -52,6 +35,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/changeEmail_txtEdt_new"
+            android:textSize="@dimen/textMediumSize"
             android:hint="@string/changeEmail_new_hint"
             android:singleLine="true"
             android:inputType="textEmailAddress"
@@ -72,6 +56,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/changeEmail_btnCancel"
+            android:textSize="@dimen/textMediumSize"
             android:id="@+id/changeEmail_btnCancel"
             android:layout_weight="1" />
 
@@ -79,6 +64,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/changeEmail_btnOk"
+            android:textSize="@dimen/textMediumSize"
             android:id="@+id/changeEmail_btnOk"
             android:layout_weight="1" />
     </LinearLayout>

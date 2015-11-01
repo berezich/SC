@@ -92,6 +92,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:textSize="@dimen/textSmallSize"
                     android:text="@string/spotinfo_details"
                     android:id="@+id/spotInfo_txt_details"
                     android:gravity="right"
@@ -172,7 +173,7 @@
                 android:id="@+id/spotInfo_txt_noPartersCoaches"
                 android:visibility="gone"
                 android:singleLine="false"
-                android:textSize="15sp"
+                android:textSize="15dp"
                 android:textColor="@color/text_msg_error"
                 android:textAlignment="center"
                 android:gravity="center"
@@ -209,7 +210,7 @@
                         android:visibility="visible"
                         android:gravity="center_horizontal"
                         android:textAlignment="gravity"
-                        android:textSize="15sp"
+                        android:textSize="15dp"
                         android:textColor="@color/text_msg_error" />
 
                     <TextView
@@ -223,7 +224,7 @@
                         android:clickable="true"
                         android:background="@drawable/text_view_backgr_selector"
                         android:textColor="@color/txt_view_color_selector"
-                        android:textSize="18sp"
+                        android:textSize="18dp"
                         android:layout_marginTop="10dp" />
 
                 </LinearLayout>

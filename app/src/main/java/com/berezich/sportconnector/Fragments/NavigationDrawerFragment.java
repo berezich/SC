@@ -20,7 +20,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ListView;
 
@@ -130,8 +129,8 @@ public class NavigationDrawerFragment extends Fragment {
         });
         mDrawerListView.setAdapter(new ArrayAdapter<String>(
                 getActionBar().getThemedContext(),
-                android.R.layout.simple_list_item_activated_1,
-                android.R.id.text1,
+                R.layout.drawer_menu_item,
+                R.id.drawer_item_txt,
                 new String[]{
                         getString(R.string.mainSearch_fragmentTitle),
                         getString(R.string.personprofile_myProfile_fragmentTitle),
@@ -160,7 +159,7 @@ public class NavigationDrawerFragment extends Fragment {
         mDrawerBottomListView.setAdapter(new ArrayAdapter<String>(
                 getActionBar().getThemedContext(),
                 R.layout.drawer_menu_logout_item,
-                R.id.drawer_item_txt,
+                R.id.drawer_bottomItem_txt,
                 new String[]{
                         getString(R.string.drawer_bottom_logout)
                 }));

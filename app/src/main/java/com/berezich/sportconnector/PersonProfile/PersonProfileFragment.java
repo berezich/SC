@@ -319,9 +319,8 @@ public class PersonProfileFragment extends Fragment {
         @Override
         public void onClick(View v) {
             Intent intent = new Intent(getActivity(), ImgViewPagerActivity.class);
-            Person myPerson = LocalDataManager.getMyPersonInfo();
-            if(myPerson!=null) {
-                Picture picture = myPerson.getPhoto();
+            if(person!=null) {
+                Picture picture = person.getPhoto();
                 if(picture!=null) {
                     GsonFactory gsonFactory = new GsonFactory();
                     try {

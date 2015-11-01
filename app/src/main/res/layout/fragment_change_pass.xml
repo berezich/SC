@@ -9,14 +9,15 @@
     android:paddingTop="@dimen/changePass_topOffset"
     android:minWidth="@dimen/changePass_Email_dialog_minWidth">
 
-    <TextView
+    <!--<TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textSize="@dimen/textMediumSize"
         android:text="Error"
         android:id="@+id/changePass_txt_error"
         android:textColor="@color/changePass_msgError"
-        android:visibility="gone" />
+        android:visibility="gone" />-->
 
     <android.support.design.widget.TextInputLayout
         android:layout_width="match_parent"
@@ -26,6 +27,7 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:id="@+id/changePass_txtEdt_old"
+            android:textSize="@dimen/textMediumSize"
             android:hint="@string/changePass_old_hint"
             android:inputType="textPassword"
             android:singleLine="true"
@@ -41,6 +43,7 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:id="@+id/changePass_txtEdt_new"
+            android:textSize="@dimen/textMediumSize"
             android:hint="@string/changePass_new_hint"
             android:inputType="textPassword"
             android:singleLine="true"
@@ -56,6 +59,7 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:id="@+id/changePass_txtEdt_new2"
+            android:textSize="@dimen/textMediumSize"
             android:hint="@string/changePass_new2_hint"
             android:inputType="textPassword"
             android:singleLine="true"
@@ -74,6 +78,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/changePass_btnCancel"
+            android:textSize="@dimen/textMediumSize"
             android:id="@+id/changePass_btnCancel"
             android:layout_weight="1" />
 
@@ -81,6 +86,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/changePass_btnOk"
+            android:textSize="@dimen/textMediumSize"
             android:id="@+id/changePass_btnOk"
             android:layout_weight="1" />
     </LinearLayout>

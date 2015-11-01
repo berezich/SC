@@ -52,6 +52,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:textSize="@dimen/textMediumSize"
                         android:text="@string/login_login"
                         android:id="@+id/login_email_title"
                         android:layout_gravity="center_horizontal|left"
@@ -59,19 +60,20 @@
                         android:paddingLeft="@dimen/login_txtPropName_leftRightOffset"
                         android:paddingRight="@dimen/login_txtPropName_leftRightOffset"
                         android:layout_weight="@integer/loginPropertyTitleWeight"
-                        android:maxLines="1" />
+                        android:maxLines="1"/>
 
                     <EditText
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:textSize="@dimen/textMediumSize"
                         android:id="@+id/login_email_value"
                         android:gravity="center_horizontal"
                         android:paddingRight="@dimen/login_txtPropVal_leftRightOffset"
                         android:background="#00FFFFFF"
                         android:inputType="textEmailAddress"
                         android:maxLength="@integer/emailMaxLength_edtTxt"
-                        android:layout_weight="@integer/loginPropertyValueWeight" />
+                        android:layout_weight="@integer/loginPropertyValueWeight"/>
                 </LinearLayout>
 
                 <View
@@ -103,19 +105,21 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:textSize="@dimen/textMediumSize"
                         android:text="@string/login_pass"
                         android:id="@+id/login_pass_title"
                         android:layout_gravity="center_horizontal|left"
                         android:gravity="left"
                         android:paddingLeft="@dimen/login_txtPropName_leftRightOffset"
                         android:paddingRight="@dimen/login_txtPropName_leftRightOffset"
-                        android:layout_weight="@integer/loginPropertyTitleWeight"
+                        android:layout_weight="@integer/loginPassTitleWeight"
                         android:maxLines="1" />
 
                     <EditText
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:textSize="@dimen/textMediumSize"
                         android:id="@+id/login_pass_value"
                         android:gravity="center_horizontal"
                         android:paddingRight="@dimen/login_txtPropVal_leftRightOffset"
@@ -162,6 +166,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textSize="@dimen/textMediumSize"
                 android:layout_marginTop="15dp"
                 android:text="@string/login_btn_txt_forgotPass"
                 android:id="@+id/login_text_forgotPass"

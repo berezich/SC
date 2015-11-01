@@ -17,6 +17,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textSize="@dimen/textMediumSize"
             android:text="@string/equalizer_title"
             android:id="@+id/textView2"
             android:paddingLeft="@dimen/equalizer_title_leftRightOffset"
@@ -60,155 +61,13 @@
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textSize="@dimen/textMediumSize"
                 android:text="0"
                 android:id="@+id/textView11"
                 android:layout_weight="8"
                 android:layout_gravity="center_vertical"
                 android:gravity="right" />
         </LinearLayout>
-
-        <!--
-
-        <LinearLayout
-            android:orientation="vertical"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:paddingTop="@dimen/equalizer_radioGrp_topOffset"
-            android:paddingBottom="@dimen/equalizer_radioGrp_bottomOffset"
-            android:layout_marginLeft="@dimen/equalizer_block_left_right_offset">
-
-            <RadioGroup
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="horizontal"
-                android:layout_gravity="center_vertical"
-                android:baselineAligned="false">
-
-                <RadioButton
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/radioButton"
-                    android:singleLine="false"
-                    android:layout_weight="1" />
-
-                <RadioButton
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/radioButton2"
-                    android:singleLine="false"
-                    android:layout_weight="1" />
-
-                <RadioButton
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/radioButton3"
-                    android:singleLine="false"
-                    android:layout_weight="1"
-                    android:checked="true" />
-
-                <RadioButton
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/radioButton4"
-                    android:singleLine="false"
-                    android:layout_weight="1" />
-
-                <RadioButton
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/radioButton5"
-                    android:singleLine="false"
-                    android:layout_weight="1" />
-
-                <RadioButton
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/radioButton6"
-                    android:singleLine="false"
-                    android:layout_weight="1" />
-
-                <RadioButton
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/radioButton7"
-                    android:singleLine="false"
-                    android:layout_weight="1"
-                    android:layout_gravity="center_horizontal" />
-
-            </RadioGroup>
-
-            <LinearLayout
-                android:orientation="horizontal"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:text="@string/equalizer_radioBtnVal1"
-                    android:id="@+id/textView4"
-                    android:layout_weight="1"
-                    android:paddingLeft="@dimen/equalizer_radioGrpValue_leftOffset" />
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:text="@string/equalizer_radioBtnVal2"
-                    android:id="@+id/textView5"
-                    android:layout_weight="1"
-                    android:paddingLeft="@dimen/equalizer_radioGrpValue_leftOffset" />
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:text="@string/equalizer_radioBtnVal3"
-                    android:id="@+id/textView6"
-                    android:layout_weight="1"
-                    android:paddingLeft="@dimen/equalizer_radioGrpValue_leftOffset" />
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:text="@string/equalizer_radioBtnVal4"
-                    android:id="@+id/textView7"
-                    android:layout_weight="1"
-                    android:paddingLeft="@dimen/equalizer_radioGrpValue_leftOffset" />
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:text="@string/equalizer_radioBtnVal5"
-                    android:id="@+id/textView8"
-                    android:layout_weight="1"
-                    android:paddingLeft="@dimen/equalizer_radioGrpValue_leftOffset" />
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:text="@string/equalizer_radioBtnVal6"
-                    android:id="@+id/textView9"
-                    android:layout_weight="1"
-                    android:paddingLeft="@dimen/equalizer_radioGrpValue_leftOffset" />
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:text="@string/equalizer_radioBtnVal7"
-                    android:id="@+id/textView10"
-                    android:layout_weight="1"
-                    android:paddingLeft="@dimen/equalizer_radioGrpValue_leftOffset" />
-
-            </LinearLayout>
-
-        </LinearLayout>-->
-
 
         <TextView
             android:layout_width="match_parent"
@@ -241,6 +100,7 @@
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textSize="@dimen/textMediumSize"
                 android:text="0"
                 android:id="@+id/textView13"
                 android:layout_weight="8"
@@ -279,6 +139,7 @@
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textSize="@dimen/textMediumSize"
                 android:text="0"
                 android:id="@+id/textView16"
                 android:layout_weight="8"
@@ -317,6 +178,7 @@
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textSize="@dimen/textMediumSize"
                 android:text="0"
                 android:id="@+id/textView17"
                 android:layout_weight="8"

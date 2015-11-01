@@ -266,8 +266,8 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
                 String ratings = activity.getString(R.string.ratingInfo_ratingValLst);
                 if(ratings!=null) {
                     final String ratingArr[] = ratings.split(",");
-                    ArrayAdapter<String> adapter = new ArrayAdapter<>(activity, android.R.layout.simple_spinner_item, ratingArr);
-                    adapter.setDropDownViewResource(android.R.layout.simple_spinner_item);
+                    ArrayAdapter<String> adapter = new ArrayAdapter<>(activity, R.layout.spinner_item, ratingArr);
+                    adapter.setDropDownViewResource(R.layout.spinner_item);
                     spinner.setAdapter(adapter);
                     int pos = (int)(this.tempMyPerson.getRating()/0.5-2);
                     if(pos<=ratingArr.length)

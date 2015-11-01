@@ -6,6 +6,7 @@
 
     <integer name="loginPropertyTitleWeight">26</integer>
     <integer name="loginPropertyValueWeight">10</integer>
+    <integer name="loginPassTitleWeight">21</integer>
     <integer name="nameMaxLength_edtTxt">15</integer>
     <integer name="surnameMaxLength_edtTxt">20</integer>
     <integer name="emailMaxLength_edtTxt">25</integer>

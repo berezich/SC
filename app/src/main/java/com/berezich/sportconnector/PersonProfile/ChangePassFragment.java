@@ -56,9 +56,9 @@ public class ChangePassFragment extends DialogFragment {
                     TextView textView;
                     String newPassStr="",newPassStr2="",oldPass1="";
                     if(rootView!=null) {
-                        textView = (TextView) rootView.findViewById(R.id.changePass_txt_error);
+                        /*textView = (TextView) rootView.findViewById(R.id.changePass_txt_error);
                         if(textView!=null)
-                            textView.setVisibility(View.GONE);
+                            textView.setVisibility(View.GONE);*/
                         if ((edtOld = (EditText) rootView.findViewById(R.id.changePass_txtEdt_old)) != null) {
                             oldPass1 = edtOld.getText().toString();
                             edtOld.setError(null);

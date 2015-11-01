@@ -45,7 +45,8 @@
             android:layout_marginTop="@dimen/spotItem_address_topOffset"
             android:layout_weight="1.13"
             android:ellipsize="end"
-            android:maxLines="2" />
+            android:maxLines="2"
+            android:textSize="15dp" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -58,7 +59,8 @@
             android:layout_marginTop="@dimen/spotItem_rating_topOffset"
             android:layout_marginRight="@dimen/spotItem_rating_rightOffset"
             android:layout_weight="1.41"
-            android:visibility="gone" />
+            android:visibility="gone"
+            android:textSize="15dp" />
 
     </LinearLayout>
 

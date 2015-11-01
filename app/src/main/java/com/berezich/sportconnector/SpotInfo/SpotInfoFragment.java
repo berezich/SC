@@ -574,7 +574,7 @@ public class SpotInfoFragment extends Fragment implements EndpointApi.GetListPer
                         String[] phones = value.split(";");
                         txtView.setText(phones[0].trim());
                         float textSize = getResources().getDimensionPixelSize(R.dimen.spotInfo_details_textSize)/getResources().getDisplayMetrics().density;
-                        txtView.setTextSize(TypedValue.COMPLEX_UNIT_SP,textSize);
+                        txtView.setTextSize(TypedValue.COMPLEX_UNIT_DIP,textSize);
                         ImageView imageView = (ImageView) itemView.findViewById(R.id.spotInfo_detailItem_image_phone);
                         imageView.setVisibility(View.VISIBLE);
                         LinearLayout linearLayout = (LinearLayout) itemView.findViewById(R.id.spotInfo_detailItem_layout_value);
@@ -591,6 +591,8 @@ public class SpotInfoFragment extends Fragment implements EndpointApi.GetListPer
                         {
                             txtView = (TextView) itemView.findViewById(R.id.spotInfo_detailItem_value2);
                             txtView.setText(phones[1].trim());
+                            txtView.setText(phones[1].trim());
+                            txtView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, textSize);
                             linearLayout = (LinearLayout) itemView.findViewById(R.id.spotInfo_detailItem_layout_value2);
                             linearLayout.setVisibility(View.VISIBLE);
                             linearLayout.setOnClickListener(new View.OnClickListener() {
