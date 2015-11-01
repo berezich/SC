@@ -314,7 +314,7 @@ public class NavigationDrawerFragment extends Fragment {
         FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
         ((MainActivity) getActivity()).hideSoftKeyboard();
         if(item!=null)
-            if(item.getItemId() == android.R.id.home && fragmentManager!=null && fragmentManager.getBackStackEntryCount()>0) {
+            if(item.getItemId() == android.R.id.home && fragmentManager!=null && fragmentManager.getBackStackEntryCount()>0 && !isDrawerOpen()) {
                 getActivity().getSupportFragmentManager().popBackStack();
                 return true;
             }
@@ -338,6 +338,7 @@ public class NavigationDrawerFragment extends Fragment {
         actionBar.setDisplayShowTitleEnabled(true);
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
         actionBar.setTitle(R.string.app_name);
+        actionBar.setHomeAsUpIndicator(R.drawable.ic_drawer);
     }
 
     private ActionBar getActionBar() {
@@ -357,5 +358,13 @@ public class NavigationDrawerFragment extends Fragment {
          */
         void onNavigationDrawerItemSelected(int position);
         void onNavigationDrawerBottomItemSelected(int position);
+    }
+    public boolean close() {
+        if (isDrawerOpen()) {
+            mDrawerLayout.closeDrawer(mFragmentContainerView);
+            return true;
+        } else {
+            return false;
+        }
     }
 }

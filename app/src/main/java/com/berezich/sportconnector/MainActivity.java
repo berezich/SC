@@ -227,6 +227,14 @@ public class MainActivity extends AppCompatActivity
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
         actionBar.setDisplayShowTitleEnabled(true);
         actionBar.setTitle(mTitle);
+        if(mTitle.equals(getString(R.string.mainSearch_fragmentTitle)) ||
+                mTitle.equals(getString(R.string.personprofile_myProfile_fragmentTitle))||
+                mTitle.equals(getString(R.string.app_name))) {
+            actionBar.setHomeAsUpIndicator(R.drawable.ic_drawer);
+        }
+        else {
+            actionBar.setHomeAsUpIndicator(null);
+        }
     }
 
     @Override
@@ -325,6 +333,14 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    @Override
+    public void onBackPressed() {
+        if(mNavigationDrawerFragment.isDrawerOpen())
+            mNavigationDrawerFragment.close();
+        else
+            super.onBackPressed();
     }
 
     public void setmTitle(String title){
