@@ -168,7 +168,8 @@ public class PersonProfileFragment extends Fragment {
             }
             if((txtView = (TextView) rootView.findViewById(R.id.profile_txt_name))!=null) {
                 String name = person.getName(), surname = person.getSurname();
-                txtView.setText( ((name!=null && !name.equals("")) ? name :"") + ((surname!=null && !surname.equals("")) ? " "+surname :""));
+                txtView.setText( ((name!=null && !name.equals("")) ? name :"") +
+                        ((surname!=null && !surname.equals("")) ? " "+surname :""));
             }
             if((txtView = (TextView) rootView.findViewById(R.id.profile_txt_typeAge))!=null) {
                 String str = person.getType().equals("PARTNER")? getString(R.string.personprofile_type_partner):getString(R.string.personprofile_type_coach);

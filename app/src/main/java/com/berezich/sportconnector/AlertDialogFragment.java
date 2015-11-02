@@ -6,7 +6,9 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
+import android.util.TypedValue;
 import android.view.KeyEvent;
+import android.widget.TextView;
 
 import java.security.Key;
 
@@ -53,7 +55,6 @@ public class AlertDialogFragment extends DialogFragment {
             builder.setTitle(title);
         if(msg!=null && !msg.equals(""))
             builder.setMessage(msg);
-
         builder.setPositiveButton(R.string.alert_dialog_ok,
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
@@ -86,7 +87,8 @@ public class AlertDialogFragment extends DialogFragment {
                 return false;
             }
         });
-        return builder.create();
+        AlertDialog alertDialog = builder.create();
+        return alertDialog;
     }
     public static interface OnActionDialogListener
     {

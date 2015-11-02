@@ -2,30 +2,28 @@
 
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
-        <item name="android:actionBarStyle">@style/MyActionBar</item>
-        <item name="actionBarStyle">@style/MyActionBar</item>
 
-        <item name="android:textAppearanceSmallPopupMenu">@style/PopupMenuTextAppearance</item>
-        <item name="textAppearanceSmallPopupMenu">@style/PopupMenuTextAppearance</item>
-
-        <item name="android:textAppearanceLargePopupMenu">@style/PopupMenuTextAppearance</item>
-        <item name="textAppearanceLargePopupMenu">@style/PopupMenuTextAppearance</item>
-
-    </style>
-
-    <style name="MyActionBar" parent="@style/Widget.AppCompat.ActionBar.Solid">
-        <item name="android:titleTextStyle">@style/MyActionBarTitleText</item>
-        <item name="titleTextStyle">@style/MyActionBarTitleText</item>
+        <item name="android:textAppearance">@style/MyTextAppearanceMedium</item>
+        <item name="android:textAppearanceLarge">@style/MyTextAppearanceLarge</item>
+        <item name="android:textAppearanceMedium">@style/MyTextAppearanceMedium</item>
+        <item name="android:textAppearanceSmall">@style/MyTextAppearanceSmall</item>
+        <item name="textAppearanceLargePopupMenu">@style/MyPopupMenuTextAppearance</item>
+        <item name="textAppearanceSmallPopupMenu">@style/MyPopupMenuTextAppearance</item>
 
     </style>
 
-    <!-- ActionBar styles for Text Style -->
-    <style name="MyActionBarTitleText" parent="@style/TextAppearance.AppCompat.Widget.ActionBar.Title">
-        <item name="android:textSize">@dimen/appTitleSize</item>
+    <style name="MyTextAppearanceLarge" parent="@style/TextAppearance.AppCompat.Large">
+        <item name="android:textSize">@dimen/textLargeSize</item>
+    </style>
+    <style name="MyTextAppearanceMedium" parent="@style/TextAppearance.AppCompat.Medium">
+        <item name="android:textSize">@dimen/textMediumSize</item>
+    </style>
+    <style name="MyTextAppearanceSmall" parent="@style/TextAppearance.AppCompat.Small">
+        <item name="android:textSize">@dimen/textSmallSize</item>
     </style>
 
     <!-- OverFlow menu Styles -->
-    <style name="PopupMenuTextAppearance" parent="@style/TextAppearance.AppCompat.Widget.ActionBar.Menu">
+    <style name="MyPopupMenuTextAppearance" parent="@style/TextAppearance.AppCompat.Widget.ActionBar.Menu">
         <item name="android:textStyle">normal</item>
         <item name="android:textSize">@dimen/textMediumSize</item>
     </style>
