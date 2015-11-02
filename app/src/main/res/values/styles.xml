@@ -21,7 +21,7 @@
 
     <!-- ActionBar styles for Text Style -->
     <style name="MyActionBarTitleText" parent="@style/TextAppearance.AppCompat.Widget.ActionBar.Title">
-        <item name="android:textSize">@dimen/textLargeSize</item>
+        <item name="android:textSize">@dimen/appTitleSize</item>
     </style>
 
     <!-- OverFlow menu Styles -->

@@ -3,6 +3,8 @@
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
 
+    <dimen name="appTitleSize">19dp</dimen>
+
     <dimen name="textSmallSize">14dp</dimen>
     <dimen name="textMediumSize">18dp</dimen>
     <dimen name="textLargeSize">22dp</dimen>
