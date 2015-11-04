@@ -112,6 +112,20 @@ public class LoginFragment extends Fragment implements EndpointApi.AuthorizePers
     }
 
     @Override
+    public void onPause() {
+        super.onPause();
+        try {
+            if(dialog!=null){
+                dialog.dismiss();
+                setVisibleProgressBar(false);
+                dialog = null;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
 
@@ -128,7 +142,12 @@ public class LoginFragment extends Fragment implements EndpointApi.AuthorizePers
     {
         super.onResume();
 
-        if ((appPref = LocalDataManager.getAppPref()) != null) {
+        if(dialog!=null ) {
+            dialog.dismiss();
+            dialog = null;
+            setVisibleProgressBar(false);
+        }
+        else if ((appPref = LocalDataManager.getAppPref()) != null) {
             if (appPref.isAutoLogin() && myPersonInfo.getPass()!=null && !myPersonInfo.getPass().equals("")) {
                 setVisibleProgressBar(true);
                 new EndpointApi.AuthorizePersonAsyncTask(this).execute(myPersonInfo.getEmail().toString(), (pass=myPersonInfo.getPass()));
@@ -254,16 +273,19 @@ public class LoginFragment extends Fragment implements EndpointApi.AuthorizePers
     @Override
     public void onPositiveClick() {
         setVisibleProgressBar(false);
+        dialog=null;
     }
 
     @Override
     public void onNegativeClick() {
         setVisibleProgressBar(false);
+        dialog=null;
     }
 
     @Override
     public void onCancelDialog() {
         setVisibleProgressBar(false);
+        dialog=null;
     }
 
     @Override

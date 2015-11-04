@@ -510,7 +510,7 @@ public class SpotInfoFragment extends Fragment implements EndpointApi.GetListPer
     private void setVisibleProgressBar()
     {
         FrameLayout frameLayout;
-        setVisible(View.GONE,View.VISIBLE,View.GONE);
+        setVisible(View.GONE, View.VISIBLE, View.GONE);
 
         if((frameLayout = (FrameLayout) spotInfoView.findViewById(R.id.spotinfo_frg_frameLayout))!=null)
             ErrorVisualizer.showProgressBar(frameLayout);
@@ -551,6 +551,14 @@ public class SpotInfoFragment extends Fragment implements EndpointApi.GetListPer
 
     }
 
+    public void dialPhone(String phone) {
+
+        Intent intent = new Intent(Intent.ACTION_DIAL);
+        intent.setData(Uri.parse("tel:" + phone));
+        if (intent.resolveActivity(activity.getBaseContext().getPackageManager()) != null) {
+            startActivity(intent);
+        }
+    }
 
     enum TXT_TYPE{SITE,PHONE,TEXT}
     private View getDetailItem(Context context,String name, String value) {
@@ -575,16 +583,15 @@ public class SpotInfoFragment extends Fragment implements EndpointApi.GetListPer
                         txtView.setText(phones[0].trim());
                         float textSize = getResources().getDimensionPixelSize(R.dimen.spotInfo_details_textSize)/getResources().getDisplayMetrics().density;
                         txtView.setTextSize(TypedValue.COMPLEX_UNIT_DIP,textSize);
-                        ImageView imageView = (ImageView) itemView.findViewById(R.id.spotInfo_detailItem_image_phone);
-                        imageView.setVisibility(View.VISIBLE);
+                        /*ImageView imageView = (ImageView) itemView.findViewById(R.id.spotInfo_detailItem_image_phone);
+                        imageView.setVisibility(View.VISIBLE);*/
                         LinearLayout linearLayout = (LinearLayout) itemView.findViewById(R.id.spotInfo_detailItem_layout_value);
                         linearLayout.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
                                 String phone_no= ((TextView)v.findViewById(R.id.spotInfo_detailItem_value)).getText().toString();
-                                Intent callIntent = new Intent(Intent.ACTION_CALL);
-                                callIntent.setData(Uri.parse("tel:"+phone_no.split("доб")[0]));
-                                startActivity(callIntent);
+                                phone_no = phone_no.split("доб")[0];
+                                dialPhone(phone_no);
                             }
                         });
                         if(phones.length>1)
@@ -599,9 +606,8 @@ public class SpotInfoFragment extends Fragment implements EndpointApi.GetListPer
                                 @Override
                                 public void onClick(View v) {
                                     String phone_no = ((TextView) v.findViewById(R.id.spotInfo_detailItem_value2)).getText().toString();
-                                    Intent callIntent = new Intent(Intent.ACTION_CALL);
-                                    callIntent.setData(Uri.parse("tel:" + phone_no.split("доб")[0]));
-                                    startActivity(callIntent);
+                                    phone_no = phone_no.split("доб")[0];
+                                    dialPhone(phone_no);
                                 }
                             });
                         }
@@ -614,6 +620,7 @@ public class SpotInfoFragment extends Fragment implements EndpointApi.GetListPer
             }
         return null;
     }
+
     private class OnPersonClick implements AdapterView.OnItemClickListener{
         List<Person> persons;
         public OnPersonClick(List<Person> persons) {

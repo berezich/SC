@@ -43,15 +43,6 @@ public class ChangeEmailFragment extends DialogFragment {
         Dialog dialog = getDialog();
         dialog.setTitle(R.string.changeEmail_dialogTitle);
 
-        //Grab the window of the dialog, and change the width
-        /*WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
-        Window window = dialog.getWindow();
-        lp.copyFrom(window.getAttributes());
-        //This makes the dialog take up the full width
-        lp.width = 900;
-        lp.height = 600;
-        window.setAttributes(lp);*/
-
         rootView = inflater.inflate(R.layout.fragment_change_email, null);
         if(rootView!=null) {
             TextView txtView = (TextView) rootView.findViewById(R.id.changeEmail_txtEdt_old);

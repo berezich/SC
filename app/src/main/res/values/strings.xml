@@ -96,6 +96,8 @@
             <!-- menu -->
                 <string name="menu_edit_profile">Редактировать мои данные</string>
             <!-- menu -->
+        <string name="personprofile_intentChooserTitle">Выполнить в...</string>
+        <string name="personprofile_chooserItemSmsMark"></string>
     <!-- personProfile_fragment end-->
 
     <!-- editProfile_fragment begin-->

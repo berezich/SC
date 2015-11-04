@@ -1,13 +1,21 @@
 package com.berezich.sportconnector.PersonProfile;
 
 import android.app.Activity;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.LabeledIntent;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
+import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.TextUtils;
+import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.util.Pair;
 import android.view.LayoutInflater;
@@ -16,7 +24,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -26,7 +33,6 @@ import com.berezich.sportconnector.GoogleMap.SpotsData;
 import com.berezich.sportconnector.ImageViewer.ImgViewPagerActivity;
 import com.berezich.sportconnector.LocalDataManager;
 import com.berezich.sportconnector.MainActivity;
-import com.berezich.sportconnector.PhoneMaskUtil;
 import com.berezich.sportconnector.R;
 import com.berezich.sportconnector.SpotInfo.SpotInfoFragment;
 import com.berezich.sportconnector.UsefulFunctions;
@@ -194,37 +200,25 @@ public class PersonProfileFragment extends Fragment {
             LinearLayout linearLayout = (LinearLayout) rootView.findViewById(R.id.profile_contactsBlock);
             LinearLayout propertyLstLayout = (LinearLayout) rootView.findViewById(R.id.profile_linearlayout_propertyLst);
             propertyLstLayout.removeAllViews();
-            //LinearLayout propertyLayout;
             if(linearLayout!=null ) {
                 linearLayout.setVisibility(View.GONE);
-                //if((propertyLayout = (LinearLayout) rootView.findViewById(R.id.profile_linearlayout_email))!=null && propertyLstLayout!=null)
                     if (email != null && !email.equals("")) {
-                        /*if((txtView = (TextView) rootView.findViewById(R.id.profile_txt_emailValue))!=null)
-                            txtView.setText(email);
-                        propertyLayout.setVisibility(View.VISIBLE);*/
                         linearLayout.setVisibility(View.VISIBLE);
                         View view = getProfileDetailItem(getContext(),getString(R.string.personprofile_email),email);
-                        if(view!=null)
+                        if(view!=null) {
                             propertyLstLayout.addView(view);
-                    }
-                    /*else
-                        propertyLstLayout.removeView(propertyLayout);*/
-
-                //if((propertyLayout = (LinearLayout) rootView.findViewById(R.id.profile_linearlayout_phone))!=null && propertyLstLayout!=null)
-                    if (phone != null && !phone.equals("")) {
-                        /*if((txtView = (TextView) rootView.findViewById(R.id.profile_txt_phoneValue))!=null){
-                            phone = PhoneMaskUtil.unmask(phone);
-                            txtView.setText(PhoneMaskUtil.setMask(phone));
+                            view.setOnClickListener(new OnComposeEmailClick());
                         }
-                        propertyLayout.setVisibility(View.VISIBLE);*/
+                    }
+                    if (phone != null && !phone.equals("")) {
 
                         linearLayout.setVisibility(View.VISIBLE);
                         View view = getProfileDetailItem(getContext(),getString(R.string.personprofile_phone),phone);
-                        if(view!=null)
+                        if(view!=null) {
                             propertyLstLayout.addView(view);
+                            view.setOnClickListener(new OnPhoneClick());
+                        }
                     }
-                    /*else
-                        propertyLstLayout.removeView(propertyLayout);*/
             }
 
             //description block
@@ -374,5 +368,82 @@ public class PersonProfileFragment extends Fragment {
                     textView.setText(value);
             }
         return itemView;
+    }
+
+    private class OnPhoneClick implements View.OnClickListener{
+        @Override
+        public void onClick(View v) {
+            phoneIntent(person.getPhone());
+        }
+    }
+    public void phoneIntent(String phone){
+        try {
+            int validIntentFlag = 0;
+            PackageManager pm = activity.getPackageManager();
+            Intent intentDial = new Intent(Intent.ACTION_DIAL);
+            Uri phoneData = Uri.parse("tel:" + phone);
+            intentDial.setData(phoneData);
+            Intent intentSms = new Intent(Intent.ACTION_VIEW);
+            Uri smsData =  Uri.parse("sms:" + phone);
+            intentSms.setData(smsData);  // This ensures only SMS apps respond
+
+            if(intentDial.resolveActivity(pm)!=null)
+                validIntentFlag |=  0x01;
+            if(intentSms.resolveActivity(pm)!=null)
+                validIntentFlag |=  0x10;
+
+            switch (validIntentFlag){
+                case 0x01:
+                    startActivity(intentDial);
+                    return;
+                case 0x10:
+                    startActivity(intentSms);
+                    return;
+                case 0x00:
+                    return;
+            }
+
+            Intent openInChooser = Intent.createChooser(intentDial,
+                    activity.getString(R.string.personprofile_intentChooserTitle));
+            // Append " (for editing)" to applicable apps, otherwise they will show up twice identically
+            Spannable mark = new SpannableString(" "+activity.getString(R.string.personprofile_chooserItemSmsMark));
+            if(mark.toString().trim().isEmpty())
+                mark = new SpannableString("");
+            else
+                mark.setSpan(new ForegroundColorSpan(Color.CYAN), 0, mark.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            List<ResolveInfo> resInfo = pm.queryIntentActivities(intentSms, PackageManager.MATCH_DEFAULT_ONLY);
+            Intent[] extraIntents = new Intent[resInfo.size()];
+            for (int i = 0; i < resInfo.size(); i++) {
+                // Extract the label, append it, and repackage it in a LabeledIntent
+                ResolveInfo ri = resInfo.get(i);
+                String packageName = ri.activityInfo.packageName;
+                Intent intent = new Intent();
+                intent.setComponent(new ComponentName(packageName, ri.activityInfo.name));
+                intent.setAction(Intent.ACTION_VIEW);
+                intent.setData(smsData);
+                CharSequence label = TextUtils.concat(ri.loadLabel(pm), mark);
+                extraIntents[i] = new LabeledIntent(intent, packageName, label, ri.icon);
+            }
+
+            openInChooser.putExtra(Intent.EXTRA_INITIAL_INTENTS, extraIntents);
+            startActivity(openInChooser);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    private class OnComposeEmailClick implements View.OnClickListener{
+        @Override
+        public void onClick(View v) {
+            composeEmail(person.getEmail());
+        }
+    }
+    public void composeEmail(String address) {
+        Intent intent = new Intent(Intent.ACTION_SENDTO);
+        intent.setType("*/*");
+        intent.setData(Uri.parse("mailto:")); // only email apps should handle this
+        intent.putExtra(Intent.EXTRA_EMAIL, new String[]{address});
+        if (intent.resolveActivity(activity.getBaseContext().getPackageManager()) != null) {
+            startActivity(intent);
+        }
     }
 }
