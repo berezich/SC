@@ -6,6 +6,8 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.text.InputFilter;
+import android.text.Spanned;
 import android.util.Log;
 import android.util.Pair;
 import android.view.LayoutInflater;
@@ -15,7 +17,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import com.berezich.sportconnector.AlertDialogFragment;
@@ -42,9 +43,11 @@ public class LoginFragment extends Fragment implements EndpointApi.AuthorizePers
     private Person myPersonInfo;
     private AppPref appPref;
     private String pass;
-    int _sectionNumber;
-    View rootView;
+    private boolean isPassChanged = false;
+    private int _sectionNumber;
+    private View rootView;
     private AlertDialogFragment dialog;
+    private String defaultPass;
 
     OnActionListenerLoginFragment listenerLoginFragment = null;
     public LoginFragment setArgs(int sectionNumber) {
@@ -88,12 +91,17 @@ public class LoginFragment extends Fragment implements EndpointApi.AuthorizePers
                 textView.setOnClickListener(new OnClickForgotPassListener());
 
             if(( myPersonInfo = LocalDataManager.getMyPersonInfo())!=null) {
-
+                if(myPersonInfo.getPass().isEmpty())
+                    defaultPass="";
+                else
+                    defaultPass = getActivity().getString(R.string.login_defaultPass);
                 if ((editTxt = (EditText) rootView.findViewById(R.id.login_email_value)) != null) {
                     editTxt.setText(myPersonInfo.getEmail());
                 }
                 if ((editTxt = (EditText) rootView.findViewById(R.id.login_pass_value)) != null) {
-                    editTxt.setText(myPersonInfo.getPass());
+                    editTxt.setOnFocusChangeListener(new OnPassFocused());
+                    editTxt.setText(defaultPass);
+                    //editTxt.setText(myPersonInfo.getPass());
 
                     if ((appPref = LocalDataManager.getAppPref()) == null) {
                         AppPref appPref = new AppPref(false);
@@ -155,6 +163,37 @@ public class LoginFragment extends Fragment implements EndpointApi.AuthorizePers
         }
     }
 
+    private class OnPassFocused implements View.OnFocusChangeListener{
+        @Override
+        public void onFocusChange(View v, boolean hasFocus) {
+            try {
+                EditText passEdt = (EditText) v;
+                if(hasFocus) {
+                    if(!isPassChanged) {
+                        passEdt.setText("");
+                        passEdt.setFilters(new InputFilter[]{new OnPassChanged()});
+                    }
+                }
+                else{
+                    passEdt.setFilters(new InputFilter[0]);
+                    if(!isPassChanged)
+                        passEdt.setText(defaultPass);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+        }
+    }
+    private class OnPassChanged implements InputFilter {
+        @Override
+        public CharSequence filter(CharSequence source, int start, int end, Spanned dest, int dstart, int dend) {
+            isPassChanged = true;
+            return null;
+        }
+    }
+
+
     private class OnClickLoginListener implements View.OnClickListener
     {
         @Override
@@ -165,7 +204,10 @@ public class LoginFragment extends Fragment implements EndpointApi.AuthorizePers
             if((editTxt = (EditText) rootView.findViewById(R.id.login_email_value))!=null)
                 login = editTxt.getText().toString();
             if((editTxt = (EditText) rootView.findViewById(R.id.login_pass_value))!=null)
-                pass = editTxt.getText().toString();
+                if(isPassChanged)
+                    pass = editTxt.getText().toString();
+                else
+                    pass = LocalDataManager.getMyPersonInfo().getPass();
             
             setVisibleProgressBar(true);
             new EndpointApi.AuthorizePersonAsyncTask(getFragment()).execute(login,pass);
@@ -250,9 +292,18 @@ public class LoginFragment extends Fragment implements EndpointApi.AuthorizePers
             return;
         }
         Log.e(TAG, "Error AuthorizePerson");
-        Log.d(TAG,"person = null");
 
-        FrameLayout frameLayout;
+
+        try {
+            if(isPassChanged) {
+                myPersonInfo.setPass("");
+                LocalDataManager.saveMyPersonInfoToPref(myPersonInfo, getActivity());
+                appPref.setIsAutoLogin(false);
+                LocalDataManager.saveAppPref(appPref, getActivity());
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         String dialogMsg;
         Pair<ErrorVisualizer.ERROR_CODE,String> errTxtCode = ErrorVisualizer.getTextCodeOfRespException(getActivity().getBaseContext(),error);
         if(errTxtCode!=null && !errTxtCode.second.equals(""))

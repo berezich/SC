@@ -49,6 +49,7 @@ public class MainActivity extends AppCompatActivity
     private static final String TAG = "MyLog_MainActivity";
     private boolean isRecover = false;
     private boolean isInstanceStateSaved = false;
+    private String defaultPass;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -337,7 +338,7 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onBackPressed() {
-        if(mNavigationDrawerFragment.isDrawerOpen())
+        if(mNavigationDrawerFragment!=null && mNavigationDrawerFragment.isDrawerOpen())
             mNavigationDrawerFragment.close();
         else
             super.onBackPressed();
