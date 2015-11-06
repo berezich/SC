@@ -371,7 +371,7 @@ public class EndpointApi {
             Long person = params[0].first.second.first;
             String pass = params[0].first.second.second;
             boolean isFavorite = params[0].first.first.second;
-            String personType = params[1].second;
+            String personType = params[0].second;
             if(spot!=null && person!=null)
             try {
                 srvApi.setSpotAsFavorite( person,spot,isFavorite,pass,personType).execute();

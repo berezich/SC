@@ -71,8 +71,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:id="@+id/spotInfo_btnImg_favorite"
-                            android:layout_centerInParent="true"
-                            android:background="@drawable/simple_btn_star" />
+                            android:layout_centerInParent="true" />
                     </RelativeLayout>
 
                 </LinearLayout>

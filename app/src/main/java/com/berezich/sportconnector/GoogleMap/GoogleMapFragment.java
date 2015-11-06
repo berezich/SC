@@ -265,25 +265,29 @@ public class GoogleMapFragment extends Fragment{
                 {
                     case R.id.map_btn_coach:
                         isCoaches = !isCoaches;
-                        btn.setPressed(isCoaches);
+                        //btn.setPressed(isCoaches);
+                        setButtonImg(btn,isCoaches,Buttons.COUCH);
                         if(!isCoaches)
                             activateButtons(Buttons.COURT,false);
                         break;
                     case R.id.map_btn_partner:
                         isPartners = !isPartners;
-                        btn.setPressed(isPartners);
+                        //btn.setPressed(isPartners);
+                        setButtonImg(btn, isPartners, Buttons.PARTNER);
                         if(!isPartners)
                             activateButtons(Buttons.COURT,false);
                         break;
                     case R.id.map_btn_court:
                         isCourts = !isCourts;
-                        btn.setPressed(isCourts);
+                        //btn.setPressed(isCourts);
+                        setButtonImg(btn, isCourts, Buttons.COURT);
                         if(isCourts)
                             activateButtons(Buttons.ALL,true);
                         break;
                     case R.id.map_btn_star:
                         isFavorite = !isFavorite;
-                        btn.setPressed(isFavorite);
+                        //btn.setPressed(isFavorite);
+                        setButtonImg(btn, isFavorite, Buttons.FAVORITE);
                         if(!isFavorite)
                             activateButtons(Buttons.COURT,false);
                         break;
@@ -304,6 +308,34 @@ public class GoogleMapFragment extends Fragment{
             return true;
         }
     }
+    private void setButtonImg(ImageButton btn, boolean isOn, Buttons btnType){
+        switch (btnType){
+            case COUCH:
+                if(isOn)
+                    btn.setBackgroundDrawable(mainActivity.getResources().getDrawable(R.drawable.gmap_coach_press));
+                else
+                    btn.setBackgroundDrawable(mainActivity.getResources().getDrawable(R.drawable.gmap_coach));
+                break;
+            case PARTNER:
+                if(isOn)
+                    btn.setBackgroundDrawable(mainActivity.getResources().getDrawable(R.drawable.gmap_partner_press));
+                else
+                    btn.setBackgroundDrawable(mainActivity.getResources().getDrawable(R.drawable.gmap_partner));
+                break;
+            case FAVORITE:
+                if(isOn)
+                    btn.setBackgroundDrawable(mainActivity.getResources().getDrawable(R.drawable.gmap_star_press));
+                else
+                    btn.setBackgroundDrawable(mainActivity.getResources().getDrawable(R.drawable.gmap_star));
+                break;
+            case COURT:
+                if(isOn)
+                    btn.setBackgroundDrawable(mainActivity.getResources().getDrawable(R.drawable.gmap_court_press));
+                else
+                    btn.setBackgroundDrawable(mainActivity.getResources().getDrawable(R.drawable.gmap_court));
+                break;
+        }
+    }
     enum Buttons{ALL,COUCH,PARTNER,FAVORITE,COURT}
     private void activateButtons(Buttons buttonType,boolean b) {
         ImageButton btn;
@@ -312,35 +344,43 @@ public class GoogleMapFragment extends Fragment{
             if (buttonType == Buttons.ALL || buttonType == Buttons.COUCH) {
                 isCoaches = b;
                 btn = (ImageButton) view.findViewById(R.id.map_btn_coach);
-                btn.setPressed(b);
+                setButtonImg(btn, b, Buttons.COUCH);
+                //btn.setPressed(b);
             }
             if (buttonType == Buttons.ALL || buttonType == Buttons.PARTNER) {
                 isPartners = b;
                 btn = (ImageButton) view.findViewById(R.id.map_btn_partner);
-                btn.setPressed(b);
+                setButtonImg(btn,b,Buttons.PARTNER);
+                //btn.setPressed(b);
             }
             if (buttonType == Buttons.ALL || buttonType == Buttons.FAVORITE) {
                 isFavorite = b;
                 btn = (ImageButton) view.findViewById(R.id.map_btn_star);
-                btn.setPressed(b);
+                setButtonImg(btn, b, Buttons.FAVORITE);
+                //btn.setPressed(b);
             }
             if (buttonType == Buttons.ALL || buttonType == Buttons.COURT) {
                 isCourts = b;
                 btn = (ImageButton) view.findViewById(R.id.map_btn_court);
-                btn.setPressed(b);
+                setButtonImg(btn, b, Buttons.COURT);
+                //btn.setPressed(b);
             }
         }
     }
     private void updateButtonsStates(){
         ImageButton btn;
         btn = (ImageButton) rootView.findViewById(R.id.map_btn_coach);
-        btn.setPressed(isCoaches);
+        //btn.setPressed(isCoaches);
+        setButtonImg(btn, isCoaches, Buttons.COUCH);
         btn = (ImageButton) rootView.findViewById(R.id.map_btn_court);
-        btn.setPressed(isCourts);
+        //btn.setPressed(isCourts);
+        setButtonImg(btn, isCourts, Buttons.COURT);
         btn = (ImageButton) rootView.findViewById(R.id.map_btn_partner);
-        btn.setPressed(isPartners);
+        //btn.setPressed(isPartners);
+        setButtonImg(btn, isPartners, Buttons.PARTNER);
         btn = (ImageButton) rootView.findViewById(R.id.map_btn_star);
-        btn.setPressed(isFavorite);
+        //btn.setPressed(isFavorite);
+        setButtonImg(btn, isFavorite, Buttons.FAVORITE);
     }
     private void setCurFilter()
     {

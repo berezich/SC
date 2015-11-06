@@ -66,7 +66,7 @@ public class SpotInfoFragment extends Fragment implements EndpointApi.GetListPer
     private static final String PARTNERS = "partners";
     private static final String COACHES = "coaches";
     private static final String TAG = "MyLog_SpotInfoFragment";
-    private boolean isFavoriteChanged = false;
+    private boolean isFavorite = false;
     private boolean isDetailsShown = false;
     private HashMap<Long, Spot> spotHashMap;
     private final String SPOT_ID = "spotId";
@@ -299,9 +299,13 @@ public class SpotInfoFragment extends Fragment implements EndpointApi.GetListPer
         ((MainActivity)activity).setmTitle(activity.getString(R.string.spotinfo_fragmentTitle));
         ((MainActivity)activity).getSupportActionBar().setHomeAsUpIndicator(null);
         ((MainActivity)activity).restoreActionBar();
-        ImageView imgButton;
-        if ((imgButton = (ImageButton) spotInfoView.findViewById(R.id.spotInfo_btnImg_favorite)) != null)
-            imgButton.setPressed(LocalDataManager.isMyFavoriteSpot(curSpot));
+        ImageButton imgButton;
+        if ((imgButton = (ImageButton) spotInfoView.findViewById(R.id.spotInfo_btnImg_favorite)) != null) {
+            isFavorite = LocalDataManager.isMyFavoriteSpot(curSpot);
+            //imgButton.setPressed(LocalDataManager.isMyFavoriteSpot(curSpot));
+            setButtonImg(imgButton,isFavorite);
+        }
+
     }
 
     @Override
@@ -321,14 +325,6 @@ public class SpotInfoFragment extends Fragment implements EndpointApi.GetListPer
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         this.activity = getActivity();
-
-        /*try {
-            mListener = (OnFragmentInteractionListener) activity;
-        } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString()
-                    + " must implement OnFragmentInteractionListener");
-        }
-        */
     }
 
     @Override
@@ -348,16 +344,7 @@ public class SpotInfoFragment extends Fragment implements EndpointApi.GetListPer
         }*/
     }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p/>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
+
     public interface OnFragmentInteractionListener {
         public void onFragmentInteraction(Uri uri);
     }
@@ -369,10 +356,15 @@ public class SpotInfoFragment extends Fragment implements EndpointApi.GetListPer
             ImageButton btn = (ImageButton) v;
             // show interest in events resulting from ACTION_DOWN
             if(event.getAction()==MotionEvent.ACTION_DOWN) {
-                btn.setPressed(!btn.isPressed());
-                isFavoriteChanged = !isFavoriteChanged;
-                SpotsData.setSpotFavorite(curSpot.getId(), btn.isPressed());
-                new EndpointApi.SetSpotAsFavoriteAsyncTask(getFragmentRef()).execute(new Pair<>(new Pair<>( new Pair<>(curSpot.getId(),btn.isPressed()),
+                /*btn.setPressed(!btn.isPressed());
+                isFavoriteChanged = !isFavoriteChanged;*/
+                setButtonImg(btn, !isFavorite);
+                //SpotsData.setSpotFavorite(curSpot.getId(), btn.isPressed());
+                SpotsData.setSpotFavorite(curSpot.getId(), isFavorite);
+                /*new EndpointApi.SetSpotAsFavoriteAsyncTask(getFragmentRef()).execute(new Pair<>(new Pair<>( new Pair<>(curSpot.getId(),btn.isPressed()),
+                        new Pair<>( LocalDataManager.getMyPersonInfo().getId(),LocalDataManager.getMyPersonInfo().getPass())),
+                        LocalDataManager.getMyPersonInfo().getType()));*/
+                new EndpointApi.SetSpotAsFavoriteAsyncTask(getFragmentRef()).execute(new Pair<>(new Pair<>( new Pair<>(curSpot.getId(),isFavorite),
                         new Pair<>( LocalDataManager.getMyPersonInfo().getId(),LocalDataManager.getMyPersonInfo().getPass())),
                         LocalDataManager.getMyPersonInfo().getType()));
                 return true;
@@ -419,7 +411,7 @@ public class SpotInfoFragment extends Fragment implements EndpointApi.GetListPer
         FrameLayout frameLayout;
         if((frameLayout = (FrameLayout) spotInfoView.findViewById(R.id.spotinfo_frg_frameLayout))!=null)
             ErrorVisualizer.showErrorAfterReq(getContext(), frameLayout, error, TAG);
-        setVisible(View.GONE,View.VISIBLE,View.GONE);
+        setVisible(View.GONE, View.VISIBLE, View.GONE);
 
     }
 
@@ -459,9 +451,10 @@ public class SpotInfoFragment extends Fragment implements EndpointApi.GetListPer
             Log.d(TAG,"UpdatedSpot = null");
     }
 */
+
     @Override
     public void onSetSpotAsFavoriteFinish(Pair<Boolean,Exception> result) {
-        boolean isFavorite = result.first;
+        boolean isFavoriteReq = result.first;
         Exception ex = result.second;
 
         if(ex!=null)
@@ -469,9 +462,11 @@ public class SpotInfoFragment extends Fragment implements EndpointApi.GetListPer
             if(spotInfoView!=null) {
                 ImageButton btn = (ImageButton) spotInfoView.findViewById(R.id.spotInfo_btnImg_favorite);
                 if (btn!=null) {
-                    if(btn.isPressed()==isFavorite)
-                        btn.setPressed(!isFavorite);
-                    SpotsData.setSpotFavorite(curSpot.getId(), !isFavorite);
+                    /*if(btn.isPressed()==isFavorite)
+                        btn.setPressed(!isFavorite);*/
+                    if(this.isFavorite == isFavoriteReq)
+                        setButtonImg(btn,!isFavoriteReq);
+                    SpotsData.setSpotFavorite(curSpot.getId(), !isFavoriteReq);
                     if(activity!=null)
                         Toast.makeText(activity.getBaseContext(), R.string.spotinfo_req_error_msg, Toast.LENGTH_SHORT).show();
                     else{
@@ -482,6 +477,13 @@ public class SpotInfoFragment extends Fragment implements EndpointApi.GetListPer
                 }
             }
         }
+    }
+    private void setButtonImg(ImageButton btn, boolean isFavorite){
+        this.isFavorite = isFavorite;
+        if (isFavorite)
+            btn.setBackgroundDrawable(activity.getResources().getDrawable(R.drawable.simple_star_press));
+        else
+            btn.setBackgroundDrawable(activity.getResources().getDrawable(R.drawable.simple_star));
     }
     private class TryAgainClickListener implements View.OnClickListener
     {
