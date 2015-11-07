@@ -45,7 +45,7 @@ public class MainActivity extends AppCompatActivity
     /**
      * Used to store the last screen title. For use in {@link #restoreActionBar()}.
      */
-    private CharSequence mTitle;
+    private CharSequence mTitle="";
     private static final String TAG = "MyLog_MainActivity";
     private boolean isRecover = false;
     private boolean isInstanceStateSaved = false;
@@ -228,9 +228,9 @@ public class MainActivity extends AppCompatActivity
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
         actionBar.setDisplayShowTitleEnabled(true);
         actionBar.setTitle(mTitle);
-        if(mTitle.equals(getString(R.string.mainSearch_fragmentTitle)) ||
+        if(mTitle!=null &&( mTitle.equals(getString(R.string.mainSearch_fragmentTitle)) ||
                 mTitle.equals(getString(R.string.personprofile_myProfile_fragmentTitle))||
-                mTitle.equals(getString(R.string.app_name))) {
+                mTitle.equals(getString(R.string.app_name)))) {
             actionBar.setHomeAsUpIndicator(R.drawable.ic_drawer);
         }
         else {

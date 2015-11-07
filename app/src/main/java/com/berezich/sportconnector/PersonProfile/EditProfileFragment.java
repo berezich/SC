@@ -468,7 +468,7 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
             if (errTxtCode != null && !errTxtCode.second.equals(""))
                 dialogMsg = errTxtCode.second;
             else
-                dialogMsg = activity.getString(R.string.server_unknow_err);
+                dialogMsg = activity.getString(R.string.server_unknown_err);
             Log.d(TAG, "registrationError code = " + errTxtCode.first + " msg = " + errTxtCode.second);
 
         }
@@ -532,7 +532,7 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
             if (errTxtCode != null && !errTxtCode.second.equals(""))
                 dialogMsg = errTxtCode.second;
             else
-                dialogMsg = activity.getString(R.string.server_unknow_err);
+                dialogMsg = activity.getString(R.string.server_unknown_err);
             Log.d(TAG, "registrationError code = " + errTxtCode.first + " msg = " + errTxtCode.second);
 
         }

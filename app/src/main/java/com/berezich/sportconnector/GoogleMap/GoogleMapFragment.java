@@ -10,7 +10,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
-import android.content.res.Resources;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
@@ -18,9 +17,7 @@ import android.net.Uri;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -266,7 +263,7 @@ public class GoogleMapFragment extends Fragment{
                     case R.id.map_btn_coach:
                         isCoaches = !isCoaches;
                         //btn.setPressed(isCoaches);
-                        setButtonImg(btn,isCoaches,Buttons.COUCH);
+                        setButtonImg(btn,isCoaches,Buttons.COACH);
                         if(!isCoaches)
                             activateButtons(Buttons.COURT,false);
                         break;
@@ -310,7 +307,7 @@ public class GoogleMapFragment extends Fragment{
     }
     private void setButtonImg(ImageButton btn, boolean isOn, Buttons btnType){
         switch (btnType){
-            case COUCH:
+            case COACH:
                 if(isOn)
                     btn.setBackgroundDrawable(mainActivity.getResources().getDrawable(R.drawable.gmap_coach_press));
                 else
@@ -336,15 +333,15 @@ public class GoogleMapFragment extends Fragment{
                 break;
         }
     }
-    enum Buttons{ALL,COUCH,PARTNER,FAVORITE,COURT}
+    enum Buttons{ALL,COACH,PARTNER,FAVORITE,COURT}
     private void activateButtons(Buttons buttonType,boolean b) {
         ImageButton btn;
         View view = getView();
         if(view!=null) {
-            if (buttonType == Buttons.ALL || buttonType == Buttons.COUCH) {
+            if (buttonType == Buttons.ALL || buttonType == Buttons.COACH) {
                 isCoaches = b;
                 btn = (ImageButton) view.findViewById(R.id.map_btn_coach);
-                setButtonImg(btn, b, Buttons.COUCH);
+                setButtonImg(btn, b, Buttons.COACH);
                 //btn.setPressed(b);
             }
             if (buttonType == Buttons.ALL || buttonType == Buttons.PARTNER) {
@@ -371,7 +368,7 @@ public class GoogleMapFragment extends Fragment{
         ImageButton btn;
         btn = (ImageButton) rootView.findViewById(R.id.map_btn_coach);
         //btn.setPressed(isCoaches);
-        setButtonImg(btn, isCoaches, Buttons.COUCH);
+        setButtonImg(btn, isCoaches, Buttons.COACH);
         btn = (ImageButton) rootView.findViewById(R.id.map_btn_court);
         //btn.setPressed(isCourts);
         setButtonImg(btn, isCourts, Buttons.COURT);

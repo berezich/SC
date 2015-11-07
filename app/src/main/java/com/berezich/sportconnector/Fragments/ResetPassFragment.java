@@ -150,7 +150,7 @@ public class ResetPassFragment extends Fragment implements EndpointApi.ResetPass
             Log.d(TAG,"resetPassError code = "+errTxtCode.first+" msg = "+errTxtCode.second);
         }
         else
-            dialogMsg = activity.getString(R.string.server_unknow_err);
+            dialogMsg = activity.getString(R.string.server_unknown_err);
 
         dialog = AlertDialogFragment.newInstance(dialogMsg, false);
         dialog.setTargetFragment(this, 0);

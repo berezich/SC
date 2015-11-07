@@ -2,7 +2,7 @@
     <string name="app_name">SportConnector</string>
 
     <!-- srvApi begin-->
-        <string name="srvApi_url">https://sportconnector-981.appspot.com/_ah/api/</string>
+        <string name="srvApi_url">https://1-dot-sportconnector-981.appspot.com/_ah/api/</string>
     <!-- srvApi end-->
 
     <!-- main begin -->
@@ -230,7 +230,9 @@
 
     <!-- errorVisualizer begin-->
         <string name="host_unreachable_err">Невозможно загрузить данные.\nПроверьте ваше интернет соединение.</string>
-        <string name="server_unknow_err">Произошла ошибка.\nПовторите попытку позже.</string>
+        <string name="server_unknown_err">Произошла ошибка.\nПовторите попытку позже.</string>
+        <string name="oauthFailed_invalidGrand">Попробуйте установить корректную дату и время.</string>
+        <string name="server_needUpdateApp_err">Вы пользуетесь устаревшей\nверсией SportConnector.\nПожалуйста, обновите приложение!</string>
         <string name="try_again">Try again</string>
     <!-- errorVisualizer end-->
 

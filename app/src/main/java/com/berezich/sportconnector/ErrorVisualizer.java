@@ -9,6 +9,7 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.google.api.client.auth.oauth2.TokenResponseException;
 import com.google.api.client.googleapis.json.GoogleJsonResponseException;
 
 import java.net.UnknownHostException;
@@ -17,7 +18,7 @@ import java.net.UnknownHostException;
  * Created by Sashka on 12.07.2015.
  */
 public class ErrorVisualizer {
-    public enum  ERROR_CODE {UNKNOWN_SRV_ERR,HOST_UNREACHABLE,AUTH_FAILED,REGISTRATION_FAILED};
+    public enum  ERROR_CODE {UNKNOWN_SRV_ERR,HOST_UNREACHABLE,AUTH_FAILED,REGISTRATION_FAILED,APP_VERSION_FAILED,OAUTH_FAILED};
     public static void showErrorAfterReq(Context context, FrameLayout layout, Exception e, String TAG)
     {
         ProgressBar progressBar;
@@ -67,7 +68,7 @@ public class ErrorVisualizer {
     }
     public static Pair<ERROR_CODE,String> getTextCodeOfRespException(Context context, Exception exception)
     {
-        String errMsg=context.getString(R.string.server_unknow_err);
+        String errMsg=context.getString(R.string.server_unknown_err);
         ERROR_CODE error_code = ERROR_CODE.UNKNOWN_SRV_ERR;
         try {
             if(exception!=null)
@@ -75,12 +76,25 @@ public class ErrorVisualizer {
                     errMsg = context.getString(R.string.host_unreachable_err);
                     error_code = ERROR_CODE.HOST_UNREACHABLE;
                 }
+                else if (exception instanceof TokenResponseException){
+                    TokenResponseException ex = (TokenResponseException) exception;
+                    error_code = ERROR_CODE.OAUTH_FAILED;
+                    String msg = ex.getDetails().getError();
+                    if(msg.equals("invalid_grant")) {
+                        errMsg = context.getString(R.string.oauthFailed_invalidGrand);
+                    }
+
+                }
                 else if (exception instanceof GoogleJsonResponseException){
                     GoogleJsonResponseException appError = (GoogleJsonResponseException) exception;
-                    String errExceptMsg = ((GoogleJsonResponseException) exception).getDetails().getMessage();
+                    String errExceptMsg = appError.getDetails().getMessage();
                     if(errExceptMsg.indexOf("AuthFailed@:")==0) {
                         errMsg = context.getString(R.string.login_err_authorized);
                         error_code = ERROR_CODE.AUTH_FAILED;
+                    }
+                    else if(errExceptMsg.indexOf("needUpdateApp@:")==0) {
+                        errMsg = context.getString(R.string.server_needUpdateApp_err);
+                        error_code = ERROR_CODE.APP_VERSION_FAILED;
                     }
                     else if(errExceptMsg.indexOf("loginExists@:")==0) {
                         errMsg = context.getString(R.string.registration_err_loginExists);
@@ -102,6 +116,7 @@ public class ErrorVisualizer {
                         errMsg = context.getString(R.string.resetPass_err_loginNotExists);
                         error_code = ERROR_CODE.REGISTRATION_FAILED;
                     }
+
 
                 }
         } finally {
