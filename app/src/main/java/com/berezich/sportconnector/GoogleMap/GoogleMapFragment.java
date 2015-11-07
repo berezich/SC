@@ -65,7 +65,7 @@ public class GoogleMapFragment extends Fragment{
     private final String IS_PARTNERS = "isPartners_key";
     private final String IS_FAVORITE = "isFavorite_key";
 
-    private AlertDialog dialog;
+    private AlertDialog dialog=null;
     enum GMAPS_STATE{NEED_UPDATE,NEED_INSTALL,OK}
     private GMAPS_STATE gmapState = GMAPS_STATE.OK;
 
@@ -206,6 +206,15 @@ public class GoogleMapFragment extends Fragment{
         mainActivity.setmTitle(mainActivity.getString(R.string.gmap_fragmentTitle));
         mainActivity.getSupportActionBar().setHomeAsUpIndicator(null);
         mainActivity.restoreActionBar();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        if(dialog!=null){
+            dialog.dismiss();
+            dialog=null;
+        }
     }
 
     @Override
@@ -502,7 +511,7 @@ public class GoogleMapFragment extends Fragment{
         };
     }
     private void showDialog(Context ctx, String msg, String btn){
-        if(dialog==null || !dialog.isShowing()) {
+        if(dialog==null ) {
             AlertDialog.Builder builder = new AlertDialog.Builder(ctx);
             builder.setMessage(msg);
             builder.setPositiveButton(btn, getGoogleMapsListener());
