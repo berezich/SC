@@ -30,11 +30,12 @@ public class Clustering {
     public static ClusterManager<AbstractMarker> clusterManager;
     private static GoogleMapFragment gmapFragment;
     private static AbstractMarker chosenMarker;
-    private  static Cluster<AbstractMarker> chosenCluster;
+    private static Context ctx;
 
     public static void initClusterManager(Context context,GoogleMap gMap,GoogleMapFragment gmapFragment) {
         clusterManager = new ClusterManager<AbstractMarker>(context, gMap);
         clusterManager.setRenderer(new OwnIconRendered(context, gMap,clusterManager));
+        ctx = context;
         Clustering.gmapFragment = gmapFragment;
         clusterManager.setOnClusterClickListener(new CustomClusterClickListener());
         clusterManager.setOnClusterItemClickListener(new CustomClusterItemClickListener());
@@ -52,7 +53,7 @@ public class Clustering {
             for (Long key : keys) {
                 spot = spots.get(key);
 
-                spotMarker = new SpotMarker(spot.getId(), spot.getName(), spot.getCoords().getLat(), spot.getCoords().getLongt(),
+                spotMarker = new SpotMarker(ctx,spot.getId(), spot.getName(), spot.getCoords().getLat(), spot.getCoords().getLongt(),
                         SpotsData.getPartnerIdsWithoutMe(spot).size(), SpotsData.getCoachIdsWithoutMe(spot).size(), LocalDataManager.isMyFavoriteSpot(spot));
                 if (spotMarker.isAppropriate(filter)) {
                     spotMarker.setSpotIcon(filter);
@@ -93,8 +94,16 @@ public class Clustering {
             if(gmapFragment.getActivity()!=null && cluster!=null) {
 
                 //iconFactory.setBackground(gmapFragment.getResources().getDrawable(R.drawable.gmap_cluster_green_red_purple));
-                iconFactory.setBackground(gmapFragment.getResources().getDrawable(getDrawableClusterMarker(cluster, gmapFragment.curFilter())));
-                iconFactory.setContentPadding(20, 10, 0, 0);
+                iconFactory.setBackground(ctx.getResources().getDrawable(getDrawableClusterMarker(cluster, gmapFragment.curFilter())));
+                int leftOffset=0;
+                if(cluster.getItems().size()<10)
+                    leftOffset = (int) ctx.getResources().getDimension(R.dimen.gmap_clusterContent_leftOffset_1);
+                else if(cluster.getItems().size()<100)
+                    leftOffset = (int) ctx.getResources().getDimension(R.dimen.gmap_clusterContent_leftOffset_2);
+                else if(cluster.getItems().size()<1000)
+                    leftOffset = (int) ctx.getResources().getDimension(R.dimen.gmap_clusterContent_leftOffset_3);
+                int topOffset = (int) ctx.getResources().getDimension(R.dimen.gmap_clusterContent_topOffset);
+                iconFactory.setContentPadding(leftOffset, topOffset, 0, 0);
 
                 BitmapDescriptor descriptor = BitmapDescriptorFactory.fromBitmap(iconFactory.makeIcon(String.valueOf(cluster.getSize())));
                 markerOptions.icon(descriptor).anchor((float) 0.5, (float) 0.5);
@@ -114,14 +123,12 @@ public class Clustering {
         @Override
         public boolean onClusterItemClick(AbstractMarker item) {
             chosenMarker = item;
-            chosenCluster = null;
             return false;
         }
     }
     public static class CustomClusterClickListener implements ClusterManager.OnClusterClickListener<AbstractMarker>{
         @Override
         public boolean onClusterClick(Cluster<AbstractMarker> cluster) {
-            chosenCluster = cluster;
             chosenMarker = null;
             return true;
         }

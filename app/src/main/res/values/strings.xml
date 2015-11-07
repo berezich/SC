@@ -72,6 +72,9 @@
 
     <!--gmap_fragment begin-->
         <string name="gmap_fragmentTitle">Поиск кортов</string>
+        <string name="gmap_desc_coach">тренер</string>
+        <string name="gmap_desc_partner">спаринг партнер</string>
+        <string name="gmap_desc_favourite">мой спот</string>
         <string name="gmap_dialog_needUpdate_msg">Обновите приложение Google карты</string>
         <string name="gmap_dialog_needUpdate_btn">Обновить</string>
         <string name="gmap_dialog_needInstall_msg">Установите приложение Google карты</string>

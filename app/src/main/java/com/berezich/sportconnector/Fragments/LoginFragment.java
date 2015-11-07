@@ -89,17 +89,16 @@ public class LoginFragment extends Fragment implements EndpointApi.AuthorizePers
             TextView textView = (TextView) rootView.findViewById(R.id.login_text_forgotPass);
             if(textView!=null)
                 textView.setOnClickListener(new OnClickForgotPassListener());
-
+            if ((editTxt = (EditText) rootView.findViewById(R.id.login_pass_value)) != null)
+                editTxt.setOnFocusChangeListener(new OnPassFocused());
+            defaultPass="";
             if(( myPersonInfo = LocalDataManager.getMyPersonInfo())!=null) {
-                if(myPersonInfo.getPass().isEmpty())
-                    defaultPass="";
-                else
+                if(!myPersonInfo.getPass().isEmpty())
                     defaultPass = getActivity().getString(R.string.login_defaultPass);
                 if ((editTxt = (EditText) rootView.findViewById(R.id.login_email_value)) != null) {
                     editTxt.setText(myPersonInfo.getEmail());
                 }
                 if ((editTxt = (EditText) rootView.findViewById(R.id.login_pass_value)) != null) {
-                    editTxt.setOnFocusChangeListener(new OnPassFocused());
                     editTxt.setText(defaultPass);
                     //editTxt.setText(myPersonInfo.getPass());
 
@@ -206,8 +205,13 @@ public class LoginFragment extends Fragment implements EndpointApi.AuthorizePers
             if((editTxt = (EditText) rootView.findViewById(R.id.login_pass_value))!=null)
                 if(isPassChanged)
                     pass = editTxt.getText().toString();
-                else
-                    pass = LocalDataManager.getMyPersonInfo().getPass();
+                else {
+                    Person myPersonInfo = LocalDataManager.getMyPersonInfo();
+                    if(myPersonInfo!=null)
+                        pass = myPersonInfo.getPass();
+                    else
+                        pass = "";
+                }
             
             setVisibleProgressBar(true);
             new EndpointApi.AuthorizePersonAsyncTask(getFragment()).execute(login,pass);
