@@ -51,11 +51,6 @@ public class ProfileItemLstAdapter extends BaseAdapter {
 
     @Override
     public long getItemId(int position) {
-        /*
-        if(position>=0 && position<getCount())
-            return ((Person)objects.get(position)).getId();
-        return -1;
-        */
         return position;
     }
 
@@ -80,7 +75,9 @@ public class ProfileItemLstAdapter extends BaseAdapter {
                 int age = UsefulFunctions.calcPersonAge(person.getBirthday());
 
                 ((TextView) view.findViewById(R.id.lstProfileItem_desc1)).setText(
-                        (age >= 0 ? ctx.getString(R.string.person_item_age) + " " + age : ""));
+                        //(age >= 0 ? ctx.getString(R.string.person_item_age) + " " + age : ""));
+                        (age >= 0 ? age +" "+UsefulFunctions.personAgeDeclension(ctx,age):""));
+
                 ((TextView) view.findViewById(R.id.lstProfileItem_desc2)).setText(
                         (person.getRating() > 0) ?
                                 ctx.getString(R.string.person_item_rating) + " " + person.getRating() : "");

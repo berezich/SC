@@ -87,6 +87,9 @@
         <string name="personprofile_type_coach">тренер</string>
         <string name="personprofile_type_partner">спарринг-партнер</string>
         <string name="personprofile_rating">Уровень игры</string>
+        <string name="personprofile_age1">год</string>
+        <string name="personprofile_age2">года</string>
+        <string name="personprofile_age3">лет</string>
         <string name="personprofile_email">Email:</string>
         <string name="personprofile_phone">Phone:</string>
         <string name="personprofile_type">Category:</string>

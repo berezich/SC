@@ -181,7 +181,7 @@ public class PersonProfileFragment extends Fragment {
                 String str = person.getType().equals("PARTNER")? getString(R.string.personprofile_type_partner):getString(R.string.personprofile_type_coach);
                 int age = UsefulFunctions.calcPersonAge(person.getBirthday());
                 if(age>=0)
-                    str += ", "+age ;
+                    str += ", "+age+" "+UsefulFunctions.personAgeDeclension(activity.getBaseContext(),age) ;
                 txtView.setText(str);
             }
             if((txtView = (TextView) rootView.findViewById(R.id.profile_txt_raiting))!=null) {

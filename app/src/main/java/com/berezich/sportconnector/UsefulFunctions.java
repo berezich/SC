@@ -1,5 +1,6 @@
 package com.berezich.sportconnector;
 
+import android.content.Context;
 import android.text.InputFilter;
 import android.text.Spanned;
 import android.util.Log;
@@ -99,6 +100,24 @@ public class UsefulFunctions {
             return false;
         return true;
     }
+
+    public static String personAgeDeclension(Context ctx, int years){
+        if(years>=10 && years<=19)
+            return ctx.getString(R.string.personprofile_age3);
+        int mod = years%10;
+        switch (mod)
+        {
+            case 1:
+                return ctx.getString(R.string.personprofile_age1);
+            case 2:
+            case 3:
+            case 4:
+                return ctx.getString(R.string.personprofile_age2);
+            default:
+                return ctx.getString(R.string.personprofile_age3);
+        }
+    }
+
     public static String pluralPostfix(int num){
         if(num>=10 && num<=19)
             return "ов";
