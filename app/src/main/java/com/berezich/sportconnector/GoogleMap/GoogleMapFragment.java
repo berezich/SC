@@ -4,6 +4,8 @@ package com.berezich.sportconnector.GoogleMap;
  * Created by berezkin on 12.05.2015.
  */
 
+import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -22,10 +24,15 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.view.animation.LinearInterpolator;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 
 import com.berezich.sportconnector.LocalDataManager;
 import com.berezich.sportconnector.MainActivity;
@@ -475,7 +482,28 @@ public class GoogleMapFragment extends Fragment{
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         menu.clear();
         super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.fragment_gmap, menu);
+        MenuItem menuItem = menu.findItem(R.id.menu_update);
+        LayoutInflater inflater1 = (LayoutInflater) mainActivity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        ImageView iv = (ImageView) inflater1.inflate(R.layout.action_img_update, null);
+        iv.setOnClickListener(new OnUpdateClickListener());
+        menuItem.setActionView(iv);
 
+    }
+    private class OnUpdateClickListener implements View.OnClickListener{
+
+        boolean isSpinning = false;
+        @Override
+        public void onClick(View view) {
+            if(!isSpinning) {
+                Animation animation = AnimationUtils.loadAnimation(mainActivity.getBaseContext(), R.anim.rotate_infinit);
+                view.setAnimation(animation);
+                view.getAnimation().start();
+            }
+            else
+                view.getAnimation().setRepeatCount(0);
+            isSpinning = !isSpinning;
+        }
     }
     public boolean isGoogleMapsInstalled()
     {
