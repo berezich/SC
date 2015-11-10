@@ -273,33 +273,28 @@ public class GoogleMapFragment extends Fragment{
             ImageButton btn = (ImageButton) v;
             // show interest in events resulting from ACTION_DOWN
             if(event.getAction()==MotionEvent.ACTION_DOWN) {
-                //btn.setPressed(!btn.isPressed());
                 switch (v.getId())
                 {
                     case R.id.map_btn_coach:
                         isCoaches = !isCoaches;
-                        //btn.setPressed(isCoaches);
                         setButtonImg(btn,isCoaches,Buttons.COACH);
                         if(!isCoaches)
                             activateButtons(Buttons.COURT,false);
                         break;
                     case R.id.map_btn_partner:
                         isPartners = !isPartners;
-                        //btn.setPressed(isPartners);
                         setButtonImg(btn, isPartners, Buttons.PARTNER);
                         if(!isPartners)
                             activateButtons(Buttons.COURT,false);
                         break;
                     case R.id.map_btn_court:
                         isCourts = !isCourts;
-                        //btn.setPressed(isCourts);
                         setButtonImg(btn, isCourts, Buttons.COURT);
                         if(isCourts)
                             activateButtons(Buttons.ALL,true);
                         break;
                     case R.id.map_btn_star:
                         isFavorite = !isFavorite;
-                        //btn.setPressed(isFavorite);
                         setButtonImg(btn, isFavorite, Buttons.FAVORITE);
                         if(!isFavorite)
                             activateButtons(Buttons.COURT,false);
@@ -307,9 +302,6 @@ public class GoogleMapFragment extends Fragment{
                 }
                 setCurFilter();
                 Clustering.addAllSpots(SpotsData.get_allSpots(), curFilter());
-
-                //map.setOnCameraChangeListener(Clustering.clusterManager);
-
                 return true;
             }
             if(event.getAction()==MotionEvent.ACTION_UP) {
@@ -358,41 +350,33 @@ public class GoogleMapFragment extends Fragment{
                 isCoaches = b;
                 btn = (ImageButton) view.findViewById(R.id.map_btn_coach);
                 setButtonImg(btn, b, Buttons.COACH);
-                //btn.setPressed(b);
             }
             if (buttonType == Buttons.ALL || buttonType == Buttons.PARTNER) {
                 isPartners = b;
                 btn = (ImageButton) view.findViewById(R.id.map_btn_partner);
                 setButtonImg(btn,b,Buttons.PARTNER);
-                //btn.setPressed(b);
             }
             if (buttonType == Buttons.ALL || buttonType == Buttons.FAVORITE) {
                 isFavorite = b;
                 btn = (ImageButton) view.findViewById(R.id.map_btn_star);
                 setButtonImg(btn, b, Buttons.FAVORITE);
-                //btn.setPressed(b);
             }
             if (buttonType == Buttons.ALL || buttonType == Buttons.COURT) {
                 isCourts = b;
                 btn = (ImageButton) view.findViewById(R.id.map_btn_court);
                 setButtonImg(btn, b, Buttons.COURT);
-                //btn.setPressed(b);
             }
         }
     }
     private void updateButtonsStates(){
         ImageButton btn;
         btn = (ImageButton) rootView.findViewById(R.id.map_btn_coach);
-        //btn.setPressed(isCoaches);
         setButtonImg(btn, isCoaches, Buttons.COACH);
         btn = (ImageButton) rootView.findViewById(R.id.map_btn_court);
-        //btn.setPressed(isCourts);
         setButtonImg(btn, isCourts, Buttons.COURT);
         btn = (ImageButton) rootView.findViewById(R.id.map_btn_partner);
-        //btn.setPressed(isPartners);
         setButtonImg(btn, isPartners, Buttons.PARTNER);
         btn = (ImageButton) rootView.findViewById(R.id.map_btn_star);
-        //btn.setPressed(isFavorite);
         setButtonImg(btn, isFavorite, Buttons.FAVORITE);
     }
     private void setCurFilter()
@@ -493,15 +477,19 @@ public class GoogleMapFragment extends Fragment{
     private class OnUpdateClickListener implements View.OnClickListener{
 
         boolean isSpinning = false;
+        ObjectAnimator anim;
         @Override
         public void onClick(View view) {
             if(!isSpinning) {
-                Animation animation = AnimationUtils.loadAnimation(mainActivity.getBaseContext(), R.anim.rotate_infinit);
-                view.setAnimation(animation);
-                view.getAnimation().start();
+                anim = ObjectAnimator.ofFloat(view, "rotation", 0f, 360f);
+                anim.setDuration(mainActivity.getResources().getInteger(R.integer.rotationDuration));
+                anim.setInterpolator(new LinearInterpolator());
+                anim.setRepeatCount(ValueAnimator.INFINITE);
+                anim.start();
             }
-            else
-                view.getAnimation().setRepeatCount(0);
+            else {
+                anim.setRepeatCount(0);
+            }
             isSpinning = !isSpinning;
         }
     }

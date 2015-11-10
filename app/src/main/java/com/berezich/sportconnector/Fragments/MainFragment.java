@@ -100,7 +100,8 @@ public class MainFragment extends Fragment implements
         try {
             listener = (OnActionListenerMainFragment) activity;
         } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString() + " must implement OnActionListener for MainFragment");
+            throw new ClassCastException(activity.toString()
+                    + " must implement OnActionListener for MainFragment");
         }
         ((MainActivity) activity).onSectionAttached(
                 getArguments().getInt(ARG_SECTION_NUMBER));
@@ -164,7 +165,8 @@ public class MainFragment extends Fragment implements
 
         if(exception!=null) {
             Log.e(TAG, "Error get regionInfo from server");
-            ErrorVisualizer.showErrorAfterReq(activity.getBaseContext(), (FrameLayout) rootView.findViewById(R.id.main_frg_frameLayout), exception, TAG);
+            ErrorVisualizer.showErrorAfterReq(activity.getBaseContext(),
+                    (FrameLayout) rootView.findViewById(R.id.main_frg_frameLayout), exception, TAG);
         }
         else if (regionInfo!=null)
         {
@@ -173,13 +175,13 @@ public class MainFragment extends Fragment implements
                 Log.d(TAG, String.format("localRegionInfo: %s", localRegionInfo.toString()));
                 if (localRegionInfo.getVersion().equals(regionInfo.getVersion())) {
                     SpotsData.loadSpotsFromCache();
-                    if (localRegionInfo.getLastSpotUpdate().getValue() - regionInfo.getLastSpotUpdate().getValue() < 0) {
+                    if (localRegionInfo.getLastSpotUpdate().getValue()
+                            - regionInfo.getLastSpotUpdate().getValue() < 0) {
                         Log.d(TAG, "Get list of updated spots and update existed");
-                        //LocalDataManager.setRegionInfo(regionInfo);
                         reqState = ReqState.REQ_UPDATE_SPOTS;
                         Log.d(TAG, "reqState = " + reqState);
                         new EndpointApi.GetUpdatedSpotListAsyncTask(this).execute(
-                                new Pair<Long, DateTime>(regionInfo.getId(), localRegionInfo.getLastSpotUpdate()));
+                                new Pair<>(regionInfo.getId(), localRegionInfo.getLastSpotUpdate()));
                         return;
                     } else {
                         Log.d(TAG, "Actual spot information");
@@ -191,7 +193,6 @@ public class MainFragment extends Fragment implements
                 }
             }
             Log.d(TAG, "get all spots from server");
-            //LocalDataManager.setRegionInfo(regionInfo);
             reqState = ReqState.REQ_SPOT_LIST;
             Log.d(TAG, "reqState = " + reqState);
             new EndpointApi.GetSpotListAsyncTask(this).execute(regionId);
