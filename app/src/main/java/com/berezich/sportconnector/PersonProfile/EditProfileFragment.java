@@ -8,12 +8,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
-import android.telephony.PhoneNumberFormattingTextWatcher;
-import android.text.Editable;
 import android.text.InputFilter;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.util.Pair;
 import android.view.LayoutInflater;
@@ -35,7 +30,7 @@ import android.widget.Toast;
 
 import com.berezich.sportconnector.AlertDialogFragment;
 import com.berezich.sportconnector.DatePickerFragment;
-import com.berezich.sportconnector.EndpointApi;
+import com.berezich.sportconnector.EndpointApi.EndpointApi;
 import com.berezich.sportconnector.ErrorVisualizer;
 import com.berezich.sportconnector.FileManager;
 import com.berezich.sportconnector.LocalDataManager;
@@ -54,7 +49,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.logging.Logger;
 
 /**
  * Created by Sashka on 25.07.2015.

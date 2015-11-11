@@ -16,9 +16,9 @@ import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
 import android.net.Uri;
+import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -28,25 +28,25 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.view.animation.LinearInterpolator;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.Toast;
 
+import com.berezich.sportconnector.EndpointApi.SyncSpots;
+import com.berezich.sportconnector.Fragments.MainFragment.Filters;
 import com.berezich.sportconnector.LocalDataManager;
 import com.berezich.sportconnector.MainActivity;
-import com.berezich.sportconnector.Fragments.MainFragment.Filters;
 import com.berezich.sportconnector.R;
-
+import com.berezich.sportconnector.backend.sportConnectorApi.model.RegionInfo;
 import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
-import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 
-public class GoogleMapFragment extends Fragment{
+public class GoogleMapFragment extends Fragment implements SyncSpots.OnActionSyncSpots{
 
     /**
      * The fragment argument representing the section number for this
@@ -78,6 +78,7 @@ public class GoogleMapFragment extends Fragment{
 
     public static OnActionListenerGMapFragment listener;
     private MainActivity mainActivity;
+    private SyncSpots syncSpots;
 
     public GoogleMapFragment setArgs(Filters filter) {
 
@@ -101,12 +102,10 @@ public class GoogleMapFragment extends Fragment{
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-        //LocalDataManager.init(getActivity());
     }
 
     public GoogleMapFragment() {
-
-        //SpotsData.loadSpotsFromCache();
+        syncSpots = new SyncSpots(this,TAG);
     }
 
     @Override
@@ -180,7 +179,7 @@ public class GoogleMapFragment extends Fragment{
         super.onAttach(activity);
         mainActivity = (MainActivity) activity;
         try {
-            listener = (OnActionListenerGMapFragment) mainActivity;
+            listener = mainActivity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString() + " must implement OnActionListenerGMapFragment for GoogleMapFragment");
         }
@@ -480,19 +479,39 @@ public class GoogleMapFragment extends Fragment{
         ObjectAnimator anim;
         @Override
         public void onClick(View view) {
-            if(!isSpinning) {
+            //if(!isSpinning) {
                 anim = ObjectAnimator.ofFloat(view, "rotation", 0f, 360f);
                 anim.setDuration(mainActivity.getResources().getInteger(R.integer.rotationDuration));
                 anim.setInterpolator(new LinearInterpolator());
                 anim.setRepeatCount(ValueAnimator.INFINITE);
                 anim.start();
-            }
+                RegionInfo regionInfo = LocalDataManager.getRegionInfo();
+            syncSpots.setReqState(SyncSpots.ReqState.REQ_REGINFO);
+            syncSpots.startSync(mainActivity.getBaseContext(),regionInfo.getId());
+            view.setClickable(false);
+            /*}
             else {
                 anim.setRepeatCount(0);
             }
-            isSpinning = !isSpinning;
+            isSpinning = !isSpinning;*/
         }
     }
+
+    @Override
+    public void syncFinish(Exception ex, SyncSpots.ReqState reqState) {
+        if(ex==null && reqState== SyncSpots.ReqState.EVERYTHING_LOADED){
+            Clustering.addAllSpots(SpotsData.get_allSpots(), curFilter());
+        }
+        else
+            Toast.makeText(mainActivity.getBaseContext(),mainActivity.getString(R.string.spotinfo_req_error_msg),Toast.LENGTH_SHORT).show();
+        /*View imageView = mainActivity.findViewById(R.id.menu_update);
+        if(imageView!=null) {
+            imageView.getAnimation().setRepeatCount(0);
+            imageView.setClickable(true);
+        }*/
+        mainActivity.invalidateOptionsMenu();
+    }
+
     public boolean isGoogleMapsInstalled()
     {
         try

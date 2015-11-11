@@ -1,4 +1,4 @@
-package com.berezich.sportconnector;
+package com.berezich.sportconnector.EndpointApi;
 
 import android.app.Activity;
 import android.content.Context;
@@ -6,6 +6,7 @@ import android.os.AsyncTask;
 import android.support.v4.app.Fragment;
 import android.util.Pair;
 
+import com.berezich.sportconnector.R;
 import com.berezich.sportconnector.backend.sportConnectorApi.SportConnectorApi;
 import com.berezich.sportconnector.backend.sportConnectorApi.model.AccountForConfirmation;
 import com.berezich.sportconnector.backend.sportConnectorApi.model.CollectionResponseSpot;
@@ -119,14 +120,14 @@ public class EndpointApi {
     public static class GetRegionAsyncTask extends AsyncTask<Long, Void, Pair<RegionInfo,Exception> >{
         private OnGetRegionAsyncTaskAction listener=null;
         private Context context = null;
-        public GetRegionAsyncTask(Fragment fragment)
+        public GetRegionAsyncTask(Context ctx, Object parentObj)
         {
-            context = fragment.getContext();
+            context = ctx;
             setSrvApi(context);
             try {
-                listener = (OnGetRegionAsyncTaskAction) fragment;
+                listener = (OnGetRegionAsyncTaskAction) parentObj;
             } catch (ClassCastException e) {
-                throw new ClassCastException(fragment.toString() + " must implement OnGetRegionAsyncTaskAction for GetRegionAsyncTask");
+                throw new ClassCastException(parentObj.toString() + " must implement OnGetRegionAsyncTaskAction for GetRegionAsyncTask");
             }
         }
         public GetRegionAsyncTask(Activity activity)
@@ -164,14 +165,14 @@ public class EndpointApi {
     public static class GetSpotListAsyncTask extends AsyncTask<Long, Void, Pair<List<Spot>,Exception> >{
         private OnAction listener=null;
         private Context context = null;
-        public GetSpotListAsyncTask(Fragment fragment)
+        public GetSpotListAsyncTask(Context ctx, Object parentObj)
         {
-            context = fragment.getContext();
+            context = ctx;
             setSrvApi(context);
             try {
-                listener = (OnAction) fragment;
+                listener = (OnAction) parentObj;
             } catch (ClassCastException e) {
-                throw new ClassCastException(fragment.toString() + " must implement OnAction for GetSpotListAsyncTask");
+                throw new ClassCastException(parentObj.toString() + " must implement OnAction for GetSpotListAsyncTask");
             }
         }
         @Override
@@ -218,14 +219,14 @@ public class EndpointApi {
     public static class GetUpdatedSpotListAsyncTask extends AsyncTask<Pair<Long,DateTime>, Void, Pair<List<UpdateSpotInfo>,Exception> >{
         private OnAction listener=null;
         private Context context = null;
-        public GetUpdatedSpotListAsyncTask(Fragment fragment)
+        public GetUpdatedSpotListAsyncTask(Context ctx, Object parentObj)
         {
-            context = fragment.getContext();
+            context = ctx;
             setSrvApi(context);
             try {
-                listener = (OnAction) fragment;
+                listener = (OnAction) parentObj;
             } catch (ClassCastException e) {
-                throw new ClassCastException(fragment.toString() + " must implement OnAction for GetUpdatedSpotListAsyncTask");
+                throw new ClassCastException(parentObj.toString() + " must implement OnAction for GetUpdatedSpotListAsyncTask");
             }
         }
         @Override

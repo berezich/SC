@@ -21,7 +21,7 @@ import android.widget.TextView;
 
 import com.berezich.sportconnector.AlertDialogFragment;
 import com.berezich.sportconnector.AppPref;
-import com.berezich.sportconnector.EndpointApi;
+import com.berezich.sportconnector.EndpointApi.EndpointApi;
 import com.berezich.sportconnector.ErrorVisualizer;
 import com.berezich.sportconnector.LocalDataManager;
 import com.berezich.sportconnector.MainActivity;

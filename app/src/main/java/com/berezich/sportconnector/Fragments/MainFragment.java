@@ -8,7 +8,6 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
-import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -19,35 +18,21 @@ import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.berezich.sportconnector.EndpointApi;
+import com.berezich.sportconnector.EndpointApi.SyncSpots;
 import com.berezich.sportconnector.ErrorVisualizer;
-import com.berezich.sportconnector.GoogleMap.SpotsData;
-import com.berezich.sportconnector.LocalDataManager;
 import com.berezich.sportconnector.MainActivity;
 import com.berezich.sportconnector.R;
 import com.berezich.sportconnector.backend.sportConnectorApi.model.RegionInfo;
-import com.berezich.sportconnector.backend.sportConnectorApi.model.Spot;
-import com.berezich.sportconnector.backend.sportConnectorApi.model.UpdateSpotInfo;
-import com.google.api.client.util.DateTime;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * A placeholder fragment containing a simple view.
  */
-public class MainFragment extends Fragment implements
-        EndpointApi.GetRegionAsyncTask.OnGetRegionAsyncTaskAction,
-        EndpointApi.GetSpotListAsyncTask.OnAction,
-        EndpointApi.GetUpdatedSpotListAsyncTask.OnAction{
+public class MainFragment extends Fragment implements SyncSpots.OnActionSyncSpots {
     /**
      * The fragment argument representing the section number for this
      * fragment.
      */
-    private enum ReqState{
-        REQ_REGINFO,REQ_SPOT_LIST,REQ_UPDATE_SPOTS,EVERYTHING_LOADED
-    }
+
     public enum Filters {
         SPARRING_PARTNERS, COUCH, COURT
     };
@@ -59,11 +44,9 @@ public class MainFragment extends Fragment implements
     OnActionListenerMainFragment listener;
     private static Long regionId = new Long(1);
     private RegionInfo regionInfo=null, localRegionInfo = null;
-    private ReqState reqState = ReqState.REQ_REGINFO;
-    /**
-     * Returns a new instance of this fragment for the given section
-     * number.
-     */
+    private SyncSpots syncSpots;
+    private boolean isSpotsSynced = false;
+
     public MainFragment setArgs(int sectionNumber) {
         _sectionNumber = sectionNumber;
         Bundle args = new Bundle();
@@ -73,6 +56,7 @@ public class MainFragment extends Fragment implements
     }
 
     public MainFragment() {
+        syncSpots = new SyncSpots(this,TAG);
     }
 
     @Override
@@ -110,15 +94,14 @@ public class MainFragment extends Fragment implements
     public void onResume()
     {
         super.onResume();
-        Log.d(TAG, "onResume reqState = " + reqState);
+        Log.d(TAG, "onResume isSpotsSynced = " + isSpotsSynced);
         ((MainActivity)activity).setmTitle(activity.getString(R.string.mainSearch_fragmentTitle));
         ((MainActivity)activity).getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_drawer);
         ((MainActivity)activity).restoreActionBar();
-        if(reqState==ReqState.EVERYTHING_LOADED)
+        if(isSpotsSynced)
             setVisibleLayouts(true,false);
-        else {
+        else
             reqExecute();
-        }
     }
     class BtnClickListener implements View.OnClickListener
     {
@@ -149,128 +132,11 @@ public class MainFragment extends Fragment implements
         }
     }
 
-    public static interface OnActionListenerMainFragment {
+    public interface OnActionListenerMainFragment {
         void onBtnClickMF(Filters position, int section);
     }
 
-    @Override
-    public void onGetRegionAsyncTaskFinish(Pair<RegionInfo, Exception> result) {
-        Exception exception = result.second;
-        regionInfo=result.first;
-        if(getActivity()==null)
-        {
-            Log.e(TAG,"current fragment isn't attached to activity");
-            return;
-        }
 
-        if(exception!=null) {
-            Log.e(TAG, "Error get regionInfo from server");
-            ErrorVisualizer.showErrorAfterReq(activity.getBaseContext(),
-                    (FrameLayout) rootView.findViewById(R.id.main_frg_frameLayout), exception, TAG);
-        }
-        else if (regionInfo!=null)
-        {
-            Log.d(TAG,String.format("regionInfo load from server\n%s",regionInfo.toString()));
-            if ((localRegionInfo = LocalDataManager.getRegionInfo()) != null) {
-                Log.d(TAG, String.format("localRegionInfo: %s", localRegionInfo.toString()));
-                if (localRegionInfo.getVersion().equals(regionInfo.getVersion())) {
-                    SpotsData.loadSpotsFromCache();
-                    if (localRegionInfo.getLastSpotUpdate().getValue()
-                            - regionInfo.getLastSpotUpdate().getValue() < 0) {
-                        Log.d(TAG, "Get list of updated spots and update existed");
-                        reqState = ReqState.REQ_UPDATE_SPOTS;
-                        Log.d(TAG, "reqState = " + reqState);
-                        new EndpointApi.GetUpdatedSpotListAsyncTask(this).execute(
-                                new Pair<>(regionInfo.getId(), localRegionInfo.getLastSpotUpdate()));
-                        return;
-                    } else {
-                        Log.d(TAG, "Actual spot information");
-                        setVisibleLayouts(true, false);
-                        reqState = ReqState.EVERYTHING_LOADED;
-                        Log.d(TAG, "reqState = " + reqState);
-                        return;
-                    }
-                }
-            }
-            Log.d(TAG, "get all spots from server");
-            reqState = ReqState.REQ_SPOT_LIST;
-            Log.d(TAG, "reqState = " + reqState);
-            new EndpointApi.GetSpotListAsyncTask(this).execute(regionId);
-        }
-        else
-            Log.e(TAG,"regionInfo from server == null");
-    }
-
-    @Override
-    public void onGetSpotListFinish(Pair<List<Spot>, Exception> result) {
-        Exception error = result.second;
-        List<Spot> spotLst = result.first;
-        if(getActivity()==null)
-        {
-            Log.e(TAG,"current fragment isn't attached to activity");
-            return;
-        }
-        if(spotLst==null)
-            spotLst = new ArrayList<Spot>();
-        if(error == null && spotLst!=null)
-        {
-            try {
-                Log.d(TAG,String.format("got all spots (%s items) from server",spotLst.size()));
-                SpotsData.saveSpotsToCache(spotLst);
-                Log.d(TAG, "all spots saved to cache");
-                LocalDataManager.setRegionInfo(regionInfo);
-                LocalDataManager.saveRegionInfoToPref(activity);
-                Log.d(TAG, "updated regionInfo saved to cache");
-                setVisibleLayouts(true, false);
-                reqState = ReqState.EVERYTHING_LOADED;
-                Log.d(TAG, "reqState = " + reqState);
-            } catch (IOException e) {
-                ErrorVisualizer.showErrorAfterReq(getActivity().getBaseContext(),
-                        (FrameLayout) rootView.findViewById(R.id.main_frg_frameLayout), error, TAG);
-            }
-            return;
-        }
-        Log.e(TAG, "Error get ListSpot from server");
-        if(error==null)
-            Log.e(TAG,"ListSpot = null");
-        ErrorVisualizer.showErrorAfterReq(getActivity().getBaseContext(),
-                (FrameLayout) rootView.findViewById(R.id.main_frg_frameLayout), error, TAG);
-    }
-
-    @Override
-    public void onGetUpdateSpotListFinish(Pair<List<UpdateSpotInfo>, Exception> result) {
-        Exception error = result.second;
-        if(getActivity()==null)
-        {
-            Log.e(TAG,"current fragment isn't attached to activity");
-            return;
-        }
-        List<UpdateSpotInfo> updateSpotInfoLst = result.first;
-
-        if(error == null && updateSpotInfoLst!=null)
-        {
-            try {
-                Log.d(TAG, String.format("got updateSpotList (%d items)from server",updateSpotInfoLst.size()));
-                SpotsData.setSpotUpdatesToCache(updateSpotInfoLst);
-                Log.d(TAG, "updated spots saved to cache");
-                LocalDataManager.setRegionInfo(regionInfo);
-                LocalDataManager.saveRegionInfoToPref(activity);
-                Log.d(TAG, "updated regionInfo saved to cache");
-                reqState = ReqState.EVERYTHING_LOADED;
-                Log.d(TAG, "reqState = " + reqState);
-                setVisibleLayouts(true,false);
-            } catch (IOException e) {
-                ErrorVisualizer.showErrorAfterReq(getActivity().getBaseContext(),
-                        (FrameLayout) rootView.findViewById(R.id.main_frg_frameLayout), error, TAG);
-            }
-            return;
-        }
-        Log.e(TAG, "Error get updated ListSpot from server");
-        if(error==null)
-            Log.e(TAG, "ListUpdatedSpot = null");
-        ErrorVisualizer.showErrorAfterReq(getActivity().getBaseContext(),
-                (FrameLayout)rootView.findViewById(R.id.main_frg_frameLayout),error,TAG);
-    }
     private void setVisibleLayouts(boolean relativeLayout, boolean frameLayout)
     {
         if(relativeLayout)
@@ -303,21 +169,23 @@ public class MainFragment extends Fragment implements
     }
     private void reqExecute()
     {
-        switch (reqState){
-            case REQ_REGINFO:
-                new EndpointApi.GetRegionAsyncTask(this).execute(regionId);
-                break;
-            case REQ_SPOT_LIST:
-                new EndpointApi.GetSpotListAsyncTask(this).execute(regionId);
-                break;
-            case REQ_UPDATE_SPOTS:
-                if(regionInfo!=null && localRegionInfo!=null)
-                    new EndpointApi.GetUpdatedSpotListAsyncTask(this).execute(
-                            new Pair<Long, DateTime>(regionInfo.getId(), localRegionInfo.getLastSpotUpdate()));
-                break;
-        }
+        syncSpots.startSync(activity.getBaseContext(),regionId);
         setVisibleProgressBar();
     }
+
+    @Override
+    public void syncFinish(Exception ex, SyncSpots.ReqState reqState) {
+        if(ex!=null) {
+            ErrorVisualizer.showErrorAfterReq(activity.getBaseContext(),
+                    (FrameLayout) rootView.findViewById(R.id.main_frg_frameLayout), ex, TAG);
+            isSpotsSynced = false;
+        }
+        else if(reqState== SyncSpots.ReqState.EVERYTHING_LOADED) {
+            setVisibleLayouts(true, false);
+            isSpotsSynced = true;
+        }
+    }
+
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);

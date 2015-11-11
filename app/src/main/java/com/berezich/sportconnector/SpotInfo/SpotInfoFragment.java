@@ -8,8 +8,6 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.text.util.Linkify;
 import android.util.Log;
 import android.util.Pair;
@@ -30,7 +28,7 @@ import android.widget.TabHost;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.berezich.sportconnector.EndpointApi;
+import com.berezich.sportconnector.EndpointApi.EndpointApi;
 import com.berezich.sportconnector.ErrorVisualizer;
 import com.berezich.sportconnector.FileManager;
 import com.berezich.sportconnector.GoogleMap.SpotsData;

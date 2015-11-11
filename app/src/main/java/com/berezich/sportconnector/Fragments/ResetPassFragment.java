@@ -17,15 +17,13 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import com.berezich.sportconnector.AlertDialogFragment;
-import com.berezich.sportconnector.EndpointApi;
+import com.berezich.sportconnector.EndpointApi.EndpointApi;
 import com.berezich.sportconnector.ErrorVisualizer;
 import com.berezich.sportconnector.InputValuesValidation;
 import com.berezich.sportconnector.LocalDataManager;
 import com.berezich.sportconnector.MainActivity;
 import com.berezich.sportconnector.R;
 import com.berezich.sportconnector.backend.sportConnectorApi.model.Person;
-
-import java.io.IOException;
 
 /**
  * Created by Sashka on 09.08.2015.
