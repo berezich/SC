@@ -128,7 +128,9 @@
         <string name="editprofile_pickImageError">Выберите другую картинку</string>
         <string name="editprofile_invalidPhone">Введите корректный номер телефона</string>
         <string name="editprofile_invalidSex">Укажите ваш пол</string>
-            <!-- menu -->
+        <string name="editprofile_chooserItemPhotoMark"></string>
+
+        <!-- menu -->
                 <string name="menu_save_profile">Сохранить</string>
             <!-- menu -->
             <!--changePass_dialog begin-->

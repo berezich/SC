@@ -1,14 +1,24 @@
 package com.berezich.sportconnector.PersonProfile;
 
 import android.app.Activity;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.LabeledIntent;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.text.InputFilter;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.TextUtils;
+import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.util.Pair;
 import android.view.LayoutInflater;
@@ -49,6 +59,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by Sashka on 25.07.2015.
@@ -69,6 +80,8 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
     private final String STATE_TEMP_PERSON = "tempPerson";
     private final String STATE_PICINFO = "picInfo";
     public static final int PICK_IMAGE = 111;
+    public static final int CAMERA_IMAGE = 112;
+    public static final int GALLERY_CAMERA_IMAGE = 113;
     FileManager.PicInfo picInfo;
     View rootView;
     Person tempMyPerson = null;
@@ -585,9 +598,66 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
     private class ImageOnClick implements View.OnClickListener {
         @Override
         public void onClick(View v) {
-            Intent intent = new Intent(Intent.ACTION_PICK,android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-            intent.setType("image/*");
-            startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE);
+            try {
+
+                int validIntentFlag = 0;
+                PackageManager pm = activity.getPackageManager();
+                Intent intentGallery = new Intent(Intent.ACTION_PICK,
+                        android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                if(intentGallery!=null)
+                    intentGallery.setType("image/*");
+
+                Intent takePictureIntent = null;
+                if(pm.hasSystemFeature(PackageManager.FEATURE_CAMERA))
+                    takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+
+                if(intentGallery!=null && intentGallery.resolveActivity(pm)!=null)
+                    validIntentFlag |=  0x01;
+                if(takePictureIntent!=null && takePictureIntent.resolveActivity(pm)!=null)
+                    validIntentFlag |=  0x10;
+
+                switch (validIntentFlag){
+                    case 0x01:
+                        startActivityForResult(intentGallery, PICK_IMAGE);
+                        return;
+                    case 0x10:
+                        startActivityForResult(takePictureIntent, CAMERA_IMAGE);
+                        return;
+                    case 0x00:
+                        return;
+                }
+
+                Intent openInChooser = Intent.createChooser(intentGallery,
+                        activity.getString(R.string.personprofile_intentChooserTitle));
+                // Append " (for editing)" to applicable apps, otherwise they will show up twice identically
+                Spannable mark = new SpannableString(" "
+                        +activity.getString(R.string.editprofile_chooserItemPhotoMark));
+                if(mark.toString().trim().isEmpty())
+                    mark = new SpannableString("");
+                else
+                    mark.setSpan(new ForegroundColorSpan(Color.CYAN), 0,
+                            mark.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                List<ResolveInfo> resInfo = pm.queryIntentActivities(takePictureIntent,
+                        PackageManager.MATCH_DEFAULT_ONLY);
+                Intent[] extraIntents = new Intent[resInfo.size()];
+                for (int i = 0; i < resInfo.size(); i++) {
+                    // Extract the label, append it, and repackage it in a LabeledIntent
+                    ResolveInfo ri = resInfo.get(i);
+                    String packageName = ri.activityInfo.packageName;
+                    Intent intent = new Intent();
+                    intent.setComponent(new ComponentName(packageName, ri.activityInfo.name));
+                    intent.setAction(MediaStore.ACTION_IMAGE_CAPTURE);
+                    CharSequence label = TextUtils.concat(ri.loadLabel(pm), mark);
+                    extraIntents[i] = new LabeledIntent(intent, packageName, label, ri.icon);
+                }
+
+                openInChooser.putExtra(Intent.EXTRA_INITIAL_INTENTS, extraIntents);
+                startActivityForResult(openInChooser, GALLERY_CAMERA_IMAGE);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+
         }
     }
 
@@ -598,43 +668,54 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
         FileManager.PicInfo tempPicInfo = null;
         if (resultCode != Activity.RESULT_OK) {
             Log.d(TAG, "resultCode !=  Activity.RESULT_OK");
-        } else if (requestCode == PICK_IMAGE) {
-            Context context = activity.getBaseContext();
-            // Get the file's content URI from the incoming Intent
-            Uri returnUri = returnIntent.getData();
-            try {
-                tempPicInfo = new FileManager.PicInfo(this,TAG,returnUri.toString());
-            } catch (IOException e) {
-                Log.e(TAG, String.format("PicInfo constructor exception %s", e.getMessage()));
-                e.printStackTrace();
-                Toast.makeText(context, activity.getString(R.string.editprofile_pickImageError), Toast.LENGTH_SHORT).show();
-                return;
-            }
-            if(tempPicInfo!=null) {
-                if (tempPicInfo.getPath()==null) {
-                    Log.e(TAG, String.format("PICK_IMAGE returned not valid URI"));
-                    Toast.makeText(context, activity.getString(R.string.editprofile_pickImageError), Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                File pickedFile = new File(tempPicInfo.getPath());
-                if (!pickedFile.exists()){
-                    Log.e(TAG, String.format("PICK_IMAGE %s not exist",tempPicInfo.getPath()));
-                    Toast.makeText(context, activity.getString(R.string.editprofile_pickImageError), Toast.LENGTH_SHORT).show();
-                    return;
-                }
+        } else {
+            switch (requestCode){
+                case GALLERY_CAMERA_IMAGE:
+                case PICK_IMAGE:
+                case CAMERA_IMAGE:
+                    Context context = activity.getBaseContext();
+                    // Get the file's content URI from the incoming Intent
+                    Uri returnUri = returnIntent.getData();
+                    try {
+                        tempPicInfo = new FileManager.PicInfo(this, TAG, returnUri.toString());
+                    } catch (IOException e) {
+                        Log.e(TAG, String.format("PicInfo constructor exception %s", e.getMessage()));
+                        e.printStackTrace();
+                        Toast.makeText(context, activity.getString(R.string.editprofile_pickImageError),
+                                Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    if (tempPicInfo != null) {
+                        if (tempPicInfo.getPath() == null) {
+                            Log.e(TAG, String.format("PICK_IMAGE returned not valid URI"));
+                            Toast.makeText(context, activity.getString(R.string.editprofile_pickImageError),
+                                    Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+                        File pickedFile = new File(tempPicInfo.getPath());
+                        if (!pickedFile.exists()) {
+                            Log.e(TAG, String.format("PICK_IMAGE %s not exist", tempPicInfo.getPath()));
+                            Toast.makeText(context, activity.getString(R.string.editprofile_pickImageError),
+                                    Toast.LENGTH_SHORT).show();
+                            return;
+                        }
 
+                    }
+                    if (tempMyPerson != null) {
+                        String cacheDir = FileManager.PERSON_CACHE_DIR + "/" + tempMyPerson.getId();
+                        tempPicInfo.savePicPreviewToCache(TAG, context, UsefulFunctions.getDigest(tempPhotoName),
+                                cacheDir);
+                        Picture picture = new Picture();
+                        picture.setBlobKey(tempPhotoName);
+                        tempMyPerson.setPhoto(picture);
+                        picInfo = tempPicInfo;
+                        //setting picture to imageView is proceeded in onResume()
+                    }
+                    break;
             }
-            if(tempMyPerson!=null) {
-                String cacheDir = FileManager.PERSON_CACHE_DIR + "/" + tempMyPerson.getId();
-                tempPicInfo.savePicPreviewToCache(TAG, context, UsefulFunctions.getDigest(tempPhotoName),
-                        cacheDir);
-                Picture picture = new Picture();
-                picture.setBlobKey(tempPhotoName);
-                tempMyPerson.setPhoto(picture);
-                picInfo = tempPicInfo;
-                //setting picture to imageView is proceeded in onResume()
-            }
+
         }
+
     }
     @Override
     public void onGetUrlForUploadAsyncTaskFinish(Pair<String, Exception> result) {
