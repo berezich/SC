@@ -224,6 +224,7 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
                     date = new Date(birthday.getValue());
                 else {
                     Calendar calendar = Calendar.getInstance();
+                    calendar.set(Calendar.YEAR,calendar.get(Calendar.YEAR)-getResources().getInteger(R.integer.editProfile_minAge));
                     date = calendar.getTime();
                 }
                 txtView.setText(String.format("%1$td.%1$tm.%1$tY", date));

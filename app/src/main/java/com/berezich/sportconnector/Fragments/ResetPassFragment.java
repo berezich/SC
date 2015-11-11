@@ -125,13 +125,13 @@ public class ResetPassFragment extends Fragment implements EndpointApi.ResetPass
 
     @Override
     public void onResetPassAsyncTaskFinish(Exception result) {
-        AlertDialogFragment dialog;
         Exception error = result;
         if(error == null)
         {
             Log.d(TAG, "ResetPassReq was created");
             try {
                 String msg = String.format( activity.getString(R.string.resetPass_msgReqResetPass),email);
+                showDialog(msg);
                 listenerResetPass.onResetPass(msg);
             } catch (Exception e) {
                 e.printStackTrace();
@@ -150,7 +150,12 @@ public class ResetPassFragment extends Fragment implements EndpointApi.ResetPass
         else
             dialogMsg = activity.getString(R.string.server_unknown_err);
 
-        dialog = AlertDialogFragment.newInstance(dialogMsg, false);
+        showDialog(dialogMsg);
+    }
+
+    private void showDialog(String msg){
+        AlertDialogFragment dialog;
+        dialog = AlertDialogFragment.newInstance(msg, false);
         dialog.setTargetFragment(this, 0);
         dialog.setCancelable(false);
         FragmentManager ft = activity.getSupportFragmentManager();

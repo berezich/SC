@@ -49,7 +49,7 @@ public class MainActivity extends AppCompatActivity
     private static final String TAG = "MyLog_MainActivity";
     private boolean isRecover = false;
     private boolean isInstanceStateSaved = false;
-    private String defaultPass;
+    private boolean isSpotsSynced=false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -346,5 +346,13 @@ public class MainActivity extends AppCompatActivity
 
     public void setmTitle(String title){
         mTitle = title;
+    }
+
+    public boolean isSpotsSynced() {
+        return isSpotsSynced;
+    }
+
+    public void setIsSpotsSynced(boolean isSpotsSynced) {
+        this.isSpotsSynced = isSpotsSynced;
     }
 }

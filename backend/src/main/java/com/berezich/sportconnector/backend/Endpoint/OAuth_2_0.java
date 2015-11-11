@@ -24,7 +24,6 @@ public class OAuth_2_0 {
         Set<String> allowedClients = new HashSet<>();
         //all Google accounts
         //allowedClients.add("292824132082.apps.googleusercontent.com");
-        //allowedClients.add("berezaman@gmail.com");
         //service account for Android app
         if(permissions == PERMISSIONS.ANDROID_APP)
             allowedClients.add("182489181232-bbiekce9fgm6gtelunr9lp82gmdk3uju.apps.googleusercontent.com");

@@ -45,7 +45,6 @@ public class MainFragment extends Fragment implements SyncSpots.OnActionSyncSpot
     private static Long regionId = new Long(1);
     private RegionInfo regionInfo=null, localRegionInfo = null;
     private SyncSpots syncSpots;
-    private boolean isSpotsSynced = false;
 
     public MainFragment setArgs(int sectionNumber) {
         _sectionNumber = sectionNumber;
@@ -94,11 +93,12 @@ public class MainFragment extends Fragment implements SyncSpots.OnActionSyncSpot
     public void onResume()
     {
         super.onResume();
-        Log.d(TAG, "onResume isSpotsSynced = " + isSpotsSynced);
-        ((MainActivity)activity).setmTitle(activity.getString(R.string.mainSearch_fragmentTitle));
-        ((MainActivity)activity).getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_drawer);
-        ((MainActivity)activity).restoreActionBar();
-        if(isSpotsSynced)
+        MainActivity mainActivity = (MainActivity)activity;
+        Log.d(TAG, "onResume isSpotsSynced = " + mainActivity.isSpotsSynced());
+        mainActivity.setmTitle(activity.getString(R.string.mainSearch_fragmentTitle));
+        mainActivity.getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_drawer);
+        mainActivity.restoreActionBar();
+        if(mainActivity.isSpotsSynced())
             setVisibleLayouts(true,false);
         else
             reqExecute();
@@ -175,14 +175,15 @@ public class MainFragment extends Fragment implements SyncSpots.OnActionSyncSpot
 
     @Override
     public void syncFinish(Exception ex, SyncSpots.ReqState reqState) {
+        MainActivity mainActivity = (MainActivity) activity;
         if(ex!=null) {
             ErrorVisualizer.showErrorAfterReq(activity.getBaseContext(),
                     (FrameLayout) rootView.findViewById(R.id.main_frg_frameLayout), ex, TAG);
-            isSpotsSynced = false;
+            mainActivity.setIsSpotsSynced(false);
         }
         else if(reqState== SyncSpots.ReqState.EVERYTHING_LOADED) {
             setVisibleLayouts(true, false);
-            isSpotsSynced = true;
+            mainActivity.setIsSpotsSynced(true);
         }
     }
 

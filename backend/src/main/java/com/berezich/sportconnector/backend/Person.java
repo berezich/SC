@@ -21,6 +21,7 @@ public class Person {
     private String name;
     private String surname;
     private Date birthday;
+    private Date registration;
     @Index
     private String email;
     private String phone;
@@ -57,6 +58,7 @@ public class Person {
         name = anotherPerson.getName();
         surname = anotherPerson.getSurname();
         birthday = anotherPerson.getBirthday();
+        registration = anotherPerson.getRegistration();
         email = anotherPerson.getEmail();
         phone = anotherPerson.getPhone();
         price = anotherPerson.getPrice();
@@ -93,6 +95,10 @@ public class Person {
 
     public Date getBirthday() {
         return birthday;
+    }
+
+    public Date getRegistration() {
+        return registration;
     }
 
     public String getEmail() {
@@ -163,6 +169,10 @@ public class Person {
 
     public void setBirthday(Date birthday) {
         this.birthday = birthday;
+    }
+
+    public void setRegistration(Date registration) {
+        this.registration = registration;
     }
 
     public void setEmail(String email) {

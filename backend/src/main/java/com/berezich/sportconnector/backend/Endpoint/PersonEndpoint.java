@@ -242,6 +242,7 @@ public class PersonEndpoint {
                 throw new BadRequestException("loginExists@:Person with the same login already exists");
             }
         }
+        person.setRegistration(Calendar.getInstance().getTime());
         ofy().save().entity(person).now();
         logger.info("Created Person.");
         Person personRes = ofy().load().entity(person).now();
@@ -417,7 +418,7 @@ public class PersonEndpoint {
     }
 
     /**
-     * Updates an existing {@code Person} except EMAIL, PASSWORD, PHOTO, TYPE.
+     * Updates an existing {@code Person} except EMAIL, PASSWORD, PHOTO, TYPE, REGISTRATION.
      *
      * @param id    the ID of the entity to be updated
      * @param person the desired state of the entity
@@ -444,6 +445,7 @@ public class PersonEndpoint {
         person.setPass(oldPerson.getPass());
         person.setEmail(oldPerson.getEmail());
         person.setPhoto(oldPerson.getPhoto());
+        person.setRegistration(oldPerson.getRegistration());
         validatePersonProperties(person);
         ofy().save().entity(person).now();
         logger.info("Updated Person: " + person);
@@ -592,12 +594,6 @@ public class PersonEndpoint {
             throw new BadRequestException("passNull@:Password property must be initialized");
         if(person.getName()==null || person.getName().equals(""))
             throw new BadRequestException("nameNull@:Name property must be initialized");
-        /*
-        if(person.getSurname()==null || person.getSurname().equals(""))
-            throw new BadRequestException("surnameNull@:Surname property must be initialized");
-        if(person.getBirthday()==null)
-            throw new BadRequestException("birthdayNull@:Birthday date property must be set");
-        */
         if(person.getType()==null)
             throw new BadRequestException("typeNull@:Type property must be 'PARTNER' or 'COACH'");
         if(person.getRating()<MIN_RATING)

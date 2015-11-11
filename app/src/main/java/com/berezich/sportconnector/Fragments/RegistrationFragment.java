@@ -152,7 +152,6 @@ public class RegistrationFragment extends Fragment implements EndpointApi.Regist
 
     @Override
     public void onRegisterAccountAsyncTaskFinish(Pair<AccountForConfirmation, Exception> result) {
-        AlertDialogFragment dialog;
         AccountForConfirmation account = result.first;
         Exception error = result.second;
         if(error == null && account!=null)
@@ -163,6 +162,7 @@ public class RegistrationFragment extends Fragment implements EndpointApi.Regist
 
                 LocalDataManager.saveMyPersonInfoToPref(UsefulFunctions.createPerson(account), activity);
                 String msg = String.format(activity.getString(R.string.registration_msgCreateAccount),email);
+                showDialog(msg);
                 listenerCreateAccount.onCreateAccount( msg);
             } catch (IOException e) {
                 e.printStackTrace();
@@ -170,7 +170,7 @@ public class RegistrationFragment extends Fragment implements EndpointApi.Regist
             return;
         }
         Log.e(TAG, "Error Registration");
-        Log.d(TAG,"person = null");
+        Log.d(TAG, "person = null");
 
         String dialogMsg;
         Pair<ErrorVisualizer.ERROR_CODE,String> errTxtCode =
@@ -182,7 +182,12 @@ public class RegistrationFragment extends Fragment implements EndpointApi.Regist
         else
             dialogMsg = activity.getString(R.string.server_unknown_err);
 
-        dialog = AlertDialogFragment.newInstance(dialogMsg, false);
+        showDialog(dialogMsg);
+    }
+
+    private void showDialog(String msg){
+        AlertDialogFragment dialog;
+        dialog = AlertDialogFragment.newInstance(msg, false);
         dialog.setTargetFragment(this, 0);
         dialog.setCancelable(false);
         FragmentManager ft = activity.getSupportFragmentManager();

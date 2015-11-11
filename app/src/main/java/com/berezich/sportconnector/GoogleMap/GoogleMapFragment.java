@@ -10,7 +10,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.location.Criteria;
 import android.location.Location;
@@ -458,7 +457,7 @@ public class GoogleMapFragment extends Fragment implements SyncSpots.OnActionSyn
         return curFilter;
     }
 
-    public static interface OnActionListenerGMapFragment {
+    public interface OnActionListenerGMapFragment {
         void onInfoWindowClickGMF(Long spotId);
     }
     @Override
@@ -475,25 +474,18 @@ public class GoogleMapFragment extends Fragment implements SyncSpots.OnActionSyn
     }
     private class OnUpdateClickListener implements View.OnClickListener{
 
-        boolean isSpinning = false;
         ObjectAnimator anim;
         @Override
         public void onClick(View view) {
-            //if(!isSpinning) {
-                anim = ObjectAnimator.ofFloat(view, "rotation", 0f, 360f);
-                anim.setDuration(mainActivity.getResources().getInteger(R.integer.rotationDuration));
-                anim.setInterpolator(new LinearInterpolator());
-                anim.setRepeatCount(ValueAnimator.INFINITE);
-                anim.start();
-                RegionInfo regionInfo = LocalDataManager.getRegionInfo();
+            anim = ObjectAnimator.ofFloat(view, "rotation", 0f, 360f);
+            anim.setDuration(mainActivity.getResources().getInteger(R.integer.rotationDuration));
+            anim.setInterpolator(new LinearInterpolator());
+            anim.setRepeatCount(ValueAnimator.INFINITE);
+            anim.start();
+            RegionInfo regionInfo = LocalDataManager.getRegionInfo();
             syncSpots.setReqState(SyncSpots.ReqState.REQ_REGINFO);
-            syncSpots.startSync(mainActivity.getBaseContext(),regionInfo.getId());
+            syncSpots.startSync(mainActivity.getBaseContext(), regionInfo.getId());
             view.setClickable(false);
-            /*}
-            else {
-                anim.setRepeatCount(0);
-            }
-            isSpinning = !isSpinning;*/
         }
     }
 
@@ -501,14 +493,10 @@ public class GoogleMapFragment extends Fragment implements SyncSpots.OnActionSyn
     public void syncFinish(Exception ex, SyncSpots.ReqState reqState) {
         if(ex==null && reqState== SyncSpots.ReqState.EVERYTHING_LOADED){
             Clustering.addAllSpots(SpotsData.get_allSpots(), curFilter());
+            mainActivity.setIsSpotsSynced(true);
         }
         else
             Toast.makeText(mainActivity.getBaseContext(),mainActivity.getString(R.string.spotinfo_req_error_msg),Toast.LENGTH_SHORT).show();
-        /*View imageView = mainActivity.findViewById(R.id.menu_update);
-        if(imageView!=null) {
-            imageView.getAnimation().setRepeatCount(0);
-            imageView.setClickable(true);
-        }*/
         mainActivity.invalidateOptionsMenu();
     }
 
@@ -516,7 +504,7 @@ public class GoogleMapFragment extends Fragment implements SyncSpots.OnActionSyn
     {
         try
         {
-            ApplicationInfo info = mainActivity.getPackageManager().getApplicationInfo("com.google.android.apps.maps", 0 );
+            mainActivity.getPackageManager().getApplicationInfo("com.google.android.apps.maps", 0 );
             return true;
         }
         catch(PackageManager.NameNotFoundException e)

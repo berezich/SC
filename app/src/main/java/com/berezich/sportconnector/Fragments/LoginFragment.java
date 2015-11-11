@@ -214,7 +214,7 @@ public class LoginFragment extends Fragment implements EndpointApi.AuthorizePers
                 }
             
             setVisibleProgressBar(true);
-            new EndpointApi.AuthorizePersonAsyncTask(getFragment()).execute(login,pass);
+            new EndpointApi.AuthorizePersonAsyncTask(getFragment()).execute(login, pass);
         }
     }
 
@@ -352,19 +352,24 @@ public class LoginFragment extends Fragment implements EndpointApi.AuthorizePers
 
     @Override
     public void onCreateAccount(String msgResult) {
-        showDialog(msgResult);
+        FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+        if(fragmentManager!=null)
+            fragmentManager.popBackStack();
+        //showDialog(msgResult);
     }
 
     @Override
     public void onResetPass(String msgResult) {
-        showDialog(msgResult);
+        FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+        if(fragmentManager!=null)
+            fragmentManager.popBackStack();
+        //showDialog(msgResult);
     }
 
     private void showDialog(String msgResult){
         FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
         if(fragmentManager!=null)
         {
-            fragmentManager.popBackStack();
             dialog = AlertDialogFragment.newInstance("",msgResult, false, true);
             dialog.setTargetFragment(this, 0);
             dialog.show(fragmentManager, "");
