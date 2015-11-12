@@ -478,10 +478,14 @@ public class SpotInfoFragment extends Fragment implements EndpointApi.GetListPer
     }
     private void setButtonImg(ImageButton btn, boolean isFavorite){
         this.isFavorite = isFavorite;
-        if (isFavorite)
+        /*if (isFavorite)
             btn.setBackgroundDrawable(activity.getResources().getDrawable(R.drawable.simple_star_press));
         else
-            btn.setBackgroundDrawable(activity.getResources().getDrawable(R.drawable.simple_star));
+            btn.setBackgroundDrawable(activity.getResources().getDrawable(R.drawable.simple_star));*/
+        if (isFavorite)
+            btn.setBackgroundDrawable(activity.getResources().getDrawable(R.drawable.ic_star_press_36dp));
+        else
+            btn.setBackgroundDrawable(activity.getResources().getDrawable(R.drawable.ic_star_36dp));
     }
     private class TryAgainClickListener implements View.OnClickListener
     {
