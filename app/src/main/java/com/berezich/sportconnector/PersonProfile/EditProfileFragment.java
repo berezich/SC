@@ -79,9 +79,11 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
     private final String tempPhotoName = "tempPhoto";
     private final String STATE_TEMP_PERSON = "tempPerson";
     private final String STATE_PICINFO = "picInfo";
-    public static final int PICK_IMAGE = 111;
-    public static final int CAMERA_IMAGE = 112;
-    public static final int GALLERY_CAMERA_IMAGE = 113;
+    private final String STATE_TEMP_FILE_PATH = "tempFilePath";
+    private String tempFileForPhotoPath;
+    public final int PICK_IMAGE = 111;
+    public final int CAMERA_IMAGE = 112;
+    public final int GALLERY_CAMERA_IMAGE = 113;
     FileManager.PicInfo picInfo;
     View rootView;
     Person tempMyPerson = null;
@@ -168,7 +170,7 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
                 Log.e(TAG, String.format("picInfo getting out of instanceState failed"));
                 e.printStackTrace();
             }
-
+            tempFileForPhotoPath = savedInstanceState.getString(STATE_TEMP_FILE_PATH);
         }
         else
             Log.d(TAG, String.format("savedInstanceState == null"));
@@ -181,6 +183,7 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
         try {
             outState.putString(STATE_TEMP_PERSON,gsonFactory.toString(tempMyPerson));
             outState.putString(STATE_PICINFO, gson.toJson(picInfo));
+            outState.putString(STATE_TEMP_FILE_PATH,tempFileForPhotoPath);
             Log.d(TAG, String.format("tempMyPerson and picInfo saved to instanceState"));
         } catch (Exception e) {
             Log.e(TAG, String.format("tempMyPerson or picInfo saving to instanceState failed"));
@@ -601,6 +604,7 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
             try {
 
                 int validIntentFlag = 0;
+
                 PackageManager pm = activity.getPackageManager();
                 Intent intentGallery = new Intent(Intent.ACTION_PICK,
                         android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
@@ -608,8 +612,11 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
                     intentGallery.setType("image/*");
 
                 Intent takePictureIntent = null;
-                if(pm.hasSystemFeature(PackageManager.FEATURE_CAMERA))
+                File tempFileForPhoto = FileManager.createTempFile(TAG,activity.getBaseContext(),tempPhotoName);
+                if(pm.hasSystemFeature(PackageManager.FEATURE_CAMERA)&&tempFileForPhoto!=null) {
+                    tempFileForPhotoPath = tempFileForPhoto.getAbsolutePath();
                     takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                }
 
                 if(intentGallery!=null && intentGallery.resolveActivity(pm)!=null)
                     validIntentFlag |=  0x01;
@@ -647,6 +654,8 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
                     Intent intent = new Intent();
                     intent.setComponent(new ComponentName(packageName, ri.activityInfo.name));
                     intent.setAction(MediaStore.ACTION_IMAGE_CAPTURE);
+                    intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(tempFileForPhoto));
+
                     CharSequence label = TextUtils.concat(ri.loadLabel(pm), mark);
                     extraIntents[i] = new LabeledIntent(intent, packageName, label, ri.icon);
                 }
@@ -669,37 +678,48 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
         if (resultCode != Activity.RESULT_OK) {
             Log.d(TAG, "resultCode !=  Activity.RESULT_OK");
         } else {
-            switch (requestCode){
+            switch (requestCode) {
                 case GALLERY_CAMERA_IMAGE:
                 case PICK_IMAGE:
                 case CAMERA_IMAGE:
                     Context context = activity.getBaseContext();
                     // Get the file's content URI from the incoming Intent
-                    Uri returnUri = returnIntent.getData();
-                    try {
-                        tempPicInfo = new FileManager.PicInfo(this, TAG, returnUri.toString());
-                    } catch (IOException e) {
-                        Log.e(TAG, String.format("PicInfo constructor exception %s", e.getMessage()));
-                        e.printStackTrace();
-                        Toast.makeText(context, activity.getString(R.string.editprofile_pickImageError),
-                                Toast.LENGTH_SHORT).show();
-                        return;
+                    if (returnIntent == null) {
+                        Log.e(TAG, "RETURN Intent == null => photo was saved to tempFile");
+                        try {
+                            File tempPhotoFile = new File(tempFileForPhotoPath);
+                            tempPicInfo = new FileManager.PicInfo(this, TAG, tempPhotoFile);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
                     }
-                    if (tempPicInfo != null) {
-                        if (tempPicInfo.getPath() == null) {
-                            Log.e(TAG, String.format("PICK_IMAGE returned not valid URI"));
+                    else{
+                        Uri returnUri = returnIntent.getData();
+                        try {
+                            tempPicInfo = new FileManager.PicInfo(this, TAG, returnUri.toString());
+                        } catch (IOException e) {
+                            Log.e(TAG, String.format("PicInfo constructor exception %s", e.getMessage()));
+                            e.printStackTrace();
                             Toast.makeText(context, activity.getString(R.string.editprofile_pickImageError),
                                     Toast.LENGTH_SHORT).show();
                             return;
                         }
-                        File pickedFile = new File(tempPicInfo.getPath());
-                        if (!pickedFile.exists()) {
-                            Log.e(TAG, String.format("PICK_IMAGE %s not exist", tempPicInfo.getPath()));
-                            Toast.makeText(context, activity.getString(R.string.editprofile_pickImageError),
-                                    Toast.LENGTH_SHORT).show();
-                            return;
-                        }
+                        if (tempPicInfo != null) {
+                            if (tempPicInfo.getPath() == null) {
+                                Log.e(TAG, String.format("PICK_IMAGE returned not valid URI"));
+                                Toast.makeText(context, activity.getString(R.string.editprofile_pickImageError),
+                                        Toast.LENGTH_SHORT).show();
+                                return;
+                            }
+                            File pickedFile = new File(tempPicInfo.getPath());
+                            if (!pickedFile.exists()) {
+                                Log.e(TAG, String.format("PICK_IMAGE %s not exist", tempPicInfo.getPath()));
+                                Toast.makeText(context, activity.getString(R.string.editprofile_pickImageError),
+                                        Toast.LENGTH_SHORT).show();
+                                return;
+                            }
 
+                        }
                     }
                     if (tempMyPerson != null) {
                         String cacheDir = FileManager.PERSON_CACHE_DIR + "/" + tempMyPerson.getId();

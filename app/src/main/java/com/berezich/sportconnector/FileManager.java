@@ -41,6 +41,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -75,6 +76,12 @@ public class FileManager {
         @Expose
         private String mimeType;
 
+        public PicInfo(Fragment fragment, String TAG, File file) throws IOException {
+            path = file.getAbsolutePath();
+            bitmap = decodeFile(new File(path));
+            name = file.getName();
+            mimeType = "image/jpeg";
+        }
         public PicInfo(Fragment fragment, String TAG, String fileUri) throws IOException{
             Uri uri = Uri.parse(fileUri);
             Cursor returnCursor = fragment.getActivity().getContentResolver().query(uri, null, null, null, null);
@@ -488,6 +495,41 @@ public class FileManager {
         return null;
     }
 
+    public static File createTempFile(String TAG,Context context, String fileName) throws IOException {
+        // Create an image file name
+
+        if (fileName == null || fileName.equals("")) {
+            Log.e(TAG, "file name not valid");
+            return null;
+        }
+        if (!isExternalStorageWritable()) {
+            Log.e(TAG, "ExternalStorage not writable");
+            return null;
+        }
+
+        File file = FileManager.getAlbumStorageDir(TAG, context, FileManager.TEMP_DIR);
+        if (file != null) {
+            Log.d(TAG, "filePath = " + file.getPath());
+            file = new File(file, fileName);
+            if(file.exists())
+                file.delete();
+        }
+        return file;
+    }
+    public static File createFileInTempStore(String TAG, Context context, String fileName){
+        if (fileName == null || fileName.equals("")) {
+            Log.e(TAG, "file name not valid");
+            return null;
+        }
+        File fileTempDir = context.getCacheDir();
+        File file=null;
+        if (fileTempDir != null) {
+            Log.d(TAG, "filePath for temp files= " + fileTempDir.getPath());
+            file = new File(fileTempDir, fileName);
+            return file;
+        }
+        return file;
+    }
     public static File savePicToTempStore(String TAG, Context context, String fileName, Bitmap bitmap,
                                           int width, int height, boolean needCenterCrop) {
 
