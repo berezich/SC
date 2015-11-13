@@ -76,7 +76,8 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
     private final String TAG = "MyLog_EditProfileFrg";
     private final String mSex = "MALE";
     private final String fSex = "FEMALE";
-    private final String tempPhotoName = "tempPhoto";
+    private String tempPhotoNameLocal = "tempPhoto";
+    private String photoAvatarNameOnServer = "avatar_";
     private final String STATE_TEMP_PERSON = "tempPerson";
     private final String STATE_PICINFO = "picInfo";
     private final String STATE_TEMP_FILE_PATH = "tempFilePath";
@@ -612,7 +613,7 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
                     intentGallery.setType("image/*");
 
                 Intent takePictureIntent = null;
-                File tempFileForPhoto = FileManager.createTempFile(TAG,activity.getBaseContext(),tempPhotoName);
+                File tempFileForPhoto = FileManager.createTempFile(TAG,activity.getBaseContext(),photoAvatarNameOnServer+tempMyPerson.getId().toString());
                 if(pm.hasSystemFeature(PackageManager.FEATURE_CAMERA)&&tempFileForPhoto!=null) {
                     tempFileForPhotoPath = tempFileForPhoto.getAbsolutePath();
                     takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
@@ -696,7 +697,7 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
                     else{
                         Uri returnUri = returnIntent.getData();
                         try {
-                            tempPicInfo = new FileManager.PicInfo(this, TAG, returnUri.toString());
+                            tempPicInfo = new FileManager.PicInfo(this, TAG, returnUri.toString(),photoAvatarNameOnServer+tempMyPerson.getId().toString());
                         } catch (IOException e) {
                             Log.e(TAG, String.format("PicInfo constructor exception %s", e.getMessage()));
                             e.printStackTrace();
@@ -723,10 +724,10 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
                     }
                     if (tempMyPerson != null) {
                         String cacheDir = FileManager.PERSON_CACHE_DIR + "/" + tempMyPerson.getId();
-                        tempPicInfo.savePicPreviewToCache(TAG, context, UsefulFunctions.getDigest(tempPhotoName),
+                        tempPicInfo.savePicPreviewToCache(TAG, context, UsefulFunctions.getDigest(tempPhotoNameLocal),
                                 cacheDir);
                         Picture picture = new Picture();
-                        picture.setBlobKey(tempPhotoName);
+                        picture.setBlobKey(tempPhotoNameLocal);
                         tempMyPerson.setPhoto(picture);
                         picInfo = tempPicInfo;
                         //setting picture to imageView is proceeded in onResume()
@@ -816,7 +817,7 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
                 Picture newPic = updatedPerson.getPhoto();
                 Picture oldPic = myPerson.getPhoto();
                 if(newPic!=null &&(oldPic==null || !newPic.getBlobKey().equals(oldPic.getBlobKey()))) {
-                    String tempFileName = UsefulFunctions.getDigest(tempPhotoName);
+                    String tempFileName = UsefulFunctions.getDigest(tempPhotoNameLocal);
                     String newFileName = UsefulFunctions.getDigest(newPic.getBlobKey());
                     FileManager.renameFile(TAG, activity.getBaseContext(), FileManager.PERSON_CACHE_DIR
                             + "/" + updatedPerson.getId() + "/" + tempFileName, newFileName);

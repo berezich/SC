@@ -83,14 +83,15 @@ public class FileManager {
             bitmap = decodeFile(new File(path));
             bitmap = rotateBitmapFileIfNeed(path,bitmap);
         }
-        public PicInfo(Fragment fragment, String TAG, String fileUri) throws IOException{
+        public PicInfo(Fragment fragment, String TAG, String fileUri, String nameToSave) throws IOException{
             Uri uri = Uri.parse(fileUri);
             Cursor returnCursor = fragment.getActivity().getContentResolver().query(uri, null, null, null, null);
             int nameIndex = returnCursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
             int sizeIndex = returnCursor.getColumnIndex(OpenableColumns.SIZE);
             int dataIdx = returnCursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA);
             returnCursor.moveToFirst();
-            this.name = returnCursor.getString(nameIndex);
+            //this.name = returnCursor.getString(nameIndex);
+            name = nameToSave;
             this.size = returnCursor.getLong(sizeIndex);
             this.mimeType = fragment.getActivity().getContentResolver().getType(uri);
             this.path = returnCursor.getString(dataIdx);
