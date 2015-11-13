@@ -78,9 +78,10 @@ public class FileManager {
 
         public PicInfo(Fragment fragment, String TAG, File file) throws IOException {
             path = file.getAbsolutePath();
-            bitmap = decodeFile(new File(path));
             name = file.getName();
             mimeType = "image/jpeg";
+            bitmap = decodeFile(new File(path));
+            bitmap = rotateBitmapFileIfNeed(path,bitmap);
         }
         public PicInfo(Fragment fragment, String TAG, String fileUri) throws IOException{
             Uri uri = Uri.parse(fileUri);
@@ -94,14 +95,7 @@ public class FileManager {
             this.mimeType = fragment.getActivity().getContentResolver().getType(uri);
             this.path = returnCursor.getString(dataIdx);
             bitmap = decodeFile(new File(path));
-            int rotation = checkRotationDegrees(this.path);
-            Log.d(TAG, "picture rotation = " + rotation);
-            Matrix matrix = new Matrix();
-            if (rotation != 0f) {
-                matrix.preRotate(rotation);
-                bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
-                Log.d(TAG, "picture rotated");
-            }
+            bitmap = rotateBitmapFileIfNeed(path,bitmap);
         }
 
         /**
@@ -450,7 +444,7 @@ public class FileManager {
         return savePicToCache(TAG, context, fileName, cacheDir, bitmap, photoWidth, photoHeight, true);
     }
     public static File savePicToCache(String TAG, Context context, String fileName, String cacheDir, Bitmap bitmap, int width, int height) {
-        return savePicToCache(TAG, context, fileName, cacheDir, bitmap, width, height,false);
+        return savePicToCache(TAG, context, fileName, cacheDir, bitmap, width, height, false);
     }
     public static File savePicToCache(String TAG, Context context, String fileName, String cacheDir,
                                       Bitmap bitmap, int width, int height, boolean needCenterCrop) {
@@ -757,5 +751,21 @@ public class FileManager {
             }
         Log.e(TAG,String.format("file %s renamed failed",file.getPath()));
         return false;
+    }
+    private static Bitmap rotateBitmapFileIfNeed(String filePath, Bitmap bitmap){
+        try {
+            int rotation = checkRotationDegrees(filePath);
+            Log.d(TAG, "picture rotation = " + rotation);
+            Matrix matrix = new Matrix();
+            if (rotation != 0f) {
+                matrix.preRotate(rotation);
+                bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+                Log.d(TAG, "picture rotated");
+            }
+            return bitmap;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 }

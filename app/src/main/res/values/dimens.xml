@@ -74,10 +74,10 @@
     <!-- fragment_editProfile-->
 
     <!-- fragment_gmap-->
-        <dimen name="gmap_clusterContent_leftOffset_1">12dp</dimen>
-        <dimen name="gmap_clusterContent_leftOffset_2">9.5dp</dimen>
-        <dimen name="gmap_clusterContent_leftOffset_3">7dp</dimen>
-        <dimen name="gmap_clusterContent_topOffset">7.5dp</dimen>
+        <dimen name="gmap_clusterContent_leftOffset_1">11dp</dimen>
+        <dimen name="gmap_clusterContent_leftOffset_2">8.5dp</dimen>
+        <dimen name="gmap_clusterContent_leftOffset_3">6dp</dimen>
+        <dimen name="gmap_clusterContent_topOffset">7dp</dimen>
     <!-- fragment_gmap-->
     <!-- fragment_spotInfo-->
         <dimen name="spotInfo_contentArea_right_offset">10dp</dimen>
