@@ -300,10 +300,14 @@ public class LoginFragment extends Fragment implements EndpointApi.AuthorizePers
 
         try {
             if(isPassChanged) {
-                myPersonInfo.setPass("");
-                LocalDataManager.saveMyPersonInfoToPref(myPersonInfo, getActivity());
-                appPref.setIsAutoLogin(false);
-                LocalDataManager.saveAppPref(appPref, getActivity());
+                if(myPersonInfo!=null) {
+                    myPersonInfo.setPass("");
+                    LocalDataManager.saveMyPersonInfoToPref(myPersonInfo, getActivity());
+                }
+                if(appPref!=null) {
+                    appPref.setIsAutoLogin(false);
+                    LocalDataManager.saveAppPref(appPref, getActivity());
+                }
             }
         } catch (IOException e) {
             e.printStackTrace();

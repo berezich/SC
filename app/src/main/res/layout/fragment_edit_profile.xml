@@ -215,9 +215,7 @@
                         android:layout_marginRight="0dp"
                         android:layout_alignParentRight="true"
                         android:layout_centerVertical="true"
-                        android:layout_alignBottom="@+id/editProfile_txtView_setRating"
-                        android:focusable="false"
-                        android:focusableInTouchMode="false" />
+                        android:layout_alignBottom="@+id/editProfile_txtView_setRating"/>
 
                     <Spinner
                         android:layout_width="wrap_content"

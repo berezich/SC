@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:state_pressed="true"
-        android:drawable="@drawable/ic_menu_info_details_press" />
-    <item android:drawable="@drawable/ic_menu_info_details" />
+        android:drawable="@drawable/ic_info_press" />
+    <item android:state_enabled="true"
+        android:drawable="@drawable/ic_info" />
 </selector>

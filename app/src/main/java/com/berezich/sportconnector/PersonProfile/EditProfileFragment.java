@@ -605,6 +605,7 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
             try {
 
                 int validIntentFlag = 0;
+                v.setEnabled(false);
 
                 PackageManager pm = activity.getPackageManager();
                 Intent intentGallery = new Intent(Intent.ACTION_PICK,
@@ -675,6 +676,8 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
     @Override
     public void onActivityResult(int requestCode, int resultCode,
                                  Intent returnIntent) {
+        FrameLayout frameLayout=(FrameLayout) rootView.findViewById(R.id.editProfile_frame_changePhoto);
+        frameLayout.setEnabled(true);
         FileManager.PicInfo tempPicInfo = null;
         if (resultCode != Activity.RESULT_OK) {
             Log.d(TAG, "resultCode !=  Activity.RESULT_OK");
