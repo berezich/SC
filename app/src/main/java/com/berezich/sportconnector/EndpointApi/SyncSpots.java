@@ -147,6 +147,8 @@ public class SyncSpots implements
                 /*ErrorVisualizer.showErrorAfterReq(getActivity().getBaseContext(),
                         (FrameLayout) rootView.findViewById(R.id.main_frg_frameLayout), error, TAG);*/
                 listener.syncFinish(e, reqState);
+            } finally {
+                return;
             }
         }
         Log.e(TAG, "Error get ListSpot from server");
