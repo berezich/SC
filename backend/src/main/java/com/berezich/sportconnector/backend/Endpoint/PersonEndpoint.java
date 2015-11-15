@@ -65,22 +65,22 @@ public class PersonEndpoint {
 
     private static final int DEFAULT_LIST_LIMIT = 20;
     private static final float MIN_RATING = 1;
-    private static String ERROR_CONFIRM = "Ошибка! Ваша учетная запись %s не активирована!";
-    private static String ERROR_CONFIRM_ALREADY = "Ваша учетная запись %s уже активирована!";
-    private static String ERROR_CONFIRM_NOTFOUND = "Ошибка! Ваша учетная запись %s не найдена!";
+    private static String ERROR_CONFIRM = "пїЅпїЅпїЅпїЅпїЅпїЅ! пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ %s пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ!";
+    private static String ERROR_CONFIRM_ALREADY = "пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ %s пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ!";
+    private static String ERROR_CONFIRM_NOTFOUND = "пїЅпїЅпїЅпїЅпїЅпїЅ! пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ %s пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ!";
     private static String subjectAccountConfirmation = "registration SportConnector";
-    private static String msgBodyAccountConfirmation = "Для активации вашей учетной записи перейдите по ссылке: " +
+    private static String msgBodyAccountConfirmation = "пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ: " +
             "https://sportconnector-981.appspot.com/confirm.html?id=%s&x=%s";
-    private static String ERROR_CONFIRM_EMAIL = "Ошибка! Ваш email %s не изменен!";
-    private static String ERROR_CONFIRM_EMAIL_ALREADY = "Ваш старый email %s уже изменен!";
-    private static String ERROR_CONFIRM_EMAIL_NOTFOUND = "Ошибка! Ваша учетная запись %s не найдена!";
+    private static String ERROR_CONFIRM_EMAIL = "пїЅпїЅпїЅпїЅпїЅпїЅ! пїЅпїЅпїЅ email %s пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ!";
+    private static String ERROR_CONFIRM_EMAIL_ALREADY = "пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ email %s пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ!";
+    private static String ERROR_CONFIRM_EMAIL_NOTFOUND = "пїЅпїЅпїЅпїЅпїЅпїЅ! пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ %s пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ!";
     private static String subjectConfirmEmail = "change Email SportConnector";
-    private static String msgBodyConfirmEmail = "Для смены email перейдите по ссылке: " +
+    private static String msgBodyConfirmEmail = "пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ email пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ: " +
             "https://sportconnector-981.appspot.com/email.html?id=%s&x=%s";
-    private static String ERROR_CONFIRM_RESET_PASS_NOTFOUND = "Ошибка! Повторите процедуру восстановления пароля.";
+    private static String ERROR_CONFIRM_RESET_PASS_NOTFOUND = "пїЅпїЅпїЅпїЅпїЅпїЅ! пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ.";
     private static String subjectResetPass = "reset Password SportConnector";
-    private static String msgBodyResetPass = "Для смены пароля перейдите по ссылке " +
-            "и следуйте дальнейшим инструкциям.\n" +
+    private static String msgBodyResetPass = "пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ " +
+            "пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.\n" +
             "https://sportconnector-981.appspot.com/pass.html?x=%s";
 
 
@@ -450,7 +450,7 @@ public class PersonEndpoint {
         ofy().save().entity(person).now();
         logger.info("Updated Person: " + person);
         Person personRes = ofy().load().entity(person).now();
-        setSpotCoachesPartners(personRes,oldPerson);
+        setSpotCoachesPartners(personRes, oldPerson);
         personRes.setPass("");
         return personRes;
     }
@@ -492,10 +492,21 @@ public class PersonEndpoint {
                 }
             }
     }
-    protected void setPersonPhoto(Long id, String photoKey) throws BadRequestException,NotFoundException{
+    protected void setPersonPhoto(Long id, String pass, String photoKey) throws BadRequestException,NotFoundException{
+        if(pass==null||pass.isEmpty()) {
+            logger.severe(String.format("Attempt to change profile(id:%d) photo to " +
+                            "another one(key:%s) with not valid password!!!",id,photoKey));
+            throw new NotFoundException("There is no such person");
+        }
         Person person;
         checkExists(id);
         person = ofy().load().type(Person.class).id(id).now();
+        if(!person.getPass().equals(msgDigest(pass))) {
+            logger.severe(String.format("Attempt to change profile(id:%d) photo(key:%s) to " +
+                            "another one(key:%s) with not valid password!!!",
+                    id,person.getPhoto().getBlobKey(),photoKey));
+            throw new NotFoundException("There is no such person");
+        }
         com.berezich.sportconnector.backend.Picture pic = new com.berezich.sportconnector.backend.Picture(photoKey);
         person.setPhoto(pic);
         ofy().save().entity(person).now();

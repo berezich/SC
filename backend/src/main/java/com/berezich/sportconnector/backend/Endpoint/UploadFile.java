@@ -37,32 +37,30 @@ public class UploadFile extends HttpServlet {
             res.sendRedirect("/serve_file?blob-key=" + blobKeys.get(0).getKeyString());
         }
         if((blobKeys = blobs.get("UsrPhoto"))!=null && !blobKeys.isEmpty()) {
+            String newUploadedFileKey = blobKeys.get(0).getKeyString();
             try {
                 Long usrId = Long.parseLong(req.getParameter("UsrId"));
+                String usrPass = req.getParameter("UsrPass");
+
+                new PersonEndpoint().setPersonPhoto(usrId, usrPass, newUploadedFileKey);
                 String replacePicBlobStr = req.getParameter("ReplaceBlob");
-                try {
-                    if(replacePicBlobStr!=null && !replacePicBlobStr.equals("")) {
-                        List<String> deleteFileKeys = new ArrayList<String>();
-                        deleteFileKeys.add(replacePicBlobStr);
-                        new FileManager().deleteFile(deleteFileKeys);
-                    }
-                } catch (Exception e) {
-                    logger.info(e.toString());
-                    e.printStackTrace();
-                    res.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
-                }
-                new PersonEndpoint().setPersonPhoto(usrId, blobKeys.get(0).getKeyString());
+                if(!deleteFileFormBlobStorage(replacePicBlobStr))
+                    res.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+                            String.format("deleting blob file(key:%s) failed",replacePicBlobStr));
             } catch (NumberFormatException e) {
                 logger.info("usrId not valid");
                 e.printStackTrace();
+                deleteFileFormBlobStorage(newUploadedFileKey);
                 res.sendError(HttpServletResponse.SC_BAD_REQUEST, "usrId not valid");
             } catch (NotFoundException e){
                 logger.info(e.toString());
                 e.printStackTrace();
+                deleteFileFormBlobStorage(newUploadedFileKey);
                 res.sendError(HttpServletResponse.SC_NOT_FOUND, e.getMessage());
             }catch (BadRequestException e){
                 logger.info(e.toString());
                 e.printStackTrace();
+                deleteFileFormBlobStorage(newUploadedFileKey);
                 res.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
             }catch (Exception e){
                 logger.info(e.toString());
@@ -72,5 +70,19 @@ public class UploadFile extends HttpServlet {
             return;
         }
         res.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "File not uploaded");
+    }
+    private boolean deleteFileFormBlobStorage(String blobKeyStr){
+        try {
+            if(blobKeyStr!=null && !blobKeyStr.equals("")) {
+                List<String> deleteFileKeys = new ArrayList<String>();
+                deleteFileKeys.add(blobKeyStr);
+                new FileManager().deleteFile(deleteFileKeys);
+            }
+            return true;
+        } catch (BadRequestException e) {
+            logger.severe(e.toString());
+            e.printStackTrace();
+            return false;
+        }
     }
 }

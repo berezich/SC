@@ -70,8 +70,7 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
                                                              EndpointApi.ChangePassAsyncTask.OnAction,
                                                              EndpointApi.UpdatePersonAsyncTask.OnAction,
                                                              EndpointApi.GetUrlForUploadAsyncTask.OnAction,
-                                                             FileManager.UploadFileAsyncTask.OnAction/*,
-                                                             EndpointApi.GetListPersonByIdLstAsyncTask.OnAction*/ {
+                                                             FileManager.UploadAndReplacePersonFileAsyncTask.OnAction {
 
     private final String TAG = "MyLog_EditProfileFrg";
     private final String mSex = "MALE";
@@ -161,7 +160,6 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
                 String picInfoStr = savedInstanceState.getString(STATE_PICINFO);
                 if(picInfoStr!=null && !picInfoStr.equals("")) {
                     picInfo = gson.fromJson(picInfoStr, FileManager.PicInfo.class);
-                    //picInfo = gsonFactory.fromString(picInfoStr, FileManager.PicInfo.class);
                     Log.d(TAG, String.format("picInfo got out of instanceState"));
                 }
                 else {
@@ -762,10 +760,11 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
             Toast.makeText(ctx, activity.getString(R.string.editprofile_saveError), Toast.LENGTH_SHORT).show();
             return;
         }
+        Log.d(TAG, String.format("url for upload file = %s",urlForUpload));
         Person myPersonInfo = LocalDataManager.getMyPersonInfo();
         if(myPersonInfo!=null && myPersonInfo.getPhoto()!=null)
             replaceBlob = myPersonInfo.getPhoto().getBlobKey();
-        new FileManager.UploadFileAsyncTask(this).execute(new Pair<>(picInfo, new Pair<>(urlForUpload,replaceBlob)));
+        new FileManager.UploadAndReplacePersonFileAsyncTask(this).execute(new Pair<>(picInfo, new Pair<>(urlForUpload,replaceBlob)));
     }
     @Override
     public void onUploadFileFinish(Exception exception) {

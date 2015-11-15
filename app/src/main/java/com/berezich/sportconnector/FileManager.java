@@ -25,6 +25,7 @@ import com.google.gson.annotations.Expose;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
+import org.apache.http.StatusLine;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ContentType;
@@ -32,6 +33,7 @@ import org.apache.http.entity.mime.HttpMultipartMode;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.protocol.HTTP;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
@@ -172,11 +174,11 @@ public class FileManager {
         }
     }
 
-    public static class UploadFileAsyncTask extends AsyncTask<Pair<PicInfo, Pair<String, String>>, Void, Exception> {
+    public static class UploadAndReplacePersonFileAsyncTask extends AsyncTask<Pair<PicInfo, Pair<String, String>>, Void, Exception> {
         private OnAction listener = null;
         private final String TAG = "MyLog_UploadFile";
 
-        public UploadFileAsyncTask(Fragment fragment) {
+        public UploadAndReplacePersonFileAsyncTask(Fragment fragment) {
             try {
                 listener = (OnAction) fragment;
             } catch (ClassCastException e) {
@@ -187,11 +189,11 @@ public class FileManager {
         @Override
         protected Exception doInBackground(Pair<PicInfo, Pair<String, String>>... params) {
             PicInfo picInfo = params[0].first;
-            String uploadUrl = params[0].second.first;
+            String urlForUpload = params[0].second.first;
             String replacePicKey = params[0].second.second;
             try {
                 HttpClient httpClient = new DefaultHttpClient();
-                HttpPost postRequest = new HttpPost(uploadUrl);
+                HttpPost postRequest = new HttpPost(urlForUpload);
                 MultipartEntityBuilder builder = MultipartEntityBuilder.create();
                 builder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
                 builder.addPart("Name", new StringBody(picInfo.getName(), ContentType.MULTIPART_FORM_DATA));
@@ -200,6 +202,7 @@ public class FileManager {
                 if (myPersonInfo == null)
                     new NullPointerException("myPersonInfo == null");
                 builder.addPart("UsrId", new StringBody(myPersonInfo.getId().toString(), ContentType.MULTIPART_FORM_DATA));
+                builder.addPart("UsrPass", new StringBody(myPersonInfo.getPass(), ContentType.MULTIPART_FORM_DATA));
                 if (replacePicKey != null && !replacePicKey.equals(""))
                     builder.addPart("ReplaceBlob", new StringBody(replacePicKey, ContentType.MULTIPART_FORM_DATA));
 
@@ -216,8 +219,12 @@ public class FileManager {
                 response = httpClient.execute(postRequest);
                 Log.d(TAG, String.format("upload pic response http status: %s\n entity content: %s",
                         response.getStatusLine(), response.getEntity().getContent()));
-                //TODO: check response state
-
+                if(response==null)
+                    return new NullPointerException("response == null");
+                StatusLine statusLine;
+                if((statusLine = response.getStatusLine())!=null && statusLine.getStatusCode()!= 200)
+                    return new Exception(String.format("response code = %d getReasonPhrase = %s",
+                            statusLine.getStatusCode(), statusLine.getReasonPhrase()));
                 return null;
             } catch (Exception e) {
                 return e;
