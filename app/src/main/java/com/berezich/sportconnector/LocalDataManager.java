@@ -401,7 +401,7 @@ public class LocalDataManager {
             return;
         }
         SQLiteDatabase db = getDB(DB_TYPE.WRITE);
-        Log.d(TAG, "Updating spots in" + SPOT_TABLE_NAME + " table");
+        Log.d(TAG, "Updating spots in " + SPOT_TABLE_NAME + " table");
         if(db!=null) {
             for (int i = 0; i < updateSpotsLst.size(); i++) {
                 spotId = updateSpotsLst.get(i).getId();

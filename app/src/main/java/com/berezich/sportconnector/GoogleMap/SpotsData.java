@@ -1,5 +1,9 @@
 package com.berezich.sportconnector.GoogleMap;
 
+import android.os.AsyncTask;
+import android.util.Log;
+import android.util.Pair;
+
 import com.berezich.sportconnector.LocalDataManager;
 import com.berezich.sportconnector.backend.sportConnectorApi.model.Person;
 import com.berezich.sportconnector.backend.sportConnectorApi.model.Spot;
@@ -25,6 +29,19 @@ public class SpotsData {
     {
         _allSpots = LocalDataManager.getAllSpots();
     }
+    public static void saveSpotsToCacheAsync(final String TAG, final List<Spot> spotLst){
+        new AsyncTask<Void, Void, Void>(){
+            @Override
+            protected Void doInBackground(Void... params) {
+                saveSpotsToCache(spotLst);
+                return null;
+            }
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                Log.d(TAG, "all spots saved to cache");
+            }
+        }.execute();
+    }
     public static void saveSpotsToCache(List<Spot> spotLst)
     {
         Spot spot;
@@ -39,6 +56,19 @@ public class SpotsData {
     public static void saveSpotsToCache()
     {
         LocalDataManager.saveAllSpots(_allSpots);
+    }
+    public static void setSpotUpdatesToCacheAsync(final String TAG,final List<UpdateSpotInfo> spotUpdates){
+            new AsyncTask<Void, Void, Void>(){
+                @Override
+                protected Void doInBackground(Void... params) {
+                    setSpotUpdatesToCache(spotUpdates);
+                    return null;
+                }
+                @Override
+                protected void onPostExecute(Void aVoid) {
+                    Log.d(TAG, "updated spots saved to cache");
+                }
+            }.execute();
     }
     public static void setSpotUpdatesToCache(List<UpdateSpotInfo> spotUpdates)
     {

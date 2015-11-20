@@ -201,7 +201,7 @@ public class LoginFragment extends Fragment implements EndpointApi.AuthorizePers
             pass = "";
             EditText editTxt;
             if((editTxt = (EditText) rootView.findViewById(R.id.login_email_value))!=null)
-                login = editTxt.getText().toString();
+                login = editTxt.getText().toString().trim();
             if((editTxt = (EditText) rootView.findViewById(R.id.login_pass_value))!=null)
                 if(isPassChanged)
                     pass = editTxt.getText().toString();

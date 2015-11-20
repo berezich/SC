@@ -169,6 +169,7 @@ public class GoogleMapFragment extends Fragment implements SyncSpots.OnActionSyn
         }
         else{
             gmapState = GMAPS_STATE.NEED_INSTALL;
+            return null;
         }
         return rootView;
     }
@@ -192,7 +193,8 @@ public class GoogleMapFragment extends Fragment implements SyncSpots.OnActionSyn
     @Override
     public void onResume() {
         Log.d(TAG, "GoogleMapFragment on onResume");
-        mapView.onResume();
+        if(mapView!=null)
+            mapView.onResume();
         super.onResume();
         switch (gmapState) {
             case OK:
@@ -248,13 +250,15 @@ public class GoogleMapFragment extends Fragment implements SyncSpots.OnActionSyn
     public void onDestroy() {
         Log.d(TAG,"GoogleMapFragment on destroy");
         super.onDestroy();
-        mapView.onDestroy();
+        if(mapView!=null)
+            mapView.onDestroy();
     }
 
     @Override
     public void onLowMemory() {
         super.onLowMemory();
-        mapView.onLowMemory();
+        if(mapView!=null)
+            mapView.onLowMemory();
     }
 
     class btnClickListener implements View.OnClickListener

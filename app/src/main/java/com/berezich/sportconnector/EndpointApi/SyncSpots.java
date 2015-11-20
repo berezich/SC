@@ -133,9 +133,10 @@ public class SyncSpots implements
         if(error == null && spotLst!=null)
         {
             try {
-                Log.d(TAG,String.format("got all spots (%s items) from server",spotLst.size()));
-                SpotsData.saveSpotsToCache(spotLst);
-                Log.d(TAG, "all spots saved to cache");
+                Log.d(TAG, String.format("got all spots (%s items) from server", spotLst.size()));
+                SpotsData.saveSpotsToCacheAsync(TAG,spotLst);
+                //SpotsData.saveSpotsToCache(spotLst);
+                //Log.d(TAG, "all spots saved to cache");
                 LocalDataManager.setRegionInfo(regionInfo);
                 LocalDataManager.saveRegionInfoToPref(activity);
                 Log.d(TAG, "updated regionInfo saved to cache");
@@ -174,8 +175,10 @@ public class SyncSpots implements
         {
             try {
                 Log.d(TAG, String.format("got updateSpotList (%d items)from server", updateSpotInfoLst.size()));
-                SpotsData.setSpotUpdatesToCache(updateSpotInfoLst);
-                Log.d(TAG, "updated spots saved to cache");
+                //SpotsData.setSpotUpdatesToCache(updateSpotInfoLst);
+                //Log.d(TAG, "updated spots saved to cache");
+                SpotsData.setSpotUpdatesToCacheAsync(TAG,updateSpotInfoLst);
+
                 LocalDataManager.setRegionInfo(regionInfo);
                 LocalDataManager.saveRegionInfoToPref(activity);
                 Log.d(TAG, "updated regionInfo saved to cache");

@@ -69,103 +69,95 @@ public class NavigationDrawerFragment extends Fragment {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+        try {
+            super.onCreate(savedInstanceState);
 
-        // Read in the flag indicating whether or not the user has demonstrated awareness of the
-        // drawer. See PREF_USER_LEARNED_DRAWER for details.
-        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        mUserLearnedDrawer = sp.getBoolean(PREF_USER_LEARNED_DRAWER, false);
+            // Read in the flag indicating whether or not the user has demonstrated awareness of the
+            // drawer. See PREF_USER_LEARNED_DRAWER for details.
+            SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getActivity());
+            mUserLearnedDrawer = sp.getBoolean(PREF_USER_LEARNED_DRAWER, false);
 
-        if (savedInstanceState != null) {
-            mCurrentSelectedPosition = savedInstanceState.getInt(STATE_SELECTED_POSITION);
-            mFromSavedInstanceState = true;
+            if (savedInstanceState != null) {
+                mCurrentSelectedPosition = savedInstanceState.getInt(STATE_SELECTED_POSITION);
+                mFromSavedInstanceState = true;
+            }
+
+            // Select either the default item (0) or the last selected item.
+            selectItem(mCurrentSelectedPosition);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-
-        // Select either the default item (0) or the last selected item.
-        selectItem(mCurrentSelectedPosition);
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        // Indicate that this fragment would like to influence the set of actions in the action bar.
-        setHasOptionsMenu(true);
+        try {
+            super.onActivityCreated(savedInstanceState);
+            // Indicate that this fragment would like to influence the set of actions in the action bar.
+            setHasOptionsMenu(true);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        /*mDrawerListView = (ListView) inflater.inflate(
-                R.layout.fragment_navigation_drawer, container, false);
-        mDrawerListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                selectItem(position);
-            }
-        });
-        mDrawerListView.setAdapter(new ArrayAdapter<String>(
-                getActionBar().getThemedContext(),
-                android.R.layout.simple_list_item_activated_1,
-                android.R.id.text1,
-                new String[]{
-                        getString(R.string.mainSearch_fragmentTitle),
-                        getString(R.string.personprofile_myProfile_fragmentTitle),
-                        *//*getString(R.string.frame_msg_title),
-                        getString(R.string.frame_friends_title),
-                        getString(R.string.frame_photo_title),*//*
-                }));
-        mDrawerListView.setItemChecked(mCurrentSelectedPosition, true);*/
 
+        try {
+            mDrawerLinearLayout = (FrameLayout) inflater.inflate(
+                    R.layout.fragment_navigation_drawer, container, false);
 
-        mDrawerLinearLayout = (FrameLayout) inflater.inflate(
-                R.layout.fragment_navigation_drawer, container, false);
-
-        mDrawerListView = (ListView) mDrawerLinearLayout.findViewById(R.id.mDrawer_headerList);
-        mDrawerListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                selectItem(position);
-            }
-        });
-        mDrawerListView.setAdapter(new ArrayAdapter<String>(
-                getActionBar().getThemedContext(),
-                R.layout.drawer_menu_item,
-                R.id.drawer_item_txt,
-                new String[]{
-                        getString(R.string.mainSearch_fragmentTitle),
-                        getString(R.string.personprofile_myProfile_fragmentTitle),
-                        /*getString(R.string.frame_msg_title),
-                        getString(R.string.frame_friends_title),
-                        getString(R.string.frame_photo_title),*/
-                }));
-        mDrawerListView.setItemChecked(mCurrentSelectedPosition, true);
-
-        mDrawerBottomListView = (ListView) mDrawerLinearLayout.findViewById(R.id.mDrawer_bottomList);
-        mDrawerBottomListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                if (mDrawerListView != null) {
-                    mDrawerListView.clearChoices();
-                    mDrawerListView.requestLayout();
+            mDrawerListView = (ListView) mDrawerLinearLayout.findViewById(R.id.mDrawer_headerList);
+            mDrawerListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    selectItem(position);
                 }
-                if (mDrawerLayout != null) {
-                    mDrawerLayout.closeDrawer(mFragmentContainerView);
-                }
-                if (mCallbacks != null) {
-                    mCallbacks.onNavigationDrawerBottomItemSelected(position);
-                }
-            }
-        });
-        mDrawerBottomListView.setAdapter(new ArrayAdapter<String>(
-                getActionBar().getThemedContext(),
-                R.layout.drawer_menu_logout_item,
-                R.id.drawer_bottomItem_txt,
-                new String[]{
-                        getString(R.string.drawer_bottom_logout)
-                }));
-        mDrawerBottomListView.setItemChecked(0, false);
+            });
+            mDrawerListView.setAdapter(new ArrayAdapter<String>(
+                    getActionBar().getThemedContext(),
+                    R.layout.drawer_menu_item,
+                    R.id.drawer_item_txt,
+                    new String[]{
+                            getString(R.string.mainSearch_fragmentTitle),
+                            getString(R.string.personprofile_myProfile_fragmentTitle),
+                            /*getString(R.string.frame_msg_title),
+                            getString(R.string.frame_friends_title),
+                            getString(R.string.frame_photo_title),*/
+                    }));
+            mDrawerListView.setItemChecked(mCurrentSelectedPosition, true);
 
-        return mDrawerLinearLayout;
+            mDrawerBottomListView = (ListView) mDrawerLinearLayout.findViewById(R.id.mDrawer_bottomList);
+            mDrawerBottomListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    if (mDrawerListView != null) {
+                        mDrawerListView.clearChoices();
+                        mDrawerListView.requestLayout();
+                    }
+                    if (mDrawerLayout != null) {
+                        mDrawerLayout.closeDrawer(mFragmentContainerView);
+                    }
+                    if (mCallbacks != null) {
+                        mCallbacks.onNavigationDrawerBottomItemSelected(position);
+                    }
+                }
+            });
+            mDrawerBottomListView.setAdapter(new ArrayAdapter<String>(
+                    getActionBar().getThemedContext(),
+                    R.layout.drawer_menu_logout_item,
+                    R.id.drawer_bottomItem_txt,
+                    new String[]{
+                            getString(R.string.drawer_bottom_logout)
+                    }));
+            mDrawerBottomListView.setItemChecked(0, false);
+
+            return mDrawerLinearLayout;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     public boolean isDrawerOpen() {
@@ -276,14 +268,22 @@ public class NavigationDrawerFragment extends Fragment {
 
     @Override
     public void onDetach() {
-        super.onDetach();
-        mCallbacks = null;
+        try {
+            super.onDetach();
+            mCallbacks = null;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putInt(STATE_SELECTED_POSITION, mCurrentSelectedPosition);
+        try {
+            super.onSaveInstanceState(outState);
+            outState.putInt(STATE_SELECTED_POSITION, mCurrentSelectedPosition);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public ActionBarDrawerToggle getDrawerToggle()
@@ -293,39 +293,47 @@ public class NavigationDrawerFragment extends Fragment {
 
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-        // Forward the new configuration the drawer toggle component.
-        mDrawerToggle.onConfigurationChanged(newConfig);
+        try {
+            super.onConfigurationChanged(newConfig);
+            // Forward the new configuration the drawer toggle component.
+            mDrawerToggle.onConfigurationChanged(newConfig);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         // If the drawer is open, show the global app actions in the action bar. See also
         // showGlobalContextActionBar, which controls the top-left area of the action bar.
-        if (mDrawerLayout != null && isDrawerOpen()) {
-            inflater.inflate(R.menu.global, menu);
-            showGlobalContextActionBar();
+        try {
+            if (mDrawerLayout != null && isDrawerOpen()) {
+                inflater.inflate(R.menu.global, menu);
+                showGlobalContextActionBar();
+            }
+            super.onCreateOptionsMenu(menu, inflater);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        super.onCreateOptionsMenu(menu, inflater);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
-        ((MainActivity) getActivity()).hideSoftKeyboard();
-        if(item!=null)
-            if(item.getItemId() == android.R.id.home && fragmentManager!=null && fragmentManager.getBackStackEntryCount()>0 && !isDrawerOpen()) {
-                getActivity().getSupportFragmentManager().popBackStack();
-                return true;
-            }
-            else if (mDrawerToggle.onOptionsItemSelected(item)) {
-                //Toast.makeText(getActivity(), "Example action.", Toast.LENGTH_SHORT).show();
-                return true;
-            }
-            /*if (item.getItemId() == R.id.action_example) {
-                Toast.makeText(getActivity(), "Example action.", Toast.LENGTH_SHORT).show();
-                return true;
-            }*/
+        try {
+            FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+            ((MainActivity) getActivity()).hideSoftKeyboard();
+            if(item!=null)
+                if(item.getItemId() == android.R.id.home && fragmentManager!=null && fragmentManager.getBackStackEntryCount()>0 && !isDrawerOpen()) {
+                    getActivity().getSupportFragmentManager().popBackStack();
+                    return true;
+                }
+                else if (mDrawerToggle.onOptionsItemSelected(item)) {
+                    return true;
+                }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         return super.onOptionsItemSelected(item);
     }
 
