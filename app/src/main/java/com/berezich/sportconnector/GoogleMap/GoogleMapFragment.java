@@ -7,6 +7,7 @@ package com.berezich.sportconnector.GoogleMap;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -18,8 +19,10 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -51,7 +54,7 @@ public class GoogleMapFragment extends Fragment implements SyncSpots.OnActionSyn
      * The fragment argument representing the section number for this
      * fragment.
      */
-    public static enum FiltersX {F0000,F1000,F0100,F0001,F1100,F1001,F0101,F1101,Fxx1x}
+    public enum FiltersX {F0000,F1000,F0100,F0001,F1100,F1001,F0101,F1101,Fxx1x}
     private static final String ARG_SECTION_NUMBER = "section_number";
     private static final String TAG = "MyLog_GoogleMapFragment";
     private final LatLng MOSCOW_loc = new LatLng(55.754357, 37.620035);
@@ -202,7 +205,7 @@ public class GoogleMapFragment extends Fragment implements SyncSpots.OnActionSyn
                 Clustering.addAllSpots(SpotsData.get_allSpots(), curFilter());
                 break;
             case NEED_INSTALL:
-                showDialog(getContext(), getString(R.string.gmap_dialog_needInstall_msg),
+                showDialog(getContext(),  getString(R.string.gmap_dialog_needInstall_msg),
                         getString(R.string.gmap_dialog_needInstall_btn));
                 break;
             case NEED_UPDATE:
@@ -508,7 +511,7 @@ public class GoogleMapFragment extends Fragment implements SyncSpots.OnActionSyn
     {
         try
         {
-            mainActivity.getPackageManager().getApplicationInfo("com.google.android.apps.maps", 0 );
+            mainActivity.getPackageManager().getApplicationInfo("com.google.android.gms", 0 );
             return true;
         }
         catch(PackageManager.NameNotFoundException e)
@@ -524,12 +527,16 @@ public class GoogleMapFragment extends Fragment implements SyncSpots.OnActionSyn
             public void onClick(DialogInterface dialog, int which)
             {
                 try {
+                    FragmentManager fm = GoogleMapFragment.this.getFragmentManager();
+                    if(fm!=null)
+                        fm.popBackStack();
                     try {
-                        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=com.google.android.apps.maps")));
+                        startActivity(new Intent(Intent.ACTION_VIEW,
+                                Uri.parse("market://details?id=com.google.android.gms")));
                     } catch (android.content.ActivityNotFoundException anfe) {
-                        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=com.google.android.apps.maps")));
+                        startActivity(new Intent(Intent.ACTION_VIEW,
+                                Uri.parse("https://play.google.com/store/apps/details?id=com.google.android.gms")));
                     }
-
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -543,6 +550,21 @@ public class GoogleMapFragment extends Fragment implements SyncSpots.OnActionSyn
             builder.setMessage(msg);
             builder.setPositiveButton(btn, getGoogleMapsListener());
             dialog = builder.create();
+            dialog.setOnKeyListener(new Dialog.OnKeyListener() {
+
+                @Override
+                public boolean onKey(DialogInterface arg0, int keyCode,
+                                     KeyEvent event) {
+                    if (keyCode == KeyEvent.KEYCODE_BACK) {
+                        dialog.dismiss();
+                        GoogleMapFragment.this.dialog = null;
+                    }
+                    FragmentManager fm = GoogleMapFragment.this.getFragmentManager();
+                    if(fm!=null)
+                        fm.popBackStack();
+                    return true;
+                }
+            });
             dialog.show();
         }
     }
