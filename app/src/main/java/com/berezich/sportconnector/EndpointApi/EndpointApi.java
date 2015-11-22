@@ -511,7 +511,7 @@ public class EndpointApi {
             listener.onResetPassAsyncTaskFinish(result);
         }
 
-        public static interface OnAction
+        public interface OnAction
         {
             void onResetPassAsyncTaskFinish(Exception result);
         }

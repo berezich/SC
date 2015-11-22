@@ -1,12 +1,9 @@
 package com.berezich.sportconnector.Fragments;
 
-/**
- * Created by berezkin on 17.04.2015.
- */
-
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.ActionBar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -22,16 +19,8 @@ import com.berezich.sportconnector.EndpointApi.SyncSpots;
 import com.berezich.sportconnector.ErrorVisualizer;
 import com.berezich.sportconnector.MainActivity;
 import com.berezich.sportconnector.R;
-import com.berezich.sportconnector.backend.sportConnectorApi.model.RegionInfo;
 
-/**
- * A placeholder fragment containing a simple view.
- */
 public class MainFragment extends Fragment implements SyncSpots.OnActionSyncSpots {
-    /**
-     * The fragment argument representing the section number for this
-     * fragment.
-     */
 
     public enum Filters {
         SPARRING_PARTNERS, COUCH, COURT
@@ -42,7 +31,7 @@ public class MainFragment extends Fragment implements SyncSpots.OnActionSyncSpot
     int _sectionNumber;
     View rootView;
     OnActionListenerMainFragment listener;
-    private static Long regionId = new Long(1);
+    private static Long regionId = Long.valueOf(1);
     private SyncSpots syncSpots;
 
     public MainFragment setArgs(int sectionNumber) {
@@ -113,7 +102,9 @@ public class MainFragment extends Fragment implements SyncSpots.OnActionSyncSpot
             MainActivity mainActivity = (MainActivity)activity;
             Log.d(TAG, "onResume isSpotsSynced = " + mainActivity.isSpotsSynced());
             mainActivity.setmTitle(activity.getString(R.string.mainSearch_fragmentTitle));
-            mainActivity.getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_drawer);
+            ActionBar actionBar = mainActivity.getSupportActionBar();
+            if(actionBar!=null)
+                actionBar.setHomeAsUpIndicator(R.drawable.ic_drawer);
             mainActivity.restoreActionBar();
             if(mainActivity.isSpotsSynced())
                 setVisibleLayouts(true,false);

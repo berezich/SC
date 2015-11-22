@@ -25,21 +25,15 @@ import com.berezich.sportconnector.MainActivity;
 import com.berezich.sportconnector.R;
 import com.berezich.sportconnector.backend.sportConnectorApi.model.Person;
 
-/**
- * Created by Sashka on 09.08.2015.
- */
 public class ResetPassFragment extends Fragment implements EndpointApi.ResetPassAsyncTask.OnAction,
         AlertDialogFragment.OnActionDialogListener {
 
     private final String TAG = "MyLog_RPassFragment";
     View rootView;
-    private Person myPersonInfo;
+    Person myPersonInfo;
     String email="";
     private FragmentActivity activity;
     ResetPassFragmentAction listenerResetPass = null;
-
-    public ResetPassFragment() {
-    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -50,65 +44,74 @@ public class ResetPassFragment extends Fragment implements EndpointApi.ResetPass
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        EditText editTxt;
-        rootView = inflater.inflate(R.layout.fragment_reset_pass, container, false);
-        if(( myPersonInfo = LocalDataManager.getMyPersonInfo())!=null)
-            if ((editTxt = (EditText) rootView.findViewById(R.id.resetPass_email_value)) != null) {
-                editTxt.setText(myPersonInfo.getEmail());
-            }
-        if(rootView!=null)
-        {
-            Button btn = (Button) rootView.findViewById(R.id.resetPass_btn_ok);
-            if(btn!=null)
-                btn.setOnClickListener(new OnClickResetPassListener());
+        try {
+            EditText editTxt;
+            rootView = inflater.inflate(R.layout.fragment_reset_pass, container, false);
+            if(( myPersonInfo = LocalDataManager.getMyPersonInfo())!=null)
+                if ((editTxt = (EditText) rootView.findViewById(R.id.resetPass_email_value)) != null) {
+                    editTxt.setText(myPersonInfo.getEmail());
+                }
+            if(rootView!=null)
+            {
+                Button btn = (Button) rootView.findViewById(R.id.resetPass_btn_ok);
+                if(btn!=null)
+                    btn.setOnClickListener(new OnClickResetPassListener());
 
-            if(getActivity()!=null)
-                ((MainActivity) getActivity()).setupUI(rootView);
+                if(getActivity()!=null)
+                    ((MainActivity) getActivity()).setupUI(rootView);
+            }
+            return rootView;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return rootView=null;
         }
-        return rootView;
     }
 
     @Override
     public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        this.activity = getActivity();
-        Fragment targetFragment = getTargetFragment();
-        if(targetFragment==null) {
-            Log.e(TAG,"targetFragment should be set");
-            throw new NullPointerException(String.format("For fragment %s targetFragment should be set", getFragment().toString()));
-        }
         try {
-            listenerResetPass =  (LoginFragment) getTargetFragment();
-        } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString() + " must implement OnActionListener for ResetPassFragment");
+            super.onAttach(activity);
+            this.activity = getActivity();
+            Fragment targetFragment = getTargetFragment();
+            if(targetFragment==null) {
+                Log.e(TAG,"targetFragment should be set");
+                throw new NullPointerException(String.format("For fragment %s targetFragment should be set",
+                        ResetPassFragment.this.toString()));
+            }
+            try {
+                listenerResetPass =  (LoginFragment) getTargetFragment();
+            } catch (ClassCastException e) {
+                throw new ClassCastException(activity.toString() + " must implement OnActionListener for ResetPassFragment");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-    }
-    @Override
-    public void onResume()
-    {
-        super.onResume();
     }
 
     private class OnClickResetPassListener implements View.OnClickListener
     {
         @Override
         public void onClick(View v) {
-            EditText editTxt;
-            if((editTxt = (EditText) rootView.findViewById(R.id.resetPass_email_value))!=null) {
-                email = editTxt.getText().toString().trim();
-                if(!InputValuesValidation.isValidEmail(email)){
-                    AlertDialogFragment dialog;
-                    dialog = AlertDialogFragment.newInstance(activity.getString(R.string.changeEmail_errNew_invalid), false);
-                    dialog.setTargetFragment(getFragment(), 0);
-                    FragmentManager ft = activity.getSupportFragmentManager();
-                    if(ft!=null)
-                        dialog.show(ft, "");
-                    return;
-                }
+            try {
+                EditText editTxt;
+                if((editTxt = (EditText) rootView.findViewById(R.id.resetPass_email_value))!=null) {
+                    email = editTxt.getText().toString().trim();
+                    if(!InputValuesValidation.isValidEmail(email)){
+                        AlertDialogFragment dialog;
+                        dialog = AlertDialogFragment.newInstance(activity.getString(R.string.changeEmail_errNew_invalid), false);
+                        dialog.setTargetFragment(ResetPassFragment.this, 0);
+                        FragmentManager ft = activity.getSupportFragmentManager();
+                        if(ft!=null)
+                            dialog.show(ft, "");
+                        return;
+                    }
 
+                }
+                setVisibleProgressBar(true);
+                new EndpointApi.ResetPassAsyncTask(ResetPassFragment.this).execute(email);
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-            setVisibleProgressBar(true);
-            new EndpointApi.ResetPassAsyncTask(getFragment()).execute(email);
         }
     }
 
@@ -124,33 +127,36 @@ public class ResetPassFragment extends Fragment implements EndpointApi.ResetPass
     }
 
     @Override
-    public void onResetPassAsyncTaskFinish(Exception result) {
-        Exception error = result;
-        if(error == null)
-        {
-            Log.d(TAG, "ResetPassReq was created");
-            try {
-                String msg = String.format( activity.getString(R.string.resetPass_msgReqResetPass),email);
-                showDialog(msg);
-                listenerResetPass.onResetPass(msg);
-            } catch (Exception e) {
-                e.printStackTrace();
+    public void onResetPassAsyncTaskFinish(Exception error) {
+        try {
+            if(error == null)
+            {
+                Log.d(TAG, "ResetPassReq was created");
+                try {
+                    String msg = String.format( activity.getString(R.string.resetPass_msgReqResetPass),email);
+                    showDialog(msg);
+                    listenerResetPass.onResetPass(msg);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                return;
             }
-            return;
-        }
-        Log.d(TAG,"error != null");
+            Log.d(TAG,"error != null");
 
-        String dialogMsg;
-        Pair<ErrorVisualizer.ERROR_CODE,String> errTxtCode =
-                ErrorVisualizer.getTextCodeOfRespException(activity.getBaseContext(),error);
-        if(errTxtCode!=null && !errTxtCode.second.equals("")){
-            dialogMsg = errTxtCode.second;
-            Log.d(TAG,"resetPassError code = "+errTxtCode.first+" msg = "+errTxtCode.second);
-        }
-        else
-            dialogMsg = activity.getString(R.string.server_unknown_err);
+            String dialogMsg;
+            Pair<ErrorVisualizer.ERROR_CODE,String> errTxtCode =
+                    ErrorVisualizer.getTextCodeOfRespException(activity.getBaseContext(),error);
+            if(errTxtCode!=null && !errTxtCode.second.equals("")){
+                dialogMsg = errTxtCode.second;
+                Log.d(TAG,"resetPassError code = "+errTxtCode.first+" msg = "+errTxtCode.second);
+            }
+            else
+                dialogMsg = activity.getString(R.string.server_unknown_err);
 
-        showDialog(dialogMsg);
+            showDialog(dialogMsg);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void showDialog(String msg){
@@ -165,31 +171,44 @@ public class ResetPassFragment extends Fragment implements EndpointApi.ResetPass
 
     @Override
     public void onPositiveClick() {
-        setVisibleProgressBar(false);
+        try {
+            setVisibleProgressBar(false);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void onNegativeClick() {
-        setVisibleProgressBar(false);
+        try {
+            setVisibleProgressBar(false);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void onCancelDialog() {
-        setVisibleProgressBar(false);
+        try {
+            setVisibleProgressBar(false);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        super.onCreateOptionsMenu(menu, inflater);
-        menu.clear();
-        android.support.v7.app.ActionBar actionBar = ((MainActivity) activity).getSupportActionBar();
-        if(actionBar!=null)
-            actionBar.setTitle(activity.getString(R.string.resetPass_fragmentTitle));
+        try {
+            super.onCreateOptionsMenu(menu, inflater);
+            menu.clear();
+            android.support.v7.app.ActionBar actionBar = ((MainActivity) activity).getSupportActionBar();
+            if(actionBar!=null)
+                actionBar.setTitle(activity.getString(R.string.resetPass_fragmentTitle));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
-    private Fragment getFragment(){
-        return  this;
-    }
 
     public interface ResetPassFragmentAction
     {
