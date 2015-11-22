@@ -13,9 +13,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-/**
- * Created by berezkin on 14.05.2015.
- */
 public class SpotsData {
     private static HashMap<Long, Spot> _allSpots = new HashMap<Long, Spot>();
 
@@ -44,14 +41,18 @@ public class SpotsData {
     }
     public static void saveSpotsToCache(List<Spot> spotLst)
     {
-        Spot spot;
-        _allSpots.clear();
-        for (int i = 0; i <spotLst.size() ; i++) {
-            spot = spotLst.get(i);
-            LocalDataManager.initListsOfSpot(spot);
-            _allSpots.put(spot.getId(),spot);
+        try {
+            Spot spot;
+            _allSpots.clear();
+            for (int i = 0; i <spotLst.size() ; i++) {
+                spot = spotLst.get(i);
+                LocalDataManager.initListsOfSpot(spot);
+                _allSpots.put(spot.getId(),spot);
+            }
+            saveSpotsToCache();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        saveSpotsToCache();
     }
     public static void saveSpotsToCache()
     {
@@ -72,19 +73,23 @@ public class SpotsData {
     }
     public static void setSpotUpdatesToCache(List<UpdateSpotInfo> spotUpdates)
     {
-        Spot spot;
-        Long spotId;
-        for (int i = 0; i <spotUpdates.size() ; i++) {
-            spotId = spotUpdates.get(i).getId();
-            spot = spotUpdates.get(i).getSpot();
-            if(spot!=null) {
-                LocalDataManager.initListsOfSpot(spot);
-                _allSpots.put(spotId, spot);
+        try {
+            Spot spot;
+            Long spotId;
+            for (int i = 0; i <spotUpdates.size() ; i++) {
+                spotId = spotUpdates.get(i).getId();
+                spot = spotUpdates.get(i).getSpot();
+                if(spot!=null) {
+                    LocalDataManager.initListsOfSpot(spot);
+                    _allSpots.put(spotId, spot);
+                }
+                else
+                    _allSpots.remove(spotId);
             }
-            else
-                _allSpots.remove(spotId);
+            LocalDataManager.setUpdateSpots(spotUpdates);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        LocalDataManager.setUpdateSpots(spotUpdates);
     }
 
     public static void setSpotFavorite(Long idSpot, boolean isFavorite)

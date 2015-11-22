@@ -1,11 +1,9 @@
 package com.berezich.sportconnector.GoogleMap;
 
 import android.content.Context;
-import android.content.res.Resources;
 
 import com.berezich.sportconnector.R;
 import com.berezich.sportconnector.UsefulFunctions;
-import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -13,13 +11,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import java.util.ArrayList;
 import java.util.List;
 
-
-/**
- * Created by berezkin on 14.05.2015.
- */
 public class SpotMarker extends AbstractMarker {
-    private static BitmapDescriptor spotIcon = null;
-
     private String _name;
     private Long _id;
     private String _description;
@@ -81,14 +73,7 @@ public class SpotMarker extends AbstractMarker {
 
         return filters;
     }
-    public BitmapDescriptor getBitmap(GoogleMapFragment.FiltersX filter)
-    {
-        if(isAppropriate(filter)) {
-            return BitmapDescriptorFactory.fromResource(getMarkerImg(filter));
-        }
-        return null;
 
-    }
     public void setSpotIcon(GoogleMapFragment.FiltersX filter)
     {
             getMarker().icon(BitmapDescriptorFactory.fromResource(getMarkerImg(filter)));

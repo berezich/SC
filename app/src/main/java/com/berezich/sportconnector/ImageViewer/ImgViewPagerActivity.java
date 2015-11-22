@@ -11,7 +11,6 @@ import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 
 import com.berezich.sportconnector.FileManager;
-import com.berezich.sportconnector.ImageViewer.ImgViewPager;
 import com.berezich.sportconnector.R;
 import com.berezich.sportconnector.backend.sportConnectorApi.model.Picture;
 import com.google.api.client.json.gson.GsonFactory;
@@ -36,55 +35,63 @@ public class ImgViewPagerActivity extends Activity {
 
     @Override
 	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-        setContentView(R.layout.acitvity_img_view_pager);
-		GsonFactory gsonFactory = new GsonFactory();
-		Intent intent = getIntent();
-		if(intent!=null)
-		{
-			picLst.clear();
-			ArrayList<String> picLstStr = intent.getStringArrayListExtra(PIC_LIST_EXTRAS);
-			index = intent.getIntExtra(PIC_INDEX_EXTRAS,0);
-			prev = index;
-			Picture pic;
-			for (String str:picLstStr)
-				try {
-					pic = gsonFactory.fromString(str, Picture.class);
-					if(pic!=null)
-						picLst.add(pic);
-				} catch (IOException e) {
-					e.printStackTrace();
+		try {
+			super.onCreate(savedInstanceState);
+			setContentView(R.layout.acitvity_img_view_pager);
+			GsonFactory gsonFactory = new GsonFactory();
+			Intent intent = getIntent();
+			if(intent!=null)
+            {
+                picLst.clear();
+                ArrayList<String> picLstStr = intent.getStringArrayListExtra(PIC_LIST_EXTRAS);
+                index = intent.getIntExtra(PIC_INDEX_EXTRAS,0);
+                prev = index;
+                Picture pic;
+                for (String str:picLstStr)
+                    try {
+                        pic = gsonFactory.fromString(str, Picture.class);
+                        if(pic!=null)
+                            picLst.add(pic);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+            }
+
+			mViewPager = (ImgViewPager) findViewById(R.id.img_view_pager);
+			setContentView(mViewPager);
+			mViewPager.setAdapter(new SamplePagerAdapter());
+			mViewPager.setCurrentItem(index);
+
+			mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+
+                @Override
+                public void onPageSelected(int position) {
+					try {
+						Log.d(TAG, "onPageSelected, position = " + position);
+						PhotoView photoView;
+						if(prev>=0 && prev < picLst.size()) {
+                            photoView = (PhotoView) mViewPager.findViewWithTag(prev);
+                            if (photoView != null)
+                                photoView.setScale(1);
+                        }
+						prev = position;
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
 				}
+
+                @Override
+                public void onPageScrolled(int position, float positionOffset,
+                                           int positionOffsetPixels) {
+                }
+
+                @Override
+                public void onPageScrollStateChanged(int state) {
+                }
+            });
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
-
-		mViewPager = (ImgViewPager) findViewById(R.id.img_view_pager);
-		setContentView(mViewPager);
-		mViewPager.setAdapter(new SamplePagerAdapter());
-		mViewPager.setCurrentItem(index);
-
-		mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-
-			@Override
-			public void onPageSelected(int position) {
-				Log.d(TAG, "onPageSelected, position = " + position);
-				PhotoView photoView;
-				if(prev>=0 && prev < picLst.size()) {
-					photoView = (PhotoView) mViewPager.findViewWithTag(prev);
-					if (photoView != null)
-						photoView.setScale(1);
-				}
-				prev = position;
-			}
-
-			@Override
-			public void onPageScrolled(int position, float positionOffset,
-									   int positionOffsetPixels) {
-			}
-
-			@Override
-			public void onPageScrollStateChanged(int state) {
-			}
-		});
 
 	}
 
@@ -101,13 +108,17 @@ public class ImgViewPagerActivity extends Activity {
 		@Override
 		public View instantiateItem(ViewGroup container, int position) {
 			PhotoView photoView = new PhotoView(container.getContext());
-			Picture picture = picLst.get(position);
+			try {
+				Picture picture = picLst.get(position);
 
-			FileManager.providePhotoForImgView(container.getContext(), photoView, picture, FileManager.TEMP_DIR, 0);
+				FileManager.providePhotoForImgView(container.getContext(), photoView, picture, FileManager.TEMP_DIR, 0);
 
-			container.addView(photoView, LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
-			photoView.setScale(1);
-			photoView.setTag(position);
+				container.addView(photoView, LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
+				photoView.setScale(1);
+				photoView.setTag(position);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 			return photoView;
 		}
 

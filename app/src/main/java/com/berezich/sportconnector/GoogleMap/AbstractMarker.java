@@ -4,9 +4,6 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.maps.android.clustering.ClusterItem;
 
-/**
- * Created by berezkin on 14.05.2015.
- */
 public abstract class AbstractMarker implements ClusterItem {
     protected double latitude;
     protected double longitude;

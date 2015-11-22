@@ -12,6 +12,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
@@ -20,6 +21,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -84,184 +86,229 @@ public class GoogleMapFragment extends Fragment implements SyncSpots.OnActionSyn
 
     public GoogleMapFragment setArgs(Filters filter) {
 
-        Bundle args = new Bundle();
-        this.setArguments(args);
-        if(filter == Filters.COUCH)
-            isCoaches = true;
-        if(filter == Filters.SPARRING_PARTNERS)
-            isPartners = true;
-        if(filter == Filters.COURT) {
-            isCourts = true;
-            isCoaches = true;
-            isPartners = true;
-            isFavorite = true;
+        try {
+            Bundle args = new Bundle();
+            this.setArguments(args);
+            if(filter == Filters.COUCH)
+                isCoaches = true;
+            if(filter == Filters.SPARRING_PARTNERS)
+                isPartners = true;
+            if(filter == Filters.COURT) {
+                isCourts = true;
+                isCoaches = true;
+                isPartners = true;
+                isFavorite = true;
+            }
+            setCurFilter();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        setCurFilter();
         return this;
     }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
+        try {
+            super.onCreate(savedInstanceState);
+            setHasOptionsMenu(true);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public GoogleMapFragment() {
-        syncSpots = new SyncSpots(this,TAG);
+
+        try {
+            syncSpots = new SyncSpots(this,TAG);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        Log.d(TAG,"GoogleMapFragment on onCreateView");
-        if(getActivity()==null) {
-            Log.e(TAG,"GoogleMapFragment isn't attached to any activity");
-            return null;
-        }
-        rootView = inflater.inflate(R.layout.fragment_googlemap, container, false);
-        if(isGoogleMapsInstalled()) {
-            mapView = ((MapView) rootView.findViewById(R.id.mapview));
-            if (mapView == null) {
-                Log.e(TAG, "Error mapView = NULL");
+        try {
+            Log.d(TAG,"GoogleMapFragment on onCreateView");
+            if(getActivity()==null) {
+                Log.e(TAG,"GoogleMapFragment isn't attached to any activity");
                 return null;
             }
-            mapView.onCreate(savedInstanceState);
+            rootView = inflater.inflate(R.layout.fragment_googlemap, container, false);
+            if(isGoogleMapsInstalled()) {
+                mapView = ((MapView) rootView.findViewById(R.id.mapview));
+                if (mapView == null) {
+                    Log.e(TAG, "Error mapView = NULL");
+                    return null;
+                }
+                mapView.onCreate(savedInstanceState);
 
-            // Gets to GoogleMap from the MapView and does initialization stuff
-            map = mapView.getMap();
-            if (map == null) {
-                Log.e(TAG, "Error map = NULL");
-                gmapState = GMAPS_STATE.NEED_UPDATE;
+                // Gets to GoogleMap from the MapView and does initialization stuff
+                map = mapView.getMap();
+                if (map == null) {
+                    Log.e(TAG, "Error map = NULL");
+                    gmapState = GMAPS_STATE.NEED_UPDATE;
+                    return null;
+                }
+                map.getUiSettings().setMyLocationButtonEnabled(true);
+                map.getUiSettings().setZoomControlsEnabled(true);
+                map.setMyLocationEnabled(true);
+                Clustering.initClusterManager(getContext(), map, this);
+
+                map.setOnCameraChangeListener(Clustering.clusterManager);
+                map.setInfoWindowAdapter(new Clustering.CustomInfoWindow());
+                map.setOnMarkerClickListener(Clustering.clusterManager);
+                map.setOnInfoWindowClickListener(Clustering.clusterManager);
+
+                ImageButton btn;
+                btn = (ImageButton) rootView.findViewById(R.id.map_btn_coach);
+                btn.setOnClickListener(new btnClickListener());
+                btn.setOnTouchListener(new btnOnTouchListener());
+                btn = (ImageButton) rootView.findViewById(R.id.map_btn_court);
+                btn.setOnClickListener(new btnClickListener());
+                btn.setOnTouchListener(new btnOnTouchListener());
+                btn = (ImageButton) rootView.findViewById(R.id.map_btn_partner);
+                btn.setOnClickListener(new btnClickListener());
+                btn.setOnTouchListener(new btnOnTouchListener());
+                btn = (ImageButton) rootView.findViewById(R.id.map_btn_star);
+                btn.setOnClickListener(new btnClickListener());
+                btn.setOnTouchListener(new btnOnTouchListener());
+
+                if (selectMarker != null)
+                    setCameraToLocation(selectMarker.getPosition(), false, curZoom);
+                else
+                    setCameraToCurLocation();
+
+                // Needs to call MapsInitializer before doing any CameraUpdateFactory calls
+                try {
+                    MapsInitializer.initialize(getActivity());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            else{
+                gmapState = GMAPS_STATE.NEED_INSTALL;
                 return null;
             }
-            map.getUiSettings().setMyLocationButtonEnabled(true);
-            map.getUiSettings().setZoomControlsEnabled(true);
-            map.setMyLocationEnabled(true);
-            Clustering.initClusterManager(getContext(), map, this);
-
-            map.setOnCameraChangeListener(Clustering.clusterManager);
-            map.setInfoWindowAdapter(new Clustering.CustomInfoWindow());
-            map.setOnMarkerClickListener(Clustering.clusterManager);
-            map.setOnInfoWindowClickListener(Clustering.clusterManager);
-
-            ImageButton btn;
-            btn = (ImageButton) rootView.findViewById(R.id.map_btn_coach);
-            btn.setOnClickListener(new btnClickListener());
-            btn.setOnTouchListener(new btnOnTouchListener());
-            btn = (ImageButton) rootView.findViewById(R.id.map_btn_court);
-            btn.setOnClickListener(new btnClickListener());
-            btn.setOnTouchListener(new btnOnTouchListener());
-            btn = (ImageButton) rootView.findViewById(R.id.map_btn_partner);
-            btn.setOnClickListener(new btnClickListener());
-            btn.setOnTouchListener(new btnOnTouchListener());
-            btn = (ImageButton) rootView.findViewById(R.id.map_btn_star);
-            btn.setOnClickListener(new btnClickListener());
-            btn.setOnTouchListener(new btnOnTouchListener());
-
-            if (selectMarker != null)
-                setCameraToLocation(selectMarker.getPosition(), false, curZoom);
-            else
-                setCameraToCurLocation();
-
-            // Needs to call MapsInitializer before doing any CameraUpdateFactory calls
-            try {
-                MapsInitializer.initialize(getActivity());
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            return rootView;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return rootView=null;
         }
-        else{
-            gmapState = GMAPS_STATE.NEED_INSTALL;
-            return null;
-        }
-        return rootView;
     }
 
     @Override
     public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        mainActivity = (MainActivity) activity;
         try {
-            listener = mainActivity;
+            super.onAttach(activity);
+            mainActivity = (MainActivity) activity;
+            try {
+                listener = mainActivity;
+            } catch (ClassCastException e) {
+                throw new ClassCastException(activity.toString() + " must implement OnActionListenerGMapFragment for GoogleMapFragment");
+            }
+            LocalDataManager.init(mainActivity);
+            mainActivity.onSectionAttached(
+                    getArguments().getInt(ARG_SECTION_NUMBER));
         } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString() + " must implement OnActionListenerGMapFragment for GoogleMapFragment");
+            e.printStackTrace();
         }
-        LocalDataManager.init(mainActivity);
-        mainActivity.onSectionAttached(
-                getArguments().getInt(ARG_SECTION_NUMBER));
-
-
-
     }
     @Override
     public void onResume() {
-        Log.d(TAG, "GoogleMapFragment on onResume");
-        if(mapView!=null)
-            mapView.onResume();
-        super.onResume();
-        switch (gmapState) {
-            case OK:
-                updateButtonsStates();
-                Clustering.addAllSpots(SpotsData.get_allSpots(), curFilter());
-                break;
-            case NEED_INSTALL:
-                showDialog(getContext(),  getString(R.string.gmap_dialog_needInstall_msg),
-                        getString(R.string.gmap_dialog_needInstall_btn));
-                break;
-            case NEED_UPDATE:
-                showDialog(getContext(), getString(R.string.gmap_dialog_needUpdate_msg),
-                        getString(R.string.gmap_dialog_needUpdate_btn));
-                break;
+        try {
+            Log.d(TAG, "GoogleMapFragment on onResume");
+            if(mapView!=null)
+                mapView.onResume();
+            super.onResume();
+            switch (gmapState) {
+                case OK:
+                    updateButtonsStates();
+                    Clustering.addAllSpots(SpotsData.get_allSpots(), curFilter());
+                    break;
+                case NEED_INSTALL:
+                    showDialog(getContext(),  getString(R.string.gmap_dialog_needInstall_msg),
+                            getString(R.string.gmap_dialog_needInstall_btn));
+                    break;
+                case NEED_UPDATE:
+                    showDialog(getContext(), getString(R.string.gmap_dialog_needUpdate_msg),
+                            getString(R.string.gmap_dialog_needUpdate_btn));
+                    break;
+            }
+            mainActivity.setmTitle(mainActivity.getString(R.string.gmap_fragmentTitle));
+            ActionBar actionBar = mainActivity.getSupportActionBar();
+            if(actionBar!=null)
+                actionBar.setHomeAsUpIndicator(null);
+            mainActivity.restoreActionBar();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        mainActivity.setmTitle(mainActivity.getString(R.string.gmap_fragmentTitle));
-        mainActivity.getSupportActionBar().setHomeAsUpIndicator(null);
-        mainActivity.restoreActionBar();
     }
 
     @Override
     public void onPause() {
-        super.onPause();
-        if(dialog!=null){
-            dialog.dismiss();
-            dialog=null;
+        try {
+            super.onPause();
+            if(dialog!=null){
+                dialog.dismiss();
+                dialog=null;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putBoolean(IS_COACHES, isCoaches);
-        outState.putBoolean(IS_PARTNERS, isPartners);
-        outState.putBoolean(IS_COURTS, isCourts);
-        outState.putBoolean(IS_FAVORITE,isFavorite);
+        try {
+            super.onSaveInstanceState(outState);
+            outState.putBoolean(IS_COACHES, isCoaches);
+            outState.putBoolean(IS_PARTNERS, isPartners);
+            outState.putBoolean(IS_COURTS, isCourts);
+            outState.putBoolean(IS_FAVORITE,isFavorite);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        if(savedInstanceState!=null){
-            isFavorite = savedInstanceState.getBoolean(IS_FAVORITE);
-            isCoaches = savedInstanceState.getBoolean(IS_COACHES);
-            isPartners = savedInstanceState.getBoolean(IS_PARTNERS);
-            isCourts = savedInstanceState.getBoolean(IS_COURTS);
-            setCurFilter();
+        try {
+            super.onActivityCreated(savedInstanceState);
+            if(savedInstanceState!=null){
+                isFavorite = savedInstanceState.getBoolean(IS_FAVORITE);
+                isCoaches = savedInstanceState.getBoolean(IS_COACHES);
+                isPartners = savedInstanceState.getBoolean(IS_PARTNERS);
+                isCourts = savedInstanceState.getBoolean(IS_COURTS);
+                setCurFilter();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
     }
 
     @Override
     public void onDestroy() {
-        Log.d(TAG,"GoogleMapFragment on destroy");
-        super.onDestroy();
-        if(mapView!=null)
-            mapView.onDestroy();
+        try {
+            Log.d(TAG,"GoogleMapFragment on destroy");
+            super.onDestroy();
+            if(mapView!=null)
+                mapView.onDestroy();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void onLowMemory() {
-        super.onLowMemory();
-        if(mapView!=null)
-            mapView.onLowMemory();
+        try {
+            super.onLowMemory();
+            if(mapView!=null)
+                mapView.onLowMemory();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     class btnClickListener implements View.OnClickListener
@@ -275,44 +322,48 @@ public class GoogleMapFragment extends Fragment implements SyncSpots.OnActionSyn
     {
         @Override
         public boolean onTouch(View v, MotionEvent event) {
-            ImageButton btn = (ImageButton) v;
-            // show interest in events resulting from ACTION_DOWN
-            if(event.getAction()==MotionEvent.ACTION_DOWN) {
-                switch (v.getId())
-                {
-                    case R.id.map_btn_coach:
-                        isCoaches = !isCoaches;
-                        setButtonImg(btn,isCoaches,Buttons.COACH);
-                        if(!isCoaches)
-                            activateButtons(Buttons.COURT,false);
-                        break;
-                    case R.id.map_btn_partner:
-                        isPartners = !isPartners;
-                        setButtonImg(btn, isPartners, Buttons.PARTNER);
-                        if(!isPartners)
-                            activateButtons(Buttons.COURT,false);
-                        break;
-                    case R.id.map_btn_court:
-                        isCourts = !isCourts;
-                        setButtonImg(btn, isCourts, Buttons.COURT);
-                        if(isCourts)
-                            activateButtons(Buttons.ALL,true);
-                        break;
-                    case R.id.map_btn_star:
-                        isFavorite = !isFavorite;
-                        setButtonImg(btn, isFavorite, Buttons.FAVORITE);
-                        if(!isFavorite)
-                            activateButtons(Buttons.COURT,false);
-                        break;
+            try {
+                ImageButton btn = (ImageButton) v;
+                // show interest in events resulting from ACTION_DOWN
+                if(event.getAction()==MotionEvent.ACTION_DOWN) {
+                    switch (v.getId())
+                    {
+                        case R.id.map_btn_coach:
+                            isCoaches = !isCoaches;
+                            setButtonImg(btn,isCoaches,Buttons.COACH);
+                            if(!isCoaches)
+                                activateButtons(Buttons.COURT,false);
+                            break;
+                        case R.id.map_btn_partner:
+                            isPartners = !isPartners;
+                            setButtonImg(btn, isPartners, Buttons.PARTNER);
+                            if(!isPartners)
+                                activateButtons(Buttons.COURT,false);
+                            break;
+                        case R.id.map_btn_court:
+                            isCourts = !isCourts;
+                            setButtonImg(btn, isCourts, Buttons.COURT);
+                            if(isCourts)
+                                activateButtons(Buttons.ALL,true);
+                            break;
+                        case R.id.map_btn_star:
+                            isFavorite = !isFavorite;
+                            setButtonImg(btn, isFavorite, Buttons.FAVORITE);
+                            if(!isFavorite)
+                                activateButtons(Buttons.COURT,false);
+                            break;
+                    }
+                    setCurFilter();
+                    Clustering.addAllSpots(SpotsData.get_allSpots(), curFilter());
+                    return true;
                 }
-                setCurFilter();
-                Clustering.addAllSpots(SpotsData.get_allSpots(), curFilter());
-                return true;
-            }
-            if(event.getAction()==MotionEvent.ACTION_UP) {
+                if(event.getAction()==MotionEvent.ACTION_UP) {
 
-                btn.performClick();
-                return true;
+                    btn.performClick();
+                    return true;
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
 
             return true;
@@ -469,14 +520,18 @@ public class GoogleMapFragment extends Fragment implements SyncSpots.OnActionSyn
     }
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        menu.clear();
-        super.onCreateOptionsMenu(menu, inflater);
-        inflater.inflate(R.menu.fragment_gmap, menu);
-        MenuItem menuItem = menu.findItem(R.id.menu_update);
-        LayoutInflater inflater1 = (LayoutInflater) mainActivity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        ImageView iv = (ImageView) inflater1.inflate(R.layout.action_img_update, null);
-        iv.setOnClickListener(new OnUpdateClickListener());
-        menuItem.setActionView(iv);
+        try {
+            menu.clear();
+            super.onCreateOptionsMenu(menu, inflater);
+            inflater.inflate(R.menu.fragment_gmap, menu);
+            MenuItem menuItem = menu.findItem(R.id.menu_update);
+            LayoutInflater inflater1 = (LayoutInflater) mainActivity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            ImageView iv = (ImageView) inflater1.inflate(R.layout.action_img_update, null);
+            iv.setOnClickListener(new OnUpdateClickListener());
+            menuItem.setActionView(iv);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
     }
     private class OnUpdateClickListener implements View.OnClickListener{
@@ -484,27 +539,36 @@ public class GoogleMapFragment extends Fragment implements SyncSpots.OnActionSyn
         ObjectAnimator anim;
         @Override
         public void onClick(View view) {
-            anim = ObjectAnimator.ofFloat(view, "rotation", 0f, 360f);
-            anim.setDuration(mainActivity.getResources().getInteger(R.integer.rotationDuration));
-            anim.setInterpolator(new LinearInterpolator());
-            anim.setRepeatCount(ValueAnimator.INFINITE);
-            anim.start();
-            RegionInfo regionInfo = LocalDataManager.getRegionInfo();
-            syncSpots.setReqState(SyncSpots.ReqState.REQ_REGINFO);
-            syncSpots.startSync(mainActivity.getBaseContext(), regionInfo.getId());
-            view.setClickable(false);
+            try {
+                anim = ObjectAnimator.ofFloat(view, "rotation", 0f, 360f);
+                anim.setDuration(mainActivity.getResources().getInteger(R.integer.rotationDuration));
+                anim.setInterpolator(new LinearInterpolator());
+                anim.setRepeatCount(ValueAnimator.INFINITE);
+                anim.start();
+                RegionInfo regionInfo = LocalDataManager.getRegionInfo();
+                syncSpots.setReqState(SyncSpots.ReqState.REQ_REGINFO);
+                if(regionInfo!=null)
+                    syncSpots.startSync(mainActivity.getBaseContext(), regionInfo.getId());
+                view.setClickable(false);
+            } catch (Resources.NotFoundException e) {
+                e.printStackTrace();
+            }
         }
     }
 
     @Override
     public void syncFinish(Exception ex, SyncSpots.ReqState reqState) {
-        if(ex==null && reqState== SyncSpots.ReqState.EVERYTHING_LOADED){
-            Clustering.addAllSpots(SpotsData.get_allSpots(), curFilter());
-            mainActivity.setIsSpotsSynced(true);
+        try {
+            if(ex==null && reqState== SyncSpots.ReqState.EVERYTHING_LOADED){
+                Clustering.addAllSpots(SpotsData.get_allSpots(), curFilter());
+                mainActivity.setIsSpotsSynced(true);
+            }
+            else
+                Toast.makeText(mainActivity.getBaseContext(),mainActivity.getString(R.string.spotinfo_req_error_msg),Toast.LENGTH_SHORT).show();
+            mainActivity.invalidateOptionsMenu();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        else
-            Toast.makeText(mainActivity.getBaseContext(),mainActivity.getString(R.string.spotinfo_req_error_msg),Toast.LENGTH_SHORT).show();
-        mainActivity.invalidateOptionsMenu();
     }
 
     public boolean isGoogleMapsInstalled()
