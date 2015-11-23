@@ -14,9 +14,6 @@ public class AppPref {
         return isAutoLogin;
     }
 
-    public boolean getIsAutoLogin(){return isAutoLogin();}
-
-
     public void setIsAutoLogin(boolean isAutoLogin) {
         this.isAutoLogin = isAutoLogin;
     }

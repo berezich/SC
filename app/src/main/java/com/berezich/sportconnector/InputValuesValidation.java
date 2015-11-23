@@ -3,9 +3,6 @@ package com.berezich.sportconnector;
 import android.content.Context;
 import android.text.TextUtils;
 
-/**
- * Created by Sashka on 24.10.2015.
- */
 public class InputValuesValidation {
     public static boolean isValidEmail(CharSequence target) {
         return !TextUtils.isEmpty(target) && android.util.Patterns.EMAIL_ADDRESS.matcher(target).matches();
@@ -21,7 +18,7 @@ public class InputValuesValidation {
             confirmPass = "";
         if(pass.isEmpty() && confirmPass.isEmpty())
             return PASS_ERROR.EMPTY;
-        int minLength = (int) ctx.getResources().getInteger(R.integer.changePass_minPassLength);
+        int minLength = ctx.getResources().getInteger(R.integer.changePass_minPassLength);
         if(pass.length()< minLength)
             return PASS_ERROR.TOO_SHORT;
         if(!pass.equals(confirmPass))

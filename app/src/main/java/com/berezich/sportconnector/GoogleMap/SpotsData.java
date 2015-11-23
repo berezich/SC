@@ -2,7 +2,6 @@ package com.berezich.sportconnector.GoogleMap;
 
 import android.os.AsyncTask;
 import android.util.Log;
-import android.util.Pair;
 
 import com.berezich.sportconnector.LocalDataManager;
 import com.berezich.sportconnector.backend.sportConnectorApi.model.Person;
@@ -14,7 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 
 public class SpotsData {
-    private static HashMap<Long, Spot> _allSpots = new HashMap<Long, Spot>();
+    private static HashMap<Long, Spot> _allSpots = new HashMap<>();
 
     public static HashMap<Long, Spot> get_allSpots() {
         if(_allSpots.isEmpty())
@@ -97,7 +96,7 @@ public class SpotsData {
         Spot spot = _allSpots.get(idSpot);
         Person myPersonInfo = LocalDataManager.getMyPersonInfo();
         Long personId;
-        List<Long> favoriteSpotLst = null;
+        List<Long> favoriteSpotLst;
         List<Long> personLst = null;
 
         if(spot!=null && myPersonInfo!=null) {
@@ -131,7 +130,7 @@ public class SpotsData {
     }
     public static List<Long> getCoachIdsWithoutMe(Spot spot)
     {
-        List<Long> personIds = new ArrayList<Long>(),coachLst;
+        List<Long> personIds = new ArrayList<>(),coachLst;
         Person myPersonInfo;
         if((coachLst = spot.getCoachLst())!=null) {
             personIds.addAll(coachLst);
@@ -142,7 +141,7 @@ public class SpotsData {
     }
     public static List<Long> getPartnerIdsWithoutMe(Spot spot)
     {
-        List<Long> personIds = new ArrayList<Long>(), partnerLst;
+        List<Long> personIds = new ArrayList<>(), partnerLst;
         Person myPersonInfo;
         if((partnerLst = spot.getPartnerLst())!=null) {
             personIds.addAll(partnerLst);

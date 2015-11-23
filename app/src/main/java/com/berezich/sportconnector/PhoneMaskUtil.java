@@ -4,15 +4,9 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.widget.EditText;
 
-/**
- * Created by Sashka on 25.10.2015.
- */
 public class PhoneMaskUtil {
     private static final String prefix = "+7";
     private static final String mask10 = "(###)###-##-##";
-    //private static final String mask11 = "(####)###-##-##";
-    private static final String mask8 = "####-####";
-    private static final String mask9 = "#####-####";
 
     public static String unmask(String s) {
         return s.replaceAll("^\\"+prefix+"*|[^0-9]*", "");
@@ -20,9 +14,7 @@ public class PhoneMaskUtil {
 
     public static boolean validate(String phone){
         phone = unmask(phone);
-        if(phone.length()==10 || phone.isEmpty())
-            return true;
-        return false;
+        return phone.length()==10 || phone.isEmpty();
     }
 
     public static TextWatcher insert(final EditText editText) {
@@ -54,30 +46,16 @@ public class PhoneMaskUtil {
         };
     }
 
-    private static String getDefaultMask(String str) {
-        String defaultMask = mask10;
-        /*if (str.length() > 11){
-            defaultMask = mask11;
-        }*/
-        return defaultMask;
+    private static String getDefaultMask() {
+        return mask10;
     }
-    private static String getMask(String str){
-        String mask;
-        String defaultMask = getDefaultMask(str);
-        switch (str.length()) {
-            /*case 11:
-                mask =prefix + mask11;
-                break;
-            */
-            default:
-                mask = prefix + defaultMask;
-                break;
-        }
-        return mask;
+    private static String getMask(){
+        String defaultMask = getDefaultMask();
+        return prefix + defaultMask;
     }
     public static String setMask(String srcStr){
         String mascara = "";
-        String mask = getMask(srcStr);
+        String mask = getMask();
         int i = 0;
         for (char m : mask.toCharArray()) {
             if (m != '#'  && srcStr.length() != i) {

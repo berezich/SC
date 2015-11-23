@@ -207,7 +207,8 @@ public class PersonProfileFragment extends Fragment {
                         View view = getProfileDetailItem(getContext(),getString(R.string.personprofile_email),email);
                         if(view!=null) {
                             propertyLstLayout.addView(view);
-                            view.setOnClickListener(new OnComposeEmailClick());
+                            if(!isMyProfile)
+                                view.setOnClickListener(new OnComposeEmailClick());
                         }
                     }
                     if (phone != null && !phone.equals("")) {
@@ -216,7 +217,8 @@ public class PersonProfileFragment extends Fragment {
                         View view = getProfileDetailItem(getContext(),getString(R.string.personprofile_phone),phone);
                         if(view!=null) {
                             propertyLstLayout.addView(view);
-                            view.setOnClickListener(new OnPhoneClick());
+                            if(!isMyProfile)
+                                view.setOnClickListener(new OnPhoneClick());
                         }
                     }
             }
@@ -231,7 +233,6 @@ public class PersonProfileFragment extends Fragment {
                         txtView.setText(desc);
                     linearLayout.setVisibility(View.VISIBLE);
                 }
-
             }
 
             //favorite spots lst

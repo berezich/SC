@@ -3,11 +3,9 @@ package com.berezich.sportconnector;
 import android.content.Context;
 import android.text.InputFilter;
 import android.text.Spanned;
-import android.util.Log;
 
 import com.berezich.sportconnector.backend.sportConnectorApi.model.AccountForConfirmation;
 import com.berezich.sportconnector.backend.sportConnectorApi.model.Person;
-import com.google.api.client.util.Base64;
 import com.google.api.client.util.DateTime;
 
 import java.security.MessageDigest;
@@ -17,11 +15,9 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.concurrent.TimeUnit;
+import java.util.Locale;
 
-/**
- * Created by Sashka on 26.07.2015.
- */
+
 public class UsefulFunctions {
     public static int calcPersonAge(DateTime birthday) {
         Calendar calendar2 = Calendar.getInstance(),calendar1 = Calendar.getInstance();
@@ -42,16 +38,15 @@ public class UsefulFunctions {
     }
     public static DateTime parseDateTime(String dtStr)
     {
-        DateFormat df = new SimpleDateFormat("dd.mm.yyyy");
+        DateFormat df = new SimpleDateFormat("dd.mm.yyyy", Locale.getDefault());
         DateTime dtBirthday = null;
         try {
             Date dBirthday = df.parse(dtStr);
             dtBirthday = new DateTime(dBirthday);
         } catch (ParseException e) {
             e.printStackTrace();
-        } finally {
-            return dtBirthday;
         }
+        return dtBirthday;
     }
     public static Person createPerson(AccountForConfirmation account)
     {

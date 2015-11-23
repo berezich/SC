@@ -107,8 +107,9 @@ public class ImgViewPagerActivity extends Activity {
 
 		@Override
 		public View instantiateItem(ViewGroup container, int position) {
-			PhotoView photoView = new PhotoView(container.getContext());
 			try {
+				PhotoView photoView = new PhotoView(container.getContext());
+
 				Picture picture = picLst.get(position);
 
 				FileManager.providePhotoForImgView(container.getContext(), photoView, picture, FileManager.TEMP_DIR, 0);
@@ -116,15 +117,20 @@ public class ImgViewPagerActivity extends Activity {
 				container.addView(photoView, LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
 				photoView.setScale(1);
 				photoView.setTag(position);
+				return photoView;
 			} catch (Exception e) {
 				e.printStackTrace();
+				return new View(container.getContext());
 			}
-			return photoView;
 		}
 
 		@Override
 		public void destroyItem(ViewGroup container, int position, Object object) {
-			container.removeView((View) object);
+			try {
+				container.removeView((View) object);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
 
 		@Override

@@ -52,7 +52,6 @@ import java.util.List;
  * Created by Sashka on 11.09.2015.
  */
 public class FileManager {
-    //private final int MAX_SIZE = 1024*10;
     private static final int COMPRESS_QUALITY = 75;
     private static final int REQUIRED_SIZE = 1000;
     private static final String TAG = "MyLog_fileManager";
@@ -78,21 +77,19 @@ public class FileManager {
         @Expose
         private String mimeType;
 
-        public PicInfo(Fragment fragment, String TAG, File file) throws IOException {
+        public PicInfo(File file) throws IOException {
             path = file.getAbsolutePath();
             name = file.getName();
             mimeType = "image/jpeg";
             bitmap = decodeFile(new File(path));
             bitmap = rotateBitmapFileIfNeed(path,bitmap);
         }
-        public PicInfo(Fragment fragment, String TAG, String fileUri, String nameToSave) throws IOException{
+        public PicInfo(Fragment fragment, String fileUri, String nameToSave) throws IOException{
             Uri uri = Uri.parse(fileUri);
             Cursor returnCursor = fragment.getActivity().getContentResolver().query(uri, null, null, null, null);
-            int nameIndex = returnCursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
             int sizeIndex = returnCursor.getColumnIndex(OpenableColumns.SIZE);
             int dataIdx = returnCursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA);
             returnCursor.moveToFirst();
-            //this.name = returnCursor.getString(nameIndex);
             name = nameToSave;
             this.size = returnCursor.getLong(sizeIndex);
             this.mimeType = fragment.getActivity().getContentResolver().getType(uri);
@@ -125,20 +122,8 @@ public class FileManager {
             return path;
         }
 
-        public Bitmap getBitmap() {
-            return bitmap;
-        }
-
         public Long getSize() {
             return size;
-        }
-
-        public Date getDate() {
-            return date;
-        }
-
-        public String getDescription() {
-            return description;
         }
 
         public String getMimeType() {
@@ -149,29 +134,10 @@ public class FileManager {
             this.name = name;
         }
 
-        public void setPath(String path) {
-            this.path = path;
-        }
-
-        public void setBitmap(Bitmap bitmap) {
-            this.bitmap = bitmap;
-        }
-
         public void setSize(Long size) {
             this.size = size;
         }
 
-        public void setDate(Date date) {
-            this.date = date;
-        }
-
-        public void setDescription(String description) {
-            this.description = description;
-        }
-
-        public void setMimeType(String mimeType) {
-            this.mimeType = mimeType;
-        }
     }
 
     public static class UploadAndReplacePersonFileAsyncTask extends AsyncTask<Pair<PicInfo, Pair<String, String>>, Void, Exception> {
@@ -191,6 +157,9 @@ public class FileManager {
             PicInfo picInfo = params[0].first;
             String urlForUpload = params[0].second.first;
             String replacePicKey = params[0].second.second;
+            Person myPersonInfo = LocalDataManager.getMyPersonInfo();
+            if (myPersonInfo == null)
+                return new NullPointerException("myPersonInfo == null");
             try {
                 HttpClient httpClient = new DefaultHttpClient();
                 HttpPost postRequest = new HttpPost(urlForUpload);
@@ -198,9 +167,7 @@ public class FileManager {
                 builder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
                 builder.addPart("Name", new StringBody(picInfo.getName(), ContentType.MULTIPART_FORM_DATA));
                 builder.addPart("Type", new StringBody(picInfo.getMimeType(), ContentType.MULTIPART_FORM_DATA));
-                Person myPersonInfo = LocalDataManager.getMyPersonInfo();
-                if (myPersonInfo == null)
-                    new NullPointerException("myPersonInfo == null");
+
                 builder.addPart("UsrId", new StringBody(myPersonInfo.getId().toString(), ContentType.MULTIPART_FORM_DATA));
                 builder.addPart("UsrPass", new StringBody(myPersonInfo.getPass(), ContentType.MULTIPART_FORM_DATA));
                 if (replacePicKey != null && !replacePicKey.equals(""))
@@ -219,8 +186,6 @@ public class FileManager {
                 response = httpClient.execute(postRequest);
                 Log.d(TAG, String.format("upload pic response http status: %s\n entity content: %s",
                         response.getStatusLine(), response.getEntity().getContent()));
-                if(response==null)
-                    return new NullPointerException("response == null");
                 StatusLine statusLine;
                 if((statusLine = response.getStatusLine())!=null && statusLine.getStatusCode()!= 200)
                     return new Exception(String.format("response code = %d getReasonPhrase = %s",
@@ -236,7 +201,7 @@ public class FileManager {
             listener.onUploadFileFinish(exception);
         }
 
-        public static interface OnAction {
+        public interface OnAction {
             void onUploadFileFinish(Exception exception);
         }
     }
@@ -283,16 +248,6 @@ public class FileManager {
         String cacheDir;
         String msgError;
 
-        public DownloadImageTask(Fragment fragment, String imgId) {
-            this.imgId = imgId;
-            this.context = fragment.getActivity().getBaseContext();
-            try {
-                listener = (OnAction) fragment;
-            } catch (ClassCastException e) {
-                throw new ClassCastException(fragment.toString() + " must implement onDownloadFileFinish for DownloadImageTask");
-            }
-
-        }
 
         public DownloadImageTask(Context context, String imgId, ImageView imageView, String cacheDir) {
             this.imgId = imgId;
@@ -303,14 +258,6 @@ public class FileManager {
             this.msgError = "";
         }
 
-        public DownloadImageTask(Context context, String imgId, ImageView imageView, String cacheDir, String msgError) {
-            this.imgId = imgId;
-            this.context = context;
-            isRespHandled = false;
-            this.imageView = imageView;
-            this.cacheDir = cacheDir;
-            this.msgError = msgError;
-        }
 
         protected Pair<Bitmap, Exception> doInBackground(String... urls) {
             String urldisplay = urls[0];
@@ -361,7 +308,7 @@ public class FileManager {
             }
         }
 
-        public static interface OnAction {
+        public interface OnAction {
             void onDownloadFileFinish(Bitmap bitmap, String imgId, Exception exception);
         }
     }

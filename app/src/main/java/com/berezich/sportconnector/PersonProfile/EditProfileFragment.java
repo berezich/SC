@@ -61,9 +61,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-/**
- * Created by Sashka on 25.07.2015.
- */
 public class EditProfileFragment extends Fragment implements DatePickerFragment.OnActionDatePickerDialogListener,
                                                              ChangePassFragment.OnActionPassDialogListener,ChangeEmailFragment.OnActionEmailDialogListener,
                                                              EndpointApi.ChangeEmailAsyncTask.OnAction,
@@ -103,33 +100,44 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
-        super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
-        LocalDataManager.init(getActivity());
         try {
-            personProfileFragment = (PersonProfileFragment) getTargetFragment();
-        }
-        catch (Exception ex){
-            Log.e(TAG,"For EditProfileFragment there is no targetFragment PersonProfileFragment!");
-            ex.printStackTrace();
+            super.onCreate(savedInstanceState);
+            setHasOptionsMenu(true);
+            LocalDataManager.init(getActivity());
+            try {
+                personProfileFragment = (PersonProfileFragment) getTargetFragment();
+            }
+            catch (Exception ex){
+                Log.e(TAG,"For EditProfileFragment there is no targetFragment PersonProfileFragment!");
+                ex.printStackTrace();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        rootView = inflater.inflate(R.layout.fragment_edit_profile, container, false);
-        EditText txtEdt;
-        if ((txtEdt = (EditText) rootView.findViewById(R.id.editProfile_txtEdt_phone)) != null)
-            txtEdt.addTextChangedListener( PhoneMaskUtil.insert(txtEdt));
-        return rootView;
+        try {
+            rootView = inflater.inflate(R.layout.fragment_edit_profile, container, false);
+            EditText txtEdt;
+            if ((txtEdt = (EditText) rootView.findViewById(R.id.editProfile_txtEdt_phone)) != null)
+                txtEdt.addTextChangedListener( PhoneMaskUtil.insert(txtEdt));
+            return rootView;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return rootView=null;
+        }
     }
 
     @Override
     public void onAttach(Activity activity) {
-        this.activity = getActivity();
-        super.onAttach(activity);
-
-
+        try {
+            this.activity = getActivity();
+            super.onAttach(activity);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -140,181 +148,201 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        if (savedInstanceState != null) {
-            //Restore the fragment's state here
-            try {
-                String tempPersonStr = savedInstanceState.getString(STATE_TEMP_PERSON);
-                if(tempPersonStr!=null && !tempPersonStr.equals("")) {
-                    tempMyPerson = gsonFactory.fromString(tempPersonStr, Person.class);
-                    Log.d(TAG, String.format("tempMyPerson got out of instanceState"));
+        try {
+            super.onActivityCreated(savedInstanceState);
+            if (savedInstanceState != null) {
+                //Restore the fragment's state here
+                try {
+                    String tempPersonStr = savedInstanceState.getString(STATE_TEMP_PERSON);
+                    if(tempPersonStr!=null && !tempPersonStr.equals("")) {
+                        tempMyPerson = gsonFactory.fromString(tempPersonStr, Person.class);
+                        Log.d(TAG, "tempMyPerson got out of instanceState");
+                    }
+                    else {
+                        Log.d(TAG, "instanceState.tempMyPerson == null");
+                    }
+                } catch (Exception e) {
+                    Log.e(TAG, "tempMyPerson getting out of instanceState failed");
+                    e.printStackTrace();
                 }
-                else {
-                    Log.d(TAG, String.format("instanceState.tempMyPerson == null"));
+                try {
+                    String picInfoStr = savedInstanceState.getString(STATE_PICINFO);
+                    if(picInfoStr!=null && !picInfoStr.equals("")) {
+                        picInfo = gson.fromJson(picInfoStr, FileManager.PicInfo.class);
+                        Log.d(TAG, "picInfo got out of instanceState");
+                    }
+                    else {
+                        Log.d(TAG, "instanceState.picInfo == null");
+                    }
+                } catch (Exception e) {
+                    Log.e(TAG, "picInfo getting out of instanceState failed");
+                    e.printStackTrace();
                 }
-            } catch (Exception e) {
-                Log.e(TAG, String.format("tempMyPerson getting out of instanceState failed"));
-                e.printStackTrace();
+                tempFileForPhotoPath = savedInstanceState.getString(STATE_TEMP_FILE_PATH);
             }
-            try {
-                String picInfoStr = savedInstanceState.getString(STATE_PICINFO);
-                if(picInfoStr!=null && !picInfoStr.equals("")) {
-                    picInfo = gson.fromJson(picInfoStr, FileManager.PicInfo.class);
-                    Log.d(TAG, String.format("picInfo got out of instanceState"));
-                }
-                else {
-                    Log.d(TAG, String.format("instanceState.picInfo == null"));
-                }
-            } catch (Exception e) {
-                Log.e(TAG, String.format("picInfo getting out of instanceState failed"));
-                e.printStackTrace();
-            }
-            tempFileForPhotoPath = savedInstanceState.getString(STATE_TEMP_FILE_PATH);
+            else
+                Log.d(TAG, "savedInstanceState == null");
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        else
-            Log.d(TAG, String.format("savedInstanceState == null"));
     }
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        //Save the fragment's state here
-        updateTempMyPerson();
         try {
-            outState.putString(STATE_TEMP_PERSON,gsonFactory.toString(tempMyPerson));
-            outState.putString(STATE_PICINFO, gson.toJson(picInfo));
-            outState.putString(STATE_TEMP_FILE_PATH,tempFileForPhotoPath);
-            Log.d(TAG, String.format("tempMyPerson and picInfo saved to instanceState"));
+            super.onSaveInstanceState(outState);
+            //Save the fragment's state here
+            updateTempMyPerson();
+            try {
+                outState.putString(STATE_TEMP_PERSON,gsonFactory.toString(tempMyPerson));
+                outState.putString(STATE_PICINFO, gson.toJson(picInfo));
+                outState.putString(STATE_TEMP_FILE_PATH,tempFileForPhotoPath);
+                Log.d(TAG, "tempMyPerson and picInfo saved to instanceState");
+            } catch (Exception e) {
+                Log.e(TAG, "tempMyPerson or picInfo saving to instanceState failed");
+                e.printStackTrace();
+            }
         } catch (Exception e) {
-            Log.e(TAG, String.format("tempMyPerson or picInfo saving to instanceState failed"));
             e.printStackTrace();
         }
     }
 
     @Override
     public void onResume() {
-        super.onResume();
-        TextView txtView;
-        EditText txtEdt;
-        DateTime birthday;
-        ImageButton imgBtn;
-        Spinner spinner;
-        ImageView imageView;
-        FrameLayout frameLayout;
+        try {
+            super.onResume();
+            TextView txtView;
+            EditText txtEdt;
+            DateTime birthday;
+            ImageButton imgBtn;
+            Spinner spinner;
+            ImageView imageView;
+            FrameLayout frameLayout;
 
-        ((MainActivity)this.activity).setmTitle(activity.getString(R.string.editprofile_fragmentTitle));
-        ((MainActivity)this.activity).getSupportActionBar().setHomeAsUpIndicator(null);
-        ((MainActivity)this.activity).restoreActionBar();
+            ((MainActivity)this.activity).setmTitle(activity.getString(R.string.editprofile_fragmentTitle));
+            ((MainActivity)this.activity).getSupportActionBar().setHomeAsUpIndicator(null);
+            ((MainActivity)this.activity).restoreActionBar();
 
-        final Person myPersonInfo = LocalDataManager.getMyPersonInfo();
-        RadioGroup radioGroup;
-        if (myPersonInfo != null && rootView != null) {
-            if(tempMyPerson ==null) {
-                tempMyPerson = myPersonInfo.clone();
-                Log.d(TAG,"tempMyPerson cloned myPersonInfo");
-            }else{
+            final Person myPersonInfo = LocalDataManager.getMyPersonInfo();
+            RadioGroup radioGroup;
+            if (myPersonInfo != null && rootView != null) {
+                if(tempMyPerson ==null) {
+                    tempMyPerson = myPersonInfo.clone();
+                    Log.d(TAG,"tempMyPerson cloned myPersonInfo");
+                }else{
 
-                if(tempMyPerson.getPhoto()!=null)
-                    Log.d(TAG,String.format("temp userPic = %s",UsefulFunctions.getDigest(tempMyPerson.getPhoto().getBlobKey())));
-            }
-            if((imageView = (ImageView) rootView.findViewById(R.id.editProfile_img_photo))!=null) {
-                Picture photoInfo = tempMyPerson.getPhoto();
-                FileManager.providePhotoForImgView(activity.getBaseContext(), imageView,
-                        photoInfo, FileManager.PERSON_CACHE_DIR + "/" + tempMyPerson.getId().toString());
-            }
-            if((frameLayout=(FrameLayout) rootView.findViewById(R.id.editProfile_frame_changePhoto))!=null)
-                frameLayout.setOnClickListener(new ImageOnClick());
-            if ((txtEdt = (EditText) rootView.findViewById(R.id.editProfile_txtEdt_name)) != null) {
-                txtEdt.setText(tempMyPerson.getName());
-                txtEdt.setFilters(new InputFilter[]{new UsefulFunctions.NameSurnameInputFilter(
-                        activity.getResources().getInteger(R.integer.nameMaxLength_edtTxt))});
-            }
-            if ((txtEdt = (EditText) rootView.findViewById(R.id.editProfile_txtEdt_surname)) != null) {
-                txtEdt.setText(tempMyPerson.getSurname());
-                txtEdt.setFilters(new InputFilter[]{new UsefulFunctions.NameSurnameInputFilter(
-                        activity.getResources().getInteger(R.integer.surnameMaxLength_edtTxt))});
-            }
-            if ((txtView = (TextView) rootView.findViewById(R.id.editProfile_txtView_birthday)) != null) {
-                Date date;
-                if ((birthday = tempMyPerson.getBirthday()) != null)
-                    date = new Date(birthday.getValue());
-                else {
-                    Calendar calendar = Calendar.getInstance();
-                    calendar.set(Calendar.YEAR,calendar.get(Calendar.YEAR)-getResources().getInteger(R.integer.editProfile_minAge));
-                    date = calendar.getTime();
+                    if(tempMyPerson.getPhoto()!=null)
+                        Log.d(TAG,String.format("temp userPic = %s",UsefulFunctions.getDigest(tempMyPerson.getPhoto().getBlobKey())));
                 }
-                txtView.setText(String.format("%1$td.%1$tm.%1$tY", date));
-                txtView.setOnClickListener(new OnBirthdayClickListener());
-            }
-            if ((radioGroup = (RadioGroup) rootView.findViewById(R.id.editProfile_radioGrp_sex)) != null) {
-                String sex = tempMyPerson.getSex() != null ? tempMyPerson.getSex() : "";
-                if (sex.equals(mSex))
-                    radioGroup.check(R.id.editProfile_radio_male);
-                else if (sex.equals(fSex))
-                    radioGroup.check(R.id.editProfile_radio_female);
-                else
-                    radioGroup.clearCheck();
-            }
+                if((imageView = (ImageView) rootView.findViewById(R.id.editProfile_img_photo))!=null) {
+                    Picture photoInfo = tempMyPerson.getPhoto();
+                    FileManager.providePhotoForImgView(activity.getBaseContext(), imageView,
+                            photoInfo, FileManager.PERSON_CACHE_DIR + "/" + tempMyPerson.getId().toString());
+                }
+                if((frameLayout=(FrameLayout) rootView.findViewById(R.id.editProfile_frame_changePhoto))!=null)
+                    frameLayout.setOnClickListener(new ImageOnClick());
+                if ((txtEdt = (EditText) rootView.findViewById(R.id.editProfile_txtEdt_name)) != null) {
+                    txtEdt.setText(tempMyPerson.getName());
+                    txtEdt.setFilters(new InputFilter[]{new UsefulFunctions.NameSurnameInputFilter(
+                            activity.getResources().getInteger(R.integer.nameMaxLength_edtTxt))});
+                }
+                if ((txtEdt = (EditText) rootView.findViewById(R.id.editProfile_txtEdt_surname)) != null) {
+                    txtEdt.setText(tempMyPerson.getSurname());
+                    txtEdt.setFilters(new InputFilter[]{new UsefulFunctions.NameSurnameInputFilter(
+                            activity.getResources().getInteger(R.integer.surnameMaxLength_edtTxt))});
+                }
+                if ((txtView = (TextView) rootView.findViewById(R.id.editProfile_txtView_birthday)) != null) {
+                    Date date;
+                    if ((birthday = tempMyPerson.getBirthday()) != null)
+                        date = new Date(birthday.getValue());
+                    else {
+                        Calendar calendar = Calendar.getInstance();
+                        calendar.set(Calendar.YEAR,calendar.get(Calendar.YEAR)-getResources().getInteger(R.integer.editProfile_minAge));
+                        date = calendar.getTime();
+                    }
+                    txtView.setText(String.format("%1$td.%1$tm.%1$tY", date));
+                    txtView.setOnClickListener(new OnBirthdayClickListener());
+                }
+                if ((radioGroup = (RadioGroup) rootView.findViewById(R.id.editProfile_radioGrp_sex)) != null) {
+                    String sex = tempMyPerson.getSex() != null ? tempMyPerson.getSex() : "";
+                    switch (sex){
+                        case mSex:
+                            radioGroup.check(R.id.editProfile_radio_male);
+                            break;
+                        case fSex:
+                            radioGroup.check(R.id.editProfile_radio_female);
+                            break;
+                        default:
+                            radioGroup.clearCheck();
+                    }
+                }
 
-            String email = tempMyPerson.getEmail(), phone = tempMyPerson.getPhone();
-            if ((txtView = (TextView) rootView.findViewById(R.id.editProfile_txtEdt_email)) != null) {
-                txtView.setText(email);
-                txtView.setOnClickListener(new EmailOnClickListener());
-            }
-            if ((txtEdt = (EditText) rootView.findViewById(R.id.editProfile_txtEdt_phone)) != null) {
-                txtEdt.setText(phone);
-            }
+                String email = tempMyPerson.getEmail(), phone = tempMyPerson.getPhone();
+                if ((txtView = (TextView) rootView.findViewById(R.id.editProfile_txtEdt_email)) != null) {
+                    txtView.setText(email);
+                    txtView.setOnClickListener(new EmailOnClickListener());
+                }
+                if ((txtEdt = (EditText) rootView.findViewById(R.id.editProfile_txtEdt_phone)) != null) {
+                    txtEdt.setText(phone);
+                }
 
-            if ((txtView = (TextView) rootView.findViewById(R.id.editProfile_txtView_changePass)) != null) {
-                txtView.setOnClickListener(new PassOnClickListener());
-            }
+                if ((txtView = (TextView) rootView.findViewById(R.id.editProfile_txtView_changePass)) != null) {
+                    txtView.setOnClickListener(new PassOnClickListener());
+                }
 
-            if ((txtView = (TextView) rootView.findViewById(R.id.editProfile_txtView_setRating)) != null) {
-                txtView.setText(activity.getString(R.string.personprofile_rating));
-            }
+                if ((txtView = (TextView) rootView.findViewById(R.id.editProfile_txtView_setRating)) != null) {
+                    txtView.setText(activity.getString(R.string.personprofile_rating));
+                }
 
-            if ((spinner = (Spinner) rootView.findViewById(R.id.editProfile_spinner_rating)) != null) {
-                String ratings = activity.getString(R.string.ratingInfo_ratingValLst);
-                if(ratings!=null) {
-                    final String ratingArr[] = ratings.split(",");
-                    ArrayAdapter<String> adapter = new ArrayAdapter<>(activity, R.layout.spinner_item, ratingArr);
-                    adapter.setDropDownViewResource(R.layout.spinner_item);
-                    spinner.setAdapter(adapter);
-                    int pos = (int)(this.tempMyPerson.getRating()/0.5-2);
-                    if(pos<=ratingArr.length)
-                        spinner.setSelection(pos);
-                    else
-                        spinner.setSelection(0);
+                if ((spinner = (Spinner) rootView.findViewById(R.id.editProfile_spinner_rating)) != null) {
+                    String ratings = activity.getString(R.string.ratingInfo_ratingValLst);
+                    if(ratings!=null) {
+                        final String ratingArr[] = ratings.split(",");
+                        ArrayAdapter<String> adapter = new ArrayAdapter<>(activity, R.layout.spinner_item, ratingArr);
+                        adapter.setDropDownViewResource(R.layout.spinner_item);
+                        spinner.setAdapter(adapter);
+                        int pos = (int)(this.tempMyPerson.getRating()/0.5-2);
+                        if(pos<=ratingArr.length)
+                            spinner.setSelection(pos);
+                        else
+                            spinner.setSelection(0);
 
-                    spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                        @Override
-                        public void onItemSelected(AdapterView<?> parent, View view,
-                                                   int position, long id) {
-                            float rating = Float.valueOf(ratingArr[position]);
-                            if( EditProfileFragment.this.tempMyPerson.getRating()!=rating) {
-                                EditProfileFragment.this.tempMyPerson.setRating(rating);
-                                ImageButton imgBtn;
-                                if ((imgBtn = (ImageButton) rootView.findViewById(R.id.editProfile_btn_ratingInfo)) != null) {
-                                    imgBtn.performClick();
+                        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                            @Override
+                            public void onItemSelected(AdapterView<?> parent, View view,
+                                                       int position, long id) {
+                                try {
+                                    float rating = Float.valueOf(ratingArr[position]);
+                                    if( EditProfileFragment.this.tempMyPerson.getRating()!=rating) {
+                                        EditProfileFragment.this.tempMyPerson.setRating(rating);
+                                        ImageButton imgBtn;
+                                        if ((imgBtn = (ImageButton) rootView.findViewById(R.id.editProfile_btn_ratingInfo)) != null) {
+                                            imgBtn.performClick();
+                                        }
+                                    }
+                                } catch (Exception e) {
+                                    e.printStackTrace();
                                 }
                             }
-                        }
 
-                        @Override
-                        public void onNothingSelected(AdapterView<?> arg0) {
-                        }
-                    });
+                            @Override
+                            public void onNothingSelected(AdapterView<?> arg0) {
+                            }
+                        });
+                    }
                 }
+
+                if ((imgBtn = (ImageButton) rootView.findViewById(R.id.editProfile_btn_ratingInfo)) != null) {
+                    imgBtn.setOnClickListener(new RatingInfoOnClickListener());
+                }
+
+                if ((txtView = (TextView) rootView.findViewById(R.id.editProfile_txtEdt_desc)) != null)
+                    txtView.setText(tempMyPerson.getDescription());
+
+                if(activity!=null)
+                    ((MainActivity)activity).setupUI(rootView);
             }
-
-            if ((imgBtn = (ImageButton) rootView.findViewById(R.id.editProfile_btn_ratingInfo)) != null) {
-                imgBtn.setOnClickListener(new RatingInfoOnClickListener());
-            }
-
-            if ((txtView = (TextView) rootView.findViewById(R.id.editProfile_txtEdt_desc)) != null)
-                txtView.setText(tempMyPerson.getDescription());
-
-            if(activity!=null)
-                ((MainActivity)activity).setupUI(rootView);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
     private Fragment getCurFragment(){
@@ -322,47 +350,53 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
     }
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-
-        menu.clear();
-        super.onCreateOptionsMenu(menu, inflater);
-        inflater.inflate(R.menu.fragment_edit_profile, menu);
-
+        try {
+            menu.clear();
+            super.onCreateOptionsMenu(menu, inflater);
+            inflater.inflate(R.menu.fragment_edit_profile, menu);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        ((MainActivity) activity).hideSoftKeyboard();
-        Context ctx = activity.getBaseContext();
-        switch (item.getItemId())
-        {
-            case R.id.menu_save_profile:
-                Person myPersonInfo = LocalDataManager.getMyPersonInfo();
-                String validationErr = updateTempMyPerson();
-                if(!validationErr.isEmpty()) {
-                    showWarnDialog(validationErr);
-                    break;
-                }
+        try {
+            ((MainActivity) activity).hideSoftKeyboard();
+            Context ctx = activity.getBaseContext();
+            switch (item.getItemId())
+            {
+                case R.id.menu_save_profile:
+                    Person myPersonInfo = LocalDataManager.getMyPersonInfo();
+                    String validationErr = updateTempMyPerson();
+                    if(!validationErr.isEmpty()) {
+                        showWarnDialog(validationErr);
+                        break;
+                    }
 
-                if(myPersonInfo!=null && tempMyPerson!=null) {
-                    if (picInfo != null) {
-                        item.setVisible(false);
-                        setVisibleProgressBar(true);
-                        new EndpointApi.GetUrlForUploadAsyncTask(this).execute();
+                    if(myPersonInfo!=null && tempMyPerson!=null) {
+                        if (picInfo != null) {
+                            item.setVisible(false);
+                            setVisibleProgressBar(true);
+                            new EndpointApi.GetUrlForUploadAsyncTask(this).execute();
+                        }
+                        else if (isChanged(tempMyPerson, myPersonInfo)) {
+                            item.setVisible(false);
+                            setVisibleProgressBar(true);
+                            new EndpointApi.UpdatePersonAsyncTask(this).execute(tempMyPerson);
+                        }
+                        else{
+                            FragmentManager fragmentManager = activity.getSupportFragmentManager();
+                            if(fragmentManager!=null)
+                                fragmentManager.popBackStack();
+                        }
                     }
-                    else if (isChanged(tempMyPerson, myPersonInfo)) {
-                        item.setVisible(false);
-                        setVisibleProgressBar(true);
-                        new EndpointApi.UpdatePersonAsyncTask(this).execute(tempMyPerson);
-                    }
-                    else{
-                        FragmentManager fragmentManager = activity.getSupportFragmentManager();
-                        if(fragmentManager!=null)
-                            fragmentManager.popBackStack();
-                    }
-                }
-                else
-                    Toast.makeText(ctx, activity.getString(R.string.editprofile_saveError), Toast.LENGTH_SHORT).show();
-                break;
+                    else
+                        Toast.makeText(ctx, activity.getString(R.string.editprofile_saveError), Toast.LENGTH_SHORT).show();
+                    break;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         return super.onOptionsItemSelected(item);
     }
@@ -370,23 +404,31 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
     private class OnBirthdayClickListener implements View.OnClickListener{
         @Override
         public void onClick(View v) {
-            DatePickerFragment datePickerFragment = new DatePickerFragment();
-            TextView txtView = (TextView) v;
+            try {
+                DatePickerFragment datePickerFragment = new DatePickerFragment();
+                TextView txtView = (TextView) v;
 
-            datePickerFragment.setArgs(txtView.getText().toString());
-            datePickerFragment.setTargetFragment(getCurFragment(), -1);
-            datePickerFragment.show(activity.getSupportFragmentManager(), null);
+                datePickerFragment.setArgs(txtView.getText().toString());
+                datePickerFragment.setTargetFragment(getCurFragment(), -1);
+                datePickerFragment.show(activity.getSupportFragmentManager(), null);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
     @Override
     public void onDateSet(int year, int month, int day) {
-        TextView textView;
-        if(rootView!=null)
-            if((textView = (TextView) rootView.findViewById(R.id.editProfile_txtView_birthday))!=null)
-            {
-                textView.setText(String.format("%02d",day)+ "." + String.format("%02d",month+1) + "." + year);
-                textView.setTextColor( activity.getResources().getColor(R.color.blackColor));
-            }
+        try {
+            TextView textView;
+            if(rootView!=null)
+                if((textView = (TextView) rootView.findViewById(R.id.editProfile_txtView_birthday))!=null)
+                {
+                    textView.setText(String.format("%02d",day)+ "." + String.format("%02d",month+1) + "." + year);
+                    textView.setTextColor( activity.getResources().getColor(R.color.blackColor));
+                }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private String updateTempMyPerson(){
@@ -396,7 +438,7 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
         RadioGroup radioGroup;
         if((txtEdt = (EditText) rootView.findViewById(R.id.editProfile_txtEdt_name))!=null){
             String name = txtEdt.getText().toString().trim();
-            if(validationError.isEmpty() &&( name==null || name.isEmpty()))
+            if(validationError.isEmpty() && name.isEmpty())
                 validationError = activity.getString(R.string.registration_err_nameNull);
             tempMyPerson.setName(name);
         }
@@ -442,11 +484,17 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
     {
         @Override
         public void onClick(View v) {
-            FragmentManager fragmentManager = activity.getSupportFragmentManager();
-            Person myPersonInfo = LocalDataManager.getMyPersonInfo();
-            ChangeEmailFragment changeEmailFragment = new ChangeEmailFragment().newInstance(myPersonInfo.getEmail());
-            changeEmailFragment.setTargetFragment(getCurFragment(), 0);
-            changeEmailFragment.show(fragmentManager, null);
+            try {
+                FragmentManager fragmentManager = activity.getSupportFragmentManager();
+                Person myPersonInfo = LocalDataManager.getMyPersonInfo();
+                if(myPersonInfo!=null) {
+                    ChangeEmailFragment changeEmailFragment = ChangeEmailFragment.newInstance(myPersonInfo.getEmail());
+                    changeEmailFragment.setTargetFragment(getCurFragment(), 0);
+                    changeEmailFragment.show(fragmentManager, null);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
 
         }
     }
@@ -456,7 +504,9 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
         try {
             this.newEmail = newEmail;
             setVisibleProgressBar(true);
-            new EndpointApi.ChangeEmailAsyncTask(this).execute(new Pair<>(new Pair<>(tempMyPerson.getId(),tempMyPerson.getPass()),new Pair<>(tempMyPerson.getEmail(),newEmail)));
+            new EndpointApi.ChangeEmailAsyncTask(this).execute(new Pair<>(
+                    new Pair<>(tempMyPerson.getId(),tempMyPerson.getPass())
+                    ,new Pair<>(tempMyPerson.getEmail(),newEmail)));
 
         }
         catch (Exception ex)
@@ -468,42 +518,55 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
 
     @Override
     public void onChangeEmailFinish(Exception error) {
-        String dialogMsg;
-        setVisibleProgressBar(false);
-        if(error==null)
-            dialogMsg = String.format(activity.getString(R.string.changeEmail_msgChangeEmail),newEmail);
-        else {
+        try {
+            String dialogMsg;
+            setVisibleProgressBar(false);
+            if(error==null)
+                dialogMsg = String.format(activity.getString(R.string.changeEmail_msgChangeEmail),newEmail);
+            else {
 
-            Pair<ErrorVisualizer.ERROR_CODE, String> errTxtCode = ErrorVisualizer.getTextCodeOfRespException(activity.getBaseContext(), error);
-            if (errTxtCode != null && !errTxtCode.second.equals(""))
-                dialogMsg = errTxtCode.second;
-            else
-                dialogMsg = activity.getString(R.string.server_unknown_err);
-            Log.d(TAG, "registrationError code = " + errTxtCode.first + " msg = " + errTxtCode.second);
+                Pair<ErrorVisualizer.ERROR_CODE, String> errTxtCode =
+                        ErrorVisualizer.getTextCodeOfRespException(activity.getBaseContext(), error);
+                if (errTxtCode != null && !errTxtCode.second.equals(""))
+                    dialogMsg = errTxtCode.second;
+                else
+                    dialogMsg = activity.getString(R.string.server_unknown_err);
+                if(errTxtCode!=null)
+                    Log.d(TAG, "registrationError code = " + errTxtCode.first + " msg = " + errTxtCode.second);
 
+            }
+            showWarnDialog(dialogMsg);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        showWarnDialog(dialogMsg);
     }
 
     private class PassOnClickListener implements View.OnClickListener
     {
         @Override
         public void onClick(View v) {
-            FragmentManager fragmentManager = activity.getSupportFragmentManager();
-            Person myPersonInfo = LocalDataManager.getMyPersonInfo();
-            ChangePassFragment changePassFragment = new ChangePassFragment().newInstance(myPersonInfo.getPass());
-            changePassFragment.setTargetFragment(getCurFragment(), 0);
-            changePassFragment.show(fragmentManager, null);
+            try {
+                FragmentManager fragmentManager = activity.getSupportFragmentManager();
+                Person myPersonInfo = LocalDataManager.getMyPersonInfo();
+                if(myPersonInfo!=null) {
+                    ChangePassFragment changePassFragment = ChangePassFragment.newInstance(myPersonInfo.getPass());
+                    changePassFragment.setTargetFragment(getCurFragment(), 0);
+                    changePassFragment.show(fragmentManager, null);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 
     @Override
     public void onChangePassClick(String newPass) {
 
-        //tempMyPerson.setPass(newPass);
         try {
             setVisibleProgressBar(true);
-            new EndpointApi.ChangePassAsyncTask(this).execute(new Pair<>(tempMyPerson.getId(), tempMyPerson.getPass()), new Pair<Long, String>(null, newPass));
+            new EndpointApi.ChangePassAsyncTask(this).execute(new Pair<>(
+                    tempMyPerson.getId(), tempMyPerson.getPass()),
+                    new Pair<Long, String>(null, newPass));
             if(tempMyPerson!=null)
                 tempMyPerson.setPass(newPass);
         }
@@ -516,84 +579,94 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
 
     @Override
     public void onChangePassFinish(Exception error) {
-        String dialogMsg;
-        setVisibleProgressBar(false);
-        if(error==null)
-        {
-            if(tempMyPerson!=null)
+        try {
+            String dialogMsg;
+            setVisibleProgressBar(false);
+            if(error==null)
             {
-                Person myPersonInfo = LocalDataManager.getMyPersonInfo();
-                if(myPersonInfo!=null)
+                if(tempMyPerson!=null)
                 {
-                    myPersonInfo.setPass(tempMyPerson.getPass());
-                    LocalDataManager.setMyPersonInfo(myPersonInfo);
+                    Person myPersonInfo = LocalDataManager.getMyPersonInfo();
+                    if(myPersonInfo!=null)
+                    {
+                        myPersonInfo.setPass(tempMyPerson.getPass());
+                        LocalDataManager.setMyPersonInfo(myPersonInfo);
+                    }
                 }
+                dialogMsg = activity.getString(R.string.changePass_msgChangePass);
             }
-            dialogMsg = activity.getString(R.string.changePass_msgChangePass);
-        }
-        else {
-            if(tempMyPerson!=null)
-            {
-                Person myPersonInfo = LocalDataManager.getMyPersonInfo();
-                if(myPersonInfo!=null)
-                    tempMyPerson.setPass(myPersonInfo.getPass());
-            }
-            Pair<ErrorVisualizer.ERROR_CODE, String> errTxtCode = ErrorVisualizer.getTextCodeOfRespException(activity.getBaseContext(), error);
-            if (errTxtCode != null && !errTxtCode.second.equals(""))
-                dialogMsg = errTxtCode.second;
-            else
-                dialogMsg = activity.getString(R.string.server_unknown_err);
-            Log.d(TAG, "registrationError code = " + errTxtCode.first + " msg = " + errTxtCode.second);
+            else {
+                if(tempMyPerson!=null)
+                {
+                    Person myPersonInfo = LocalDataManager.getMyPersonInfo();
+                    if(myPersonInfo!=null)
+                        tempMyPerson.setPass(myPersonInfo.getPass());
+                }
+                Pair<ErrorVisualizer.ERROR_CODE, String> errTxtCode =
+                        ErrorVisualizer.getTextCodeOfRespException(activity.getBaseContext(), error);
+                if (errTxtCode != null && !errTxtCode.second.equals(""))
+                    dialogMsg = errTxtCode.second;
+                else
+                    dialogMsg = activity.getString(R.string.server_unknown_err);
+                if(errTxtCode!=null)
+                    Log.d(TAG, "registrationError code = " + errTxtCode.first + " msg = " + errTxtCode.second);
 
+            }
+            showWarnDialog(dialogMsg);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        showWarnDialog(dialogMsg);
     }
 
     private class RatingInfoOnClickListener implements View.OnClickListener
     {
         @Override
         public void onClick(View v) {
-            ImageButton imageButton = (ImageButton) v;
-            imageButton.setFocusable(false);
-            imageButton.setFocusableInTouchMode(false);
-            if(rootView!=null) {
-                Spinner spinner = (Spinner) rootView.findViewById(R.id.editProfile_spinner_rating);
-                if (spinner!=null)
-                    spinner.requestFocus();
-            }
+            try {
+                ImageButton imageButton = (ImageButton) v;
+                imageButton.setFocusable(false);
+                imageButton.setFocusableInTouchMode(false);
+                if(rootView!=null) {
+                    Spinner spinner = (Spinner) rootView.findViewById(R.id.editProfile_spinner_rating);
+                    if (spinner!=null)
+                        spinner.requestFocus();
+                }
 
-            String msgInfoId;
-            if(tempMyPerson.getRating() == 1.0)
-                msgInfoId = activity.getString(R.string.ratingInfo_1_0);
-            else if(tempMyPerson.getRating() == 1.5)
-                msgInfoId = activity.getString(R.string.ratingInfo_1_5);
-            else if(tempMyPerson.getRating() == 2.0)
-                msgInfoId = activity.getString(R.string.ratingInfo_2_0);
-            else if(tempMyPerson.getRating() == 2.5)
-                msgInfoId = activity.getString(R.string.ratingInfo_2_5);
-            else if(tempMyPerson.getRating() == 3.0)
-                msgInfoId = activity.getString(R.string.ratingInfo_3_0);
-            else if(tempMyPerson.getRating() == 3.5)
-                msgInfoId = activity.getString(R.string.ratingInfo_3_5);
-            else if(tempMyPerson.getRating() == 4.0)
-                msgInfoId = activity.getString(R.string.ratingInfo_4_0);
-            else if(tempMyPerson.getRating() == 4.5)
-                msgInfoId = activity.getString(R.string.ratingInfo_4_5);
-            else if(tempMyPerson.getRating() == 5.0)
-                msgInfoId = activity.getString(R.string.ratingInfo_5_0);
-            else if(tempMyPerson.getRating() == 5.5)
-                msgInfoId = activity.getString(R.string.ratingInfo_5_5);
-            else if(tempMyPerson.getRating() == 6.0)
-                msgInfoId = activity.getString(R.string.ratingInfo_6_0);
-            else if(tempMyPerson.getRating() == 6.5)
-                msgInfoId = activity.getString(R.string.ratingInfo_6_5);
-            else if(tempMyPerson.getRating() == 7.0)
-                msgInfoId = activity.getString(R.string.ratingInfo_7_0);
-            else
-                msgInfoId="";
+                String msgInfoId;
+                if(tempMyPerson.getRating() == 1.0)
+                    msgInfoId = activity.getString(R.string.ratingInfo_1_0);
+                else if(tempMyPerson.getRating() == 1.5)
+                    msgInfoId = activity.getString(R.string.ratingInfo_1_5);
+                else if(tempMyPerson.getRating() == 2.0)
+                    msgInfoId = activity.getString(R.string.ratingInfo_2_0);
+                else if(tempMyPerson.getRating() == 2.5)
+                    msgInfoId = activity.getString(R.string.ratingInfo_2_5);
+                else if(tempMyPerson.getRating() == 3.0)
+                    msgInfoId = activity.getString(R.string.ratingInfo_3_0);
+                else if(tempMyPerson.getRating() == 3.5)
+                    msgInfoId = activity.getString(R.string.ratingInfo_3_5);
+                else if(tempMyPerson.getRating() == 4.0)
+                    msgInfoId = activity.getString(R.string.ratingInfo_4_0);
+                else if(tempMyPerson.getRating() == 4.5)
+                    msgInfoId = activity.getString(R.string.ratingInfo_4_5);
+                else if(tempMyPerson.getRating() == 5.0)
+                    msgInfoId = activity.getString(R.string.ratingInfo_5_0);
+                else if(tempMyPerson.getRating() == 5.5)
+                    msgInfoId = activity.getString(R.string.ratingInfo_5_5);
+                else if(tempMyPerson.getRating() == 6.0)
+                    msgInfoId = activity.getString(R.string.ratingInfo_6_0);
+                else if(tempMyPerson.getRating() == 6.5)
+                    msgInfoId = activity.getString(R.string.ratingInfo_6_5);
+                else if(tempMyPerson.getRating() == 7.0)
+                    msgInfoId = activity.getString(R.string.ratingInfo_7_0);
+                else
+                    msgInfoId="";
 
-            if(!msgInfoId.equals("")) {
-                showWarnDialog(activity.getString(R.string.ratingInfo_title) + " " + tempMyPerson.getRating(), msgInfoId);
+                if(!msgInfoId.equals("")) {
+                    showWarnDialog(activity.getString(R.string.ratingInfo_title) + " " + tempMyPerson.getRating(), msgInfoId);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }
     }
@@ -608,8 +681,7 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
                 PackageManager pm = activity.getPackageManager();
                 Intent intentGallery = new Intent(Intent.ACTION_PICK,
                         android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                if(intentGallery!=null)
-                    intentGallery.setType("image/*");
+                intentGallery.setType("image/*");
 
                 Intent takePictureIntent = null;
                 File tempFileForPhoto = FileManager.createTempFile(TAG,activity.getBaseContext(),photoAvatarNameOnServer+tempMyPerson.getId().toString());
@@ -618,7 +690,7 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
                     takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                 }
 
-                if(intentGallery!=null && intentGallery.resolveActivity(pm)!=null)
+                if( intentGallery.resolveActivity(pm)!=null)
                     validIntentFlag |=  0x01;
                 if(takePictureIntent!=null && takePictureIntent.resolveActivity(pm)!=null)
                     validIntentFlag |=  0x10;
@@ -665,8 +737,6 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
             } catch (Exception e) {
                 e.printStackTrace();
             }
-
-
         }
     }
 
@@ -674,41 +744,42 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
     @Override
     public void onActivityResult(int requestCode, int resultCode,
                                  Intent returnIntent) {
-        FrameLayout frameLayout=(FrameLayout) rootView.findViewById(R.id.editProfile_frame_changePhoto);
-        frameLayout.setEnabled(true);
-        FileManager.PicInfo tempPicInfo = null;
-        if (resultCode != Activity.RESULT_OK) {
-            Log.d(TAG, "resultCode !=  Activity.RESULT_OK");
-        } else {
-            switch (requestCode) {
-                case GALLERY_CAMERA_IMAGE:
-                case PICK_IMAGE:
-                case CAMERA_IMAGE:
-                    Context context = activity.getBaseContext();
-                    // Get the file's content URI from the incoming Intent
-                    if (returnIntent == null) {
-                        Log.e(TAG, "RETURN Intent == null => photo was saved to tempFile");
-                        try {
-                            File tempPhotoFile = new File(tempFileForPhotoPath);
-                            tempPicInfo = new FileManager.PicInfo(this, TAG, tempPhotoFile);
-                        } catch (Exception e) {
-                            e.printStackTrace();
+        try {
+            FrameLayout frameLayout=(FrameLayout) rootView.findViewById(R.id.editProfile_frame_changePhoto);
+            frameLayout.setEnabled(true);
+            FileManager.PicInfo tempPicInfo = null;
+            if (resultCode != Activity.RESULT_OK) {
+                Log.d(TAG, "resultCode !=  Activity.RESULT_OK");
+            } else {
+                switch (requestCode) {
+                    case GALLERY_CAMERA_IMAGE:
+                    case PICK_IMAGE:
+                    case CAMERA_IMAGE:
+                        Context context = activity.getBaseContext();
+                        // Get the file's content URI from the incoming Intent
+                        if (returnIntent == null) {
+                            Log.e(TAG, "RETURN Intent == null => photo was saved to tempFile");
+                            try {
+                                File tempPhotoFile = new File(tempFileForPhotoPath);
+                                tempPicInfo = new FileManager.PicInfo(tempPhotoFile);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
                         }
-                    }
-                    else{
-                        Uri returnUri = returnIntent.getData();
-                        try {
-                            tempPicInfo = new FileManager.PicInfo(this, TAG, returnUri.toString(),photoAvatarNameOnServer+tempMyPerson.getId().toString());
-                        } catch (IOException e) {
-                            Log.e(TAG, String.format("PicInfo constructor exception %s", e.getMessage()));
-                            e.printStackTrace();
-                            Toast.makeText(context, activity.getString(R.string.editprofile_pickImageError),
-                                    Toast.LENGTH_SHORT).show();
-                            return;
-                        }
-                        if (tempPicInfo != null) {
+                        else{
+                            Uri returnUri = returnIntent.getData();
+                            try {
+                                tempPicInfo = new FileManager.PicInfo(this, returnUri.toString(),photoAvatarNameOnServer+tempMyPerson.getId().toString());
+                            } catch (IOException e) {
+                                Log.e(TAG, String.format("PicInfo constructor exception %s", e.getMessage()));
+                                e.printStackTrace();
+                                Toast.makeText(context, activity.getString(R.string.editprofile_pickImageError),
+                                        Toast.LENGTH_SHORT).show();
+                                return;
+                            }
+
                             if (tempPicInfo.getPath() == null) {
-                                Log.e(TAG, String.format("PICK_IMAGE returned not valid URI"));
+                                Log.e(TAG, "PICK_IMAGE returned not valid URI");
                                 Toast.makeText(context, activity.getString(R.string.editprofile_pickImageError),
                                         Toast.LENGTH_SHORT).show();
                                 return;
@@ -722,63 +793,75 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
                             }
 
                         }
-                    }
-                    if (tempMyPerson != null) {
-                        String cacheDir = FileManager.PERSON_CACHE_DIR + "/" + tempMyPerson.getId();
-                        tempPicInfo.savePicPreviewToCache(TAG, context, UsefulFunctions.getDigest(tempPhotoNameLocal),
-                                cacheDir);
-                        Picture picture = new Picture();
-                        picture.setBlobKey(tempPhotoNameLocal);
-                        tempMyPerson.setPhoto(picture);
-                        picInfo = tempPicInfo;
-                        //setting picture to imageView is proceeded in onResume()
-                    }
-                    break;
-            }
+                        if (tempMyPerson != null) {
+                            String cacheDir = FileManager.PERSON_CACHE_DIR + "/" + tempMyPerson.getId();
+                            if(tempPicInfo!=null)
+                                tempPicInfo.savePicPreviewToCache(TAG, context, UsefulFunctions.getDigest(tempPhotoNameLocal),
+                                    cacheDir);
+                            Picture picture = new Picture();
+                            picture.setBlobKey(tempPhotoNameLocal);
+                            tempMyPerson.setPhoto(picture);
+                            picInfo = tempPicInfo;
+                            //setting picture to imageView is proceeded in onResume()
+                        }
+                        break;
+                }
 
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
     }
     @Override
     public void onGetUrlForUploadAsyncTaskFinish(Pair<String, Exception> result) {
-        String urlForUpload = result.first;
-        Exception ex = result.second;
-        String replaceBlob = "";
-        Context ctx = activity.getBaseContext();
-        if(ex!=null)
-        {
-            Log.e(TAG,String.format("getUrlForUpload error %s", ErrorVisualizer.getDebugMsgOfRespException(ex)));
-            ex.printStackTrace();
-            setVisibleProgressBar(false);
-            Toast.makeText(ctx,activity.getString(R.string.editprofile_saveError),Toast.LENGTH_SHORT).show();
-            return;
+        try {
+            String urlForUpload = result.first;
+            Exception ex = result.second;
+            String replaceBlob = "";
+            Context ctx = activity.getBaseContext();
+            if(ex!=null)
+            {
+                Log.e(TAG,String.format("getUrlForUpload error %s", ErrorVisualizer.getDebugMsgOfRespException(ex)));
+                ex.printStackTrace();
+                setVisibleProgressBar(false);
+                Toast.makeText(ctx,activity.getString(R.string.editprofile_saveError),Toast.LENGTH_SHORT).show();
+                return;
+            }
+            if(urlForUpload==null || urlForUpload.equals(""))
+            {
+                Log.e(TAG, "getUrlForUpload error urlForUpload not valid");
+                setVisibleProgressBar(false);
+                Toast.makeText(ctx, activity.getString(R.string.editprofile_saveError), Toast.LENGTH_SHORT).show();
+                return;
+            }
+            Log.d(TAG, String.format("url for upload file = %s",urlForUpload));
+            Person myPersonInfo = LocalDataManager.getMyPersonInfo();
+            if(myPersonInfo!=null && myPersonInfo.getPhoto()!=null)
+                replaceBlob = myPersonInfo.getPhoto().getBlobKey();
+            new FileManager.UploadAndReplacePersonFileAsyncTask(this).execute(
+                    new Pair<>(picInfo, new Pair<>(urlForUpload,replaceBlob)));
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        if(urlForUpload==null || urlForUpload.equals(""))
-        {
-            Log.e(TAG, String.format("getUrlForUpload error urlForUpload not valid"));
-            setVisibleProgressBar(false);
-            Toast.makeText(ctx, activity.getString(R.string.editprofile_saveError), Toast.LENGTH_SHORT).show();
-            return;
-        }
-        Log.d(TAG, String.format("url for upload file = %s",urlForUpload));
-        Person myPersonInfo = LocalDataManager.getMyPersonInfo();
-        if(myPersonInfo!=null && myPersonInfo.getPhoto()!=null)
-            replaceBlob = myPersonInfo.getPhoto().getBlobKey();
-        new FileManager.UploadAndReplacePersonFileAsyncTask(this).execute(new Pair<>(picInfo, new Pair<>(urlForUpload,replaceBlob)));
     }
     @Override
     public void onUploadFileFinish(Exception exception) {
-        if(exception!=null) {
-            exception.printStackTrace();
-            Log.e(TAG, String.format("UploadFile failed: %s", exception.getMessage()));
-            exception.printStackTrace();
-            setVisibleProgressBar(false);
-            Toast.makeText(activity.getBaseContext(),activity.getString(R.string.editprofile_saveError),
-                    Toast.LENGTH_SHORT).show();
-        }
-        else {
-            Log.d(TAG, "File uploaded!");
-            new EndpointApi.UpdatePersonAsyncTask(this).execute(tempMyPerson);
+        try {
+            if(exception!=null) {
+                exception.printStackTrace();
+                Log.e(TAG, String.format("UploadFile failed: %s", exception.getMessage()));
+                exception.printStackTrace();
+                setVisibleProgressBar(false);
+                Toast.makeText(activity.getBaseContext(),activity.getString(R.string.editprofile_saveError),
+                        Toast.LENGTH_SHORT).show();
+            }
+            else {
+                Log.d(TAG, "File uploaded!");
+                new EndpointApi.UpdatePersonAsyncTask(this).execute(tempMyPerson);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
     }
@@ -810,41 +893,45 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
 
     @Override
     public void onUpdatePersonFinish(Pair<Person, Exception> result) {
-        Person updatedPerson = result.first;
-        Exception ex = result.second;
-        Person myPerson = LocalDataManager.getMyPersonInfo();
-        if(ex==null && updatedPerson!=null)
-        {
-            if(myPerson!=null) {
-                Picture newPic = updatedPerson.getPhoto();
-                Picture oldPic = myPerson.getPhoto();
-                if(newPic!=null &&(oldPic==null || !newPic.getBlobKey().equals(oldPic.getBlobKey()))) {
-                    String tempFileName = UsefulFunctions.getDigest(tempPhotoNameLocal);
-                    String newFileName = UsefulFunctions.getDigest(newPic.getBlobKey());
-                    FileManager.renameFile(TAG, activity.getBaseContext(), FileManager.PERSON_CACHE_DIR
-                            + "/" + updatedPerson.getId() + "/" + tempFileName, newFileName);
+        try {
+            Person updatedPerson = result.first;
+            Exception ex = result.second;
+            Person myPerson = LocalDataManager.getMyPersonInfo();
+            if(ex==null && updatedPerson!=null)
+            {
+                if(myPerson!=null) {
+                    Picture newPic = updatedPerson.getPhoto();
+                    Picture oldPic = myPerson.getPhoto();
+                    if(newPic!=null &&(oldPic==null || !newPic.getBlobKey().equals(oldPic.getBlobKey()))) {
+                        String tempFileName = UsefulFunctions.getDigest(tempPhotoNameLocal);
+                        String newFileName = UsefulFunctions.getDigest(newPic.getBlobKey());
+                        FileManager.renameFile(TAG, activity.getBaseContext(), FileManager.PERSON_CACHE_DIR
+                                + "/" + updatedPerson.getId() + "/" + tempFileName, newFileName);
+                    }
+                    updatedPerson.setPass(myPerson.getPass());
+                    try {
+                        LocalDataManager.saveMyPersonInfoToPref(updatedPerson, activity);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    if(personProfileFragment!=null && personProfileFragment.isResumed())
+                        personProfileFragment.onResume();
                 }
-                updatedPerson.setPass(myPerson.getPass());
-                try {
-                    LocalDataManager.saveMyPersonInfoToPref(updatedPerson, activity);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                if(personProfileFragment!=null && personProfileFragment.isResumed())
-                    personProfileFragment.onResume();
+                FragmentManager fragmentManager = activity.getSupportFragmentManager();
+                if(fragmentManager!=null)
+                    fragmentManager.popBackStack();
             }
-            FragmentManager fragmentManager = activity.getSupportFragmentManager();
-            if(fragmentManager!=null)
-                fragmentManager.popBackStack();
-        }
-        else {
-            Log.e(TAG, "updatePerson failed error");
-            String debugMsg = ErrorVisualizer.getDebugMsgOfRespException(ex);
-            if(debugMsg!=null)
-                Log.e(TAG, debugMsg);
+            else {
+                Log.e(TAG, "updatePerson failed error");
+                String debugMsg = ErrorVisualizer.getDebugMsgOfRespException(ex);
+                if(debugMsg!=null)
+                    Log.e(TAG, debugMsg);
 
-            setVisibleProgressBar(false);
-            Toast.makeText(activity.getBaseContext(), activity.getString(R.string.editprofile_saveError), Toast.LENGTH_LONG).show();
+                setVisibleProgressBar(false);
+                Toast.makeText(activity.getBaseContext(), activity.getString(R.string.editprofile_saveError), Toast.LENGTH_LONG).show();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -860,7 +947,7 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
             return true;
         if(!UsefulFunctions.isSameStrValue(p.getPrice(),pNew.getPrice()))
             return true;
-        if(pNew.getRating() != p.getRating())
+        if(pNew.getRating().equals( p.getRating()))
             return true;
         if(!UsefulFunctions.isSameStrValue(p.getDescription(), pNew.getDescription()))
             return true;

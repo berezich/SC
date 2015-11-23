@@ -35,6 +35,9 @@ public class ResetPassFragment extends Fragment implements EndpointApi.ResetPass
     private FragmentActivity activity;
     ResetPassFragmentAction listenerResetPass = null;
 
+    public ResetPassFragment() {
+    }
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

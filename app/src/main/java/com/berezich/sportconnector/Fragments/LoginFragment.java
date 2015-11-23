@@ -47,6 +47,9 @@ public class LoginFragment extends Fragment implements EndpointApi.AuthorizePers
     private AlertDialogFragment dialog;
     private String defaultPass;
 
+    public LoginFragment() {
+    }
+
     public LoginFragment setArgs(int sectionNumber) {
         Bundle args = new Bundle();
         args.putInt(ARG_SECTION_NUMBER, sectionNumber);

@@ -2,22 +2,18 @@ package com.berezich.sportconnector;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
-
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
-import android.util.TypedValue;
 import android.view.KeyEvent;
-import android.widget.TextView;
 
-import java.security.Key;
-
-/**
- * Created by berezkin on 22.07.2015.
- */
 public class AlertDialogFragment extends DialogFragment {
-    private static final String TAG = "MyLog_AlertDialogFragment";
     private OnActionDialogListener listener=null;
+
+    public AlertDialogFragment() {
+    }
+
     public static AlertDialogFragment newInstance(String msg, boolean isNegativeBtn) {
         return newInstance("",msg,isNegativeBtn,true);
     }
@@ -33,14 +29,11 @@ public class AlertDialogFragment extends DialogFragment {
     }
 
     @Override
-    public Dialog onCreateDialog(Bundle savedInstanceState) {
-        String title = getArguments().getString("title");
-        String msg = getArguments().getString("msg");
-        boolean isNegativeBtn = getArguments().getBoolean("isNegativeBtn");
-        boolean isInterfaceNeed = getArguments().getBoolean("isInterfaceNeed");
-
+    @NonNull
+    public Dialog onCreateDialog( Bundle savedInstanceState) {
         if(getTargetFragment()==null)
             throw new NullPointerException("Need to set targetFragment for AlertDialogFragment");
+        boolean isInterfaceNeed = getArguments().getBoolean("isInterfaceNeed");
         if(isInterfaceNeed)
             try {
                 listener = (OnActionDialogListener)getTargetFragment();
@@ -48,49 +41,66 @@ public class AlertDialogFragment extends DialogFragment {
                 throw new ClassCastException(getTargetFragment().toString() +
                         " must implement OnActionDialogListener for AlertDialogFragment");
             }
+
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-                //.setIcon(R.drawable.alert_dialog_icon)
-
-        if(title!=null && !title.equals(""))
-            builder.setTitle(title);
-        if(msg!=null && !msg.equals(""))
-            builder.setMessage(msg);
-        builder.setPositiveButton(R.string.alert_dialog_ok,
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int whichButton) {
-                        dismiss();
-                        if (listener != null)
-                            listener.onPositiveClick();
-                    }
-                }
-        );
-
-        if (isNegativeBtn)
-            builder.setNegativeButton(R.string.alert_dialog_cancel,
+        try {
+            String title = getArguments().getString("title");
+            String msg = getArguments().getString("msg");
+            if(title!=null && !title.equals(""))
+                builder.setTitle(title);
+            if(msg!=null && !msg.equals(""))
+                builder.setMessage(msg);
+            builder.setPositiveButton(R.string.alert_dialog_ok,
                     new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int whichButton) {
-                            dismiss();
-                            if(listener!=null)
-                                listener.onNegativeClick();
+                            try {
+                                dismiss();
+                                if (listener != null)
+                                    listener.onPositiveClick();
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
                         }
                     }
             );
-        builder.setOnKeyListener(new DialogInterface.OnKeyListener() {
-            @Override
-            public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {
-                if(keyCode == KeyEvent.KEYCODE_BACK) {
-                    dismiss();
-                    if (listener != null)
-                        listener.onCancelDialog();
-                    return true;
+
+            boolean isNegativeBtn = getArguments().getBoolean("isNegativeBtn");
+            if (isNegativeBtn)
+                builder.setNegativeButton(R.string.alert_dialog_cancel,
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int whichButton) {
+                                try {
+                                    dismiss();
+                                    if(listener!=null)
+                                        listener.onNegativeClick();
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        }
+                );
+            builder.setOnKeyListener(new DialogInterface.OnKeyListener() {
+                @Override
+                public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {
+                    try {
+                        if(keyCode == KeyEvent.KEYCODE_BACK) {
+                            dismiss();
+                            if (listener != null)
+                                listener.onCancelDialog();
+                            return true;
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    return false;
                 }
-                return false;
-            }
-        });
-        AlertDialog alertDialog = builder.create();
-        return alertDialog;
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return builder.create();
     }
-    public static interface OnActionDialogListener
+    public interface OnActionDialogListener
     {
         void onPositiveClick();
         void onNegativeClick();

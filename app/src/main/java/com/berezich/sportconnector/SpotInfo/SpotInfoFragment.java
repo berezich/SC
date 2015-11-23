@@ -3,11 +3,13 @@ package com.berezich.sportconnector.SpotInfo;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
+import android.support.v7.app.ActionBar;
 import android.text.util.Linkify;
 import android.util.Log;
 import android.util.Pair;
@@ -49,16 +51,7 @@ import java.util.HashMap;
 import java.util.List;
 
 
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link SpotInfoFragment.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link SpotInfoFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class SpotInfoFragment extends Fragment implements EndpointApi.GetListPersonByIdLstAsyncTask.OnAction,
-                                                          /*EndpointApi.UpdateSpotAsyncTask.OnAction,*/
                                                           EndpointApi.SetSpotAsFavoriteAsyncTask.OnAction {
     private static final String ARG_SPOT_ID = "spotId";
     private static final String PARTNERS = "partners";
@@ -66,7 +59,7 @@ public class SpotInfoFragment extends Fragment implements EndpointApi.GetListPer
     private static final String TAG = "MyLog_SpotInfoFragment";
     private boolean isFavorite = false;
     private boolean isDetailsShown = false;
-    private HashMap<Long, Spot> spotHashMap;
+    HashMap<Long, Spot> spotHashMap;
     private final String SPOT_ID = "spotId";
     private Spot curSpot;
     private View spotInfoView;
@@ -76,42 +69,37 @@ public class SpotInfoFragment extends Fragment implements EndpointApi.GetListPer
     List<Person> coachLst = null;
     List<Person> partnerLst = null;
 
-    private OnFragmentInteractionListener mListener;
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     * <p/>
-     * //@param param1 Parameter 1.
-     * //@param param2 Parameter 2.
-     *
-     * @return A new instance of fragment BlankFragment.
-     */
     public static SpotInfoFragment newInstance(Long spotId) {
         SpotInfoFragment fragment = new SpotInfoFragment();
         Bundle args = new Bundle();
         args.putString(ARG_SPOT_ID, String.valueOf(spotId));
-        //args.putString(ARG_PARAM2, param2);
         fragment.setArguments(args);
         return fragment;
     }
 
     public SpotInfoFragment() {
-        // Required empty public constructor
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
-        LocalDataManager.init(getActivity());
-        spotHashMap = SpotsData.get_allSpots();
-        if (getArguments() != null) {
-            Long spotId = Long.valueOf(getArguments().getString(ARG_SPOT_ID));
-            curSpot = spotHashMap.get(spotId);
-        }else if(savedInstanceState!=null) {
-            Long spotId = savedInstanceState.getLong(SPOT_ID);
-            curSpot = spotHashMap.get(spotId);
+        try {
+            super.onCreate(savedInstanceState);
+            setHasOptionsMenu(true);
+            LocalDataManager.init(getActivity());
+            spotHashMap = SpotsData.get_allSpots();
+            if (getArguments() != null) {
+                String spotIdStr = getArguments().getString(ARG_SPOT_ID);
+                if(spotIdStr!=null) {
+                    Long spotId = Long.valueOf(spotIdStr);
+                    curSpot = spotHashMap.get(spotId);
+                }
+            }else if(savedInstanceState!=null) {
+                Long spotId = savedInstanceState.getLong(SPOT_ID);
+                curSpot = spotHashMap.get(spotId);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
     }
@@ -119,189 +107,190 @@ public class SpotInfoFragment extends Fragment implements EndpointApi.GetListPer
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        TextView txtView;
-        TabHost tabHost;
-        LinearLayout linearLayout;
-        ImageButton imgButton;
-        spotInfoView = inflater.inflate(R.layout.fragment_spot_info, container, false);
+        try {
+            TextView txtView;
+            TabHost tabHost;
+            LinearLayout linearLayout;
+            ImageButton imgButton;
+            spotInfoView = inflater.inflate(R.layout.fragment_spot_info, container, false);
 
-        if ((txtView = (TextView) spotInfoView.findViewById(R.id.spotinfo_frg_tryAgain_txtView)) != null)
-            txtView.setOnClickListener(new TryAgainClickListener());
-        if (curSpot != null) {
-            if ((txtView = (TextView) spotInfoView.findViewById(R.id.spotInfo_txt_name)) != null)
-                txtView.setText(curSpot.getName());
-            if ((txtView = (TextView) spotInfoView.findViewById(R.id.spotInfo_txt_adress)) != null)
-                txtView.setText(curSpot.getAddress());
-            if((linearLayout = (LinearLayout) spotInfoView.findViewById(R.id.spotInfo_layout_details))!=null)
-            {
-                String value;
-                boolean enableDetails = false;
-                if ((value = curSpot.getSite()) != null && !value.equals("")) {
-                    linearLayout.addView(getDetailItem(getContext(), getString(R.string.spotinfo_site), value, TXT_TYPE.SITE));
-                    enableDetails = true;
-                }
-                if ((value = curSpot.getContact()) != null && !value.equals("")) {
-                    linearLayout.addView(getDetailItem(getContext(), getString(R.string.spotinfo_phone), value,TXT_TYPE.PHONE));
-                    enableDetails = true;
-                }
-                if ((value = curSpot.getPrice()) != null && !value.equals("")) {
-                    linearLayout.addView(getDetailItem(getContext(), getString(R.string.spotinfo_prices), value));
-                    enableDetails = true;
-                }
-                int numCourts;
-                value = "";
-                if((numCourts = curSpot.getOpenPlayFieldNum())>0) {
-                    value = String.format("%d %s%s %s%s", numCourts, getString(R.string.spotinfo_openCourts),
-                            UsefulFunctions.adjPluralPostfix(numCourts), getString(R.string.spotinfo_playField),
-                            UsefulFunctions.pluralPostfix(numCourts));
-                    enableDetails = true;
-                }
-                if((numCourts = curSpot.getClosedPlayFieldNum())>0){
-                    value += ((value.equals(""))?"":", ")+String.format("%d %s%s %s%s", numCourts,getString(R.string.spotinfo_closedCourts),
-                            UsefulFunctions.adjPluralPostfix(numCourts), getString(R.string.spotinfo_playField),
-                            UsefulFunctions.pluralPostfix(numCourts));
-                    enableDetails = true;
-                }
-                if(!value.equals(""))
-                    linearLayout.addView(getDetailItem(getContext(),getString(R.string.spotinfo_courts),value));
-
-                if ((value = curSpot.getDescription()) != null && !value.equals("")) {
-                    linearLayout.addView(getDetailItem(getContext(), getString(R.string.spotinfo_description), value));
-                    enableDetails = true;
-                }
-
-                txtView = (TextView) spotInfoView.findViewById(R.id.spotInfo_txt_details);
-
-                if(enableDetails)
-                    txtView.setVisibility(View.VISIBLE);
-                else
-                    txtView.setVisibility(View.GONE);
-
-                txtView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        isDetailsShown = !isDetailsShown;
-                        TextView textView = (TextView) spotInfoView.findViewById(R.id.spotInfo_txt_details);
-                        LinearLayout linearLayout = (LinearLayout) spotInfoView.findViewById(R.id.spotInfo_layout_details);
-                        linearLayout.setVisibility((isDetailsShown) ? View.VISIBLE : View.GONE);
-                        linearLayout = (LinearLayout) spotInfoView.findViewById(R.id.spotInfo_layout_toHide);
-                        linearLayout.setVisibility((isDetailsShown) ? View.GONE : View.VISIBLE);
-                        textView.setText((isDetailsShown) ? getString(R.string.spotinfo_details_hide) : getString(R.string.spotinfo_details));
+            if ((txtView = (TextView) spotInfoView.findViewById(R.id.spotinfo_frg_tryAgain_txtView)) != null)
+                txtView.setOnClickListener(new TryAgainClickListener());
+            if (curSpot != null) {
+                if ((txtView = (TextView) spotInfoView.findViewById(R.id.spotInfo_txt_name)) != null)
+                    txtView.setText(curSpot.getName());
+                if ((txtView = (TextView) spotInfoView.findViewById(R.id.spotInfo_txt_adress)) != null)
+                    txtView.setText(curSpot.getAddress());
+                if((linearLayout = (LinearLayout) spotInfoView.findViewById(R.id.spotInfo_layout_details))!=null)
+                {
+                    String value;
+                    boolean enableDetails = false;
+                    if ((value = curSpot.getSite()) != null && !value.equals("")) {
+                        View view = getDetailItem(getContext(), getString(R.string.spotinfo_site),value, TXT_TYPE.SITE);
+                        if(view!=null)
+                            linearLayout.addView(view);
+                        enableDetails = true;
                     }
-                });
-
-
-            }
-
-            if ((imgButton = (ImageButton) spotInfoView.findViewById(R.id.spotInfo_btnImg_favorite)) != null) {
-                imgButton.setOnTouchListener(new StarBtnOnTouchListener());
-            }
-
-            if ((linearLayout = (LinearLayout) spotInfoView.findViewById(R.id.spotInfo_list_photos)) != null) {
-                List<Picture> picList = curSpot.getPictureLst();
-                if (picList != null && picList.size() > 0) {
-                    //linearLayout.setOnClickListener(new OnImageClick());
-                    Context ctx = getContext();
-                    ImageView imageView;
-                    for (Picture pic : picList) {
-                        imageView = new ImageView(ctx);
-                        linearLayout.addView(imageView);
-                        imageView.getLayoutParams().height = (int) getResources().getDimension(R.dimen.spotInfo_photos_height);
-                        imageView.getLayoutParams().width = (int) getResources().getDimension(R.dimen.spotInfo_photos_width);
-                        FileManager.providePhotoForImgView(ctx, imageView, pic, FileManager.SPOT_CACHE_DIR + "/" + curSpot.getId());
-                        imageView.setOnClickListener(new OnImageClick());
+                    if ((value = curSpot.getContact()) != null && !value.equals("")) {
+                        View view = getDetailItem(getContext(), getString(R.string.spotinfo_phone), value, TXT_TYPE.PHONE);
+                        if(view!=null)
+                            linearLayout.addView(view);
+                        enableDetails = true;
                     }
-                    linearLayout.setVisibility(View.VISIBLE);
+                    if ((value = curSpot.getPrice()) != null && !value.equals("")) {
+                        linearLayout.addView(getDetailItem(getContext(), getString(R.string.spotinfo_prices), value));
+                        enableDetails = true;
+                    }
+                    int numCourts;
+                    value = "";
+                    if((numCourts = curSpot.getOpenPlayFieldNum())>0) {
+                        value = String.format("%d %s%s %s%s", numCourts, getString(R.string.spotinfo_openCourts),
+                                UsefulFunctions.adjPluralPostfix(numCourts), getString(R.string.spotinfo_playField),
+                                UsefulFunctions.pluralPostfix(numCourts));
+                        enableDetails = true;
+                    }
+                    if((numCourts = curSpot.getClosedPlayFieldNum())>0){
+                        value += ((value.equals(""))?"":", ")+String.format("%d %s%s %s%s", numCourts,getString(R.string.spotinfo_closedCourts),
+                                UsefulFunctions.adjPluralPostfix(numCourts), getString(R.string.spotinfo_playField),
+                                UsefulFunctions.pluralPostfix(numCourts));
+                        enableDetails = true;
+                    }
+                    if(!value.equals(""))
+                        linearLayout.addView(getDetailItem(getContext(),getString(R.string.spotinfo_courts),value));
 
+                    if ((value = curSpot.getDescription()) != null && !value.equals("")) {
+                        linearLayout.addView(getDetailItem(getContext(), getString(R.string.spotinfo_description), value));
+                        enableDetails = true;
+                    }
+
+                    txtView = (TextView) spotInfoView.findViewById(R.id.spotInfo_txt_details);
+
+                    if(enableDetails)
+                        txtView.setVisibility(View.VISIBLE);
+                    else
+                        txtView.setVisibility(View.GONE);
+
+                    txtView.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            isDetailsShown = !isDetailsShown;
+                            TextView textView = (TextView) spotInfoView.findViewById(R.id.spotInfo_txt_details);
+                            LinearLayout linearLayout = (LinearLayout) spotInfoView.findViewById(R.id.spotInfo_layout_details);
+                            linearLayout.setVisibility((isDetailsShown) ? View.VISIBLE : View.GONE);
+                            linearLayout = (LinearLayout) spotInfoView.findViewById(R.id.spotInfo_layout_toHide);
+                            linearLayout.setVisibility((isDetailsShown) ? View.GONE : View.VISIBLE);
+                            textView.setText((isDetailsShown) ? getString(R.string.spotinfo_details_hide) : getString(R.string.spotinfo_details));
+                        }
+                    });
+
+
+                }
+
+                if ((imgButton = (ImageButton) spotInfoView.findViewById(R.id.spotInfo_btnImg_favorite)) != null) {
+                    imgButton.setOnTouchListener(new StarBtnOnTouchListener());
+                }
+
+                if ((linearLayout = (LinearLayout) spotInfoView.findViewById(R.id.spotInfo_list_photos)) != null) {
+                    List<Picture> picList = curSpot.getPictureLst();
+                    if (picList != null && picList.size() > 0) {
+                        //linearLayout.setOnClickListener(new OnImageClick());
+                        Context ctx = getContext();
+                        ImageView imageView;
+                        for (Picture pic : picList) {
+                            imageView = new ImageView(ctx);
+                            linearLayout.addView(imageView);
+                            imageView.getLayoutParams().height = (int) getResources().getDimension(R.dimen.spotInfo_photos_height);
+                            imageView.getLayoutParams().width = (int) getResources().getDimension(R.dimen.spotInfo_photos_width);
+                            FileManager.providePhotoForImgView(ctx, imageView, pic, FileManager.SPOT_CACHE_DIR + "/" + curSpot.getId());
+                            imageView.setOnClickListener(new OnImageClick());
+                        }
+                        linearLayout.setVisibility(View.VISIBLE);
+
+                    } else {
+                        linearLayout.setVisibility(View.GONE);
+                    }
+                }
+
+                int coachesNum = SpotsData.getCoachIdsWithoutMe(curSpot).size(), partnersNum = SpotsData.getPartnerIdsWithoutMe(curSpot).size();
+                if ((partnersNum > 0 || coachesNum > 0) && (tabHost = (TabHost) spotInfoView.findViewById(R.id.spotInfo_tabHost)) != null) {
+                    // инициализация
+                    tabHost.setup();
+
+                    TabHost.TabSpec tabSpec;
+                    if (partnersNum > 0) {
+                        // создаем вкладку и указываем тег
+                        tabSpec = tabHost.newTabSpec(PARTNERS);
+                        // название вкладки
+                        tabSpec.setIndicator(getString(R.string.spotinfo_tab1_title));
+
+                        // указываем id компонента из FrameLayout, он и станет содержимым
+                        tabSpec.setContent(R.id.spotInfo_list_tab_partners);
+                        // добавляем в корневой элемент
+                        tabHost.addTab(tabSpec);
+                    }
+                    if (coachesNum > 0) {
+                        tabSpec = tabHost.newTabSpec(COACHES);
+                        tabSpec.setIndicator(getString(R.string.spotinfo_tab2_title));
+                        tabSpec.setContent(R.id.spotInfo_list_tab_coaches);
+                        tabHost.addTab(tabSpec);
+                    }
+                    /*// обработчик переключения вкладок
+                    tabHost.setOnTabChangedListener(new OnTabChangeListener() {
+                        public void onTabChanged(String tabId) {
+                            Toast.makeText(getBaseContext(), "tabId = " + tabId, Toast.LENGTH_SHORT).show();
+                        }
+                    });*/
                 } else {
-                    linearLayout.setVisibility(View.GONE);
+                    setVisible(View.GONE, View.GONE, View.VISIBLE);
+                    return spotInfoView;
                 }
-            }
 
-            int coachesNum = SpotsData.getCoachIdsWithoutMe(curSpot).size(), partnersNum = SpotsData.getPartnerIdsWithoutMe(curSpot).size();
-            if ((partnersNum > 0 || coachesNum > 0) && (tabHost = (TabHost) spotInfoView.findViewById(R.id.spotInfo_tabHost)) != null) {
-                // инициализация
-                tabHost.setup();
-
-                TabHost.TabSpec tabSpec;
-                if (partnersNum > 0) {
-                    // создаем вкладку и указываем тег
-                    tabSpec = tabHost.newTabSpec(PARTNERS);
-                    // название вкладки
-                    tabSpec.setIndicator(getString(R.string.spotinfo_tab1_title));
-
-                    // указываем id компонента из FrameLayout, он и станет содержимым
-                    tabSpec.setContent(R.id.spotInfo_list_tab_partners);
-                    // добавляем в корневой элемент
-                    tabHost.addTab(tabSpec);
+                if(coachLst!=null && partnerLst!=null){
+                    int personCount=0;
+                    personCount+=fillPersonsList(coachLst,COACHES);
+                    personCount+=fillPersonsList(partnerLst,PARTNERS);
+                    if(personCount>0)
+                        setVisible(View.VISIBLE,View.GONE,View.GONE);
+                    else
+                        setVisible(View.GONE,View.GONE,View.VISIBLE);
                 }
-                if (coachesNum > 0) {
-                    tabSpec = tabHost.newTabSpec(COACHES);
-                    tabSpec.setIndicator(getString(R.string.spotinfo_tab2_title));
-                    tabSpec.setContent(R.id.spotInfo_list_tab_coaches);
-                    tabHost.addTab(tabSpec);
-                }
-    /*
-                // обработчик переключения вкладок
-                tabHost.setOnTabChangedListener(new OnTabChangeListener() {
-                    public void onTabChanged(String tabId) {
-                        Toast.makeText(getBaseContext(), "tabId = " + tabId, Toast.LENGTH_SHORT).show();
+                else {
+                    personIdLst = new ArrayList<>();
+                    if (curSpot.getCoachLst() != null)
+                        personIdLst.addAll(SpotsData.getCoachIdsWithoutMe(curSpot));
+                    if (curSpot.getPartnerLst() != null)
+                        personIdLst.addAll(SpotsData.getPartnerIdsWithoutMe(curSpot));
+                    if (personIdLst.size() > 0) {
+                        setVisibleProgressBar();
+                        new EndpointApi.GetListPersonByIdLstAsyncTask(this).execute(personIdLst);
+
                     }
-                });
-    */
-            } else {
-                setVisible(View.GONE, View.GONE, View.VISIBLE);
-                return spotInfoView;
-            }
-            /*else if((txtView =(TextView) spotInfoView.findViewById(R.id.spotInfo_txt_noPartersCoaches))!=null) {
-                if((tabHost = (TabHost) spotInfoView.findViewById(R.id.spotInfo_tabHost))!=null)
-                    tabHost.setVisibility(View.GONE);
-                txtView.setVisibility(View.VISIBLE);
-            }*/
-
-
-            if(coachLst!=null && partnerLst!=null){
-                int personCount=0;
-                personCount+=fillPersonsList(coachLst,COACHES);
-                personCount+=fillPersonsList(partnerLst,PARTNERS);
-                if(personCount>0)
-                    setVisible(View.VISIBLE,View.GONE,View.GONE);
-                else
-                    setVisible(View.GONE,View.GONE,View.VISIBLE);
-            }
-            else {
-                personIdLst = new ArrayList<Long>();
-                if (curSpot.getCoachLst() != null)
-                    personIdLst.addAll(SpotsData.getCoachIdsWithoutMe(curSpot));
-                if (curSpot.getPartnerLst() != null)
-                    personIdLst.addAll(SpotsData.getPartnerIdsWithoutMe(curSpot));
-                if (personIdLst.size() > 0) {
-                    setVisibleProgressBar();
-                    new EndpointApi.GetListPersonByIdLstAsyncTask(this).execute(personIdLst);
-
                 }
             }
+            return spotInfoView;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return spotInfoView=null;
         }
-        return spotInfoView;
     }
 
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
-        }
-    }
 
     @Override
     public void onResume(){
-        super.onResume();
-        ((MainActivity)activity).setmTitle(activity.getString(R.string.spotinfo_fragmentTitle));
-        ((MainActivity)activity).getSupportActionBar().setHomeAsUpIndicator(null);
-        ((MainActivity)activity).restoreActionBar();
-        ImageButton imgButton;
-        if ((imgButton = (ImageButton) spotInfoView.findViewById(R.id.spotInfo_btnImg_favorite)) != null) {
-            isFavorite = LocalDataManager.isMyFavoriteSpot(curSpot);
-            //imgButton.setPressed(LocalDataManager.isMyFavoriteSpot(curSpot));
-            setButtonImg(imgButton,isFavorite);
+        try {
+            super.onResume();
+            ((MainActivity)activity).setmTitle(activity.getString(R.string.spotinfo_fragmentTitle));
+            ActionBar actionBar = ((MainActivity) activity).getSupportActionBar();
+            if(actionBar!=null)
+                actionBar.setHomeAsUpIndicator(null);
+            ((MainActivity)activity).restoreActionBar();
+            ImageButton imgButton;
+            if ((imgButton = (ImageButton) spotInfoView.findViewById(R.id.spotInfo_btnImg_favorite)) != null) {
+                isFavorite = LocalDataManager.isMyFavoriteSpot(curSpot);
+                setButtonImg(imgButton,isFavorite);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
     }
@@ -309,107 +298,106 @@ public class SpotInfoFragment extends Fragment implements EndpointApi.GetListPer
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putLong(SPOT_ID, curSpot.getId());
+        try {
+            outState.putLong(SPOT_ID, curSpot.getId());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-
-
     }
 
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        this.activity = getActivity();
+        try {
+            this.activity = getActivity();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-        mListener = null;
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        /*if(isFavoriteChanged) {
-
-            //new EndpointApi.UpdateSpotAsyncTask(this).execute(spotHashMap.get(curSpot.getId()));
-
-
-        }*/
     }
 
-
-    public interface OnFragmentInteractionListener {
-        public void onFragmentInteraction(Uri uri);
-    }
 
     class StarBtnOnTouchListener implements View.OnTouchListener
     {
         @Override
         public boolean onTouch(View v, MotionEvent event) {
-            ImageButton btn = (ImageButton) v;
-            // show interest in events resulting from ACTION_DOWN
-            if(event.getAction()==MotionEvent.ACTION_DOWN) {
-                /*btn.setPressed(!btn.isPressed());
-                isFavoriteChanged = !isFavoriteChanged;*/
-                setButtonImg(btn, !isFavorite);
-                //SpotsData.setSpotFavorite(curSpot.getId(), btn.isPressed());
-                SpotsData.setSpotFavorite(curSpot.getId(), isFavorite);
-                /*new EndpointApi.SetSpotAsFavoriteAsyncTask(getFragmentRef()).execute(new Pair<>(new Pair<>( new Pair<>(curSpot.getId(),btn.isPressed()),
-                        new Pair<>( LocalDataManager.getMyPersonInfo().getId(),LocalDataManager.getMyPersonInfo().getPass())),
-                        LocalDataManager.getMyPersonInfo().getType()));*/
-                new EndpointApi.SetSpotAsFavoriteAsyncTask(getFragmentRef()).execute(new Pair<>(new Pair<>( new Pair<>(curSpot.getId(),isFavorite),
-                        new Pair<>( LocalDataManager.getMyPersonInfo().getId(),LocalDataManager.getMyPersonInfo().getPass())),
-                        LocalDataManager.getMyPersonInfo().getType()));
+            try {
+                ImageButton btn = (ImageButton) v;
+                if(event.getAction()==MotionEvent.ACTION_DOWN) {
+                    setButtonImg(btn, !isFavorite);
+                    SpotsData.setSpotFavorite(curSpot.getId(), isFavorite);
+                    Person myPersonInfo = LocalDataManager.getMyPersonInfo();
+                    if(myPersonInfo!=null)
+                    new EndpointApi.SetSpotAsFavoriteAsyncTask(SpotInfoFragment.this).execute(
+                            new Pair<>(new Pair<>( new Pair<>(curSpot.getId(),isFavorite),
+                            new Pair<>( myPersonInfo.getId(),myPersonInfo.getPass())),myPersonInfo.getType()));
+                    return true;
+                }
+                return true;
+            } catch (Exception e) {
+                e.printStackTrace();
                 return true;
             }
-            return true;
         }
     }
 
     @Override
     public void onGetListPersonByIdLstFinish(Pair<List<Person>, Exception> result) {
-        List<Person> personLst = result.first;
-        Exception error = result.second;
-        Person person;
+        try {
+            List<Person> personLst = result.first;
+            Exception error = result.second;
+            Person person;
 
-        if(getActivity()==null)
-        {
-            Log.e(TAG,"current fragment isn't attached to activity");
-            return;
-        }
-        if(error == null && personLst!=null)
-        {
-            coachLst = new ArrayList<>();
-            partnerLst = new ArrayList<>();
-            for (int i = 0; i <personLst.size() ; i++) {
-                person = personLst.get(i);
-                if(person.getType().equals("COACH"))
-                    coachLst.add(person);
-                if(person.getType().equals("PARTNER"))
-                    partnerLst.add(person);
+            if(getActivity()==null)
+            {
+                Log.e(TAG,"current fragment isn't attached to activity");
+                return;
             }
-            fillPersonsList(coachLst, COACHES);
-            fillPersonsList(partnerLst,PARTNERS);
-            if(partnerLst.size()>0 || coachLst.size()>0)
-                setVisible(View.VISIBLE,View.GONE,View.GONE);
-            else
-                setVisible(View.GONE, View.GONE, View.VISIBLE);
+            if(error == null && personLst!=null)
+            {
+                coachLst = new ArrayList<>();
+                partnerLst = new ArrayList<>();
+                for (int i = 0; i <personLst.size() ; i++) {
+                    person = personLst.get(i);
+                    if(person.getType().equals("COACH"))
+                        coachLst.add(person);
+                    if(person.getType().equals("PARTNER"))
+                        partnerLst.add(person);
+                }
+                fillPersonsList(coachLst, COACHES);
+                fillPersonsList(partnerLst,PARTNERS);
+                if(partnerLst.size()>0 || coachLst.size()>0)
+                    setVisible(View.VISIBLE,View.GONE,View.GONE);
+                else
+                    setVisible(View.GONE, View.GONE, View.VISIBLE);
 
-            return;
+                return;
+            }
+            Log.e(TAG, "Error GetListPersonByIdLst");
+            if(personLst==null)
+                Log.e(TAG, "personLst = null");
+
+            FrameLayout frameLayout;
+            if((frameLayout = (FrameLayout) spotInfoView.findViewById(R.id.spotinfo_frg_frameLayout))!=null)
+                ErrorVisualizer.showErrorAfterReq(getContext(), frameLayout, error, TAG);
+            setVisible(View.GONE, View.VISIBLE, View.GONE);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        Log.e(TAG, "Error GetListPersonByIdLst");
-        if(personLst==null)
-            Log.e(TAG, "personLst = null");
-
-        FrameLayout frameLayout;
-        if((frameLayout = (FrameLayout) spotInfoView.findViewById(R.id.spotinfo_frg_frameLayout))!=null)
-            ErrorVisualizer.showErrorAfterReq(getContext(), frameLayout, error, TAG);
-        setVisible(View.GONE, View.VISIBLE, View.GONE);
 
     }
 
@@ -418,70 +406,54 @@ public class SpotInfoFragment extends Fragment implements EndpointApi.GetListPer
         ListView listView=null;
         if(personList==null || personList.isEmpty())
             return 0;
-        if(typeOfPerson.equals(COACHES))
-            listView = (ListView) spotInfoView.findViewById(R.id.spotInfo_list_tab_coaches);
-        else if(typeOfPerson.equals(PARTNERS))
-            listView = (ListView) spotInfoView.findViewById(R.id.spotInfo_list_tab_partners);
-        else
-            assert true;
-        listView.getLayoutParams().height = android.app.ActionBar.LayoutParams.MATCH_PARENT;
-        ProfileItemLstAdapter partnersAdapter = new ProfileItemLstAdapter(activity.getApplicationContext(),
-                new ArrayList<>(personList));
-        listView.setAdapter(partnersAdapter);
-        listView.setOnItemClickListener(new OnPersonClick(personList));
+        switch (typeOfPerson){
+            case COACHES:
+                listView = (ListView) spotInfoView.findViewById(R.id.spotInfo_list_tab_coaches);
+                break;
+            case PARTNERS:
+                listView = (ListView) spotInfoView.findViewById(R.id.spotInfo_list_tab_partners);
+                break;
+            default:
+                assert true;
+        }
+
+        if(listView!=null) {
+            listView.getLayoutParams().height = android.app.ActionBar.LayoutParams.MATCH_PARENT;
+            ProfileItemLstAdapter partnersAdapter = new ProfileItemLstAdapter(activity.getApplicationContext(),
+                    new ArrayList<>(personList));
+            listView.setAdapter(partnersAdapter);
+            listView.setOnItemClickListener(new OnPersonClick(personList));
+        }
         return personList.size();
     }
-    /*@Override
-    public void onUpdateSpotFinish(Pair<Spot, Exception> result) {
-        Spot spot = result.first;
-        Exception error = result.second;
-        if(error == null && spot!=null) {
-            Log.d(TAG, "Spot updated success");
-            return;
-        }
-            Log.e(TAG, "Error UpdateSpot");
-        if(error!=null)
-        {
-            Log.e(TAG, error.getMessage());
-            error.printStackTrace();
-        }
-        else
-            Log.d(TAG,"UpdatedSpot = null");
-    }
-*/
 
     @Override
     public void onSetSpotAsFavoriteFinish(Pair<Boolean,Exception> result) {
-        boolean isFavoriteReq = result.first;
-        Exception ex = result.second;
+        try {
+            boolean isFavoriteReq = result.first;
+            Exception ex = result.second;
 
-        if(ex!=null)
-        {
-            if(spotInfoView!=null) {
-                ImageButton btn = (ImageButton) spotInfoView.findViewById(R.id.spotInfo_btnImg_favorite);
-                if (btn!=null) {
-                    /*if(btn.isPressed()==isFavorite)
-                        btn.setPressed(!isFavorite);*/
-                    if(this.isFavorite == isFavoriteReq)
-                        setButtonImg(btn,!isFavoriteReq);
-                    SpotsData.setSpotFavorite(curSpot.getId(), !isFavoriteReq);
-                    if(activity!=null)
-                        Toast.makeText(activity.getBaseContext(), R.string.spotinfo_req_error_msg, Toast.LENGTH_SHORT).show();
-                    else{
-                        Log.e(TAG, "current fragment isn't attached to activity");
-                        return;
+            if(ex!=null)
+            {
+                if(spotInfoView!=null) {
+                    ImageButton btn = (ImageButton) spotInfoView.findViewById(R.id.spotInfo_btnImg_favorite);
+                    if (btn!=null) {
+                        if(this.isFavorite == isFavoriteReq)
+                            setButtonImg(btn,!isFavoriteReq);
+                        SpotsData.setSpotFavorite(curSpot.getId(), !isFavoriteReq);
+                        if(activity!=null)
+                            Toast.makeText(activity.getBaseContext(), R.string.spotinfo_req_error_msg, Toast.LENGTH_SHORT).show();
+                        else
+                            Log.e(TAG, "current fragment isn't attached to activity");
                     }
-
                 }
             }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
     private void setButtonImg(ImageButton btn, boolean isFavorite){
         this.isFavorite = isFavorite;
-        /*if (isFavorite)
-            btn.setBackgroundDrawable(activity.getResources().getDrawable(R.drawable.simple_star_press));
-        else
-            btn.setBackgroundDrawable(activity.getResources().getDrawable(R.drawable.simple_star));*/
         if (isFavorite)
             btn.setBackgroundDrawable(activity.getResources().getDrawable(R.drawable.ic_star_press_36dp));
         else
@@ -491,10 +463,13 @@ public class SpotInfoFragment extends Fragment implements EndpointApi.GetListPer
     {
         @Override
         public void onClick(View v) {
-            if(personIdLst.size()>0) {
-                setVisibleProgressBar();
-                new EndpointApi.GetListPersonByIdLstAsyncTask(getFragmentRef()).execute(personIdLst);
-
+            try {
+                if(personIdLst.size()>0) {
+                    setVisibleProgressBar();
+                    new EndpointApi.GetListPersonByIdLstAsyncTask(SpotInfoFragment.this).execute(personIdLst);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }
     }
@@ -522,36 +497,40 @@ public class SpotInfoFragment extends Fragment implements EndpointApi.GetListPer
     private class OnImageClick implements View.OnClickListener{
         @Override
         public void onClick(View v) {
-            LinearLayout linearLayout = (LinearLayout) v.getParent();
-            int index = linearLayout.indexOfChild(v);
-            Intent intent = new Intent(activity, ImgViewPagerActivity.class);
-            if(curSpot!=null) {
-                List<Picture> picLst = curSpot.getPictureLst();
-                if(picLst!=null) {
-                    GsonFactory gsonFactory = new GsonFactory();
-                    try {
-                        ArrayList<String> picList = new ArrayList<String>();
-                        for(Picture pic:picLst)
-                            picList.add(gsonFactory.toString(pic));
-                        intent.putStringArrayListExtra(ImgViewPagerActivity.PIC_LIST_EXTRAS, picList);
-                        intent.putExtra(ImgViewPagerActivity.PIC_INDEX_EXTRAS, index);
-                        startActivity(intent);
-                    } catch (IOException e) {
-                        e.printStackTrace();
+            try {
+                LinearLayout linearLayout = (LinearLayout) v.getParent();
+                int index = linearLayout.indexOfChild(v);
+                Intent intent = new Intent(activity, ImgViewPagerActivity.class);
+                if(curSpot!=null) {
+                    List<Picture> picLst = curSpot.getPictureLst();
+                    if(picLst!=null) {
+                        GsonFactory gsonFactory = new GsonFactory();
+                        try {
+                            ArrayList<String> picList = new ArrayList<>();
+                            for(Picture pic:picLst)
+                                picList.add(gsonFactory.toString(pic));
+                            intent.putStringArrayListExtra(ImgViewPagerActivity.PIC_LIST_EXTRAS, picList);
+                            intent.putExtra(ImgViewPagerActivity.PIC_INDEX_EXTRAS, index);
+                            startActivity(intent);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
                     }
                 }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }
-    }
-    private Fragment getFragmentRef()
-    {
-        return  this;
     }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        menu.clear();
-        super.onCreateOptionsMenu(menu, inflater);
+        try {
+            menu.clear();
+            super.onCreateOptionsMenu(menu, inflater);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
     }
 
@@ -587,8 +566,6 @@ public class SpotInfoFragment extends Fragment implements EndpointApi.GetListPer
                         txtView.setText(phones[0].trim());
                         float textSize = getResources().getDimensionPixelSize(R.dimen.spotInfo_details_textSize)/getResources().getDisplayMetrics().density;
                         txtView.setTextSize(TypedValue.COMPLEX_UNIT_DIP,textSize);
-                        /*ImageView imageView = (ImageView) itemView.findViewById(R.id.spotInfo_detailItem_image_phone);
-                        imageView.setVisibility(View.VISIBLE);*/
                         LinearLayout linearLayout = (LinearLayout) itemView.findViewById(R.id.spotInfo_detailItem_layout_value);
                         linearLayout.setOnClickListener(new View.OnClickListener() {
                             @Override
@@ -634,7 +611,6 @@ public class SpotInfoFragment extends Fragment implements EndpointApi.GetListPer
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
             try {
-
                 Person person = persons.get(position);
                 FragmentManager fragmentManager = activity.getSupportFragmentManager();
                 fragmentManager.beginTransaction()

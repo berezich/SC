@@ -141,9 +141,7 @@ public class LocalDataManager {
 
         return true;
     }
-    public static void saveMyPersonInfoToPref(Activity activity)throws IOException {
-        saveMyPersonInfoToPref(myPersonInfo, activity);
-    }
+
     public static void saveMyPersonInfoToPref(Person personInfo,Activity activity)throws IOException {
         if(activity==null)
         {
@@ -183,13 +181,6 @@ public class LocalDataManager {
         return appPref;
     }
 
-    public static void setAppPref(AppPref appPref) {
-        LocalDataManager.appPref = appPref;
-    }
-
-    public static void saveAppPref(Activity activity)throws IOException {
-        saveAppPref(appPref, activity);
-    }
     public static void saveAppPref(AppPref appPref,Activity activity)throws IOException {
         if(activity==null)
         {

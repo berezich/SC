@@ -3,22 +3,22 @@ package com.berezich.sportconnector;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.widget.DatePicker;
-
 
 import com.google.api.client.util.DateTime;
 
 import java.util.Calendar;
 
-/**
- * Created by Sashka on 26.07.2015.
- */
 public class DatePickerFragment extends DialogFragment
         implements DatePickerDialog.OnDateSetListener {
 
     private static final String ARG_DTBIRTHDAY = "dtBirthday_milsec";
     OnActionDatePickerDialogListener listener;
+
+    public DatePickerFragment() {
+    }
 
     public DatePickerFragment setArgs(String dBirthday) {
         Bundle args = new Bundle();
@@ -30,40 +30,46 @@ public class DatePickerFragment extends DialogFragment
     }
 
     @Override
+    @NonNull
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        // Use the current date as the default date in the picker
-        Calendar c = Calendar.getInstance();
-        Long birthday = getArguments().getLong(ARG_DTBIRTHDAY);
-        if(birthday!=null && !birthday.equals(""))
-            c.setTimeInMillis(birthday);
-        int year = c.get(Calendar.YEAR);
-        int month = c.get(Calendar.MONTH);
-        int day = c.get(Calendar.DAY_OF_MONTH);
-
         if(getTargetFragment()==null)
             throw new NullPointerException("Need to set targetFragment for DatePickerFragment");
-
         try {
             listener = (OnActionDatePickerDialogListener)getTargetFragment();
         } catch (ClassCastException e) {
             throw new ClassCastException(getTargetFragment().toString() + " must implement OnActionDialogListener for AlertDialogFragment");
         }
 
-        DatePickerDialog pickerDialog = new DatePickerDialog(getTargetFragment().getActivity(), this, year, month, day);
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.YEAR,calendar.get(Calendar.YEAR)-getResources().getInteger(R.integer.editProfile_minAge));
-        pickerDialog.getDatePicker().setMaxDate(calendar.getTimeInMillis());
-        calendar.set(Calendar.YEAR, calendar.get(Calendar.YEAR) - getResources().getInteger(R.integer.editProfile_maxAge));
-        pickerDialog.getDatePicker().setMinDate(calendar.getTimeInMillis());
-        return pickerDialog;
+        Calendar c = Calendar.getInstance();
+        int year = c.get(Calendar.YEAR);
+        int month = c.get(Calendar.MONTH);
+        int day = c.get(Calendar.DAY_OF_MONTH);
+        try {
+            Long birthday = getArguments().getLong(ARG_DTBIRTHDAY);
+            if(birthday>0) {
+                c.setTimeInMillis(birthday);
+                year = c.get(Calendar.YEAR);
+                month = c.get(Calendar.MONTH);
+                day = c.get(Calendar.DAY_OF_MONTH);
+            }
+            DatePickerDialog pickerDialog = new DatePickerDialog(getTargetFragment().getActivity(), this, year, month, day);
+            Calendar calendar = Calendar.getInstance();
+            calendar.set(Calendar.YEAR,calendar.get(Calendar.YEAR)-getResources().getInteger(R.integer.editProfile_minAge));
+            pickerDialog.getDatePicker().setMaxDate(calendar.getTimeInMillis());
+            calendar.set(Calendar.YEAR, calendar.get(Calendar.YEAR) - getResources().getInteger(R.integer.editProfile_maxAge));
+            pickerDialog.getDatePicker().setMinDate(calendar.getTimeInMillis());
+            return pickerDialog;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new DatePickerDialog(getTargetFragment().getActivity(), this,year, month, day);
+        }
     }
 
     public void onDateSet(DatePicker view, int year, int month, int day) {
-        // Do something with the date chosen by the user
         listener.onDateSet( year, month, day);
         this.dismiss();
     }
-    public static interface OnActionDatePickerDialogListener
+    public interface OnActionDatePickerDialogListener
     {
         void onDateSet(int year, int month, int day);
     }
