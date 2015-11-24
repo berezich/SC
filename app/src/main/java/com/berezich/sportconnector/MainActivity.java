@@ -296,15 +296,6 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        try {
-            int id = item.getItemId();
-            if (id == R.id.action_settings) {
-                return true;
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
         return super.onOptionsItemSelected(item);
     }
 
