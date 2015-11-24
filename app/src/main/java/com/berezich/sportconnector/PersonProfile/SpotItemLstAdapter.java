@@ -35,8 +35,12 @@ public class SpotItemLstAdapter extends BaseAdapter {
 
     @Override
     public Object getItem(int position) {
-        if(position>=0 && position<getCount())
-            return objects.get(position);
+        try {
+            if(position>=0 && position<getCount())
+                return objects.get(position);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return null;
     }
 

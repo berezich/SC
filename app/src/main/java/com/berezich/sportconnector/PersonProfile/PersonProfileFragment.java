@@ -12,6 +12,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v7.app.ActionBar;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.TextUtils;
@@ -46,9 +47,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-/**
- * Created by berezkin on 17.07.2015.
- */
 public class PersonProfileFragment extends Fragment {
 
 
@@ -87,55 +85,67 @@ public class PersonProfileFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
-        Bundle args = getArguments();
-        if(args!=null){
-            isMyProfile = args.getBoolean(ARG_IS_MYPROFILE);
-            if(!isMyProfile){
-                String personStr = args.getString(ARG_PERSON);
-                try {
-                    person = gsonFactory.fromString(personStr,Person.class);
-                } catch (Exception e) {
-                    Log.e(TAG,"exception occurred in personProfile onCreate");
-                    e.printStackTrace();
+        try {
+            setHasOptionsMenu(true);
+            Bundle args = getArguments();
+            if(args!=null){
+                isMyProfile = args.getBoolean(ARG_IS_MYPROFILE);
+                if(!isMyProfile){
+                    String personStr = args.getString(ARG_PERSON);
+                    try {
+                        person = gsonFactory.fromString(personStr,Person.class);
+                    } catch (Exception e) {
+                        Log.e(TAG,"exception occurred in personProfile onCreate");
+                        e.printStackTrace();
+                    }
                 }
             }
-        }
-        if(savedInstanceState!=null){
-            isMyProfile = savedInstanceState.getBoolean(ARG_IS_MYPROFILE);
-            if(!isMyProfile) {
-                String personStr = savedInstanceState.getString(ARG_PERSON);
-                try {
-                    person = gsonFactory.fromString(personStr, Person.class);
-                } catch (Exception e) {
-                    Log.e(TAG, "exception occurred in personProfile onCreate");
-                    e.printStackTrace();
+            if(savedInstanceState!=null){
+                isMyProfile = savedInstanceState.getBoolean(ARG_IS_MYPROFILE);
+                if(!isMyProfile) {
+                    String personStr = savedInstanceState.getString(ARG_PERSON);
+                    try {
+                        person = gsonFactory.fromString(personStr, Person.class);
+                    } catch (Exception e) {
+                        Log.e(TAG, "exception occurred in personProfile onCreate");
+                        e.printStackTrace();
+                    }
                 }
             }
-        }
-        LocalDataManager.init(getActivity());
-        if(isMyProfile)
-            person =LocalDataManager.getMyPersonInfo();
+            LocalDataManager.init(getActivity());
+            if(isMyProfile)
+                person =LocalDataManager.getMyPersonInfo();
 
-        if (person != null && savedInstanceState==null) {
-            Log.d(TAG, "run RemoveOldPersonCache");
-            new FileManager.RemoveOldPersonCache().execute(new Pair<>(getActivity().getBaseContext(), person));
+            if (person != null && savedInstanceState==null) {
+                Log.d(TAG, "run RemoveOldPersonCache");
+                new FileManager.RemoveOldPersonCache().execute(new Pair<>(getActivity().getBaseContext(), person));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        rootView = inflater.inflate(R.layout.fragment_person_profile, container, false);
-
-        return rootView;
+        try {
+            rootView = inflater.inflate(R.layout.fragment_person_profile, container, false);
+            return rootView;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return rootView=null;
+        }
     }
 
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        this.activity = (MainActivity)activity;
-        if(isMyProfile)
-            this.activity.onSectionAttached(getArguments().getInt(ARG_SECTION_NUMBER));
+        try {
+            this.activity = (MainActivity)activity;
+            if(isMyProfile)
+                this.activity.onSectionAttached(getArguments().getInt(ARG_SECTION_NUMBER));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
 
     }
@@ -150,130 +160,143 @@ public class PersonProfileFragment extends Fragment {
     public void onResume()
     {
         super.onResume();
-        TextView txtView;
-        ImageView imageView;
-        if(isMyProfile)
-            person = LocalDataManager.getMyPersonInfo();
-        if(isMyProfile) {
-            this.activity.setmTitle(activity.getString(R.string.personprofile_myProfile_fragmentTitle));
-            this.activity.getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_drawer);
-        }
-        else {
-            this.activity.setmTitle(activity.getString(R.string.personprofile_profile_fragmentTitle));
-            this.activity.getSupportActionBar().setHomeAsUpIndicator(null);
-        }
-        this.activity.restoreActionBar();
+        try {
+            TextView txtView;
+            ImageView imageView;
+            if(isMyProfile)
+                person = LocalDataManager.getMyPersonInfo();
+            if(isMyProfile) {
+                this.activity.setmTitle(activity.getString(R.string.personprofile_myProfile_fragmentTitle));
+                ActionBar actionBar = this.activity.getSupportActionBar();
+                if(actionBar!=null)
+                    actionBar.setHomeAsUpIndicator(R.drawable.ic_drawer);
+            }
+            else {
+                this.activity.setmTitle(activity.getString(R.string.personprofile_profile_fragmentTitle));
+                ActionBar actionBar = this.activity.getSupportActionBar();
+                if(actionBar!=null)
+                    actionBar.setHomeAsUpIndicator(null);
+            }
+            this.activity.restoreActionBar();
 
-        if(person!=null && rootView!=null)
-        {
-            if((imageView = (ImageView) rootView.findViewById(R.id.profile_img_photo))!=null) {
-                imageView.setOnClickListener(new OnImageClick());
-                Picture photoInfo = person.getPhoto();
-                FileManager.providePhotoForImgView(this.getActivity().getBaseContext(), imageView,
-                        photoInfo, FileManager.PERSON_CACHE_DIR + "/" + person.getId().toString());
-            }
-            if((txtView = (TextView) rootView.findViewById(R.id.profile_txt_name))!=null) {
-                String name = person.getName(), surname = person.getSurname();
-                txtView.setText( ((name!=null && !name.equals("")) ? name :"") +
-                        ((surname!=null && !surname.equals("")) ? " "+surname :""));
-            }
-            if((txtView = (TextView) rootView.findViewById(R.id.profile_txt_typeAge))!=null) {
-                String str = person.getType().equals("PARTNER")? getString(R.string.personprofile_type_partner):getString(R.string.personprofile_type_coach);
-                int age = UsefulFunctions.calcPersonAge(person.getBirthday());
-                if(age>=0)
-                    str += ", "+age+" "+UsefulFunctions.personAgeDeclension(activity.getBaseContext(),age) ;
-                txtView.setText(str);
-            }
-            if((txtView = (TextView) rootView.findViewById(R.id.profile_txt_raiting))!=null) {
-                String ratings = getString(R.string.ratingInfo_ratingValLst);
-                if(person.getRating()<1.0 && ratings!=null) {
-                    String ratingArr[] = ratings.split(",");
-                    if(ratingArr.length>0)
-                    txtView.setText(getString(R.string.personprofile_rating) + " " + ratingArr[0]);
+            if(person!=null && rootView!=null)
+            {
+                if((imageView = (ImageView) rootView.findViewById(R.id.profile_img_photo))!=null) {
+                    imageView.setOnClickListener(new OnImageClick());
+                    Picture photoInfo = person.getPhoto();
+                    FileManager.providePhotoForImgView(this.getActivity().getBaseContext(), imageView,
+                            photoInfo, FileManager.PERSON_CACHE_DIR + "/" + person.getId().toString());
                 }
-                else
-                    txtView.setText(getString(R.string.personprofile_rating) + " " + person.getRating());
-            }
-
-            //contacts block
-            String email = person.getEmail(),phone = person.getPhone();
-            LinearLayout linearLayout = (LinearLayout) rootView.findViewById(R.id.profile_contactsBlock);
-            LinearLayout propertyLstLayout = (LinearLayout) rootView.findViewById(R.id.profile_linearlayout_propertyLst);
-            propertyLstLayout.removeAllViews();
-            if(linearLayout!=null ) {
-                linearLayout.setVisibility(View.GONE);
-                    if (email != null && !email.equals("")) {
-                        linearLayout.setVisibility(View.VISIBLE);
-                        View view = getProfileDetailItem(getContext(),getString(R.string.personprofile_email),email);
-                        if(view!=null) {
-                            propertyLstLayout.addView(view);
-                            if(!isMyProfile)
-                                view.setOnClickListener(new OnComposeEmailClick());
-                        }
-                    }
-                    if (phone != null && !phone.equals("")) {
-
-                        linearLayout.setVisibility(View.VISIBLE);
-                        View view = getProfileDetailItem(getContext(),getString(R.string.personprofile_phone),phone);
-                        if(view!=null) {
-                            propertyLstLayout.addView(view);
-                            if(!isMyProfile)
-                                view.setOnClickListener(new OnPhoneClick());
-                        }
-                    }
-            }
-
-            //description block
-            String desc = person.getDescription();
-            linearLayout = (LinearLayout) rootView.findViewById(R.id.profile_descBlock);
-            if(linearLayout!=null) {
-                linearLayout.setVisibility(View.GONE);
-                if (desc != null && !desc.equals("")) {
-                    if((txtView = (TextView) rootView.findViewById(R.id.profile_txt_desc))!=null)
-                        txtView.setText(desc);
-                    linearLayout.setVisibility(View.VISIBLE);
+                if((txtView = (TextView) rootView.findViewById(R.id.profile_txt_name))!=null) {
+                    String name = person.getName(), surname = person.getSurname();
+                    txtView.setText( ((name!=null && !name.equals("")) ? name :"") +
+                            ((surname!=null && !surname.equals("")) ? " "+surname :""));
                 }
-            }
+                if((txtView = (TextView) rootView.findViewById(R.id.profile_txt_typeAge))!=null) {
+                    String str = person.getType().equals("PARTNER")? getString(
+                            R.string.personprofile_type_partner):getString(R.string.personprofile_type_coach);
+                    int age = UsefulFunctions.calcPersonAge(person.getBirthday());
+                    if(age>=0)
+                        str += ", "+age+" "+UsefulFunctions.personAgeDeclension(activity.getBaseContext(),age) ;
+                    txtView.setText(str);
+                }
+                if((txtView = (TextView) rootView.findViewById(R.id.profile_txt_raiting))!=null) {
+                    String ratings = getString(R.string.ratingInfo_ratingValLst);
+                    if(person.getRating()<1.0 && ratings!=null) {
+                        String ratingArr[] = ratings.split(",");
+                        if(ratingArr.length>0)
+                        txtView.setText(getString(R.string.personprofile_rating) + " " + ratingArr[0]);
+                    }
+                    else
+                        txtView.setText(getString(R.string.personprofile_rating) + " " + person.getRating());
+                }
 
-            //favorite spots lst
-            boolean isVisibleSpotLst = false;
-            if((linearLayout = (LinearLayout) rootView.findViewById(R.id.profile_linearLayout_favoriteSpotLst))!=null) {
-                List<Long> spotLst = person.getFavoriteSpotIdLst();
-                if(spotLst!=null && spotLst.size()>0) {
-                    Spot spot;
-                    HashMap<Long,Spot> hshMapSpot = SpotsData.get_allSpots();
-                    ArrayList<Spot> spots = new ArrayList<>();
-                    for(int i=0; i<spotLst.size(); i++)
-                        if((spot = hshMapSpot.get(spotLst.get(i)))!=null)
-                            spots.add(spot);
-
-                    if(spots.size()>0) {
-                        SpotItemLstAdapter spotItemLstAdapter = new SpotItemLstAdapter(getActivity().getApplicationContext(),spots);
-                        if( linearLayout.getChildAt(0) instanceof TextView) {
-                            txtView = (TextView) linearLayout.getChildAt(0);
-                            linearLayout.removeAllViews();
-                            linearLayout.addView(txtView);
-                            for (int i = 0; i < spotItemLstAdapter.getCount(); i++) {
-
-                                View view = spotItemLstAdapter.getView(i, null, null);
-                                view.setOnClickListener(new OnSpotClick());
-                                linearLayout.addView(view);
+                //contacts block
+                String email = person.getEmail(),phone = person.getPhone();
+                LinearLayout linearLayout = (LinearLayout) rootView.findViewById(R.id.profile_contactsBlock);
+                LinearLayout propertyLstLayout = (LinearLayout) rootView.findViewById(R.id.profile_linearlayout_propertyLst);
+                propertyLstLayout.removeAllViews();
+                if(linearLayout!=null ) {
+                    linearLayout.setVisibility(View.GONE);
+                        if (email != null && !email.equals("")) {
+                            linearLayout.setVisibility(View.VISIBLE);
+                            View view = getProfileDetailItem(getContext(),getString(R.string.personprofile_email),email);
+                            if(view!=null) {
+                                propertyLstLayout.addView(view);
+                                if(!isMyProfile)
+                                    view.setOnClickListener(new OnComposeEmailClick());
                             }
-                            isVisibleSpotLst = true;
-
                         }
-                    }
+                        if (phone != null && !phone.equals("")) {
 
+                            linearLayout.setVisibility(View.VISIBLE);
+                            View view = getProfileDetailItem(getContext(),getString(R.string.personprofile_phone),phone);
+                            if(view!=null) {
+                                propertyLstLayout.addView(view);
+                                if(!isMyProfile)
+                                    view.setOnClickListener(new OnPhoneClick());
+                            }
+                        }
                 }
-                linearLayout.setVisibility(isVisibleSpotLst? View.VISIBLE : View.GONE);
+
+                //description block
+                String desc = person.getDescription();
+                linearLayout = (LinearLayout) rootView.findViewById(R.id.profile_descBlock);
+                if(linearLayout!=null) {
+                    linearLayout.setVisibility(View.GONE);
+                    if (desc != null && !desc.equals("")) {
+                        if((txtView = (TextView) rootView.findViewById(R.id.profile_txt_desc))!=null)
+                            txtView.setText(desc);
+                        linearLayout.setVisibility(View.VISIBLE);
+                    }
+                }
+
+                //favorite spots lst
+                boolean isVisibleSpotLst = false;
+                if((linearLayout = (LinearLayout) rootView.findViewById(R.id.profile_linearLayout_favoriteSpotLst))!=null) {
+                    List<Long> spotLst = person.getFavoriteSpotIdLst();
+                    if(spotLst!=null && spotLst.size()>0) {
+                        Spot spot;
+                        HashMap<Long,Spot> hshMapSpot = SpotsData.get_allSpots();
+                        ArrayList<Spot> spots = new ArrayList<>();
+                        for(int i=0; i<spotLst.size(); i++)
+                            if((spot = hshMapSpot.get(spotLst.get(i)))!=null)
+                                spots.add(spot);
+
+                        if(spots.size()>0) {
+                            SpotItemLstAdapter spotItemLstAdapter = new SpotItemLstAdapter(getActivity().getApplicationContext(),spots);
+                            if( linearLayout.getChildAt(0) instanceof TextView) {
+                                txtView = (TextView) linearLayout.getChildAt(0);
+                                linearLayout.removeAllViews();
+                                linearLayout.addView(txtView);
+                                for (int i = 0; i < spotItemLstAdapter.getCount(); i++) {
+
+                                    View view = spotItemLstAdapter.getView(i, null, null);
+                                    view.setOnClickListener(new OnSpotClick());
+                                    linearLayout.addView(view);
+                                }
+                                isVisibleSpotLst = true;
+
+                            }
+                        }
+
+                    }
+                    linearLayout.setVisibility(isVisibleSpotLst? View.VISIBLE : View.GONE);
+                }
             }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putBoolean(ARG_IS_MYPROFILE,isMyProfile);
+        try {
+            outState.putBoolean(ARG_IS_MYPROFILE,isMyProfile);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         if(!isMyProfile)
             try {
                 outState.putString(ARG_PERSON, gsonFactory.toString(person));
@@ -286,27 +309,35 @@ public class PersonProfileFragment extends Fragment {
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        Log.d(TAG, "onCreateOptionsMenu");
-        menu.clear();
         super.onCreateOptionsMenu(menu, inflater);
-        if(isMyProfile)
-            inflater.inflate(R.menu.fragment_person_profile, menu);
+        try {
+            Log.d(TAG, "onCreateOptionsMenu");
+            menu.clear();
+            if(isMyProfile)
+                inflater.inflate(R.menu.fragment_person_profile, menu);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.menu_edit_profile:
-                FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
-                if(fragmentManager!=null) {
-                    EditProfileFragment fragment = new EditProfileFragment();
-                    fragment.setTargetFragment(this,0);
-                    String name = fragment.getClass().getName();
-                    fragmentManager.beginTransaction().replace(R.id.container, fragment).addToBackStack(name).commit();
-                    Log.d(TAG, String.format("prev fragment replaced with %s", fragment.getClass().getName()));
-                }
-                break;
+        try {
+            switch (item.getItemId()) {
+                case R.id.menu_edit_profile:
+                    FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+                    if(fragmentManager!=null) {
+                        EditProfileFragment fragment = new EditProfileFragment();
+                        fragment.setTargetFragment(this,0);
+                        String name = fragment.getClass().getName();
+                        fragmentManager.beginTransaction().replace(R.id.container, fragment).addToBackStack(name).commit();
+                        Log.d(TAG, String.format("prev fragment replaced with %s", fragment.getClass().getName()));
+                    }
+                    break;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         return super.onOptionsItemSelected(item);
     }
@@ -314,20 +345,24 @@ public class PersonProfileFragment extends Fragment {
     private class OnImageClick implements View.OnClickListener{
         @Override
         public void onClick(View v) {
-            Intent intent = new Intent(getActivity(), ImgViewPagerActivity.class);
-            if(person!=null) {
-                Picture picture = person.getPhoto();
-                if(picture!=null) {
-                    GsonFactory gsonFactory = new GsonFactory();
-                    try {
-                        ArrayList<String> picList = new ArrayList<String>();
-                        picList.add(gsonFactory.toString(picture));
-                        intent.putStringArrayListExtra(ImgViewPagerActivity.PIC_LIST_EXTRAS, picList);
-                        getCurFragment().startActivity(intent);
-                    } catch (IOException e) {
-                        e.printStackTrace();
+            try {
+                Intent intent = new Intent(getActivity(), ImgViewPagerActivity.class);
+                if(person!=null) {
+                    Picture picture = person.getPhoto();
+                    if(picture!=null) {
+                        GsonFactory gsonFactory = new GsonFactory();
+                        try {
+                            ArrayList<String> picList = new ArrayList<>();
+                            picList.add(gsonFactory.toString(picture));
+                            intent.putStringArrayListExtra(ImgViewPagerActivity.PIC_LIST_EXTRAS, picList);
+                            getCurFragment().startActivity(intent);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
                     }
                 }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }
     }
@@ -336,15 +371,15 @@ public class PersonProfileFragment extends Fragment {
         public void onClick(View v) {
             try {
                 int position = ((LinearLayout) v.getParent()).indexOfChild(v);
-                Person myPersonInfo = LocalDataManager.getMyPersonInfo();
-                Long spotId = myPersonInfo.getFavoriteSpotIdLst().get(position - 1);
+                //Person myPersonInfo = LocalDataManager.getMyPersonInfo();
+                Long spotId = person.getFavoriteSpotIdLst().get(position - 1);
                 FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
                 SpotInfoFragment fragment = SpotInfoFragment.newInstance(spotId);
                 fragmentManager.beginTransaction().replace(R.id.container, fragment).addToBackStack(fragment.getClass().getName()).commit();
                 Log.d(TAG, String.format("prev fragment replaced with %s", fragment.getClass().getName()));
             }
             catch (Exception e){
-                Log.e(TAG,String.format("exception occurred while hitting spotItem"));
+                Log.e(TAG,"exception occurred while hitting spotItem");
                 e.printStackTrace();
             }
         }
@@ -374,11 +409,14 @@ public class PersonProfileFragment extends Fragment {
     private class OnPhoneClick implements View.OnClickListener{
         @Override
         public void onClick(View v) {
-            phoneIntent(person.getPhone());
+            try {
+                phoneIntent(person.getPhone());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
     public void phoneIntent(String phone){
-        try {
             int validIntentFlag = 0;
             PackageManager pm = activity.getPackageManager();
             Intent intentDial = new Intent(Intent.ACTION_DIAL);
@@ -428,14 +466,15 @@ public class PersonProfileFragment extends Fragment {
 
             openInChooser.putExtra(Intent.EXTRA_INITIAL_INTENTS, extraIntents);
             startActivity(openInChooser);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
     private class OnComposeEmailClick implements View.OnClickListener{
         @Override
         public void onClick(View v) {
-            composeEmail(person.getEmail());
+            try {
+                composeEmail(person.getEmail());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
     public void composeEmail(String address) {
