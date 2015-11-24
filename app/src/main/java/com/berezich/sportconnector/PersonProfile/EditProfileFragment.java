@@ -947,7 +947,7 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
             return true;
         if(!UsefulFunctions.isSameStrValue(p.getPrice(),pNew.getPrice()))
             return true;
-        if(pNew.getRating().equals( p.getRating()))
+        if(pNew.getRating()!= p.getRating())
             return true;
         if(!UsefulFunctions.isSameStrValue(p.getDescription(), pNew.getDescription()))
             return true;
