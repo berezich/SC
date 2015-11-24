@@ -17,7 +17,6 @@ import com.google.appengine.repackaged.com.google.api.client.util.Base64;
 import com.googlecode.objectify.ObjectifyService;
 import com.googlecode.objectify.cmd.Query;
 
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
@@ -65,22 +64,22 @@ public class PersonEndpoint {
 
     private static final int DEFAULT_LIST_LIMIT = 20;
     private static final float MIN_RATING = 1;
-    private static String ERROR_CONFIRM = "пїЅпїЅпїЅпїЅпїЅпїЅ! пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ %s пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ!";
-    private static String ERROR_CONFIRM_ALREADY = "пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ %s пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ!";
-    private static String ERROR_CONFIRM_NOTFOUND = "пїЅпїЅпїЅпїЅпїЅпїЅ! пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ %s пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ!";
-    private static String subjectAccountConfirmation = "registration SportConnector";
-    private static String msgBodyAccountConfirmation = "пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ: " +
+    static String ERROR_CONFIRM = "Ошибка! Ваша учетная запись %s не активирована!";
+    static String ERROR_CONFIRM_ALREADY = "Ваша учетная запись %s уже активирована!";
+    static String ERROR_CONFIRM_NOTFOUND = "Ошибка! Ваша учетная запись %s не найдена!";
+    static String subjectAccountConfirmation = "registration SportConnector";
+    static String msgBodyAccountConfirmation = "Для активации вашей учетной записи перейдите по ссылке: " +
             "https://sportconnector-981.appspot.com/confirm.html?id=%s&x=%s";
-    private static String ERROR_CONFIRM_EMAIL = "пїЅпїЅпїЅпїЅпїЅпїЅ! пїЅпїЅпїЅ email %s пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ!";
-    private static String ERROR_CONFIRM_EMAIL_ALREADY = "пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ email %s пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ!";
-    private static String ERROR_CONFIRM_EMAIL_NOTFOUND = "пїЅпїЅпїЅпїЅпїЅпїЅ! пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ %s пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ!";
-    private static String subjectConfirmEmail = "change Email SportConnector";
-    private static String msgBodyConfirmEmail = "пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ email пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ: " +
+    static String ERROR_CONFIRM_EMAIL = "Ошибка! Ваш email %s не изменен!";
+    static String ERROR_CONFIRM_EMAIL_ALREADY = "Ваш старый email %s уже изменен!";
+    static String ERROR_CONFIRM_EMAIL_NOTFOUND = "Ошибка! Ваша учетная запись %s не найдена!";
+    static String subjectConfirmEmail = "change Email SportConnector";
+    static String msgBodyConfirmEmail = "Для смены email перейдите по ссылке: " +
             "https://sportconnector-981.appspot.com/email.html?id=%s&x=%s";
-    private static String ERROR_CONFIRM_RESET_PASS_NOTFOUND = "пїЅпїЅпїЅпїЅпїЅпїЅ! пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ.";
-    private static String subjectResetPass = "reset Password SportConnector";
-    private static String msgBodyResetPass = "пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ " +
-            "пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.\n" +
+    static String ERROR_CONFIRM_RESET_PASS_NOTFOUND = "Ошибка! Повторите процедуру восстановления пароля.";
+    static String subjectResetPass = "reset Password SportConnector";
+    static String msgBodyResetPass = "Для смены пароля перейдите по ссылке " +
+            "и следуйте дальнейшим инструкциям.\n" +
             "https://sportconnector-981.appspot.com/pass.html?x=%s";
 
 
@@ -385,7 +384,6 @@ public class PersonEndpoint {
             ofy().delete().type(ReqResetPass.class).id(x).now();
             logger.info(String.format("Deleted ReqResetPass with ID: %s personId: %d",
                     reqResetPass.getUuid(), reqResetPass.getPersonId()));
-            return;
         }
 
 
@@ -628,11 +626,11 @@ public class PersonEndpoint {
     //update lists of partners and coaches of some spots since a person was updated
     private void setSpotCoachesPartners(Person person, Person oldPerson) throws BadRequestException
     {
-        List<Long> addSpotLst = null;
+        List<Long> addSpotLst;
         List<Long> removeSpotLst = new ArrayList<>();
 
-        List<Long> oldies = new ArrayList<Long>();
-        List<Long> news = new ArrayList<Long>();
+        List<Long> oldies = new ArrayList<>();
+        List<Long> news = new ArrayList<>();
 
         Long id = null;
         Person.TYPE type = null;
@@ -651,9 +649,9 @@ public class PersonEndpoint {
             if (oldPerson.getFavoriteSpotIdLst() != null)
                 oldies.addAll(oldPerson.getFavoriteSpotIdLst());
 
-            addSpotLst = new ArrayList<Long>(news);
+            addSpotLst = new ArrayList<>(news);
             addSpotLst.removeAll(oldies);
-            removeSpotLst = new ArrayList<Long>(oldies);
+            removeSpotLst = new ArrayList<>(oldies);
             removeSpotLst.removeAll(news);
         }
         else
@@ -679,15 +677,12 @@ public class PersonEndpoint {
             return "";
         }
         messageDigest.update(stringToEncrypt.getBytes());
-        String encryptedString = new String(messageDigest.digest());
         messageDigest.update((stringToEncrypt + "329emdIDSxc8989sfh").getBytes());
-        encryptedString = new String(messageDigest.digest());
+        String encryptedString = new String(messageDigest.digest());
         byte[]   bytesEncoded = Base64.encodeBase64(encryptedString.getBytes());
         encryptedString = new String(bytesEncoded);
         return encryptedString;
     }
-
-
 
     private void sendMail(String emailTo,String subject,String msgBody) {
         // ...
