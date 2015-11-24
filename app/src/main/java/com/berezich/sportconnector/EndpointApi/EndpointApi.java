@@ -21,6 +21,8 @@ import com.google.api.client.extensions.android.json.AndroidJsonFactory;
 import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
 import com.google.api.client.googleapis.services.AbstractGoogleClientRequest;
 import com.google.api.client.googleapis.services.GoogleClientRequestInitializer;
+import com.google.api.client.http.HttpRequest;
+import com.google.api.client.http.HttpRequestInitializer;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.util.DateTime;
 
@@ -38,6 +40,8 @@ public class EndpointApi {
     static String SERVICE_ACCOUNT_EMAIL = "182489181232-bbiekce9fgm6gtelunr9lp82gmdk3uju@developer.gserviceaccount.com";
     static String USERINFO_EMAIL_SCOPE = "https://www.googleapis.com/auth/userinfo.email";
     static String FILE_NAME = "file";
+    final static int CONNECT_TIMEOUT_MS = 5000;
+    final static int READ_TIMEOUT_MS = 5000;
     private static void setSrvApi(Context context)
     {
         setSrvApi(context, false);
@@ -73,6 +77,12 @@ public class EndpointApi {
                                 .setServiceAccountId(SERVICE_ACCOUNT_EMAIL)
                                 .setServiceAccountScopes(Collections.singleton(USERINFO_EMAIL_SCOPE))
                                 .setServiceAccountPrivateKeyFromP12File(file)
+                                .setRequestInitializer(new HttpRequestInitializer() {
+                                    public void initialize(HttpRequest httpRequest) {
+                                        httpRequest.setConnectTimeout(CONNECT_TIMEOUT_MS);
+                                        httpRequest.setReadTimeout(READ_TIMEOUT_MS);
+                                    }
+                                })
                                 .build();
                         file.delete();
                         builder = new SportConnectorApi.Builder(
