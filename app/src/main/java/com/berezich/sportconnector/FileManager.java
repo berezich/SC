@@ -33,7 +33,6 @@ import org.apache.http.entity.mime.HttpMultipartMode;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.protocol.HTTP;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
@@ -43,14 +42,9 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
-/**
- * Created by Sashka on 11.09.2015.
- */
 public class FileManager {
     private static final int COMPRESS_QUALITY = 75;
     private static final int REQUIRED_SIZE = 1000;
@@ -70,10 +64,6 @@ public class FileManager {
         private Bitmap bitmap;
         @Expose
         private Long size;
-        @Expose
-        private Date date;
-        @Expose
-        private String description;
         @Expose
         private String mimeType;
 
@@ -95,7 +85,8 @@ public class FileManager {
             this.mimeType = fragment.getActivity().getContentResolver().getType(uri);
             this.path = returnCursor.getString(dataIdx);
             bitmap = decodeFile(new File(path));
-            bitmap = rotateBitmapFileIfNeed(path,bitmap);
+            bitmap = rotateBitmapFileIfNeed(path, bitmap);
+            returnCursor.close();
         }
 
         /**
@@ -154,13 +145,20 @@ public class FileManager {
 
         @Override
         protected Exception doInBackground(Pair<PicInfo, Pair<String, String>>... params) {
-            PicInfo picInfo = params[0].first;
-            String urlForUpload = params[0].second.first;
-            String replacePicKey = params[0].second.second;
-            Person myPersonInfo = LocalDataManager.getMyPersonInfo();
+
+            Person myPersonInfo;
+            try {
+                myPersonInfo = LocalDataManager.getMyPersonInfo();
+            } catch (Exception e) {
+                e.printStackTrace();
+                return e;
+            }
             if (myPersonInfo == null)
                 return new NullPointerException("myPersonInfo == null");
             try {
+                PicInfo picInfo = params[0].first;
+                String urlForUpload = params[0].second.first;
+                String replacePicKey = params[0].second.second;
                 HttpClient httpClient = new DefaultHttpClient();
                 HttpPost postRequest = new HttpPost(urlForUpload);
                 MultipartEntityBuilder builder = MultipartEntityBuilder.create();
@@ -182,7 +180,7 @@ public class FileManager {
 
                 HttpEntity entity = builder.build();
                 postRequest.setEntity(entity);
-                HttpResponse response = null;
+                HttpResponse response;
                 response = httpClient.execute(postRequest);
                 Log.d(TAG, String.format("upload pic response http status: %s\n entity content: %s",
                         response.getStatusLine(), response.getEntity().getContent()));
@@ -198,7 +196,11 @@ public class FileManager {
 
         @Override
         protected void onPostExecute(Exception exception) {
-            listener.onUploadFileFinish(exception);
+            try {
+                listener.onUploadFileFinish(exception);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
 
         public interface OnAction {
@@ -211,7 +213,6 @@ public class FileManager {
     }
     public static void providePhotoForImgView(Context context, ImageView imageView, Picture photoInfo, String cacheDir,int height) {
         int width = height;
-
         if (photoInfo != null) {
             String photoId = UsefulFunctions.getDigest(photoInfo.getBlobKey());
             File myFolder;
@@ -260,9 +261,9 @@ public class FileManager {
 
 
         protected Pair<Bitmap, Exception> doInBackground(String... urls) {
-            String urldisplay = urls[0];
-            Bitmap mIcon11 = null;
+            Bitmap mIcon11;
             try {
+                String urldisplay = urls[0];
                 InputStream in = new java.net.URL(urldisplay).openStream();
                 mIcon11 = BitmapFactory.decodeStream(in);
             } catch (Exception e) {
@@ -275,36 +276,39 @@ public class FileManager {
 
         protected void onPostExecute(Pair<Bitmap, Exception> result) {
 
-            if (isRespHandled) {
-                if (listener != null)
-                    listener.onDownloadFileFinish(result.first, imgId, result.second);
-            } else {
-                Exception exception = result.second;
-                Bitmap bitmap = result.first;
-                if (exception == null) {
-                    if (bitmap == null) {
-                        Log.e(TAG, "bitmap not loaded from server cause: bitmap == null");
-                        Toast.makeText(context, context.getString(R.string.personprofile_reqError), Toast.LENGTH_SHORT).show();
-                        return;
-                    }
-                    Log.d(TAG, "bitmap loaded from server");
-                    if (imageView != null) {
-                        imageView.setImageBitmap(bitmap);
-                    if(cacheDir.equals(TEMP_DIR))
-                        FileManager.savePicToTempStore(TAG, context, imgId, bitmap, bitmap.getWidth(), bitmap.getHeight(),false);
-                    else
-                        FileManager.savePicToCache(TAG, context, imgId, cacheDir, bitmap, bitmap.getWidth(), bitmap.getHeight());
-
-                    }
+            try {
+                if (isRespHandled) {
+                    if (listener != null)
+                        listener.onDownloadFileFinish(result.first, imgId, result.second);
                 } else {
-                    Log.e(TAG, "bitmap not loaded from server");
-                    Log.e(TAG, exception.getMessage());
-                    exception.printStackTrace();
-                    if (!msgError.equals(""))
-                        Toast.makeText(context, msgError, Toast.LENGTH_SHORT).show();
-                    return;
-                }
+                    Exception exception = result.second;
+                    Bitmap bitmap = result.first;
+                    if (exception == null) {
+                        if (bitmap == null) {
+                            Log.e(TAG, "bitmap not loaded from server cause: bitmap == null");
+                            Toast.makeText(context, context.getString(R.string.personprofile_reqError), Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+                        Log.d(TAG, "bitmap loaded from server");
+                        if (imageView != null) {
+                            imageView.setImageBitmap(bitmap);
+                        if(cacheDir.equals(TEMP_DIR))
+                            FileManager.savePicToTempStore(TAG, context, imgId, bitmap, bitmap.getWidth(), bitmap.getHeight(),false);
+                        else
+                            FileManager.savePicToCache(TAG, context, imgId, cacheDir, bitmap, bitmap.getWidth(), bitmap.getHeight());
 
+                        }
+                    } else {
+                        Log.e(TAG, "bitmap not loaded from server");
+                        Log.e(TAG, exception.getMessage());
+                        exception.printStackTrace();
+                        if (!msgError.equals(""))
+                            Toast.makeText(context, msgError, Toast.LENGTH_SHORT).show();
+                    }
+
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }
 
@@ -313,10 +317,10 @@ public class FileManager {
         }
     }
 
-    public static boolean isExistsAlbumStorageDir(String LOG_TAG, Context context, String albumName) {
+    public static boolean isExistsAlbumStorageDir(Context context, String albumName) {
         File file = new File(context.getExternalFilesDir(
                 Environment.DIRECTORY_PICTURES), albumName);
-        return (file==null)? false : file.exists();
+        return file.exists();
     }
     public static File getAlbumStorageDir(String LOG_TAG, Context context, String albumName) {
         // Get the directory for the user's public pictures directory.
@@ -331,20 +335,7 @@ public class FileManager {
     /* Checks if external storage is available for read and write */
     public static boolean isExternalStorageWritable() {
         String state = Environment.getExternalStorageState();
-        if (Environment.MEDIA_MOUNTED.equals(state)) {
-            return true;
-        }
-        return false;
-    }
-
-    /* Checks if external storage is available to at least read */
-    public static boolean isExternalStorageReadable() {
-        String state = Environment.getExternalStorageState();
-        if (Environment.MEDIA_MOUNTED.equals(state) ||
-                Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)) {
-            return true;
-        }
-        return false;
+        return Environment.MEDIA_MOUNTED.equals(state);
     }
 
     public static Bitmap cropCenterBitmap(Bitmap srcBmp) {
@@ -417,14 +408,13 @@ public class FileManager {
         if (file != null) {
             Log.d(TAG, "filePath = " + file.getPath());
             file = new File(file, fileName);
-            if (file.exists())
-                file.delete();
+
             try {
                 FileOutputStream out = new FileOutputStream(file);
                 Bitmap endBitmap;
                 if(needCenterCrop) {
                     endBitmap = cropCenterBitmap(bitmap);
-                    Log.d(TAG, String.format("photo cropped to square"));
+                    Log.d(TAG, "photo cropped to square");
 
                 }
                 else
@@ -465,20 +455,7 @@ public class FileManager {
         }
         return file;
     }
-    public static File createFileInTempStore(String TAG, Context context, String fileName){
-        if (fileName == null || fileName.equals("")) {
-            Log.e(TAG, "file name not valid");
-            return null;
-        }
-        File fileTempDir = context.getCacheDir();
-        File file=null;
-        if (fileTempDir != null) {
-            Log.d(TAG, "filePath for temp files= " + fileTempDir.getPath());
-            file = new File(fileTempDir, fileName);
-            return file;
-        }
-        return file;
-    }
+
     public static File savePicToTempStore(String TAG, Context context, String fileName, Bitmap bitmap,
                                           int width, int height, boolean needCenterCrop) {
 
@@ -493,14 +470,12 @@ public class FileManager {
             int dirSize, otherFilesSize;
 
             file = new File(fileTempDir, fileName);
-            if (file.exists())
-                file.delete();
             try {
                 FileOutputStream out = new FileOutputStream(file);
                 Bitmap endBitmap;
                 if(needCenterCrop) {
                     endBitmap = cropCenterBitmap(bitmap);
-                    Log.d(TAG, String.format("photo cropped to square"));
+                    Log.d(TAG, "photo cropped to square");
 
                 }
                 else
@@ -522,7 +497,7 @@ public class FileManager {
                 File oldestFile = null;
                 int myFilesNum = 0;
                 for (File itemFile : fileTempDir.listFiles()) {
-                    if (itemFile.getName().indexOf(TEMP_FILE_POSTFIX) >= 0) {
+                    if (itemFile.getName().contains(TEMP_FILE_POSTFIX)) {
                         dirSize += itemFile.length();
                         myFilesNum++;
                         if (oldestFile == null || oldestFile.lastModified() > itemFile.lastModified())
@@ -550,43 +525,39 @@ public class FileManager {
     }
 
     public static void setPicToImageView(File imgFile, ImageView imgView, int width, int height) {
-        InputStream in = null;
+        InputStream in;
         try {
             in = new BufferedInputStream(new FileInputStream(imgFile));
-            if (in != null) {
-                ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            try {
+                IOUtils.copy(in, bos);
+            } catch (Exception e) {
+                e.printStackTrace();
                 try {
-                    IOUtils.copy(in, bos);
                     in.close();
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+                return;
+            }
 
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    return;
-                } finally {
-                    if (in != null) {
-                        try {
-                            in.close();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                            return;
-                        }
-                    }
-                }
-                Bitmap bitmap = BitmapFactory.decodeByteArray(bos.toByteArray(), 0, bos.toByteArray().length);
-                if (bitmap != null && imgView != null) {
-                    if(height>0)
-                        imgView.setImageBitmap(Bitmap.createScaledBitmap(bitmap, width, height, false));
-                    else
-                        imgView.setImageBitmap(bitmap);
-                }
-                if (bos != null) {
-                    try {
-                        bos.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                        return;
-                    }
-                }
+            try {
+                in.close();
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+
+            Bitmap bitmap = BitmapFactory.decodeByteArray(bos.toByteArray(), 0, bos.toByteArray().length);
+            if (bitmap != null && imgView != null) {
+                if(height>0)
+                    imgView.setImageBitmap(Bitmap.createScaledBitmap(bitmap, width, height, false));
+                else
+                    imgView.setImageBitmap(bitmap);
+            }
+            try {
+                bos.close();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         } catch (FileNotFoundException ex) {
             ex.printStackTrace();
@@ -595,16 +566,20 @@ public class FileManager {
 
     public static class RemoveOldPersonCache extends AsyncTask<Pair<Context,Person>,Void,Void>{
         protected Void doInBackground(Pair<Context, Person>... params) {
-            Context context = params[0].first;
-            Person person = params[0].second;
-            List<String> usefulCacheFiles = new ArrayList<>();
-            if(person.getPhoto()!=null)
-                usefulCacheFiles.add(UsefulFunctions.getDigest(person.getPhoto().getBlobKey()));
-            List<Picture> pictures = person.getPictureLst();
-            if(pictures!=null)
-                for(Picture pic:pictures)
-                    usefulCacheFiles.add(UsefulFunctions.getDigest(pic.getBlobKey()));
-            removeOldFiles(TAG, context, usefulCacheFiles, PERSON_CACHE_DIR + "/" + person.getId());
+            try {
+                Context context = params[0].first;
+                Person person = params[0].second;
+                List<String> usefulCacheFiles = new ArrayList<>();
+                if(person.getPhoto()!=null)
+                    usefulCacheFiles.add(UsefulFunctions.getDigest(person.getPhoto().getBlobKey()));
+                List<Picture> pictures = person.getPictureLst();
+                if(pictures!=null)
+                    for(Picture pic:pictures)
+                        usefulCacheFiles.add(UsefulFunctions.getDigest(pic.getBlobKey()));
+                removeOldFiles(TAG, context, usefulCacheFiles, PERSON_CACHE_DIR + "/" + person.getId());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             return null;
         }
 
@@ -612,14 +587,18 @@ public class FileManager {
 
     public static class RemoveOldSpotCache extends AsyncTask<Pair<Context,Spot>,Void,Void>{
         protected Void doInBackground(Pair<Context, Spot>... params) {
-            Context context = params[0].first;
-            Spot spot = params[0].second;
-            List<String> usefulCacheFiles = new ArrayList<>();
-            List<Picture> pictures = spot.getPictureLst();
-            if(pictures!=null)
-                for(Picture pic:pictures)
-                    usefulCacheFiles.add(UsefulFunctions.getDigest(pic.getBlobKey()));
-            removeOldFiles(TAG, context, usefulCacheFiles, SPOT_CACHE_DIR + "/" + spot.getId());
+            try {
+                Context context = params[0].first;
+                Spot spot = params[0].second;
+                List<String> usefulCacheFiles = new ArrayList<>();
+                List<Picture> pictures = spot.getPictureLst();
+                if(pictures!=null)
+                    for(Picture pic:pictures)
+                        usefulCacheFiles.add(UsefulFunctions.getDigest(pic.getBlobKey()));
+                removeOldFiles(TAG, context, usefulCacheFiles, SPOT_CACHE_DIR + "/" + spot.getId());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             return null;
         }
 
@@ -630,24 +609,22 @@ public class FileManager {
             Log.e(TAG, "ExternalStorage not writable");
             return ;
         }
-        if(isExistsAlbumStorageDir(TAG,context,folder)){
+        if(isExistsAlbumStorageDir(context,folder)){
             File file = FileManager.getAlbumStorageDir(TAG, context, folder);
             if(file!=null)
             {
                 if(usefulFileNameLst==null || usefulFileNameLst.isEmpty()) {
                     removeDirectory(file);
                     Log.d(TAG, String.format("Folder %s removed",file.getPath()));
-                    return;
                 }
                 else {
                     File[] allFiles = file.listFiles();
-                    String fileName="";
                     for (File item : allFiles) {
                         if(item.isDirectory()) {
                             removeDirectory(item);
                             continue;
                         }
-                        fileName = item.getName();
+                        String fileName = item.getName();
                         if (!usefulFileNameLst.contains(fileName)) {
                             if(item.delete())
                                 Log.d(TAG, "old cache file filePath = " + item.getPath() + " removed");
@@ -658,7 +635,6 @@ public class FileManager {
                 }
             }
         }
-        return;
     }
     public static void removeDirectory(File dir) {
         if (dir.isDirectory()) {
@@ -684,8 +660,7 @@ public class FileManager {
     {
         ExifInterface exif = new ExifInterface(filePath);
         int rotation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
-        int rotationInDegrees = exifToDegrees(rotation);
-        return rotationInDegrees;
+        return exifToDegrees(rotation);
     }
     private static int exifToDegrees(int exifOrientation) {
         if (exifOrientation == ExifInterface.ORIENTATION_ROTATE_90) { return 90; }
@@ -704,7 +679,8 @@ public class FileManager {
                 Log.d(TAG,String.format("file %s renamed to %s",file.getPath(),newFileName));
                 return true;
             }
-        Log.e(TAG,String.format("file %s renamed failed",file.getPath()));
+        if(file!=null)
+            Log.e(TAG,String.format("file %s renamed failed",file.getPath()));
         return false;
     }
     private static Bitmap rotateBitmapFileIfNeed(String filePath, Bitmap bitmap){

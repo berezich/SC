@@ -19,31 +19,25 @@ import com.berezich.sportconnector.backend.sportConnectorApi.model.UpdateSpotInf
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.extensions.android.json.AndroidJsonFactory;
 import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
-import com.google.api.client.googleapis.services.AbstractGoogleClient;
 import com.google.api.client.googleapis.services.AbstractGoogleClientRequest;
 import com.google.api.client.googleapis.services.GoogleClientRequestInitializer;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.util.DateTime;
-import com.google.maps.android.geometry.Bounds;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-/**
- * Created by Sashka on 01.07.2015.
- */
 public class EndpointApi {
     private static SportConnectorApi srvApi = null;
-    private static String SERVICE_ACCOUNT_EMAIL = "182489181232-bbiekce9fgm6gtelunr9lp82gmdk3uju@developer.gserviceaccount.com";
-    private static String USERINFO_EMAIL_SCOPE = "https://www.googleapis.com/auth/userinfo.email";
-    private static String FILE_NAME = "file";
+    static String SERVICE_ACCOUNT_EMAIL = "182489181232-bbiekce9fgm6gtelunr9lp82gmdk3uju@developer.gserviceaccount.com";
+    static String USERINFO_EMAIL_SCOPE = "https://www.googleapis.com/auth/userinfo.email";
+    static String FILE_NAME = "file";
     private static void setSrvApi(Context context)
     {
         setSrvApi(context, false);
@@ -73,17 +67,17 @@ public class EndpointApi {
 
                 try {
                     File file = createFileFromInputStream(context,ins);
-                    GoogleCredential credential = new GoogleCredential.Builder().setTransport(httpTransport)
-                            .setJsonFactory(androidJsonFactory)
-                            .setServiceAccountId(SERVICE_ACCOUNT_EMAIL)
-                            .setServiceAccountScopes(Collections.singleton(USERINFO_EMAIL_SCOPE))
-                            .setServiceAccountPrivateKeyFromP12File(file)
-                            .build();
-                    file.delete();
-                    builder = new SportConnectorApi.Builder(
-                            httpTransport,androidJsonFactory , credential).setRootUrl(url);
-                } catch (GeneralSecurityException e) {
-                    e.printStackTrace();
+                    if(file!=null) {
+                        GoogleCredential credential = new GoogleCredential.Builder().setTransport(httpTransport)
+                                .setJsonFactory(androidJsonFactory)
+                                .setServiceAccountId(SERVICE_ACCOUNT_EMAIL)
+                                .setServiceAccountScopes(Collections.singleton(USERINFO_EMAIL_SCOPE))
+                                .setServiceAccountPrivateKeyFromP12File(file)
+                                .build();
+                        file.delete();
+                        builder = new SportConnectorApi.Builder(
+                                httpTransport, androidJsonFactory, credential).setRootUrl(url);
+                    }
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -130,21 +124,10 @@ public class EndpointApi {
                 throw new ClassCastException(parentObj.toString() + " must implement OnGetRegionAsyncTaskAction for GetRegionAsyncTask");
             }
         }
-        public GetRegionAsyncTask(Activity activity)
-        {
-            context = activity.getBaseContext();
-            setSrvApi(context);
-            try {
-                listener = (OnGetRegionAsyncTaskAction) activity;
-            } catch (ClassCastException e) {
-                throw new ClassCastException(activity.toString() + " must implement OnGetRegionAsyncTaskAction for GetRegionAsyncTask");
-            }
-        }
         @Override
         protected Pair<RegionInfo,Exception> doInBackground(Long... params) {
-            Long regionId;
-            regionId = params[0];
             try {
+                Long regionId = params[0];
                 return new Pair<>(srvApi.getRegionInfo(regionId).execute(),null);
             } catch (Exception e) {
                 return new Pair<>(null,e);
@@ -153,10 +136,14 @@ public class EndpointApi {
 
         @Override
         protected void onPostExecute(Pair<RegionInfo,Exception> result) {
-            listener.onGetRegionAsyncTaskFinish(result);
+            try {
+                listener.onGetRegionAsyncTaskFinish(result);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
 
-        public static interface OnGetRegionAsyncTaskAction
+        public interface OnGetRegionAsyncTaskAction
         {
             void onGetRegionAsyncTaskFinish(Pair<RegionInfo,Exception> result);
         }
@@ -177,13 +164,12 @@ public class EndpointApi {
         }
         @Override
         protected Pair<List<Spot>,Exception> doInBackground(Long... params) {
-            Long regionId;
             final int MAX_LIMIT=20;
-            regionId = params[0];
-            String nextPageToken="";
-            List<Spot> spots = new ArrayList<>();
-            CollectionResponseSpot response;
             try {
+                Long regionId = params[0];
+                String nextPageToken="";
+                List<Spot> spots = new ArrayList<>();
+                CollectionResponseSpot response;
                 while (true) {
                     if(nextPageToken == null || nextPageToken.equals(""))
                         response = srvApi.listSpotByRegId(regionId).execute();
@@ -207,10 +193,14 @@ public class EndpointApi {
 
         @Override
         protected void onPostExecute(Pair<List<Spot>,Exception> result) {
-            listener.onGetSpotListFinish(result);
+            try {
+                listener.onGetSpotListFinish(result);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
 
-        public static interface OnAction
+        public interface OnAction
         {
             void onGetSpotListFinish(Pair<List<Spot>,Exception> result);
         }
@@ -232,14 +222,14 @@ public class EndpointApi {
         @Override
         protected Pair<List<UpdateSpotInfo>,Exception> doInBackground(Pair<Long,DateTime>... params) {
             int MAX_LIMIT = 20;
-            Long regionId;
-            DateTime lastUpdate;
-            regionId = params[0].first;
-            lastUpdate = params[0].second;
-            String nextPageToken="";
-            CollectionResponseUpdateSpotInfo response;
-            List<UpdateSpotInfo> spotInfos = new ArrayList<>();
             try {
+                Long regionId;
+                DateTime lastUpdate;
+                regionId = params[0].first;
+                lastUpdate = params[0].second;
+                String nextPageToken="";
+                CollectionResponseUpdateSpotInfo response;
+                List<UpdateSpotInfo> spotInfos = new ArrayList<>();
 
                 while (true) {
                     if(nextPageToken == null || nextPageToken.equals(""))
@@ -265,10 +255,14 @@ public class EndpointApi {
 
         @Override
         protected void onPostExecute(Pair<List<UpdateSpotInfo>,Exception> result) {
-            listener.onGetUpdateSpotListFinish(result);
+            try {
+                listener.onGetUpdateSpotListFinish(result);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
 
-        public static interface OnAction
+        public interface OnAction
         {
             void onGetUpdateSpotListFinish(Pair<List<UpdateSpotInfo>,Exception> result);
         }
@@ -290,11 +284,12 @@ public class EndpointApi {
         @Override
         protected Pair<List<Person>,Exception> doInBackground(List<Long>... params) {
             int BATCH_SIZE = 20;
-            List<Long> idLst = new ArrayList<>(params[0]) ;
-            List<Person> persons = new ArrayList<>();
-            List<Long> batchPersons;
-            int cur=0;
             try {
+                List<Long> idLst = new ArrayList<>(params[0]) ;
+                List<Person> persons = new ArrayList<>();
+                List<Long> batchPersons;
+                int cur=0;
+
                 while (cur < idLst.size()) {
                     batchPersons = idLst.subList(cur,(cur+BATCH_SIZE)<idLst.size() ? cur+BATCH_SIZE : idLst.size());
                     persons.addAll(srvApi.listPersonByIdLst(batchPersons).execute().getItems());
@@ -308,52 +303,20 @@ public class EndpointApi {
 
         @Override
         protected void onPostExecute(Pair<List<Person>,Exception> result) {
-            listener.onGetListPersonByIdLstFinish(result);
+            try {
+                listener.onGetListPersonByIdLstFinish(result);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
 
-        public static interface OnAction
+        public interface OnAction
         {
             void onGetListPersonByIdLstFinish(Pair<List<Person>,Exception> result);
         }
     }
 
-    /*public static class UpdateSpotAsyncTask extends AsyncTask< Spot, Void, Pair<Spot,Exception> >{
-        private OnAction listener=null;
-        private Context context = null;
-        public UpdateSpotAsyncTask(Fragment fragment)
-        {
-            context = fragment.getContext();
-            setSrvApi(context);
-            try {
-                listener = (OnAction) fragment;
-            } catch (ClassCastException e) {
-                throw new ClassCastException(fragment.toString() + " must implement OnAction for UpdateSpotAsyncTask");
-            }
-        }
-        @Override
-        protected Pair<Spot,Exception> doInBackground(Spot... params) {
-            Spot spot = params[0];
-            Spot updatedSpot;
-            try {
-                updatedSpot = srvApi.updateSpot(spot.getId(),spot).execute();
-                return new Pair<>(updatedSpot,null);
-            } catch (Exception e) {
-                return new Pair<>(null,e);
-            }
-        }
-
-        @Override
-        protected void onPostExecute(Pair<Spot,Exception> result) {
-            listener.onUpdateSpotFinish(result);
-        }
-
-        public static interface OnAction
-        {
-            void onUpdateSpotFinish(Pair<Spot,Exception> result);
-        }
-    }
-*/
-    public static class SetSpotAsFavoriteAsyncTask extends AsyncTask< Pair<Pair<Pair<Long,Boolean>,Pair<Long,String>>,String>, Void, Pair<Boolean ,Exception> >{
+     public static class SetSpotAsFavoriteAsyncTask extends AsyncTask< Pair<Pair<Pair<Long,Boolean>,Pair<Long,String>>,String>, Void, Pair<Boolean ,Exception> >{
         private OnAction listener=null;
         private Context context = null;
         public SetSpotAsFavoriteAsyncTask(Fragment fragment)
@@ -368,13 +331,21 @@ public class EndpointApi {
         }
         @Override
         protected Pair<Boolean,Exception> doInBackground(Pair<Pair<Pair<Long,Boolean>,Pair<Long,String>>,String>... params) {
-            Long spot = params[0].first.first.first;
-            Long person = params[0].first.second.first;
-            String pass = params[0].first.second.second;
-            boolean isFavorite = params[0].first.first.second;
-            String personType = params[0].second;
-            if(spot!=null && person!=null)
+            boolean isFavorite;
             try {
+                isFavorite = params[0].first.first.second;
+            } catch (Exception e) {
+                e.printStackTrace();
+                return new Pair<>(false,e);
+            }
+
+            try {
+                Long spot = params[0].first.first.first;
+                Long person = params[0].first.second.first;
+                String pass = params[0].first.second.second;
+                String personType = params[0].second;
+                if(spot!=null && person!=null)
+
                 srvApi.setSpotAsFavorite( person,spot,isFavorite,pass,personType).execute();
             } catch (IOException e) {
                 return new Pair<Boolean,Exception>(isFavorite,e);
@@ -387,10 +358,14 @@ public class EndpointApi {
 
         @Override
         protected void onPostExecute(Pair<Boolean,Exception> result) {
-            listener.onSetSpotAsFavoriteFinish(result);
+            try {
+                listener.onSetSpotAsFavoriteFinish(result);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
 
-        public static interface OnAction
+        public interface OnAction
         {
             void onSetSpotAsFavoriteFinish(Pair<Boolean,Exception> result);
         }
@@ -421,11 +396,9 @@ public class EndpointApi {
         }
         @Override
         protected Pair<Person,Exception> doInBackground(String... params) {
-            String email,pass;
-            String url;
-            email = params[0];
-            pass = params[1];
             try {
+                String email = params[0];
+                String pass = params[1];
                 return new Pair<>(srvApi.authorizePerson(email,pass).execute(),null);
             } catch (Exception e) {
                 return new Pair<>(null, e);
@@ -434,10 +407,14 @@ public class EndpointApi {
 
         @Override
         protected void onPostExecute(Pair<Person,Exception> result) {
-            listener.onAuthorizePersonAsyncTaskFinish(result);
+            try {
+                listener.onAuthorizePersonAsyncTaskFinish(result);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
 
-        public static interface OnAction
+        public interface OnAction
         {
             void onAuthorizePersonAsyncTaskFinish(Pair<Person,Exception> result);
         }
@@ -458,13 +435,12 @@ public class EndpointApi {
         }
         @Override
         protected Pair<AccountForConfirmation,Exception> doInBackground(String... params) {
-            String url;
-            AccountForConfirmation account = new AccountForConfirmation();
-            account.setEmail(params[0]);
-            account.setName(params[1]);
-            account.setPass(params[2]);
-            account.setType(params[3]);
             try {
+                AccountForConfirmation account = new AccountForConfirmation();
+                account.setEmail(params[0]);
+                account.setName(params[1]);
+                account.setPass(params[2]);
+                account.setType(params[3]);
                 return new Pair<>(srvApi.registerAccount(account).execute(),null);
             } catch (Exception e) {
                 return new Pair<>(null,e);
@@ -473,10 +449,14 @@ public class EndpointApi {
 
         @Override
         protected void onPostExecute(Pair<AccountForConfirmation,Exception> result) {
-            listener.onRegisterAccountAsyncTaskFinish(result);
+            try {
+                listener.onRegisterAccountAsyncTaskFinish(result);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
 
-        public static interface OnAction
+        public interface OnAction
         {
             void onRegisterAccountAsyncTaskFinish(Pair<AccountForConfirmation, Exception> result);
         }
@@ -497,8 +477,8 @@ public class EndpointApi {
         }
         @Override
         protected Exception doInBackground(String... params) {
-            String email = params[0];
             try {
+                String email = params[0];
                 srvApi.resetPass(email).execute();
                 return null;
             } catch (Exception e) {
@@ -508,7 +488,11 @@ public class EndpointApi {
 
         @Override
         protected void onPostExecute(Exception result) {
-            listener.onResetPassAsyncTaskFinish(result);
+            try {
+                listener.onResetPassAsyncTaskFinish(result);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
 
         public interface OnAction
@@ -532,10 +516,9 @@ public class EndpointApi {
         }
         @Override
         protected Pair<Person,Exception> doInBackground(Person... params) {
-            Person person = params[0];
-            Person updatedPerson;
             try {
-                updatedPerson = srvApi.updatePerson(person.getId(),person).execute();
+                Person person = params[0];
+                Person updatedPerson = srvApi.updatePerson(person.getId(),person).execute();
                 return new Pair<>(updatedPerson,null);
             } catch (Exception e) {
                 return new Pair<>(null,e);
@@ -544,10 +527,14 @@ public class EndpointApi {
 
         @Override
         protected void onPostExecute(Pair<Person,Exception> result) {
-            listener.onUpdatePersonFinish(result);
+            try {
+                listener.onUpdatePersonFinish(result);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
 
-        public static interface OnAction
+        public interface OnAction
         {
             void onUpdatePersonFinish(Pair<Person,Exception> result);
         }
@@ -568,10 +555,10 @@ public class EndpointApi {
         }
         @Override
         protected Exception doInBackground(Pair<Long,String>... params) {
-            Long id = params[0].first;
-            String oldPass = params[0].second;
-            String newPass = params[1].second;
             try {
+                Long id = params[0].first;
+                String oldPass = params[0].second;
+                String newPass = params[1].second;
                 srvApi.changePass(id,newPass,oldPass).execute();
                 return null;
             } catch (Exception e) {
@@ -581,10 +568,14 @@ public class EndpointApi {
 
         @Override
         protected void onPostExecute(Exception result) {
-            listener.onChangePassFinish(result);
+            try {
+                listener.onChangePassFinish(result);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
 
-        public static interface OnAction
+        public interface OnAction
         {
             void onChangePassFinish(Exception result);
         }
@@ -595,9 +586,9 @@ public class EndpointApi {
         private Context context = null;
         public ChangeEmailAsyncTask(Fragment fragment)
         {
-            context = fragment.getContext();
-            setSrvApi(context);
             try {
+                context = fragment.getContext();
+                setSrvApi(context);
                 listener = (OnAction) fragment;
             } catch (ClassCastException e) {
                 throw new ClassCastException(fragment.toString() + " must implement OnAction for ChangeEmailAsyncTask");
@@ -605,11 +596,11 @@ public class EndpointApi {
         }
         @Override
         protected Exception doInBackground(Pair<Pair<Long,String>,Pair<String,String>>... params) {
-            Long id = params[0].first.first;
-            String pass = params[0].first.second;
-            String oldEmail = params[0].second.first;
-            String newEmail = params[0].second.second;
             try {
+                Long id = params[0].first.first;
+                String pass = params[0].first.second;
+                String oldEmail = params[0].second.first;
+                String newEmail = params[0].second.second;
                 srvApi.changeEmail(id, newEmail, oldEmail,pass).execute();
                 return null;
             } catch (Exception e) {
@@ -619,10 +610,14 @@ public class EndpointApi {
 
         @Override
         protected void onPostExecute(Exception result) {
-            listener.onChangeEmailFinish(result);
+            try {
+                listener.onChangeEmailFinish(result);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
 
-        public static interface OnAction
+        public interface OnAction
         {
             void onChangeEmailFinish(Exception result);
         }
@@ -655,10 +650,14 @@ public class EndpointApi {
 
         @Override
         protected void onPostExecute(Pair<String,Exception> result) {
-            listener.onGetUrlForUploadAsyncTaskFinish(result);
+            try {
+                listener.onGetUrlForUploadAsyncTaskFinish(result);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
 
-        public static interface OnAction
+        public interface OnAction
         {
             void onGetUrlForUploadAsyncTaskFinish(Pair<String, Exception> result);
         }
