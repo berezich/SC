@@ -73,8 +73,10 @@ public class SpotEndpoint {
             name = "getSpot",
             path = "spot/{id}",
             httpMethod = ApiMethod.HttpMethod.GET)
-    public Spot get(@Named("id") Long id) throws NotFoundException,BadRequestException {
-        OAuth_2_0.check(OAuth_2_0.PERMISSIONS.ADMIN);
+    public Spot get(@Named("login") String login,
+                    @Named("pass") String pass,
+                    @Named("id") Long id) throws NotFoundException,BadRequestException {
+        Auth.admin_check(login,pass);
         logger.info("Getting Spot with ID: " + id);
         Spot spot = ofy().load().type(Spot.class).id(id).now();
         if (spot == null) {
@@ -90,14 +92,16 @@ public class SpotEndpoint {
             name = "insertSpot",
             path = "spot",
             httpMethod = ApiMethod.HttpMethod.POST)
-    public Spot insert(Spot spot) throws NotFoundException, BadRequestException {
+    public Spot insert(@Named("login") String login,
+                       @Named("pass") String pass,
+                       Spot spot) throws NotFoundException, BadRequestException {
         // Typically in a RESTful API a POST does not have a known ID (assuming the ID is used in the resource path).
         // You should validate that spot.getId has not been set. If the ID type is not supported by the
         // Objectify ID generator, e.g. long or String, then you should generate the unique ID yourself prior to saving.
         //
         // If your client provides the ID then you should probably use PUT instead.
 
-        OAuth_2_0.check(OAuth_2_0.PERMISSIONS.ADMIN);
+        Auth.admin_check(login, pass);
         validateSpotProperties(spot);
         updateRegionInfoAboutSpot(spot);
         spot.setId(null);
@@ -116,13 +120,16 @@ public class SpotEndpoint {
             name = "uploadSpots",
             path = "spot/parseFile",
             httpMethod = ApiMethod.HttpMethod.POST)
-    public void uploadSpotsFromFile(@Named("blobKey") String blobKey) throws NotFoundException, BadRequestException, InternalServerErrorException{
+    public void uploadSpotsFromFile(@Named("login") String login,
+                                    @Named("pass") String pass,
+                                    @Named("blobKey") String blobKey)
+            throws NotFoundException, BadRequestException, InternalServerErrorException{
         final int BUFF_SIZE = 1024*500;
         int length;
         BlobKey blobKeyObj = null;
         BlobstoreInputStream inputStream;
         byte[] buff = new byte[BUFF_SIZE];
-        OAuth_2_0.check(OAuth_2_0.PERMISSIONS.ADMIN);
+        Auth.admin_check(login, pass);
         try {
             blobKeyObj = new BlobKey(blobKey);
             inputStream = new BlobstoreInputStream(blobKeyObj);
@@ -161,9 +168,9 @@ public class SpotEndpoint {
                 e.printStackTrace();
                 throw new InternalServerErrorException(String.format("split <endline> failed exception: %s",e.getMessage()));
             }
-            Spot spot=null;
+            Spot spot;
             List<Spot> spotList = new ArrayList<>();
-            List<BlobInfo> blobInfos = new FileManager().getBlobInfos();
+            List<BlobInfo> blobInfos = new FileManager().getBlobInfos(login,pass);
             for(String courtStr:courtsStr)
             {
                 if(!courtStr.equals("")) {
@@ -201,7 +208,7 @@ public class SpotEndpoint {
             }
 
             for (Spot spot1:spotList)
-                insert(spot1);
+                insert(login,pass,spot1);
 
             logger.info(String.format("%d spots were inserted",spotList.size()));
         } else
@@ -224,8 +231,11 @@ public class SpotEndpoint {
             name = "updateSpot",
             path = "spot/{id}",
             httpMethod = ApiMethod.HttpMethod.PUT)
-    public Spot update(@Named("id") Long id, Spot spot) throws NotFoundException, BadRequestException {
-        OAuth_2_0.check(OAuth_2_0.PERMISSIONS.ADMIN);
+    public Spot update(@Named("login") String login,
+                       @Named("pass") String pass,
+                       @Named("id") Long id, Spot spot) throws NotFoundException, BadRequestException {
+        //Auth.oAuth_2_0_check(Auth.PERMISSIONS.ADMIN);
+        Auth.admin_check(login, pass);
         Spot oldSpot = ofy().load().type(Spot.class).id(id).now();
         if(oldSpot==null)
             throw new NotFoundException("Spot with id:"+id+" not found");
@@ -244,10 +254,13 @@ public class SpotEndpoint {
             name = "attacheSpotPictures",
             path = "spot/{id}/pictures",
             httpMethod = ApiMethod.HttpMethod.PUT)
-    public Spot attacheSpotPictures(@Named("id") Long id, @Named("picBlobKeyLst") List<String> picBlobKeyLst,
-                                @Named("isOverwrite") boolean isOverwrite)
+    public Spot attacheSpotPictures(@Named("login") String login,
+                                    @Named("pass") String pass,
+                                    @Named("id") Long id,
+                                    @Named("picBlobKeyLst") List<String> picBlobKeyLst,
+                                    @Named("isOverwrite") boolean isOverwrite)
             throws NotFoundException, BadRequestException {
-        OAuth_2_0.check(OAuth_2_0.PERMISSIONS.ADMIN);
+        Auth.admin_check(login, pass);
         Spot spot = ofy().load().type(Spot.class).id(id).now();
         if(spot==null)
             throw new NotFoundException("Spot with id:"+id+" not found");
@@ -284,13 +297,13 @@ public class SpotEndpoint {
             name = "setSpotAsFavorite",
             path = "spotSetAsFavorite",
             httpMethod = ApiMethod.HttpMethod.PUT)
-    //TODO: check user pass
+    //TODO: oAuth_2_0_check user pass
     public void setAsFavorite(@Named("idSpot") Long idSpot,
                               @Named("idPerson") Long idPerson,
                               @Named("pass") String pass,
                               @Named("isFavorite") boolean isFavorite,
                               @Named("typePerson")Person.TYPE type) throws NotFoundException, BadRequestException {
-        OAuth_2_0.check(OAuth_2_0.PERMISSIONS.ANDROID_APP);
+        Auth.oAuth_2_0_check(Auth.PERMISSIONS.ANDROID_APP);
         Person person = ofy().load().type(Person.class).id(idPerson).now();
         if(!person.getPass().equals(PersonEndpoint.msgDigest(pass))){
             logger.severe(String.format("Warning!!! Attempt of setting spot as favorite for person (id:%d) with not valid password", person.getId()));
@@ -330,7 +343,7 @@ public class SpotEndpoint {
     }
 
     protected void removePersonFromSpots(List<Long> idLst, Person.TYPE type, Long personId) throws BadRequestException{
-        //OAuth_2_0.check(OAuth_2_0.PERMISSIONS.ADMIN);
+        //OAuth_2_0.oAuth_2_0_check(OAuth_2_0.PERMISSIONS.ADMIN);
         Spot spot;
         List<Long> personLst;
         for (int i = 0; i < idLst.size(); i++) {
@@ -355,7 +368,7 @@ public class SpotEndpoint {
         }
     }
     protected void addPersonsToSpots(List<Long> idLst, Person.TYPE type,Long personId) throws BadRequestException{
-        //OAuth_2_0.check(OAuth_2_0.PERMISSIONS.ADMIN);
+        //OAuth_2_0.oAuth_2_0_check(OAuth_2_0.PERMISSIONS.ADMIN);
         Spot spot;
         List<Long> personLst;
         for (int i = 0; i < idLst.size(); i++) {
@@ -385,14 +398,14 @@ public class SpotEndpoint {
             name = "removeAllSpots",
             path = "spot/all",
             httpMethod = ApiMethod.HttpMethod.DELETE)
-    public void removeAll() throws BadRequestException{
+    public void removeAll(@Named("login") String login, @Named("pass") String pass) throws BadRequestException{
         final int MAX_LIMIT = 30;
         CollectionResponse<Spot> spotCollectionResponse;
-        OAuth_2_0.check(OAuth_2_0.PERMISSIONS.ADMIN);
+        Auth.admin_check(login, pass);
         String nextToken = "";
         List<Spot> spots = new ArrayList<>();
         while (true) {
-            spotCollectionResponse = list(nextToken, MAX_LIMIT);
+            spotCollectionResponse = list(login,pass, nextToken, MAX_LIMIT);
             nextToken = spotCollectionResponse.getNextPageToken();
             spots.addAll(spotCollectionResponse.getItems());
             if(spotCollectionResponse.getItems().size()<MAX_LIMIT)
@@ -400,7 +413,7 @@ public class SpotEndpoint {
         }
         for(Spot spotItem:spots)
             try {
-                remove(spotItem.getId());
+                remove(login,pass,spotItem.getId());
             } catch (NotFoundException e) {
                 logger.info(String.format("removing error spot (id = %s): not found",spotItem.getId()));
                 e.printStackTrace();
@@ -418,8 +431,10 @@ public class SpotEndpoint {
             name = "removeSpot",
             path = "spot/{id}",
             httpMethod = ApiMethod.HttpMethod.DELETE)
-    public void remove(@Named("id") Long id) throws NotFoundException,BadRequestException {
-        OAuth_2_0.check(OAuth_2_0.PERMISSIONS.ADMIN);
+    public void remove(@Named("login") String login,
+                       @Named("pass") String pass,
+                       @Named("id") Long id) throws NotFoundException,BadRequestException {
+        Auth.admin_check(login, pass);
         checkExists(id);
         Spot spot = ofy().load().type(Spot.class).id(id).now();
         if(spot!=null) {
@@ -464,15 +479,18 @@ public class SpotEndpoint {
             name = "listSpot",
             path = "spot",
             httpMethod = ApiMethod.HttpMethod.GET)
-    public CollectionResponse<Spot> list(@Nullable @Named("cursor") String cursor, @Nullable @Named("limit") Integer limit) throws BadRequestException{
-        OAuth_2_0.check(OAuth_2_0.PERMISSIONS.ADMIN);
+    public CollectionResponse<Spot> list(@Named("login") String login,
+                                         @Named("pass") String pass,
+                                         @Nullable @Named("cursor") String cursor,
+                                         @Nullable @Named("limit") Integer limit) throws BadRequestException{
+        Auth.admin_check(login, pass);
         limit = limit == null ? DEFAULT_LIST_LIMIT : limit;
         Query<Spot> query = ofy().load().type(Spot.class).limit(limit);
         if (cursor != null) {
             query = query.startAt(Cursor.fromWebSafeString(cursor));
         }
         QueryResultIterator<Spot> queryIterator = query.iterator();
-        List<Spot> spotList = new ArrayList<Spot>(limit);
+        List<Spot> spotList = new ArrayList<>(limit);
         while (queryIterator.hasNext()) {
             spotList.add(queryIterator.next());
         }
@@ -491,7 +509,7 @@ public class SpotEndpoint {
             path = "spotByRegId",
             httpMethod = ApiMethod.HttpMethod.GET)
     public CollectionResponse<Spot> listByRegId(@Named("regionId") Long regionId, @Nullable @Named("cursor") String cursor, @Nullable @Named("limit") Integer limit) throws BadRequestException{
-        OAuth_2_0.check(OAuth_2_0.PERMISSIONS.ANDROID_APP);
+        Auth.oAuth_2_0_check(Auth.PERMISSIONS.ANDROID_APP);
         limit = limit == null ? DEFAULT_LIST_LIMIT : limit;
         Query<Spot> query = ofy().load().type(Spot.class).filter("regionId", regionId).limit(limit);
         if (cursor != null) {

@@ -221,6 +221,12 @@ public class LoginFragment extends Fragment implements EndpointApi.AuthorizePers
             }
             String dialogMsg;
             Pair<ErrorVisualizer.ERROR_CODE, String> errTxtCode = ErrorVisualizer.getTextCodeOfRespException(getActivity().getBaseContext(), error);
+            if(errTxtCode.first == ErrorVisualizer.ERROR_CODE.AUTH_FAILED){
+                if (appPref != null) {
+                    appPref.setIsAutoLogin(false);
+                    LocalDataManager.saveAppPref(appPref, getActivity());
+                }
+            }
             if (errTxtCode != null && !errTxtCode.second.equals(""))
                 dialogMsg = errTxtCode.second;
             else
@@ -370,6 +376,11 @@ public class LoginFragment extends Fragment implements EndpointApi.AuthorizePers
         @Override
         public void onClick(View v) {
             try {
+                if(appPref!=null)
+                {
+                    appPref.setIsAutoLogin(false);
+                    LocalDataManager.saveAppPref(appPref,getActivity());
+                }
                 FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
                 RegistrationFragment registrationFragment = new RegistrationFragment();
                 registrationFragment.setTargetFragment(LoginFragment.this, 0);
@@ -389,8 +400,17 @@ public class LoginFragment extends Fragment implements EndpointApi.AuthorizePers
         @Override
         public void onClick(View v) {
             try {
+                if(appPref!=null)
+                {
+                    appPref.setIsAutoLogin(false);
+                    LocalDataManager.saveAppPref(appPref,getActivity());
+                }
                 FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
-                ResetPassFragment resetPassFragment = new ResetPassFragment();
+                EditText emailView = (EditText) rootView.findViewById(R.id.login_email_value);
+                String email = "";
+                if(emailView!=null)
+                    email = emailView.getText().toString();
+                ResetPassFragment resetPassFragment = new ResetPassFragment().setArgs(email);
                 resetPassFragment.setTargetFragment(LoginFragment.this, 0);
                 if (fragmentManager != null) {
                     fragmentManager.beginTransaction().replace(R.id.container, resetPassFragment)

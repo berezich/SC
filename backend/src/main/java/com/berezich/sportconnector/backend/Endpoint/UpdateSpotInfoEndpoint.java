@@ -61,8 +61,10 @@ public class UpdateSpotInfoEndpoint {
             name = "getUpdateSpotInfo",
             path = "updateSpotInfo/{id}",
             httpMethod = ApiMethod.HttpMethod.GET)
-    public UpdateSpotInfo get(@Named("id") Long id) throws NotFoundException,BadRequestException {
-        OAuth_2_0.check(OAuth_2_0.PERMISSIONS.ADMIN);
+    public UpdateSpotInfo get(@Named("login") String login,
+                              @Named("pass") String pass,
+                              @Named("id") Long id) throws NotFoundException,BadRequestException {
+        Auth.admin_check(login, pass);
         logger.info("Getting UpdateSpotInfo with ID: " + id);
         UpdateSpotInfo updateSpotInfo = ofy().load().type(UpdateSpotInfo.class).id(id).now();
         if (updateSpotInfo == null) {
@@ -78,7 +80,7 @@ public class UpdateSpotInfoEndpoint {
         // Objectify ID generator, e.g. long or String, then you should generate the unique ID yourself prior to saving.
         //
         // If your client provides the ID then you should probably use PUT instead.
-        //OAuth_2_0.check(OAuth_2_0.PERMISSIONS.ANDROID_APP);
+        //OAuth_2_0.oAuth_2_0_check(OAuth_2_0.PERMISSIONS.ANDROID_APP);
         validateUpdateSpotInfoProperties(updateSpotInfo);
         if(updateSpotInfo.getUpdateDate()==null)
             updateSpotInfo.setUpdateDate(new Date());
@@ -89,7 +91,7 @@ public class UpdateSpotInfoEndpoint {
     }
 
     protected UpdateSpotInfo update(Long id, UpdateSpotInfo updateSpotInfo) throws NotFoundException, BadRequestException {
-        //OAuth_2_0.check(OAuth_2_0.PERMISSIONS.ANDROID_APP);
+        //OAuth_2_0.oAuth_2_0_check(OAuth_2_0.PERMISSIONS.ANDROID_APP);
         checkExists(id);
         validateUpdateSpotInfoProperties(updateSpotInfo);
         if(updateSpotInfo.getUpdateDate()==null)
@@ -107,7 +109,7 @@ public class UpdateSpotInfoEndpoint {
                                                    @Named("date") Date lastUpdate,
                                                    @Nullable @Named("cursor") String cursor,
                                                    @Nullable @Named("limit") Integer limit) throws BadRequestException{
-        OAuth_2_0.check(OAuth_2_0.PERMISSIONS.ANDROID_APP);
+        Auth.oAuth_2_0_check(Auth.PERMISSIONS.ANDROID_APP);
         limit = limit == null ? DEFAULT_LIST_LIMIT : limit;
         Query<UpdateSpotInfo> query = ofy().load().type(UpdateSpotInfo.class).filter("regionId",regionId).filter("updateDate >",lastUpdate).limit(limit);
         if (cursor != null) {

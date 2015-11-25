@@ -22,6 +22,7 @@ public class DatePickerFragment extends DialogFragment
 
     public DatePickerFragment setArgs(String dBirthday) {
         Bundle args = new Bundle();
+
         DateTime dtBirthday = UsefulFunctions.parseDateTime(dBirthday);
         if(dtBirthday!=null)
             args.putLong(ARG_DTBIRTHDAY, dtBirthday.getValue());

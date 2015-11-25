@@ -1,11 +1,9 @@
 package com.berezich.sportconnector.backend.Endpoint;
 
 import com.berezich.sportconnector.backend.RegionInfo;
-import com.google.api.server.spi.config.AnnotationBoolean;
 import com.google.api.server.spi.config.Api;
 import com.google.api.server.spi.config.ApiMethod;
 import com.google.api.server.spi.config.ApiNamespace;
-import com.google.api.server.spi.config.ApiResourceProperty;
 import com.google.api.server.spi.response.BadRequestException;
 import com.google.api.server.spi.response.NotFoundException;
 import com.googlecode.objectify.ObjectifyService;
@@ -57,7 +55,7 @@ public class RegionInfoEndpoint {
             path = "storeDataInfo/{id}",
             httpMethod = ApiMethod.HttpMethod.GET)
     public RegionInfo get(@Named("id") Long id) throws NotFoundException, BadRequestException {
-        OAuth_2_0.check(OAuth_2_0.PERMISSIONS.ANDROID_APP);
+        Auth.oAuth_2_0_check(Auth.PERMISSIONS.ANDROID_APP);
         logger.info("Getting StoreDataInfo with ID: " + id);
         RegionInfo regionInfo = ofy().load().type(RegionInfo.class).id(id).now();
         if (regionInfo == null) {
@@ -79,7 +77,7 @@ public class RegionInfoEndpoint {
         // Objectify ID generator, e.g. long or String, then you should generate the unique ID yourself prior to saving.
         //
         // If your client provides the ID then you should probably use PUT instead.
-        //OAuth_2_0.check(OAuth_2_0.PERMISSIONS.ADMIN);
+        //OAuth_2_0.oAuth_2_0_check(OAuth_2_0.PERMISSIONS.ADMIN);
         validateRegionInfoProperties(regionInfo);
         try {
             checkExists(regionInfo.getId());
@@ -113,7 +111,7 @@ public class RegionInfoEndpoint {
             httpMethod = ApiMethod.HttpMethod.PUT)
     */
     protected RegionInfo update(Long id, RegionInfo regionInfo) throws NotFoundException, BadRequestException {
-        //OAuth_2_0.check(OAuth_2_0.PERMISSIONS.ANDROID_APP);
+        //OAuth_2_0.oAuth_2_0_check(OAuth_2_0.PERMISSIONS.ANDROID_APP);
         checkExists(id);
         validateRegionInfoProperties(regionInfo);
         ofy().save().entity(regionInfo).now();

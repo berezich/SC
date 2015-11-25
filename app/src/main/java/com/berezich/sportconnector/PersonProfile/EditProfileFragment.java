@@ -252,14 +252,17 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
                 }
                 if ((txtView = (TextView) rootView.findViewById(R.id.editProfile_txtView_birthday)) != null) {
                     Date date;
-                    if ((birthday = tempMyPerson.getBirthday()) != null)
+                    if ((birthday = tempMyPerson.getBirthday()) != null) {
                         date = new Date(birthday.getValue());
+                        txtView.setText(String.format("%1$td.%1$tm.%1$tY", date));
+                    }
                     else {
-                        Calendar calendar = Calendar.getInstance();
+                        txtView.setText("");
+                        /*Calendar calendar = Calendar.getInstance();
                         calendar.set(Calendar.YEAR,calendar.get(Calendar.YEAR)-getResources().getInteger(R.integer.editProfile_minAge));
                         date = calendar.getTime();
+                        txtView.setText(String.format("%1$td.%1$tm.%1$tY", date));*/
                     }
-                    txtView.setText(String.format("%1$td.%1$tm.%1$tY", date));
                     txtView.setOnClickListener(new OnBirthdayClickListener());
                 }
                 if ((radioGroup = (RadioGroup) rootView.findViewById(R.id.editProfile_radioGrp_sex)) != null) {
@@ -435,7 +438,6 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
         EditText txtEdt;
         TextView txtView;
         String validationError = "";
-        RadioGroup radioGroup;
         if((txtEdt = (EditText) rootView.findViewById(R.id.editProfile_txtEdt_name))!=null){
             String name = txtEdt.getText().toString().trim();
             if(validationError.isEmpty() && name.isEmpty())
@@ -453,6 +455,7 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
             else
                 Log.e(TAG, "parsing of birthday failed");
         }
+        RadioGroup radioGroup;
         if((radioGroup = (RadioGroup) rootView.findViewById(R.id.editProfile_radioGrp_sex))!=null)
             switch (radioGroup.getCheckedRadioButtonId())
             {
@@ -462,10 +465,10 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
                 case R.id.editProfile_radio_female:
                     tempMyPerson.setSex(fSex);
                     break;
-                default:
+                /*default:
                     if(validationError.isEmpty()){
                         validationError = activity.getString(R.string.editprofile_invalidSex);
-                    }
+                    }*/
             }
 
         if((txtView = (TextView) rootView.findViewById(R.id.editProfile_txtEdt_phone))!=null) {
@@ -941,7 +944,13 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
             return true;
         if(!UsefulFunctions.isSameStrValue(p.getSurname(),pNew.getSurname()))
             return true;
-        if(pNew.getBirthday().getValue() != p.getBirthday().getValue())
+        long newBirthday = 0;
+        if(pNew.getBirthday()!=null)
+            newBirthday = pNew.getBirthday().getValue();
+        long oldBirthday = 0;
+        if(p.getBirthday()!=null)
+            oldBirthday = p.getBirthday().getValue();
+        if(newBirthday != oldBirthday)
             return true;
         if(!UsefulFunctions.isSameStrValue(p.getPhone(), pNew.getPhone()))
             return true;

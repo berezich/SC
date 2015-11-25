@@ -29,6 +29,7 @@ public class ResetPassFragment extends Fragment implements EndpointApi.ResetPass
         AlertDialogFragment.OnActionDialogListener {
 
     private final String TAG = "MyLog_RPassFragment";
+    private final String ARG_EMAIL = "email";
     View rootView;
     Person myPersonInfo;
     String email="";
@@ -36,6 +37,13 @@ public class ResetPassFragment extends Fragment implements EndpointApi.ResetPass
     ResetPassFragmentAction listenerResetPass = null;
 
     public ResetPassFragment() {
+    }
+
+    public ResetPassFragment setArgs(String email){
+        Bundle args = new Bundle();
+        args.putString(ARG_EMAIL, email);
+        this.setArguments(args);
+        return this;
     }
 
     @Override
@@ -50,10 +58,11 @@ public class ResetPassFragment extends Fragment implements EndpointApi.ResetPass
         try {
             EditText editTxt;
             rootView = inflater.inflate(R.layout.fragment_reset_pass, container, false);
-            if(( myPersonInfo = LocalDataManager.getMyPersonInfo())!=null)
-                if ((editTxt = (EditText) rootView.findViewById(R.id.resetPass_email_value)) != null) {
-                    editTxt.setText(myPersonInfo.getEmail());
-                }
+            //if(( myPersonInfo = LocalDataManager.getMyPersonInfo())!=null)
+            if ((editTxt = (EditText) rootView.findViewById(R.id.resetPass_email_value)) != null) {
+                //editTxt.setText(myPersonInfo.getEmail());
+                editTxt.setText(getArguments().getString(ARG_EMAIL));
+            }
             if(rootView!=null)
             {
                 Button btn = (Button) rootView.findViewById(R.id.resetPass_btn_ok);

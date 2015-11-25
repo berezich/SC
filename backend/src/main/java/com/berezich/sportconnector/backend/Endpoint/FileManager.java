@@ -4,7 +4,6 @@ import com.berezich.sportconnector.backend.FileUrl;
 import com.google.api.server.spi.config.Api;
 import com.google.api.server.spi.config.ApiMethod;
 import com.google.api.server.spi.config.ApiNamespace;
-import com.google.api.server.spi.config.Named;
 import com.google.api.server.spi.response.BadRequestException;
 import com.google.appengine.api.blobstore.BlobInfo;
 import com.google.appengine.api.blobstore.BlobInfoFactory;
@@ -19,7 +18,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
 
-import javax.xml.ws.Endpoint;
+import javax.inject.Named;
 
 /**
  * Created by Sashka on 29.08.2015.
@@ -46,7 +45,7 @@ public class FileManager {
             path = "fileManager",
             httpMethod = ApiMethod.HttpMethod.GET)
     public FileUrl uploadFileHandle() throws BadRequestException {
-        OAuth_2_0.check(OAuth_2_0.PERMISSIONS.ANDROID_APP);
+        Auth.oAuth_2_0_check(Auth.PERMISSIONS.ANDROID_APP);
         BlobstoreService blobstoreService = BlobstoreServiceFactory.getBlobstoreService();
         return new FileUrl(blobstoreService.createUploadUrl("/upload_file"));
     }
@@ -71,8 +70,9 @@ public class FileManager {
             name = "getBlobInfos",
             path = "fileManager/blobs",
             httpMethod = ApiMethod.HttpMethod.GET)
-    public List<BlobInfo> getBlobInfos()throws BadRequestException{
-        OAuth_2_0.check(OAuth_2_0.PERMISSIONS.ADMIN);
+    public List<BlobInfo> getBlobInfos(@Named("login") String login,
+                                       @Named("pass") String pass)throws BadRequestException{
+        Auth.admin_check(login, pass);
         List<BlobInfo> blobInfos = new ArrayList<>();
         BlobInfoFactory infoFactory = new BlobInfoFactory();
         BlobInfo blobInfo;
