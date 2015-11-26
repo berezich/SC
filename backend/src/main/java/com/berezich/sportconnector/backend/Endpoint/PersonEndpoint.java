@@ -219,7 +219,7 @@ public class PersonEndpoint {
             path = "person",
             httpMethod = ApiMethod.HttpMethod.POST)
     public Person insert(@Named("login") String login,
-                         @Named("pass") String pass,
+                         @Named("password") String pass,
                          Person person) throws BadRequestException {
         // Typically in a RESTful API a POST does not have a known ID (assuming the ID is used in the resource path).
         // You should validate that person._id has not been set. If the ID type is not supported by the
@@ -563,7 +563,7 @@ public class PersonEndpoint {
                                            @Named("pass") String pass,
                                            @Nullable @Named("cursor") String cursor,
                                            @Nullable @Named("limit") Integer limit) throws BadRequestException{
-        Auth.admin_check(login,pass);
+        Auth.admin_check(login, pass);
         limit = limit == null ? DEFAULT_LIST_LIMIT : limit;
         Query<Person> query = ofy().load().type(Person.class).limit(limit);
         if (cursor != null) {
