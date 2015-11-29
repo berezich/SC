@@ -61,6 +61,7 @@
         <string name="registration_err_pass_empty">Введите пароль</string>
         <string name="registration_err_pass_tooShort">Мин. длина пароля %d символов</string>
         <string name="registration_msgCreateAccount">Вам на почту %s отправлено письмо. В нем описаны инструкции для завершения регистрации.</string>
+        <string name="spam_warning_msg">Внимание! Если письмо попало в спам, добавьте отправителя в список доверенных адресов.</string>
     <!--registration_fragment end-->
 
     <!-- main_search_fragment -->
@@ -147,7 +148,7 @@
                 <string name="changePass_errNew_tooShort">Мин. длина %d символов</string>
                 <string name="changePass_msgChangePass">Ваш пароль изменен.</string>
             <!--changePass_dialog end-->
-            <!--changePass_dialog begin-->
+            <!--changeEmail_dialog begin-->
                 <string name="changeEmail_dialogTitle">Смена Email</string>
                 <string name="changeEmail_old_hint">Старый Email</string>
                 <string name="changeEmail_new_hint">Новый Email</string>
@@ -157,7 +158,7 @@
                 <string name="changeEmail_btnCancel">Отмена</string>
                 <string name="changeEmail_msgChangeEmail">Вам на почту %s отправлено письмо. В нем описаны инструкции для подтверждения почты.</string>
                 <string name="changeEmail_err_oldEmailErr">Введите пароль</string>
-            <!--changePass_dialog end-->
+            <!--changeEmail_dialog end-->
 
     <!-- editProfile_fragment end-->
 

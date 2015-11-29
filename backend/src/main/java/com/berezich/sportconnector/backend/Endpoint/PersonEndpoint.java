@@ -64,6 +64,7 @@ public class PersonEndpoint {
 
     private static final int DEFAULT_LIST_LIMIT = 20;
     private static final float MIN_RATING = 1;
+    static String emailForm = "sportconnector-981@appspot.gserviceaccount.com";
     static String ERROR_CONFIRM = "Ошибка! Ваша учетная запись %s не активирована!";
     static String ERROR_CONFIRM_ALREADY = "Ваша учетная запись %s уже активирована!";
     static String ERROR_CONFIRM_NOTFOUND = "Ошибка! Ваша учетная запись %s не найдена!";
@@ -697,7 +698,6 @@ public class PersonEndpoint {
         // ...
         Properties props = new Properties();
         Session session = Session.getDefaultInstance(props, null);
-        String emailForm = "berezaman@gmail.com";
 
         try {
 
@@ -712,10 +712,15 @@ public class PersonEndpoint {
 
         } catch (AddressException e) {
             // TODO: sendMail handle exception
+            logger.severe(e.getMessage());
         }catch (UnsupportedEncodingException e) {
             // ...
+            logger.severe(e.getMessage());
+
         } catch (MessagingException e) {
             // ...
+            logger.severe(e.getMessage());
+
         }
     }
 }

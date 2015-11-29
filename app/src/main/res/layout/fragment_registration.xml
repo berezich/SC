@@ -120,7 +120,7 @@
                         android:paddingRight="@dimen/registration_txtPropVal_leftRightOffset"
                         android:background="#00FFFFFF"
                         android:password="false"
-                        android:inputType="textPersonName"
+                        android:inputType="textNoSuggestions|textPersonName"
                         android:maxLength="@integer/nameMaxLength_edtTxt"
                         android:layout_weight="@integer/loginPropertyValueWeight" />
                 </LinearLayout>

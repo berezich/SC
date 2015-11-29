@@ -4,27 +4,27 @@ android {
     signingConfigs {
         config {
             keyPassword 'Telepuziki101'
-            storeFile file('D:/Development/Android/Android_Studio/sportConnector_key.jks')
-            //storeFile file('C:/Andorid/Android_Studio_projects/sportConnector_key.jks')
+            //storeFile file('D:/Development/Android/Android_Studio/sportConnector_key.jks')
+            storeFile file('C:/Andorid/Android_Studio_projects/sportConnector_key.jks')
             storePassword 'Telepuziki101'
             keyAlias 'SportConnector_key'
         }
     }
-
     compileSdkVersion 21
     buildToolsVersion "21.1.2"
     defaultConfig {
         applicationId "com.berezich.sportconnector"
         minSdkVersion 15
         targetSdkVersion 21
-        versionCode 1
-        versionName "1.0"
+        versionCode 27
+        versionName '1.0.0.27'
         multiDexEnabled true
     }
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.config
         }
         debug {
             signingConfig signingConfigs.config
@@ -37,18 +37,20 @@ android {
         exclude 'META-INF/NOTICE'
         exclude 'META-INF/NOTICE.txt'
     }
+    productFlavors {
+    }
 }
 dependencies {
     compile 'com.android.support:multidex:1.0.1'
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile fileTree(include: ['*.jar'], dir: 'libs')
     compile project(':library')
     compile 'com.android.support:design:22.2.1'
     compile 'com.android.support:appcompat-v7:22.2.1'
     compile 'com.google.android.gms:play-services:7.8.0'
     compile project(path: ':backend', configuration: 'android-endpoints')
     compile 'com.google.http-client:google-http-client-gson:1.19.0'
-    compile group: 'org.apache.httpcomponents' , name: 'httpclient-android' , version: '4.3.5'
-    compile (group: 'org.apache.httpcomponents' , name: 'httpmime' , version: '4.3.5') {
+    compile 'org.apache.httpcomponents:httpclient-android:4.3.5'
+    compile('org.apache.httpcomponents:httpmime:4.3.5') {
         exclude module: 'org.apache.httpcomponents:httpclient'
     }
     compile 'com.commit451:PhotoView:1.2.4'

@@ -173,7 +173,9 @@ public class RegistrationFragment extends Fragment implements EndpointApi.Regist
                     account.setPass(pass);
 
                     LocalDataManager.saveMyPersonInfoToPref(UsefulFunctions.createPerson(account), activity);
-                    String msg = String.format(activity.getString(R.string.registration_msgCreateAccount),email);
+                    String msg = String.format(activity.getString(R.string.registration_msgCreateAccount)
+                            +" "+activity.getString(R.string.spam_warning_msg)
+                            ,email);
                     showDialog(msg);
                     listenerCreateAccount.onCreateAccount( msg);
                 } catch (IOException e) {

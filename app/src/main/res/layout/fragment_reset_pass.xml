@@ -67,7 +67,7 @@
                         android:gravity="center_horizontal"
                         android:paddingRight="@dimen/registration_txtPropVal_leftRightOffset"
                         android:background="#00FFFFFF"
-                        android:inputType="textNoSuggestions"
+                        android:inputType="textEmailAddress"
                         android:maxLength="@integer/emailMaxLength_edtTxt"
                         android:layout_weight="@integer/loginPropertyValueWeight" />
                 </LinearLayout>

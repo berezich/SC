@@ -525,7 +525,8 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
             String dialogMsg;
             setVisibleProgressBar(false);
             if(error==null)
-                dialogMsg = String.format(activity.getString(R.string.changeEmail_msgChangeEmail),newEmail);
+                dialogMsg = String.format(activity.getString(R.string.changeEmail_msgChangeEmail)+
+                        " "+activity.getString(R.string.spam_warning_msg),newEmail);
             else {
 
                 Pair<ErrorVisualizer.ERROR_CODE, String> errTxtCode =

@@ -31,7 +31,6 @@ public class ResetPassFragment extends Fragment implements EndpointApi.ResetPass
     private final String TAG = "MyLog_RPassFragment";
     private final String ARG_EMAIL = "email";
     View rootView;
-    Person myPersonInfo;
     String email="";
     private FragmentActivity activity;
     ResetPassFragmentAction listenerResetPass = null;
@@ -145,7 +144,8 @@ public class ResetPassFragment extends Fragment implements EndpointApi.ResetPass
             {
                 Log.d(TAG, "ResetPassReq was created");
                 try {
-                    String msg = String.format( activity.getString(R.string.resetPass_msgReqResetPass),email);
+                    String msg = String.format( activity.getString(R.string.resetPass_msgReqResetPass)+
+                            " "+activity.getString(R.string.spam_warning_msg),email);
                     showDialog(msg);
                     listenerResetPass.onResetPass(msg);
                 } catch (Exception e) {
