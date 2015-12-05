@@ -281,7 +281,7 @@ public class LoginFragment extends Fragment implements EndpointApi.AuthorizePers
             menu.clear();
             ActionBar actionBar = ((MainActivity) getActivity()).getSupportActionBar();
             if(actionBar!=null)
-                actionBar.setTitle(R.string.login_fragmentTitle);
+                actionBar.setTitle(R.string.app_name);
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">SportConnector</string>
+    <string name="app_name">МСК Теннис</string>
 
     <!-- srvApi begin-->
         <string name="srvApi_url">https://1-dot-sportconnector-981.appspot.com/_ah/api/</string>
@@ -22,7 +22,6 @@
     <!-- main end -->
 
     <!--login_fragment begin-->
-        <string name="login_fragmentTitle">SportConnector</string>
         <string name="login_login">E-mail:</string>
         <string name="login_pass">Пароль:</string>
         <string name="login_checkBox_txt">Автоматический вход</string>

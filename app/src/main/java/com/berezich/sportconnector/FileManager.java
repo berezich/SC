@@ -683,7 +683,7 @@ public class FileManager {
             Log.e(TAG,String.format("file %s renamed failed",file.getPath()));
         return false;
     }
-    private static Bitmap rotateBitmapFileIfNeed(String filePath, Bitmap bitmap){
+    public static Bitmap rotateBitmapFileIfNeed(String filePath, Bitmap bitmap){
         try {
             int rotation = checkRotationDegrees(filePath);
             Log.d(TAG, "picture rotation = " + rotation);

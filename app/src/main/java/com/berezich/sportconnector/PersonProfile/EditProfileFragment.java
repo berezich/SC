@@ -7,10 +7,14 @@ import android.content.Intent;
 import android.content.pm.LabeledIntent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.provider.OpenableColumns;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
@@ -56,7 +60,9 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -772,30 +778,83 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
                         }
                         else{
                             Uri returnUri = returnIntent.getData();
-                            try {
-                                tempPicInfo = new FileManager.PicInfo(this, returnUri.toString(),photoAvatarNameOnServer+tempMyPerson.getId().toString());
-                            } catch (IOException e) {
-                                Log.e(TAG, String.format("PicInfo constructor exception %s", e.getMessage()));
-                                e.printStackTrace();
-                                Toast.makeText(context, activity.getString(R.string.editprofile_pickImageError),
-                                        Toast.LENGTH_SHORT).show();
-                                return;
-                            }
+                            String url = returnUri.toString();
+                            Bitmap bitmap1=null;
+                            InputStream is=null;
+                            if (url.startsWith("content://com.google.android.apps.photos.content")){
+                                try {
+                                    try {
+                                        is = activity.getContentResolver().openInputStream(Uri.parse(url));
+                                        bitmap1 = BitmapFactory.decodeStream(is);
 
-                            if (tempPicInfo.getPath() == null) {
-                                Log.e(TAG, "PICK_IMAGE returned not valid URI");
-                                Toast.makeText(context, activity.getString(R.string.editprofile_pickImageError),
-                                        Toast.LENGTH_SHORT).show();
-                                return;
-                            }
-                            File pickedFile = new File(tempPicInfo.getPath());
-                            if (!pickedFile.exists()) {
-                                Log.e(TAG, String.format("PICK_IMAGE %s not exist", tempPicInfo.getPath()));
-                                Toast.makeText(context, activity.getString(R.string.editprofile_pickImageError),
-                                        Toast.LENGTH_SHORT).show();
-                                return;
-                            }
+                                        /*Cursor returnCursor = activity.getContentResolver().query(returnUri, null, null, null, null);
+                                        int dataIdx = returnCursor.getColumnIndex(MediaStore.Images.ImageColumns.ORIENTATION);
+                                        returnCursor.moveToFirst();
+                                        int orientation = returnCursor.getInt(dataIdx);
+                                        bitmap1 = FileManager.rotateBitmapFileIfNeed(returnUri.getPath(), bitmap1);
+                                        returnCursor.close();*/
 
+                                    } catch(Exception ex){
+                                        ex.printStackTrace();
+                                    } finally {
+                                        if(is!=null)
+                                            is.close();
+                                    }
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                                try {
+                                    if(bitmap1!=null) {
+                                        File tempPhotoFile = new File(tempFileForPhotoPath);
+
+                                        FileOutputStream out = null;
+                                        try {
+                                            out = new FileOutputStream(tempPhotoFile);
+                                            bitmap1.compress(Bitmap.CompressFormat.JPEG, 70, out); // bmp is your Bitmap instance
+                                            // PNG is a lossless format, the compression factor (100) is ignored
+                                        } catch (Exception e) {
+                                            e.printStackTrace();
+                                        } finally {
+                                            try {
+                                                if (out != null) {
+                                                    out.close();
+                                                }
+                                            } catch (IOException e) {
+                                                e.printStackTrace();
+                                            }
+                                        }
+
+                                        tempPicInfo = new FileManager.PicInfo(tempPhotoFile);
+                                    }
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                            else {
+                                try {
+                                    tempPicInfo = new FileManager.PicInfo(this, returnUri.toString(), photoAvatarNameOnServer + tempMyPerson.getId().toString());
+                                } catch (IOException e) {
+                                    Log.e(TAG, String.format("PicInfo constructor exception %s", e.getMessage()));
+                                    e.printStackTrace();
+                                    Toast.makeText(context, activity.getString(R.string.editprofile_pickImageError),
+                                            Toast.LENGTH_SHORT).show();
+                                    return;
+                                }
+
+                                if (tempPicInfo.getPath() == null) {
+                                    Log.e(TAG, "PICK_IMAGE returned not valid URI");
+                                    Toast.makeText(context, activity.getString(R.string.editprofile_pickImageError),
+                                            Toast.LENGTH_SHORT).show();
+                                    return;
+                                }
+                                File pickedFile = new File(tempPicInfo.getPath());
+                                if (!pickedFile.exists()) {
+                                    Log.e(TAG, String.format("PICK_IMAGE %s not exist", tempPicInfo.getPath()));
+                                    Toast.makeText(context, activity.getString(R.string.editprofile_pickImageError),
+                                            Toast.LENGTH_SHORT).show();
+                                    return;
+                                }
+                            }
                         }
                         if (tempMyPerson != null) {
                             String cacheDir = FileManager.PERSON_CACHE_DIR + "/" + tempMyPerson.getId();
