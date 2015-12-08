@@ -12,6 +12,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
@@ -246,10 +247,17 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
                 LinearLayout linearLayout;
                 if((linearLayout=(LinearLayout) rootView.findViewById(R.id.editProfile_hLayout_changePhoto))!=null)
                     linearLayout.setOnClickListener(new ImageOnClick());
-                if((linearLayout=(LinearLayout) rootView.findViewById(R.id.editProfile_hLayout_rotateImgL))!=null)
+                if ((linearLayout = (LinearLayout) rootView.findViewById(R.id.editProfile_hLayout_rotateImgL)) != null)
                     linearLayout.setOnClickListener(new RotateImageOnClick());
-                if((linearLayout=(LinearLayout) rootView.findViewById(R.id.editProfile_hLayout_rotateImgR))!=null)
+                if ((linearLayout = (LinearLayout) rootView.findViewById(R.id.editProfile_hLayout_rotateImgR)) != null)
                     linearLayout.setOnClickListener(new RotateImageOnClick());
+                if(picInfo!=null) {
+                    if ((linearLayout = (LinearLayout) rootView.findViewById(R.id.editProfile_vLayout_rotateImgBlock)) != null)
+                        linearLayout.setVisibility(View.VISIBLE);
+                }
+                else if ((linearLayout = (LinearLayout) rootView.findViewById(R.id.editProfile_vLayout_rotateImgBlock)) != null)
+                        linearLayout.setVisibility(View.GONE);
+
                 if ((txtEdt = (EditText) rootView.findViewById(R.id.editProfile_txtEdt_name)) != null) {
                     txtEdt.setText(tempMyPerson.getName());
                     txtEdt.setFilters(new InputFilter[]{new UsefulFunctions.NameSurnameInputFilter(
@@ -264,15 +272,10 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
                     Date date;
                     if ((birthday = tempMyPerson.getBirthday()) != null) {
                         date = new Date(birthday.getValue());
-                        //txtView.setText(String.format("%1$td.%1$tm.%1$tY", date));
                         txtView.setText(new SimpleDateFormat("dd.MM.yyyy").format(date));
                     }
                     else {
                         txtView.setText("");
-                        /*Calendar calendar = Calendar.getInstance();
-                        calendar.set(Calendar.YEAR,calendar.get(Calendar.YEAR)-getResources().getInteger(R.integer.editProfile_minAge));
-                        date = calendar.getTime();
-                        txtView.setText(String.format("%1$td.%1$tm.%1$tY", date));*/
                     }
                     txtView.setOnClickListener(new OnBirthdayClickListener());
                 }
@@ -758,30 +761,45 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
     private class RotateImageOnClick implements View.OnClickListener{
         @Override
         public void onClick(View v) {
-            try {
-                int rotation;
-                if(v.getId()==R.id.editProfile_hLayout_rotateImgL)
-                    rotation=-90;
-                else
-                    rotation=90;
-                picInfo.rotateImg(rotation);
+            int rotation;
+            if(v.getId()==R.id.editProfile_hLayout_rotateImgL)
+                rotation=-90;
+            else
+                rotation=90;
 
-                String cacheDir = FileManager.PERSON_CACHE_DIR + "/" + tempMyPerson.getId();
-                picInfo.savePicPreviewToCache(TAG, activity, UsefulFunctions.getDigest(tempPhotoNameLocal), cacheDir);
-                Picture picture = new Picture();
-                picture.setBlobKey(tempPhotoNameLocal);
-                tempMyPerson.setPhoto(picture);
+            final String cacheDir = FileManager.PERSON_CACHE_DIR + "/" + tempMyPerson.getId();
 
-                ImageView imageView;
-                if((imageView = (ImageView) rootView.findViewById(R.id.editProfile_img_photo))!=null) {
-                    File file = FileManager.getAlbumStorageDir(TAG, activity, cacheDir);
-                    File imgFile = new File(file,UsefulFunctions.getDigest(tempPhotoNameLocal));
-                    FileManager.setPicToImageView(imgFile, imageView, (int) activity.getResources().getDimension(R.dimen.personProfile_photoWidth),
-                            (int) activity.getResources().getDimension(R.dimen.personProfile_photoHeight));
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            new AsyncTask<Integer, Void, Void>(){
+                    @Override
+                    protected Void doInBackground(Integer... params) {
+                        try {
+                            int rotation = params[0];
+                            picInfo.rotateImg(rotation);
+
+                            picInfo.savePicPreviewToCache(TAG, activity, UsefulFunctions.getDigest(tempPhotoNameLocal), cacheDir);
+                            Picture picture = new Picture();
+                            picture.setBlobKey(tempPhotoNameLocal);
+                            tempMyPerson.setPhoto(picture);
+
+
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        return null;
+                    }
+                    @Override
+                    protected void onPostExecute(Void aVoid) {
+                        ImageView imageView;
+                        if((imageView = (ImageView) rootView.findViewById(R.id.editProfile_img_photo))!=null) {
+                            File file = FileManager.getAlbumStorageDir(TAG, activity, cacheDir);
+                            File imgFile = new File(file,UsefulFunctions.getDigest(tempPhotoNameLocal));
+                            FileManager.setPicToImageView(imgFile, imageView,
+                                    (int) activity.getResources().getDimension(R.dimen.personProfile_photoWidth),
+                                    (int) activity.getResources().getDimension(R.dimen.personProfile_photoHeight));
+                        }
+                    }
+                }.execute(rotation);
+
         }
     }
     public void onActivityResult(int requestCode, int resultCode,
@@ -789,7 +807,6 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
         try {
             LinearLayout linearLayout=(LinearLayout) rootView.findViewById(R.id.editProfile_hLayout_changePhoto);
             linearLayout.setEnabled(true);
-            FileManager.PicInfo tempPicInfo = null;
             if (resultCode != Activity.RESULT_OK) {
                 Log.d(TAG, "resultCode !=  Activity.RESULT_OK");
             } else {
@@ -797,108 +814,137 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
                     case GALLERY_CAMERA_IMAGE:
                     case PICK_IMAGE:
                     case CAMERA_IMAGE:
-                        Context context = activity.getBaseContext();
-                        // Get the file's content URI from the incoming Intent
-                        if (returnIntent == null) {
-                            Log.e(TAG, "RETURN Intent == null => photo was saved to tempFile");
-                            try {
-                                File tempPhotoFile = new File(tempFileForPhotoPath);
-                                tempPicInfo = new FileManager.PicInfo(tempPhotoFile);
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
-                        }
-                        else{
-                            Uri returnUri = returnIntent.getData();
-                            String url = returnUri.toString();
-                            Bitmap bitmap1=null;
-                            InputStream is=null;
-                            if (url.startsWith("content://com.google.android.apps.photos.content")){
+                        final Context context = activity.getBaseContext();
+                        new AsyncTask<Intent,Void,Void>(){
+                            @Override
+                            protected Void doInBackground(Intent... params) {
                                 try {
-                                    try {
-                                        is = activity.getContentResolver().openInputStream(Uri.parse(url));
-                                        bitmap1 = BitmapFactory.decodeStream(is);
-
-                                        /*Cursor returnCursor = activity.getContentResolver().query(returnUri, null, null, null, null);
-                                        int dataIdx = returnCursor.getColumnIndex(MediaStore.Images.ImageColumns.ORIENTATION);
-                                        returnCursor.moveToFirst();
-                                        int orientation = returnCursor.getInt(dataIdx);
-                                        bitmap1 = FileManager.rotateBitmapFileIfNeed(returnUri.getPath(), bitmap1);
-                                        returnCursor.close();*/
-
-                                    } catch(Exception ex){
-                                        ex.printStackTrace();
-                                    } finally {
-                                        if(is!=null)
-                                            is.close();
-                                    }
-                                } catch (IOException e) {
-                                    e.printStackTrace();
-                                }
-                                try {
-                                    if(bitmap1!=null) {
-                                        File tempPhotoFile = new File(tempFileForPhotoPath);
-
-                                        FileOutputStream out = null;
+                                    FileManager.PicInfo tempPicInfo = null;
+                                    // Get the file's content URI from the incoming Intent
+                                    Intent returnIntent = params[0];
+                                    if (returnIntent == null) {
+                                        Log.e(TAG, "RETURN Intent == null => photo was saved to tempFile");
                                         try {
-                                            out = new FileOutputStream(tempPhotoFile);
-                                            bitmap1.compress(Bitmap.CompressFormat.JPEG, 70, out); // bmp is your Bitmap instance
-                                            // PNG is a lossless format, the compression factor (100) is ignored
+                                            File tempPhotoFile = new File(tempFileForPhotoPath);
+                                            tempPicInfo = new FileManager.PicInfo(tempPhotoFile);
                                         } catch (Exception e) {
                                             e.printStackTrace();
-                                        } finally {
+                                        }
+                                    } else {
+                                        Uri returnUri = returnIntent.getData();
+                                        String url = returnUri.toString();
+                                        Bitmap bitmap1 = null;
+                                        InputStream is = null;
+                                        if (url.startsWith("content://com.google.android.apps.photos.content")) {
                                             try {
-                                                if (out != null) {
-                                                    out.close();
+                                                try {
+                                                    is = activity.getContentResolver().openInputStream(Uri.parse(url));
+                                                    bitmap1 = BitmapFactory.decodeStream(is);
+
+                                                } catch (Exception ex) {
+                                                    ex.printStackTrace();
+                                                } finally {
+                                                    if (is != null)
+                                                        is.close();
                                                 }
                                             } catch (IOException e) {
                                                 e.printStackTrace();
                                             }
-                                        }
+                                            try {
+                                                if (bitmap1 != null) {
+                                                    File tempPhotoFile = new File(tempFileForPhotoPath);
 
-                                        tempPicInfo = new FileManager.PicInfo(tempPhotoFile);
+                                                    FileOutputStream out = null;
+                                                    try {
+                                                        out = new FileOutputStream(tempPhotoFile);
+                                                        bitmap1.compress(Bitmap.CompressFormat.JPEG, FileManager.COMPRESS_QUALITY, out);
+                                                        bitmap1.recycle();
+                                                    } catch (Exception e) {
+                                                        e.printStackTrace();
+                                                    } finally {
+                                                        try {
+                                                            if (out != null) {
+                                                                out.close();
+                                                            }
+                                                        } catch (IOException e) {
+                                                            e.printStackTrace();
+                                                        }
+                                                    }
+
+                                                    tempPicInfo = new FileManager.PicInfo(tempPhotoFile);
+                                                }
+                                            } catch (Exception e) {
+                                                e.printStackTrace();
+                                            }
+                                        } else {
+                                            try {
+                                                tempPicInfo = new FileManager.PicInfo(
+                                                        EditProfileFragment.this, returnUri.toString(),
+                                                        photoAvatarNameOnServer + tempMyPerson.getId().toString());
+                                            } catch (IOException e) {
+                                                Log.e(TAG, String.format("PicInfo constructor exception %s", e.getMessage()));
+                                                e.printStackTrace();
+                                                Toast.makeText(context, activity.getString(R.string.editprofile_pickImageError),
+                                                        Toast.LENGTH_SHORT).show();
+                                                return null;
+                                            }
+
+                                            if (tempPicInfo.getPath() == null) {
+                                                Log.e(TAG, "PICK_IMAGE returned not valid URI");
+                                                Toast.makeText(context, activity.getString(R.string.editprofile_pickImageError),
+                                                        Toast.LENGTH_SHORT).show();
+                                                return null;
+                                            }
+                                            File pickedFile = new File(tempPicInfo.getPath());
+                                            if (!pickedFile.exists()) {
+                                                Log.e(TAG, String.format("PICK_IMAGE %s not exist", tempPicInfo.getPath()));
+                                                Toast.makeText(context, activity.getString(R.string.editprofile_pickImageError),
+                                                        Toast.LENGTH_SHORT).show();
+                                                return null;
+                                            }
+                                        }
                                     }
+                                    if (tempMyPerson != null) {
+                                        String cacheDir = FileManager.PERSON_CACHE_DIR + "/" + tempMyPerson.getId();
+                                        if (tempPicInfo != null)
+                                            tempPicInfo.savePicPreviewToCache(TAG, context, UsefulFunctions.getDigest(tempPhotoNameLocal),
+                                                    cacheDir);
+                                        Picture picture = new Picture();
+                                        picture.setBlobKey(tempPhotoNameLocal);
+                                        tempMyPerson.setPhoto(picture);
+                                        picInfo = tempPicInfo;
+
+                                    }
+                                    return null;
+                                }
+                                catch (Exception ex){
+                                    ex.printStackTrace();
+                                    return null;
+                                }
+                            }
+
+                            @Override
+                            protected void onPostExecute(Void aVoid) {
+                                try {
+                                    ImageView imageView;
+                                    if((imageView = (ImageView) rootView.findViewById(R.id.editProfile_img_photo))!=null) {
+                                        Picture photoInfo = tempMyPerson.getPhoto();
+                                        FileManager.providePhotoForImgView(activity.getBaseContext(), imageView,
+                                                photoInfo, FileManager.PERSON_CACHE_DIR + "/" + tempMyPerson.getId().toString());
+                                    }
+                                    LinearLayout linearLayout;
+                                    if(picInfo!=null) {
+                                        if ((linearLayout = (LinearLayout) rootView.findViewById(R.id.editProfile_vLayout_rotateImgBlock)) != null)
+                                            linearLayout.setVisibility(View.VISIBLE);
+                                    }
+                                    else if ((linearLayout = (LinearLayout) rootView.findViewById(R.id.editProfile_vLayout_rotateImgBlock)) != null)
+                                        linearLayout.setVisibility(View.GONE);
                                 } catch (Exception e) {
                                     e.printStackTrace();
                                 }
                             }
-                            else {
-                                try {
-                                    tempPicInfo = new FileManager.PicInfo(this, returnUri.toString(), photoAvatarNameOnServer + tempMyPerson.getId().toString());
-                                } catch (IOException e) {
-                                    Log.e(TAG, String.format("PicInfo constructor exception %s", e.getMessage()));
-                                    e.printStackTrace();
-                                    Toast.makeText(context, activity.getString(R.string.editprofile_pickImageError),
-                                            Toast.LENGTH_SHORT).show();
-                                    return;
-                                }
+                        }.execute(returnIntent);
 
-                                if (tempPicInfo.getPath() == null) {
-                                    Log.e(TAG, "PICK_IMAGE returned not valid URI");
-                                    Toast.makeText(context, activity.getString(R.string.editprofile_pickImageError),
-                                            Toast.LENGTH_SHORT).show();
-                                    return;
-                                }
-                                File pickedFile = new File(tempPicInfo.getPath());
-                                if (!pickedFile.exists()) {
-                                    Log.e(TAG, String.format("PICK_IMAGE %s not exist", tempPicInfo.getPath()));
-                                    Toast.makeText(context, activity.getString(R.string.editprofile_pickImageError),
-                                            Toast.LENGTH_SHORT).show();
-                                    return;
-                                }
-                            }
-                        }
-                        if (tempMyPerson != null) {
-                            String cacheDir = FileManager.PERSON_CACHE_DIR + "/" + tempMyPerson.getId();
-                            if(tempPicInfo!=null)
-                                tempPicInfo.savePicPreviewToCache(TAG, context, UsefulFunctions.getDigest(tempPhotoNameLocal),
-                                    cacheDir);
-                            Picture picture = new Picture();
-                            picture.setBlobKey(tempPhotoNameLocal);
-                            tempMyPerson.setPhoto(picture);
-                            picInfo = tempPicInfo;
-                            //setting picture to imageView is proceeded in onResume()
-                        }
                         break;
                 }
 

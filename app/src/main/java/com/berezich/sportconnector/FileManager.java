@@ -46,7 +46,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class FileManager {
-    private static final int COMPRESS_QUALITY = 75;
+    public static final int COMPRESS_QUALITY = 75;
     private static final int REQUIRED_SIZE = 1000;
     private static final String TAG = "MyLog_fileManager";
     public static final String PERSON_CACHE_DIR = "Person";
@@ -72,7 +72,8 @@ public class FileManager {
             name = file.getName();
             mimeType = "image/jpeg";
             bitmap = decodeFile(new File(path));
-            bitmap = rotateBitmapFileIfNeed(path,bitmap);
+            bitmap = rotateBitmapFileIfNeed(path, bitmap);
+            bitmap.recycle();
         }
         public PicInfo(Fragment fragment, String fileUri, String nameToSave) throws IOException{
             Uri uri = Uri.parse(fileUri);
@@ -86,6 +87,7 @@ public class FileManager {
             this.path = returnCursor.getString(dataIdx);
             bitmap = decodeFile(new File(path));
             bitmap = rotateBitmapFileIfNeed(path, bitmap);
+            bitmap.recycle();
             returnCursor.close();
         }
 
@@ -94,14 +96,23 @@ public class FileManager {
          */
         public byte[] getCompressedPic() throws FileNotFoundException{
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            if(bitmap==null)
+            if(bitmap==null || bitmap.isRecycled())
                 bitmap = decodeFile(new File(path));
             bitmap.compress(Bitmap.CompressFormat.JPEG, COMPRESS_QUALITY, bos);
+            bitmap.recycle();
             return bos.toByteArray();
         }
 
         public File savePicPreviewToCache(String TAG, Context context, String fileName, String cacheDir) {
-            return FileManager.savePicPreviewToCache(TAG, context, fileName, cacheDir, bitmap);
+            if(bitmap==null || bitmap.isRecycled())
+                try {
+                    bitmap = decodeFile(new File(path));
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }
+            File imgFile = FileManager.savePicPreviewToCache(TAG, context, fileName, cacheDir, bitmap);
+            bitmap.recycle();
+            return imgFile;
         }
 
 
@@ -136,6 +147,13 @@ public class FileManager {
             Matrix matrix = new Matrix();
             if (rotation != 0f) {
                 matrix.preRotate(rotation);
+                if(bitmap==null || bitmap.isRecycled()) {
+                    try {
+                        bitmap = FileManager.decodeFile(new File(path));
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                    }
+                }
                 bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
 
                 File tempPhotoFile = new File(path);
@@ -143,8 +161,9 @@ public class FileManager {
                 FileOutputStream out = null;
                 try {
                     out = new FileOutputStream(tempPhotoFile);
-                    bitmap.compress(Bitmap.CompressFormat.JPEG, 70, out); // bmp is your Bitmap instance
+                    bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out); // bmp is your Bitmap instance
                     // PNG is a lossless format, the compression factor (100) is ignored
+                    bitmap.recycle();
                 } catch (Exception e) {
                     e.printStackTrace();
                 } finally {
@@ -156,7 +175,6 @@ public class FileManager {
                         e.printStackTrace();
                     }
                 }
-
                 Log.d(TAG, "picture rotated");
             }
         }
@@ -399,9 +417,14 @@ public class FileManager {
     private static Bitmap decodeFile(File f) throws FileNotFoundException{
         // Decode image size
         BitmapFactory.Options o = new BitmapFactory.Options();
+        FileInputStream fis;
         o.inJustDecodeBounds = true;
-        BitmapFactory.decodeStream(new FileInputStream(f), null, o);
-
+        BitmapFactory.decodeStream(fis = new FileInputStream(f), null, o);
+        try {
+            fis.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         // Find the correct scale value. It should be the power of 2.
         int scale = 1;
         while (o.outWidth / scale / 2 >= REQUIRED_SIZE &&
@@ -412,7 +435,13 @@ public class FileManager {
         // Decode with inSampleSize
         BitmapFactory.Options o2 = new BitmapFactory.Options();
         o2.inSampleSize = scale;
-        return BitmapFactory.decodeStream(new FileInputStream(f), null, o2);
+        Bitmap bitmap = BitmapFactory.decodeStream(fis = new FileInputStream(f), null, o2);
+        try {
+            fis.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return bitmap;
     }
 
 
