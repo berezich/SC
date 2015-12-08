@@ -62,6 +62,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
@@ -258,7 +259,8 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
                     Date date;
                     if ((birthday = tempMyPerson.getBirthday()) != null) {
                         date = new Date(birthday.getValue());
-                        txtView.setText(String.format("%1$td.%1$tm.%1$tY", date));
+                        //txtView.setText(String.format("%1$td.%1$tm.%1$tY", date));
+                        txtView.setText(new SimpleDateFormat("dd.MM.yyyy").format(date));
                     }
                     else {
                         txtView.setText("");

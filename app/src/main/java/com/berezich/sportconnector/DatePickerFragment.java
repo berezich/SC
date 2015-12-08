@@ -57,6 +57,7 @@ public class DatePickerFragment extends DialogFragment
             Calendar calendar = Calendar.getInstance();
             calendar.set(Calendar.YEAR,calendar.get(Calendar.YEAR)-getResources().getInteger(R.integer.editProfile_minAge));
             pickerDialog.getDatePicker().setMaxDate(calendar.getTimeInMillis());
+            calendar = Calendar.getInstance();
             calendar.set(Calendar.YEAR, calendar.get(Calendar.YEAR) - getResources().getInteger(R.integer.editProfile_maxAge));
             pickerDialog.getDatePicker().setMinDate(calendar.getTimeInMillis());
             return pickerDialog;

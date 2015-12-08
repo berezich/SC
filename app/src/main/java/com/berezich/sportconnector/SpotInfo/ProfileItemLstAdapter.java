@@ -71,8 +71,7 @@ public class ProfileItemLstAdapter extends BaseAdapter {
                     int age = UsefulFunctions.calcPersonAge(person.getBirthday());
 
                     ((TextView) view.findViewById(R.id.lstProfileItem_desc1)).setText(
-                            //(age >= 0 ? ctx.getString(R.string.person_item_age) + " " + age : ""));
-                            (age >= 0 ? age +" "+UsefulFunctions.personAgeDeclension(ctx,age):""));
+                            (age > 0 ? age +" "+UsefulFunctions.personAgeDeclension(ctx,age):""));
 
                     ((TextView) view.findViewById(R.id.lstProfileItem_desc2)).setText(
                             (person.getRating() > 0) ?

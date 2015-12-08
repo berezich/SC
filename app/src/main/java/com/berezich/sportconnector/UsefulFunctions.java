@@ -38,7 +38,7 @@ public class UsefulFunctions {
     }
     public static DateTime parseDateTime(String dtStr)
     {
-        DateFormat df = new SimpleDateFormat("dd.mm.yyyy", Locale.getDefault());
+        DateFormat df = new SimpleDateFormat("dd.MM.yyyy", Locale.getDefault());
         DateTime dtBirthday = null;
         try {
             Date dBirthday = df.parse(dtStr);
