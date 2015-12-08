@@ -7,14 +7,12 @@ import android.content.Intent;
 import android.content.pm.LabeledIntent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.provider.OpenableColumns;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
@@ -37,6 +35,7 @@ import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -63,7 +62,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -222,7 +220,6 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
             ImageButton imgBtn;
             Spinner spinner;
             ImageView imageView;
-            FrameLayout frameLayout;
 
             ((MainActivity)this.activity).setmTitle(activity.getString(R.string.editprofile_fragmentTitle));
             ((MainActivity)this.activity).getSupportActionBar().setHomeAsUpIndicator(null);
@@ -244,8 +241,9 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
                     FileManager.providePhotoForImgView(activity.getBaseContext(), imageView,
                             photoInfo, FileManager.PERSON_CACHE_DIR + "/" + tempMyPerson.getId().toString());
                 }
-                if((frameLayout=(FrameLayout) rootView.findViewById(R.id.editProfile_frame_changePhoto))!=null)
-                    frameLayout.setOnClickListener(new ImageOnClick());
+                LinearLayout linearLayout;
+                if((linearLayout=(LinearLayout) rootView.findViewById(R.id.editProfile_hLayout_changePhoto))!=null)
+                    linearLayout.setOnClickListener(new ImageOnClick());
                 if ((txtEdt = (EditText) rootView.findViewById(R.id.editProfile_txtEdt_name)) != null) {
                     txtEdt.setText(tempMyPerson.getName());
                     txtEdt.setFilters(new InputFilter[]{new UsefulFunctions.NameSurnameInputFilter(
@@ -755,8 +753,8 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
     public void onActivityResult(int requestCode, int resultCode,
                                  Intent returnIntent) {
         try {
-            FrameLayout frameLayout=(FrameLayout) rootView.findViewById(R.id.editProfile_frame_changePhoto);
-            frameLayout.setEnabled(true);
+            LinearLayout linearLayout=(LinearLayout) rootView.findViewById(R.id.editProfile_hLayout_changePhoto);
+            linearLayout.setEnabled(true);
             FileManager.PicInfo tempPicInfo = null;
             if (resultCode != Activity.RESULT_OK) {
                 Log.d(TAG, "resultCode !=  Activity.RESULT_OK");
