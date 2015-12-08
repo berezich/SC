@@ -10,6 +10,7 @@ import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -245,6 +246,10 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
                 LinearLayout linearLayout;
                 if((linearLayout=(LinearLayout) rootView.findViewById(R.id.editProfile_hLayout_changePhoto))!=null)
                     linearLayout.setOnClickListener(new ImageOnClick());
+                if((linearLayout=(LinearLayout) rootView.findViewById(R.id.editProfile_hLayout_rotateImgL))!=null)
+                    linearLayout.setOnClickListener(new RotateImageOnClick());
+                if((linearLayout=(LinearLayout) rootView.findViewById(R.id.editProfile_hLayout_rotateImgR))!=null)
+                    linearLayout.setOnClickListener(new RotateImageOnClick());
                 if ((txtEdt = (EditText) rootView.findViewById(R.id.editProfile_txtEdt_name)) != null) {
                     txtEdt.setText(tempMyPerson.getName());
                     txtEdt.setFilters(new InputFilter[]{new UsefulFunctions.NameSurnameInputFilter(
@@ -750,8 +755,35 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
         }
     }
 
+    private class RotateImageOnClick implements View.OnClickListener{
+        @Override
+        public void onClick(View v) {
+            try {
+                int rotation;
+                if(v.getId()==R.id.editProfile_hLayout_rotateImgL)
+                    rotation=-90;
+                else
+                    rotation=90;
+                picInfo.rotateImg(rotation);
 
-    @Override
+                String cacheDir = FileManager.PERSON_CACHE_DIR + "/" + tempMyPerson.getId();
+                picInfo.savePicPreviewToCache(TAG, activity, UsefulFunctions.getDigest(tempPhotoNameLocal), cacheDir);
+                Picture picture = new Picture();
+                picture.setBlobKey(tempPhotoNameLocal);
+                tempMyPerson.setPhoto(picture);
+
+                ImageView imageView;
+                if((imageView = (ImageView) rootView.findViewById(R.id.editProfile_img_photo))!=null) {
+                    File file = FileManager.getAlbumStorageDir(TAG, activity, cacheDir);
+                    File imgFile = new File(file,UsefulFunctions.getDigest(tempPhotoNameLocal));
+                    FileManager.setPicToImageView(imgFile, imageView, (int) activity.getResources().getDimension(R.dimen.personProfile_photoWidth),
+                            (int) activity.getResources().getDimension(R.dimen.personProfile_photoHeight));
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
     public void onActivityResult(int requestCode, int resultCode,
                                  Intent returnIntent) {
         try {

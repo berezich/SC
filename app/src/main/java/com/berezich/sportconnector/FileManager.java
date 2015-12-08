@@ -129,6 +129,38 @@ public class FileManager {
             this.size = size;
         }
 
+        /*
+        *   rotate bitmap and update the file
+         */
+        public void rotateImg(int rotation){
+            Matrix matrix = new Matrix();
+            if (rotation != 0f) {
+                matrix.preRotate(rotation);
+                bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+
+                File tempPhotoFile = new File(path);
+
+                FileOutputStream out = null;
+                try {
+                    out = new FileOutputStream(tempPhotoFile);
+                    bitmap.compress(Bitmap.CompressFormat.JPEG, 70, out); // bmp is your Bitmap instance
+                    // PNG is a lossless format, the compression factor (100) is ignored
+                } catch (Exception e) {
+                    e.printStackTrace();
+                } finally {
+                    try {
+                        if (out != null) {
+                            out.close();
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                Log.d(TAG, "picture rotated");
+            }
+        }
+
     }
 
     public static class UploadAndReplacePersonFileAsyncTask extends AsyncTask<Pair<PicInfo, Pair<String, String>>, Void, Exception> {
