@@ -857,7 +857,7 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
                                                     FileOutputStream out = null;
                                                     try {
                                                         out = new FileOutputStream(tempPhotoFile);
-                                                        bitmap1.compress(Bitmap.CompressFormat.JPEG, FileManager.COMPRESS_QUALITY, out);
+                                                        bitmap1.compress(Bitmap.CompressFormat.JPEG, FileManager.COMPRESS_QUALITY_HIGHEST, out);
                                                         bitmap1.recycle();
                                                     } catch (Exception e) {
                                                         e.printStackTrace();

@@ -46,7 +46,9 @@
                         android:id="@+id/editProfile_hLayout_changePhoto"
                         android:layout_gravity="center"
                         android:gravity="center_vertical"
-                        android:background="@drawable/view_backgr_trans_selector">
+                        android:background="@drawable/view_backgr_trans_selector"
+                        android:paddingRight="@dimen/editprofile_changePhoto_leftRightOffset"
+                        android:paddingLeft="@dimen/editprofile_changePhoto_leftRightOffset">
 
                         <ImageView
                             android:layout_width="wrap_content"
@@ -61,7 +63,7 @@
                             android:textSize="@dimen/textMediumSize"
                             android:text="@string/editprofile_chagePhoto"
                             android:id="@+id/editprofile_txt_changePhoto"
-                            android:paddingLeft="@dimen/editprofile_changePhoto_leftOffset" />
+                            android:paddingLeft="@dimen/editprofile_changePhoto_leftRightOffset" />
                     </LinearLayout>
                     <!--
                     <LinearLayout
@@ -125,8 +127,8 @@
                             android:layout_height="wrap_content"
                             android:layout_gravity="center"
                             android:gravity="center_vertical"
-                            android:layout_marginRight="15dp"
-                            android:paddingRight="6dp"
+                            android:layout_marginRight="@dimen/editprofile_rotatePhoto_leftRightMargin"
+                            android:paddingRight="@dimen/editprofile_rotatePhoto_leftRightPadding"
                             android:id="@+id/editProfile_hLayout_rotateImgL"
                             android:background="@drawable/view_backgr_trans_selector">
 
@@ -143,7 +145,8 @@
                                 android:textSize="@dimen/textMediumSize"
                                 android:text="+90"
                                 android:id="@+id/editprofile_txt_rotatePhotoL"
-                                android:paddingLeft="@dimen/editprofile_changePhoto_leftOffset" />
+                                android:paddingLeft="@dimen/editprofile_changePhoto_leftRightOffset"
+                                android:paddingRight="@dimen/editprofile_changePhoto_leftRightOffset"/>
                         </LinearLayout>
 
                         <LinearLayout
@@ -152,8 +155,8 @@
                             android:layout_height="wrap_content"
                             android:layout_gravity="center"
                             android:gravity="center_vertical"
-                            android:layout_marginLeft="15dp"
-                            android:paddingRight="6dp"
+                            android:layout_marginLeft="@dimen/editprofile_rotatePhoto_leftRightMargin"
+                            android:paddingRight="@dimen/editprofile_rotatePhoto_leftRightPadding"
                             android:id="@+id/editProfile_hLayout_rotateImgR"
                             android:background="@drawable/view_backgr_trans_selector">
 
@@ -169,7 +172,7 @@
                                 android:textSize="@dimen/textMediumSize"
                                 android:text="-90"
                                 android:id="@+id/editprofile_txt_rotatePhotoR"
-                                android:paddingLeft="@dimen/editprofile_changePhoto_leftOffset" />
+                                android:paddingLeft="@dimen/editprofile_changePhoto_leftRightOffset" />
                         </LinearLayout>
 
                     </LinearLayout>

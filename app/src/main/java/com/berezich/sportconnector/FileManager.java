@@ -47,13 +47,14 @@ import java.util.List;
 
 public class FileManager {
     public static final int COMPRESS_QUALITY = 75;
+    public static final int COMPRESS_QUALITY_HIGHEST = 100;
     private static final int REQUIRED_SIZE = 1000;
     private static final String TAG = "MyLog_fileManager";
     public static final String PERSON_CACHE_DIR = "Person";
     public static final String SPOT_CACHE_DIR = "Spot";
     public static final String TEMP_DIR = "tempStore";
     public static final String TEMP_FILE_POSTFIX = "_01spb";
-    private static final int MAX_TEMP_SIZE = 1024*1024;
+    private static final int MAX_TEMPDATA_SIZE = 1024*1024;
 
 
     public static class PicInfo {
@@ -161,7 +162,7 @@ public class FileManager {
                 FileOutputStream out = null;
                 try {
                     out = new FileOutputStream(tempPhotoFile);
-                    bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out); // bmp is your Bitmap instance
+                    bitmap.compress(Bitmap.CompressFormat.JPEG, COMPRESS_QUALITY_HIGHEST, out); // bmp is your Bitmap instance
                     // PNG is a lossless format, the compression factor (100) is ignored
                     bitmap.recycle();
                 } catch (Exception e) {
@@ -482,7 +483,8 @@ public class FileManager {
                     endBitmap = bitmap;
                 Log.d(TAG, String.format("photo preview size = %dx%d", width, height));
                 endBitmap = Bitmap.createScaledBitmap(endBitmap, width, height, false);
-                endBitmap.compress(Bitmap.CompressFormat.JPEG, FileManager.COMPRESS_QUALITY, out);
+                //endBitmap.compress(Bitmap.CompressFormat.JPEG, FileManager.COMPRESS_QUALITY, out);
+                endBitmap.compress(Bitmap.CompressFormat.JPEG, FileManager.COMPRESS_QUALITY_HIGHEST, out);
                 out.flush();
                 out.close();
                 return file;
@@ -572,7 +574,7 @@ public class FileManager {
                 Log.d(TAG,String.format("total tempFiles Size = %d", otherFilesSize + dirSize));
                 Log.d(TAG,String.format("my tempFiles Size = %d",dirSize));
                 Log.d(TAG,String.format("myFiles number = %d",myFilesNum));
-                if(otherFilesSize + dirSize <MAX_TEMP_SIZE  || oldestFile==null || myFilesNum<=2)
+                if(otherFilesSize + dirSize < MAX_TEMPDATA_SIZE || oldestFile==null || myFilesNum<=2)
                     break;
                 Log.d(TAG,String.format("oldestFile = %s",oldestFile.getPath()));
                 if(oldestFile.delete())
