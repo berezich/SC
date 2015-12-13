@@ -42,6 +42,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -162,7 +163,8 @@ public class FileManager {
                 FileOutputStream out = null;
                 try {
                     out = new FileOutputStream(tempPhotoFile);
-                    bitmap.compress(Bitmap.CompressFormat.JPEG, COMPRESS_QUALITY_HIGHEST, out); // bmp is your Bitmap instance
+                    //bitmap.compress(Bitmap.CompressFormat.JPEG, COMPRESS_QUALITY_HIGHEST, out); // bmp is your Bitmap instance
+                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, out); // bmp is your Bitmap instance
                     // PNG is a lossless format, the compression factor (100) is ignored
                     bitmap.recycle();
                 } catch (Exception e) {
@@ -518,7 +520,38 @@ public class FileManager {
         }
         return file;
     }
+    public static boolean copy(File src, File dst) throws IOException {
+        InputStream in = null;
+        OutputStream out = null;
+        boolean result = true;
+        try {
+            in = new FileInputStream(src);
+            out = new FileOutputStream(dst);
 
+            // Transfer bytes from in to out
+            byte[] buf = new byte[1024];
+            int len;
+            while ((len = in.read(buf)) > 0) {
+                out.write(buf, 0, len);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            result = false;
+        }
+        try {
+            if(in!=null)
+                in.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        try {
+            if(out!=null)
+                out.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
     public static File savePicToTempStore(String TAG, Context context, String fileName, Bitmap bitmap,
                                           int width, int height, boolean needCenterCrop) {
 

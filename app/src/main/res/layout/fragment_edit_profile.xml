@@ -25,12 +25,41 @@
                 android:layout_width="match_parent"
                 android:background="@color/background_floating_material_light"
                 android:orientation="horizontal">
-                <ImageView
+                <FrameLayout
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/editProfile_img_photo"
-                    android:src="@drawable/lst_profile_icon"
-                    android:background="#ffbcbcbc" />
+                    android:layout_height="wrap_content">
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/editProfile_img_photo"
+                        android:src="@drawable/lst_profile_icon"
+                        android:background="#ffbcbcbc"
+                        android:layout_gravity="center" />
+
+                    <FrameLayout
+                        android:layout_width="@dimen/personProfile_photoWidth"
+                        android:layout_height="@dimen/personProfile_photoHeight"
+                        android:background="@color/imgProgressBar_background"
+                        android:id="@+id/editProfile_frameImgProgressBar"
+                        android:visibility="gone"
+                        android:layout_gravity="center">
+
+                        <ProgressBar
+                            style="?android:attr/progressBarStyleSmall"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:id="@+id/editProfile_imgProgressBar"
+                            android:layout_gravity="center"
+                            />
+
+                    </FrameLayout>
+
+
+
+
+                </FrameLayout>
+
 
                 <LinearLayout
                     android:layout_width="match_parent"
