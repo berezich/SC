@@ -63,7 +63,7 @@ public class FileManager {
         private String name;
         @Expose
         private String path;
-        private Bitmap bitmap;
+        private Bitmap bitmap=null;
         @Expose
         private Long size;
         @Expose
@@ -73,9 +73,7 @@ public class FileManager {
             path = file.getAbsolutePath();
             name = file.getName();
             mimeType = "image/jpeg";
-            bitmap = decodeFile(new File(path));
-            bitmap = rotateBitmapFileIfNeed(path, bitmap);
-            bitmap.recycle();
+            rotateFileIfNeed();
         }
         public PicInfo(Fragment fragment, String fileUri, String nameToSave) throws IOException{
             Uri uri = Uri.parse(fileUri);
@@ -87,9 +85,7 @@ public class FileManager {
             this.size = returnCursor.getLong(sizeIndex);
             this.mimeType = fragment.getActivity().getContentResolver().getType(uri);
             this.path = returnCursor.getString(dataIdx);
-            bitmap = decodeFile(new File(path));
-            bitmap = rotateBitmapFileIfNeed(path, bitmap);
-            bitmap.recycle();
+            rotateFileIfNeed();
             returnCursor.close();
         }
 
@@ -142,6 +138,16 @@ public class FileManager {
             this.size = size;
         }
 
+        public void rotateFileIfNeed(){
+            try {
+                int rotation = checkRotationDegrees(path);
+                Log.d(TAG, "picture rotation = " + rotation);
+                if (rotation != 0f)
+                    rotateImg(rotation);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
         /*
         *   rotate bitmap and update the file
          */
@@ -163,8 +169,7 @@ public class FileManager {
                 FileOutputStream out = null;
                 try {
                     out = new FileOutputStream(tempPhotoFile);
-                    //bitmap.compress(Bitmap.CompressFormat.JPEG, COMPRESS_QUALITY_HIGHEST, out); // bmp is your Bitmap instance
-                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, out); // bmp is your Bitmap instance
+                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, out);
                     // PNG is a lossless format, the compression factor (100) is ignored
                     bitmap.recycle();
                 } catch (Exception e) {
@@ -285,7 +290,7 @@ public class FileManager {
             }
             if (isNeedLoad) {
                 Log.d(TAG, "need to load myPhoto from server");
-                String dynamicUrl = String.format((height>0)?"%s=s%d-c":"%s=s%d", photoInfo.getServingUrl(), height);
+                String dynamicUrl = String.format((height>0)?"%s=s%d-p":"%s=s%d", photoInfo.getServingUrl(), height);
                 Log.d(TAG, String.format("url for download image = %s", dynamicUrl));
                 new FileManager.DownloadImageTask(context, photoId, imageView, cacheDir).execute(dynamicUrl);
             }
@@ -485,7 +490,6 @@ public class FileManager {
                     endBitmap = bitmap;
                 Log.d(TAG, String.format("photo preview size = %dx%d", width, height));
                 endBitmap = Bitmap.createScaledBitmap(endBitmap, width, height, false);
-                //endBitmap.compress(Bitmap.CompressFormat.JPEG, FileManager.COMPRESS_QUALITY, out);
                 endBitmap.compress(Bitmap.CompressFormat.JPEG, FileManager.COMPRESS_QUALITY_HIGHEST, out);
                 out.flush();
                 out.close();
@@ -764,35 +768,5 @@ public class FileManager {
         else if (exifOrientation == ExifInterface.ORIENTATION_ROTATE_270) {  return 270; }
         return 0;
     }
-    public static boolean renameFile(String TAG, Context context,String cacheFile, String newFileName){
-        if(!isExternalStorageWritable()) {
-            Log.e(TAG, "ExternalStorage not writable");
-            return false;
-        }
-        File file = FileManager.getAlbumStorageDir(TAG, context, cacheFile);
-        if(file!=null && file.exists())
-            if(file.renameTo(new File(file.getParent()+"/"+newFileName))) {
-                Log.d(TAG,String.format("file %s renamed to %s",file.getPath(),newFileName));
-                return true;
-            }
-        if(file!=null)
-            Log.e(TAG,String.format("file %s renamed failed",file.getPath()));
-        return false;
-    }
-    public static Bitmap rotateBitmapFileIfNeed(String filePath, Bitmap bitmap){
-        try {
-            int rotation = checkRotationDegrees(filePath);
-            Log.d(TAG, "picture rotation = " + rotation);
-            Matrix matrix = new Matrix();
-            if (rotation != 0f) {
-                matrix.preRotate(rotation);
-                bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
-                Log.d(TAG, "picture rotated");
-            }
-            return bitmap;
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
+
 }
