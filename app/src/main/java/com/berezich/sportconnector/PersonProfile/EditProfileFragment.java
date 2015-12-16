@@ -1083,6 +1083,14 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
             if(ex==null && updatedPerson!=null)
             {
                 if(myPerson!=null) {
+                    Picture newPic = updatedPerson.getPhoto();
+                    Picture oldPic = myPerson.getPhoto();
+                    if(newPic!=null &&(oldPic==null || !newPic.getBlobKey().equals(oldPic.getBlobKey()))) {
+                        String tempFileName = UsefulFunctions.getDigest(tempPhotoNameLocal);
+                        String newFileName = UsefulFunctions.getDigest(newPic.getBlobKey());
+                        FileManager.renameFile(TAG, activity.getBaseContext(), FileManager.PERSON_CACHE_DIR
+                                + "/" + updatedPerson.getId() + "/" + tempFileName, newFileName);
+                    }
                     updatedPerson.setPass(myPerson.getPass());
                     try {
                         LocalDataManager.saveMyPersonInfoToPref(updatedPerson, activity);

@@ -290,7 +290,7 @@ public class FileManager {
             }
             if (isNeedLoad) {
                 Log.d(TAG, "need to load myPhoto from server");
-                String dynamicUrl = String.format((height>0)?"%s=s%d-p":"%s=s%d", photoInfo.getServingUrl(), height);
+                String dynamicUrl = String.format((height>0)?"%s=s%d-c":"%s=s%d", photoInfo.getServingUrl(), height);
                 Log.d(TAG, String.format("url for download image = %s", dynamicUrl));
                 new FileManager.DownloadImageTask(context, photoId, imageView, cacheDir).execute(dynamicUrl);
             }
@@ -396,7 +396,11 @@ public class FileManager {
         return Environment.MEDIA_MOUNTED.equals(state);
     }
 
-    public static Bitmap cropCenterBitmap(Bitmap srcBmp) {
+    /*
+    * crop servUrl=sXXX-c
+    * the App Engine images service get_serving_url() URI options
+    */
+    public static Bitmap cropBitmap(Bitmap srcBmp) {
         Bitmap dstBmp;
         if (srcBmp.getWidth() >= srcBmp.getHeight()) {
 
@@ -413,7 +417,7 @@ public class FileManager {
             dstBmp = Bitmap.createBitmap(
                     srcBmp,
                     0,
-                    srcBmp.getHeight() / 2 - srcBmp.getWidth() / 2,
+                    (srcBmp.getHeight() / 2 - srcBmp.getWidth() / 2)/2,
                     srcBmp.getWidth(),
                     srcBmp.getWidth()
             );
@@ -482,7 +486,8 @@ public class FileManager {
                 FileOutputStream out = new FileOutputStream(file);
                 Bitmap endBitmap;
                 if(needCenterCrop) {
-                    endBitmap = cropCenterBitmap(bitmap);
+                    //endBitmap = cropCenterBitmap(bitmap);
+                    endBitmap = cropBitmap(bitmap);
                     Log.d(TAG, "photo cropped to square");
 
                 }
@@ -574,7 +579,8 @@ public class FileManager {
                 FileOutputStream out = new FileOutputStream(file);
                 Bitmap endBitmap;
                 if(needCenterCrop) {
-                    endBitmap = cropCenterBitmap(bitmap);
+                    //endBitmap = cropCenterBitmap(bitmap);
+                    endBitmap = cropBitmap(bitmap);
                     Log.d(TAG, "photo cropped to square");
 
                 }
@@ -755,6 +761,21 @@ public class FileManager {
             else
                 Log.e(TAG, "old cache filePath = " + dir.getPath() + " not removed");
         }
+    }
+    public static boolean renameFile(String TAG, Context context,String cacheFile, String newFileName){
+        if(!isExternalStorageWritable()) {
+            Log.e(TAG, "ExternalStorage not writable");
+            return false;
+        }
+        File file = FileManager.getAlbumStorageDir(TAG, context, cacheFile);
+        if(file!=null && file.exists())
+            if(file.renameTo(new File(file.getParent()+"/"+newFileName))) {
+                Log.d(TAG,String.format("file %s renamed to %s",file.getPath(),newFileName));
+                return true;
+            }
+        if(file!=null)
+            Log.e(TAG,String.format("file %s renamed failed",file.getPath()));
+        return false;
     }
     public static int checkRotationDegrees (String filePath)throws IOException
     {
