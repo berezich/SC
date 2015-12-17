@@ -68,17 +68,18 @@ public class PersonEndpoint {
     static String ERROR_CONFIRM = "Ошибка! Ваша учетная запись %s не активирована!";
     static String ERROR_CONFIRM_ALREADY = "Ваша учетная запись %s уже активирована!";
     static String ERROR_CONFIRM_NOTFOUND = "Ошибка! Ваша учетная запись %s не найдена!";
-    static String subjectAccountConfirmation = "registration SportConnector";
+    static String APP_NAME = "МСК Теннис";
+    static String subjectAccountConfirmation = "Регистрация в "+"\""+APP_NAME+"\"";
     static String msgBodyAccountConfirmation = "Для активации вашей учетной записи перейдите по ссылке: " +
             "https://sportconnector-981.appspot.com/confirm.html?id=%s&x=%s";
     static String ERROR_CONFIRM_EMAIL = "Ошибка! Ваш email %s не изменен!";
     static String ERROR_CONFIRM_EMAIL_ALREADY = "Ваш старый email %s уже изменен!";
     static String ERROR_CONFIRM_EMAIL_NOTFOUND = "Ошибка! Ваша учетная запись %s не найдена!";
-    static String subjectConfirmEmail = "change Email SportConnector";
+    static String subjectConfirmEmail = "Смена E-mail "+"\""+APP_NAME+"\"";
     static String msgBodyConfirmEmail = "Для смены email перейдите по ссылке: " +
             "https://sportconnector-981.appspot.com/email.html?id=%s&x=%s";
     static String ERROR_CONFIRM_RESET_PASS_NOTFOUND = "Ошибка! Повторите процедуру восстановления пароля.";
-    static String subjectResetPass = "reset Password SportConnector";
+    static String subjectResetPass = "Сброс пароля "+"\""+APP_NAME+"\"";
     static String msgBodyResetPass = "Для смены пароля перейдите по ссылке " +
             "и следуйте дальнейшим инструкциям.\n" +
             "https://sportconnector-981.appspot.com/pass.html?x=%s";
@@ -288,10 +289,16 @@ public class PersonEndpoint {
                     logger.info("ReqChangeEmail was created: " + reqChangeEmail);
                     String subject = subjectConfirmEmail;
                     String msgBody =msgBodyConfirmEmail;
-                    sendMail(reqChangeEmail.getNewEmail(),subject,String.format(msgBody,
+
+
+                    //subject = URLEncoder.encode(subject,"UTF-8");
+                    /*sendMail(reqChangeEmail.getNewEmail(),subject,String.format(msgBody,
                             URLEncoder.encode(reqChangeEmail.getEmail(), "UTF-8"), URLEncoder.encode(
-                                    reqChangeEmail.getUuid(),"UTF-8")));
-                } catch (UnsupportedEncodingException e) {
+                                    reqChangeEmail.getUuid(),"UTF-8")));*/
+                    sendMail(reqChangeEmail.getNewEmail(),subject,String.format(msgBody,
+                            reqChangeEmail.getEmail(), reqChangeEmail.getUuid()));
+
+                } catch (Exception e) {
                     throw new BadRequestException("createConfirmEmailMsg@: msg for confirm email didn't send");
                 }
             }
@@ -701,12 +708,12 @@ public class PersonEndpoint {
 
         try {
 
-            Message msg = new MimeMessage(session);
-            //msg.setHeader("Content-Type", "text/plain; charset=UTF-8");
-            msg.setFrom(new InternetAddress(emailForm, "SportConnector Admin"));
-            msg.addRecipient(Message.RecipientType.TO, new InternetAddress(emailTo, "Mr. User"));
-            msg.setSubject(subject);
-            msg.setText(msgBody);
+            MimeMessage msg = new MimeMessage(session);
+            msg.setHeader("Content-Type", "text/plain; charset=windows-1251");
+            msg.setFrom(new InternetAddress(emailForm, APP_NAME, "windows-1251"));
+            msg.addRecipient(Message.RecipientType.TO, new InternetAddress(emailTo));
+            msg.setSubject(subject, "windows-1251");
+            msg.setText(msgBody,"windows-1251");
 
             Transport.send(msg);
 

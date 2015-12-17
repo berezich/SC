@@ -10,9 +10,6 @@ import java.util.logging.Logger;
 
 import static java.util.logging.Logger.getLogger;
 
-/**
- * Created by berezkin on 25.06.2015.
- */
 @Entity
 public class Spot {
     private static final Logger logger = getLogger(Spot.class.getName());
