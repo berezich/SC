@@ -23,6 +23,7 @@
 
     <!-- fragment_editProfile-->
         <color name="text_property">#000000</color>
+        <color name="imgProgressBar_background">#AA505050</color>
         <!-- changePass_dialog-->
             <color name="changePass_msgError">#b0ff0000</color>
         <!-- changePass_dialog-->

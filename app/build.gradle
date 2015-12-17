@@ -4,8 +4,8 @@ android {
     signingConfigs {
         config {
             keyPassword 'Telepuziki101'
-            //storeFile file('D:/Development/Android/Android_Studio/sportConnector_key.jks')
-            storeFile file('C:/Andorid/Android_Studio_projects/sportConnector_key.jks')
+            storeFile file('D:/Development/Android/Android_Studio/sportConnector_key.jks')
+            //storeFile file('C:/Andorid/Android_Studio_projects/sportConnector_key.jks')
             storePassword 'Telepuziki101'
             keyAlias 'SportConnector_key'
         }
@@ -16,8 +16,8 @@ android {
         applicationId "com.berezich.sportconnector"
         minSdkVersion 15
         targetSdkVersion 21
-        versionCode 27
-        versionName '1.0.0.27'
+        versionCode 29
+        versionName '1.0.0.29'
         multiDexEnabled true
     }
     buildTypes {

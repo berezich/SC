@@ -7,14 +7,15 @@ import android.content.Intent;
 import android.content.pm.LabeledIntent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.provider.OpenableColumns;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
@@ -34,9 +35,10 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
-import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -63,7 +65,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Calendar;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
@@ -83,7 +85,7 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
     private final String STATE_TEMP_PERSON = "tempPerson";
     private final String STATE_PICINFO = "picInfo";
     private final String STATE_TEMP_FILE_PATH = "tempFilePath";
-    private String tempFileForPhotoPath;
+    private String tempFileForPickedImage;
     public final int PICK_IMAGE = 111;
     public final int CAMERA_IMAGE = 112;
     public final int GALLERY_CAMERA_IMAGE = 113;
@@ -96,6 +98,7 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
     private static Gson gson;
     private FragmentActivity activity;
     private PersonProfileFragment personProfileFragment;
+    private boolean g_isRotationGoing = false;
 
     public EditProfileFragment() {
         gsonBuilder.serializeNulls().excludeFieldsWithoutExposeAnnotation();
@@ -184,7 +187,7 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
                     Log.e(TAG, "picInfo getting out of instanceState failed");
                     e.printStackTrace();
                 }
-                tempFileForPhotoPath = savedInstanceState.getString(STATE_TEMP_FILE_PATH);
+                tempFileForPickedImage = savedInstanceState.getString(STATE_TEMP_FILE_PATH);
             }
             else
                 Log.d(TAG, "savedInstanceState == null");
@@ -201,7 +204,7 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
             try {
                 outState.putString(STATE_TEMP_PERSON,gsonFactory.toString(tempMyPerson));
                 outState.putString(STATE_PICINFO, gson.toJson(picInfo));
-                outState.putString(STATE_TEMP_FILE_PATH,tempFileForPhotoPath);
+                outState.putString(STATE_TEMP_FILE_PATH, tempFileForPickedImage);
                 Log.d(TAG, "tempMyPerson and picInfo saved to instanceState");
             } catch (Exception e) {
                 Log.e(TAG, "tempMyPerson or picInfo saving to instanceState failed");
@@ -222,7 +225,6 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
             ImageButton imgBtn;
             Spinner spinner;
             ImageView imageView;
-            FrameLayout frameLayout;
 
             ((MainActivity)this.activity).setmTitle(activity.getString(R.string.editprofile_fragmentTitle));
             ((MainActivity)this.activity).getSupportActionBar().setHomeAsUpIndicator(null);
@@ -244,8 +246,20 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
                     FileManager.providePhotoForImgView(activity.getBaseContext(), imageView,
                             photoInfo, FileManager.PERSON_CACHE_DIR + "/" + tempMyPerson.getId().toString());
                 }
-                if((frameLayout=(FrameLayout) rootView.findViewById(R.id.editProfile_frame_changePhoto))!=null)
-                    frameLayout.setOnClickListener(new ImageOnClick());
+                LinearLayout linearLayout;
+                if((linearLayout=(LinearLayout) rootView.findViewById(R.id.editProfile_hLayout_changePhoto))!=null)
+                    linearLayout.setOnClickListener(new ImageOnClick());
+                if ((linearLayout = (LinearLayout) rootView.findViewById(R.id.editProfile_hLayout_rotateImgL)) != null)
+                    linearLayout.setOnClickListener(new RotateImageOnClick());
+                if ((linearLayout = (LinearLayout) rootView.findViewById(R.id.editProfile_hLayout_rotateImgR)) != null)
+                    linearLayout.setOnClickListener(new RotateImageOnClick());
+                if(picInfo!=null) {
+                    if ((linearLayout = (LinearLayout) rootView.findViewById(R.id.editProfile_vLayout_rotateImgBlock)) != null)
+                        linearLayout.setVisibility(View.VISIBLE);
+                }
+                else if ((linearLayout = (LinearLayout) rootView.findViewById(R.id.editProfile_vLayout_rotateImgBlock)) != null)
+                        linearLayout.setVisibility(View.GONE);
+
                 if ((txtEdt = (EditText) rootView.findViewById(R.id.editProfile_txtEdt_name)) != null) {
                     txtEdt.setText(tempMyPerson.getName());
                     txtEdt.setFilters(new InputFilter[]{new UsefulFunctions.NameSurnameInputFilter(
@@ -260,14 +274,10 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
                     Date date;
                     if ((birthday = tempMyPerson.getBirthday()) != null) {
                         date = new Date(birthday.getValue());
-                        txtView.setText(String.format("%1$td.%1$tm.%1$tY", date));
+                        txtView.setText(new SimpleDateFormat("dd.MM.yyyy").format(date));
                     }
                     else {
                         txtView.setText("");
-                        /*Calendar calendar = Calendar.getInstance();
-                        calendar.set(Calendar.YEAR,calendar.get(Calendar.YEAR)-getResources().getInteger(R.integer.editProfile_minAge));
-                        date = calendar.getTime();
-                        txtView.setText(String.format("%1$td.%1$tm.%1$tY", date));*/
                     }
                     txtView.setOnClickListener(new OnBirthdayClickListener());
                 }
@@ -361,8 +371,11 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         try {
             menu.clear();
-            super.onCreateOptionsMenu(menu, inflater);
             inflater.inflate(R.menu.fragment_edit_profile, menu);
+            MenuItem menuItem = menu.findItem(R.id.menu_save_profile);
+            if(menuItem!=null)
+                menuItem.setVisible(!g_isRotationGoing);
+            super.onCreateOptionsMenu(menu, inflater);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -471,10 +484,6 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
                 case R.id.editProfile_radio_female:
                     tempMyPerson.setSex(fSex);
                     break;
-                /*default:
-                    if(validationError.isEmpty()){
-                        validationError = activity.getString(R.string.editprofile_invalidSex);
-                    }*/
             }
 
         if((txtView = (TextView) rootView.findViewById(R.id.editProfile_txtEdt_phone))!=null) {
@@ -694,9 +703,10 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
                 intentGallery.setType("image/*");
 
                 Intent takePictureIntent = null;
-                File tempFileForPhoto = FileManager.createTempFile(TAG,activity.getBaseContext(),photoAvatarNameOnServer+tempMyPerson.getId().toString());
-                if(pm.hasSystemFeature(PackageManager.FEATURE_CAMERA)&&tempFileForPhoto!=null) {
-                    tempFileForPhotoPath = tempFileForPhoto.getAbsolutePath();
+                File tempFileForPickedImage = FileManager.createTempFile(TAG,activity.getBaseContext(),
+                        photoAvatarNameOnServer+tempMyPerson.getId().toString());
+                if(pm.hasSystemFeature(PackageManager.FEATURE_CAMERA)&&tempFileForPickedImage!=null) {
+                    EditProfileFragment.this.tempFileForPickedImage = tempFileForPickedImage.getAbsolutePath();
                     takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                 }
 
@@ -736,7 +746,7 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
                     Intent intent = new Intent();
                     intent.setComponent(new ComponentName(packageName, ri.activityInfo.name));
                     intent.setAction(MediaStore.ACTION_IMAGE_CAPTURE);
-                    intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(tempFileForPhoto));
+                    intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(tempFileForPickedImage));
 
                     CharSequence label = TextUtils.concat(ri.loadLabel(pm), mark);
                     extraIntents[i] = new LabeledIntent(intent, packageName, label, ri.icon);
@@ -750,123 +760,233 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
         }
     }
 
+    private class RotateImageOnClick implements View.OnClickListener{
+        private String cacheDir;
+        @Override
+        public void onClick(View v) {
+            int rotation=0;
+            try {
+                if(v.getId()==R.id.editProfile_hLayout_rotateImgL)
+                    rotation=-90;
+                else
+                    rotation=90;
+                View progressBar = rootView.findViewById(R.id.editProfile_frameImgProgressBar);
+                if(progressBar!=null)
+                    progressBar.setVisibility(View.VISIBLE);
+                cacheDir = FileManager.PERSON_CACHE_DIR + "/" + tempMyPerson.getId();
+                setEnableControlsForRotation(false);
+                g_isRotationGoing = true;
+                activity.supportInvalidateOptionsMenu();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            new AsyncTask<Integer, Void, Void>(){
+                    @Override
+                    protected Void doInBackground(Integer... params) {
+                        try {
+                            int rotation = params[0];
+                            picInfo.rotateImg(rotation);
 
-    @Override
+                            picInfo.savePicPreviewToCache(TAG, activity, UsefulFunctions.getDigest(tempPhotoNameLocal), cacheDir);
+                            Picture picture = new Picture();
+                            picture.setBlobKey(tempPhotoNameLocal);
+                            tempMyPerson.setPhoto(picture);
+
+
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        return null;
+                    }
+                    @Override
+                    protected void onPostExecute(Void aVoid) {
+                        ImageView imageView;
+                        try {
+                            if((imageView = (ImageView) rootView.findViewById(R.id.editProfile_img_photo))!=null) {
+                                File file = FileManager.getAlbumStorageDir(TAG, activity, cacheDir);
+                                File imgFile = new File(file,UsefulFunctions.getDigest(tempPhotoNameLocal));
+                                FileManager.setPicToImageView(imgFile, imageView,
+                                        (int) activity.getResources().getDimension(R.dimen.personProfile_photoWidth),
+                                        (int) activity.getResources().getDimension(R.dimen.personProfile_photoHeight));
+                            }
+                            View progressBar = rootView.findViewById(R.id.editProfile_frameImgProgressBar);
+                            if(progressBar!=null)
+                                progressBar.setVisibility(View.GONE);
+                            setEnableControlsForRotation(true);
+                            g_isRotationGoing = false;
+                            activity.supportInvalidateOptionsMenu();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }.execute(rotation);
+
+        }
+    }
     public void onActivityResult(int requestCode, int resultCode,
                                  Intent returnIntent) {
         try {
-            FrameLayout frameLayout=(FrameLayout) rootView.findViewById(R.id.editProfile_frame_changePhoto);
-            frameLayout.setEnabled(true);
-            FileManager.PicInfo tempPicInfo = null;
+            LinearLayout linearLayout=(LinearLayout) rootView.findViewById(R.id.editProfile_hLayout_changePhoto);
+            linearLayout.setEnabled(true);
             if (resultCode != Activity.RESULT_OK) {
                 Log.d(TAG, "resultCode !=  Activity.RESULT_OK");
             } else {
+                View progressBar = rootView.findViewById(R.id.editProfile_frameImgProgressBar);
+                if(progressBar!=null)
+                    progressBar.setVisibility(View.VISIBLE);
+                setEnableControlsForRotation(false);
+                g_isRotationGoing = true;
+                activity.supportInvalidateOptionsMenu();
                 switch (requestCode) {
                     case GALLERY_CAMERA_IMAGE:
                     case PICK_IMAGE:
                     case CAMERA_IMAGE:
-                        Context context = activity.getBaseContext();
-                        // Get the file's content URI from the incoming Intent
-                        if (returnIntent == null) {
-                            Log.e(TAG, "RETURN Intent == null => photo was saved to tempFile");
-                            try {
-                                File tempPhotoFile = new File(tempFileForPhotoPath);
-                                tempPicInfo = new FileManager.PicInfo(tempPhotoFile);
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
-                        }
-                        else{
-                            Uri returnUri = returnIntent.getData();
-                            String url = returnUri.toString();
-                            Bitmap bitmap1=null;
-                            InputStream is=null;
-                            if (url.startsWith("content://com.google.android.apps.photos.content")){
+                        final Context context = activity.getBaseContext();
+                        new AsyncTask<Intent,Void,Boolean>(){
+                            @Override
+                            protected Boolean doInBackground(Intent... params) {
                                 try {
-                                    try {
-                                        is = activity.getContentResolver().openInputStream(Uri.parse(url));
-                                        bitmap1 = BitmapFactory.decodeStream(is);
-
-                                        /*Cursor returnCursor = activity.getContentResolver().query(returnUri, null, null, null, null);
-                                        int dataIdx = returnCursor.getColumnIndex(MediaStore.Images.ImageColumns.ORIENTATION);
-                                        returnCursor.moveToFirst();
-                                        int orientation = returnCursor.getInt(dataIdx);
-                                        bitmap1 = FileManager.rotateBitmapFileIfNeed(returnUri.getPath(), bitmap1);
-                                        returnCursor.close();*/
-
-                                    } catch(Exception ex){
-                                        ex.printStackTrace();
-                                    } finally {
-                                        if(is!=null)
-                                            is.close();
-                                    }
-                                } catch (IOException e) {
-                                    e.printStackTrace();
-                                }
-                                try {
-                                    if(bitmap1!=null) {
-                                        File tempPhotoFile = new File(tempFileForPhotoPath);
-
-                                        FileOutputStream out = null;
+                                    FileManager.PicInfo tempPicInfo = null;
+                                    // Get the file's content URI from the incoming Intent
+                                    Intent returnIntent = params[0];
+                                    if (returnIntent == null) {
+                                        Log.e(TAG, "RETURN Intent == null => photo was saved to tempFile");
                                         try {
-                                            out = new FileOutputStream(tempPhotoFile);
-                                            bitmap1.compress(Bitmap.CompressFormat.JPEG, 70, out); // bmp is your Bitmap instance
-                                            // PNG is a lossless format, the compression factor (100) is ignored
+                                            File tempPhotoFile = new File(tempFileForPickedImage);
+                                            tempPicInfo = new FileManager.PicInfo(tempPhotoFile);
                                         } catch (Exception e) {
                                             e.printStackTrace();
-                                        } finally {
+                                        }
+                                    } else {
+                                        Uri returnUri = returnIntent.getData();
+                                        String url = returnUri.toString();
+                                        Bitmap bitmap1 = null;
+                                        InputStream is = null;
+                                        if (url.startsWith("content://com.google.android.apps.photos.content")) {
                                             try {
-                                                if (out != null) {
-                                                    out.close();
+                                                try {
+                                                    is = activity.getContentResolver().openInputStream(Uri.parse(url));
+                                                    bitmap1 = BitmapFactory.decodeStream(is);
+
+                                                } catch (Exception ex) {
+                                                    ex.printStackTrace();
+                                                } finally {
+                                                    if (is != null)
+                                                        is.close();
                                                 }
                                             } catch (IOException e) {
                                                 e.printStackTrace();
+                                                return false;
+                                            }
+                                            try {
+                                                if (bitmap1 != null) {
+                                                    File tempPhotoFile = new File(tempFileForPickedImage);
+
+                                                    FileOutputStream out = null;
+                                                    try {
+                                                        out = new FileOutputStream(tempPhotoFile);
+                                                        bitmap1.compress(Bitmap.CompressFormat.JPEG, FileManager.COMPRESS_QUALITY_HIGHEST, out);
+                                                        bitmap1.recycle();
+                                                    } catch (Exception e) {
+                                                        e.printStackTrace();
+                                                    } finally {
+                                                        try {
+                                                            if (out != null) {
+                                                                out.close();
+                                                            }
+                                                        } catch (IOException e) {
+                                                            e.printStackTrace();
+                                                        }
+                                                    }
+
+                                                    tempPicInfo = new FileManager.PicInfo(tempPhotoFile);
+                                                }
+                                            } catch (Exception e) {
+                                                e.printStackTrace();
+                                                return false;
+                                            }
+                                        } else {//image from local gallery
+                                            try {
+                                                //copy image to tempFileForPickedImage
+                                                Cursor returnCursor = activity.getContentResolver().query(returnUri, null, null, null, null);
+                                                int dataIdx = returnCursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA);
+                                                returnCursor.moveToFirst();
+                                                String filePath = returnCursor.getString(dataIdx);
+                                                returnCursor.close();
+                                                File photoFile = new File(filePath);
+                                                File tempPhotoFile = new File(tempFileForPickedImage);
+                                                if(FileManager.copy(photoFile,tempPhotoFile))
+                                                    tempPicInfo = new FileManager.PicInfo(tempPhotoFile);
+                                            } catch (Exception e) {
+                                                Log.e(TAG, String.format("PicInfo constructor exception %s", e.getMessage()));
+                                                e.printStackTrace();
+                                                return false;
+                                            }
+
+                                            if (tempPicInfo.getPath() == null) {
+                                                Log.e(TAG, "PICK_IMAGE returned not valid URI");
+                                                return false;
+                                            }
+                                            File pickedFile = new File(tempPicInfo.getPath());
+                                            if (!pickedFile.exists()) {
+                                                Log.e(TAG, String.format("PICK_IMAGE %s not exist", tempPicInfo.getPath()));
+                                                return false;
                                             }
                                         }
-
-                                        tempPicInfo = new FileManager.PicInfo(tempPhotoFile);
                                     }
+                                    if (tempMyPerson != null) {
+                                        String cacheDir = FileManager.PERSON_CACHE_DIR + "/" + tempMyPerson.getId();
+                                        if (tempPicInfo != null)
+                                            tempPicInfo.savePicPreviewToCache(TAG, context, UsefulFunctions.getDigest(tempPhotoNameLocal),
+                                                    cacheDir);
+                                        Picture picture = new Picture();
+                                        picture.setBlobKey(tempPhotoNameLocal);
+                                        tempMyPerson.setPhoto(picture);
+                                        picInfo = tempPicInfo;
+
+                                    }
+                                    return true;
+                                }
+                                catch (Exception ex){
+                                    ex.printStackTrace();
+                                    return false;
+                                }
+                            }
+
+                            @Override
+                            protected void onPostExecute(Boolean isSuccess) {
+                                try {
+                                    if(isSuccess) {
+                                        ImageView imageView;
+                                        if ((imageView = (ImageView) rootView.findViewById(R.id.editProfile_img_photo)) != null) {
+                                            Picture photoInfo = tempMyPerson.getPhoto();
+                                            FileManager.providePhotoForImgView(activity.getBaseContext(), imageView,
+                                                    photoInfo, FileManager.PERSON_CACHE_DIR + "/" + tempMyPerson.getId().toString());
+                                        }
+                                        LinearLayout linearLayout;
+                                        if (picInfo != null) {
+                                            if ((linearLayout = (LinearLayout) rootView.findViewById(R.id.editProfile_vLayout_rotateImgBlock)) != null)
+                                                linearLayout.setVisibility(View.VISIBLE);
+                                        } else if ((linearLayout = (LinearLayout) rootView.findViewById(R.id.editProfile_vLayout_rotateImgBlock)) != null)
+                                            linearLayout.setVisibility(View.GONE);
+
+                                    }
+                                    else{
+                                        Toast.makeText(context, activity.getString(R.string.editprofile_pickImageError),
+                                                Toast.LENGTH_SHORT).show();
+                                    }
+                                    View progressBar = rootView.findViewById(R.id.editProfile_frameImgProgressBar);
+                                    if (progressBar != null)
+                                        progressBar.setVisibility(View.GONE);
+                                    setEnableControlsForRotation(true);
+                                    g_isRotationGoing = false;
+                                    activity.supportInvalidateOptionsMenu();
                                 } catch (Exception e) {
                                     e.printStackTrace();
                                 }
                             }
-                            else {
-                                try {
-                                    tempPicInfo = new FileManager.PicInfo(this, returnUri.toString(), photoAvatarNameOnServer + tempMyPerson.getId().toString());
-                                } catch (IOException e) {
-                                    Log.e(TAG, String.format("PicInfo constructor exception %s", e.getMessage()));
-                                    e.printStackTrace();
-                                    Toast.makeText(context, activity.getString(R.string.editprofile_pickImageError),
-                                            Toast.LENGTH_SHORT).show();
-                                    return;
-                                }
+                        }.execute(returnIntent);
 
-                                if (tempPicInfo.getPath() == null) {
-                                    Log.e(TAG, "PICK_IMAGE returned not valid URI");
-                                    Toast.makeText(context, activity.getString(R.string.editprofile_pickImageError),
-                                            Toast.LENGTH_SHORT).show();
-                                    return;
-                                }
-                                File pickedFile = new File(tempPicInfo.getPath());
-                                if (!pickedFile.exists()) {
-                                    Log.e(TAG, String.format("PICK_IMAGE %s not exist", tempPicInfo.getPath()));
-                                    Toast.makeText(context, activity.getString(R.string.editprofile_pickImageError),
-                                            Toast.LENGTH_SHORT).show();
-                                    return;
-                                }
-                            }
-                        }
-                        if (tempMyPerson != null) {
-                            String cacheDir = FileManager.PERSON_CACHE_DIR + "/" + tempMyPerson.getId();
-                            if(tempPicInfo!=null)
-                                tempPicInfo.savePicPreviewToCache(TAG, context, UsefulFunctions.getDigest(tempPhotoNameLocal),
-                                    cacheDir);
-                            Picture picture = new Picture();
-                            picture.setBlobKey(tempPhotoNameLocal);
-                            tempMyPerson.setPhoto(picture);
-                            picInfo = tempPicInfo;
-                            //setting picture to imageView is proceeded in onResume()
-                        }
                         break;
                 }
 
@@ -898,7 +1018,7 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
                 Toast.makeText(ctx, activity.getString(R.string.editprofile_saveError), Toast.LENGTH_SHORT).show();
                 return;
             }
-            Log.d(TAG, String.format("url for upload file = %s",urlForUpload));
+            Log.d(TAG, String.format("url for upload file = %s", urlForUpload));
             Person myPersonInfo = LocalDataManager.getMyPersonInfo();
             if(myPersonInfo!=null && myPersonInfo.getPhoto()!=null)
                 replaceBlob = myPersonInfo.getPhoto().getBlobKey();
@@ -1024,5 +1144,16 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
             return true;
         return false;
     }
+    void setEnableControlsForRotation(boolean isEnable){
+        View changeImgLayout = rootView.findViewById(R.id.editProfile_hLayout_changePhoto);
+        if(changeImgLayout!=null)
+            changeImgLayout.setEnabled(isEnable);
+        View rotateLImgLayout = rootView.findViewById(R.id.editProfile_hLayout_rotateImgL);
+        if(rotateLImgLayout!=null)
+            rotateLImgLayout.setEnabled(isEnable);
+        View rotateRImgLayout = rootView.findViewById(R.id.editProfile_hLayout_rotateImgR);
+        if(rotateRImgLayout!=null)
+            rotateRImgLayout.setEnabled(isEnable);
 
+    }
 }

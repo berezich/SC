@@ -42,18 +42,20 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
 public class FileManager {
-    private static final int COMPRESS_QUALITY = 75;
+    public static final int COMPRESS_QUALITY = 75;
+    public static final int COMPRESS_QUALITY_HIGHEST = 100;
     private static final int REQUIRED_SIZE = 1000;
     private static final String TAG = "MyLog_fileManager";
     public static final String PERSON_CACHE_DIR = "Person";
     public static final String SPOT_CACHE_DIR = "Spot";
     public static final String TEMP_DIR = "tempStore";
     public static final String TEMP_FILE_POSTFIX = "_01spb";
-    private static final int MAX_TEMP_SIZE = 1024*1024;
+    private static final int MAX_TEMPDATA_SIZE = 1024*1024;
 
 
     public static class PicInfo {
@@ -61,7 +63,7 @@ public class FileManager {
         private String name;
         @Expose
         private String path;
-        private Bitmap bitmap;
+        private Bitmap bitmap=null;
         @Expose
         private Long size;
         @Expose
@@ -71,8 +73,7 @@ public class FileManager {
             path = file.getAbsolutePath();
             name = file.getName();
             mimeType = "image/jpeg";
-            bitmap = decodeFile(new File(path));
-            bitmap = rotateBitmapFileIfNeed(path,bitmap);
+            rotateFileIfNeed();
         }
         public PicInfo(Fragment fragment, String fileUri, String nameToSave) throws IOException{
             Uri uri = Uri.parse(fileUri);
@@ -84,8 +85,7 @@ public class FileManager {
             this.size = returnCursor.getLong(sizeIndex);
             this.mimeType = fragment.getActivity().getContentResolver().getType(uri);
             this.path = returnCursor.getString(dataIdx);
-            bitmap = decodeFile(new File(path));
-            bitmap = rotateBitmapFileIfNeed(path, bitmap);
+            rotateFileIfNeed();
             returnCursor.close();
         }
 
@@ -94,14 +94,23 @@ public class FileManager {
          */
         public byte[] getCompressedPic() throws FileNotFoundException{
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            if(bitmap==null)
+            if(bitmap==null || bitmap.isRecycled())
                 bitmap = decodeFile(new File(path));
             bitmap.compress(Bitmap.CompressFormat.JPEG, COMPRESS_QUALITY, bos);
+            bitmap.recycle();
             return bos.toByteArray();
         }
 
         public File savePicPreviewToCache(String TAG, Context context, String fileName, String cacheDir) {
-            return FileManager.savePicPreviewToCache(TAG, context, fileName, cacheDir, bitmap);
+            if(bitmap==null || bitmap.isRecycled())
+                try {
+                    bitmap = decodeFile(new File(path));
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }
+            File imgFile = FileManager.savePicPreviewToCache(TAG, context, fileName, cacheDir, bitmap);
+            bitmap.recycle();
+            return imgFile;
         }
 
 
@@ -127,6 +136,55 @@ public class FileManager {
 
         public void setSize(Long size) {
             this.size = size;
+        }
+
+        public void rotateFileIfNeed(){
+            try {
+                int rotation = checkRotationDegrees(path);
+                Log.d(TAG, "picture rotation = " + rotation);
+                if (rotation != 0f)
+                    rotateImg(rotation);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        /*
+        *   rotate bitmap and update the file
+         */
+        public void rotateImg(int rotation){
+            Matrix matrix = new Matrix();
+            if (rotation != 0f) {
+                matrix.preRotate(rotation);
+                if(bitmap==null || bitmap.isRecycled()) {
+                    try {
+                        bitmap = FileManager.decodeFile(new File(path));
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                    }
+                }
+                bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+
+                File tempPhotoFile = new File(path);
+
+                FileOutputStream out = null;
+                try {
+                    out = new FileOutputStream(tempPhotoFile);
+                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, out);
+                    // PNG is a lossless format, the compression factor (100) is ignored
+                    bitmap.recycle();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                } finally {
+                    try {
+                        if (out != null) {
+                            out.close();
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+                Log.d(TAG, "picture rotated");
+            }
         }
 
     }
@@ -338,7 +396,11 @@ public class FileManager {
         return Environment.MEDIA_MOUNTED.equals(state);
     }
 
-    public static Bitmap cropCenterBitmap(Bitmap srcBmp) {
+    /*
+    * crop servUrl=sXXX-c
+    * the App Engine images service get_serving_url() URI options
+    */
+    public static Bitmap cropBitmap(Bitmap srcBmp) {
         Bitmap dstBmp;
         if (srcBmp.getWidth() >= srcBmp.getHeight()) {
 
@@ -355,7 +417,7 @@ public class FileManager {
             dstBmp = Bitmap.createBitmap(
                     srcBmp,
                     0,
-                    srcBmp.getHeight() / 2 - srcBmp.getWidth() / 2,
+                    (srcBmp.getHeight() / 2 - srcBmp.getWidth() / 2)/2,
                     srcBmp.getWidth(),
                     srcBmp.getWidth()
             );
@@ -367,9 +429,14 @@ public class FileManager {
     private static Bitmap decodeFile(File f) throws FileNotFoundException{
         // Decode image size
         BitmapFactory.Options o = new BitmapFactory.Options();
+        FileInputStream fis;
         o.inJustDecodeBounds = true;
-        BitmapFactory.decodeStream(new FileInputStream(f), null, o);
-
+        BitmapFactory.decodeStream(fis = new FileInputStream(f), null, o);
+        try {
+            fis.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         // Find the correct scale value. It should be the power of 2.
         int scale = 1;
         while (o.outWidth / scale / 2 >= REQUIRED_SIZE &&
@@ -380,7 +447,13 @@ public class FileManager {
         // Decode with inSampleSize
         BitmapFactory.Options o2 = new BitmapFactory.Options();
         o2.inSampleSize = scale;
-        return BitmapFactory.decodeStream(new FileInputStream(f), null, o2);
+        Bitmap bitmap = BitmapFactory.decodeStream(fis = new FileInputStream(f), null, o2);
+        try {
+            fis.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return bitmap;
     }
 
 
@@ -413,7 +486,8 @@ public class FileManager {
                 FileOutputStream out = new FileOutputStream(file);
                 Bitmap endBitmap;
                 if(needCenterCrop) {
-                    endBitmap = cropCenterBitmap(bitmap);
+                    //endBitmap = cropCenterBitmap(bitmap);
+                    endBitmap = cropBitmap(bitmap);
                     Log.d(TAG, "photo cropped to square");
 
                 }
@@ -421,7 +495,7 @@ public class FileManager {
                     endBitmap = bitmap;
                 Log.d(TAG, String.format("photo preview size = %dx%d", width, height));
                 endBitmap = Bitmap.createScaledBitmap(endBitmap, width, height, false);
-                endBitmap.compress(Bitmap.CompressFormat.JPEG, FileManager.COMPRESS_QUALITY, out);
+                endBitmap.compress(Bitmap.CompressFormat.JPEG, FileManager.COMPRESS_QUALITY_HIGHEST, out);
                 out.flush();
                 out.close();
                 return file;
@@ -455,7 +529,38 @@ public class FileManager {
         }
         return file;
     }
+    public static boolean copy(File src, File dst) throws IOException {
+        InputStream in = null;
+        OutputStream out = null;
+        boolean result = true;
+        try {
+            in = new FileInputStream(src);
+            out = new FileOutputStream(dst);
 
+            // Transfer bytes from in to out
+            byte[] buf = new byte[1024];
+            int len;
+            while ((len = in.read(buf)) > 0) {
+                out.write(buf, 0, len);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            result = false;
+        }
+        try {
+            if(in!=null)
+                in.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        try {
+            if(out!=null)
+                out.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
     public static File savePicToTempStore(String TAG, Context context, String fileName, Bitmap bitmap,
                                           int width, int height, boolean needCenterCrop) {
 
@@ -474,7 +579,8 @@ public class FileManager {
                 FileOutputStream out = new FileOutputStream(file);
                 Bitmap endBitmap;
                 if(needCenterCrop) {
-                    endBitmap = cropCenterBitmap(bitmap);
+                    //endBitmap = cropCenterBitmap(bitmap);
+                    endBitmap = cropBitmap(bitmap);
                     Log.d(TAG, "photo cropped to square");
 
                 }
@@ -511,7 +617,7 @@ public class FileManager {
                 Log.d(TAG,String.format("total tempFiles Size = %d", otherFilesSize + dirSize));
                 Log.d(TAG,String.format("my tempFiles Size = %d",dirSize));
                 Log.d(TAG,String.format("myFiles number = %d",myFilesNum));
-                if(otherFilesSize + dirSize <MAX_TEMP_SIZE  || oldestFile==null || myFilesNum<=2)
+                if(otherFilesSize + dirSize < MAX_TEMPDATA_SIZE || oldestFile==null || myFilesNum<=2)
                     break;
                 Log.d(TAG,String.format("oldestFile = %s",oldestFile.getPath()));
                 if(oldestFile.delete())
@@ -656,18 +762,6 @@ public class FileManager {
                 Log.e(TAG, "old cache filePath = " + dir.getPath() + " not removed");
         }
     }
-    public static int checkRotationDegrees (String filePath)throws IOException
-    {
-        ExifInterface exif = new ExifInterface(filePath);
-        int rotation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
-        return exifToDegrees(rotation);
-    }
-    private static int exifToDegrees(int exifOrientation) {
-        if (exifOrientation == ExifInterface.ORIENTATION_ROTATE_90) { return 90; }
-        else if (exifOrientation == ExifInterface.ORIENTATION_ROTATE_180) {  return 180; }
-        else if (exifOrientation == ExifInterface.ORIENTATION_ROTATE_270) {  return 270; }
-        return 0;
-    }
     public static boolean renameFile(String TAG, Context context,String cacheFile, String newFileName){
         if(!isExternalStorageWritable()) {
             Log.e(TAG, "ExternalStorage not writable");
@@ -683,20 +777,17 @@ public class FileManager {
             Log.e(TAG,String.format("file %s renamed failed",file.getPath()));
         return false;
     }
-    public static Bitmap rotateBitmapFileIfNeed(String filePath, Bitmap bitmap){
-        try {
-            int rotation = checkRotationDegrees(filePath);
-            Log.d(TAG, "picture rotation = " + rotation);
-            Matrix matrix = new Matrix();
-            if (rotation != 0f) {
-                matrix.preRotate(rotation);
-                bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
-                Log.d(TAG, "picture rotated");
-            }
-            return bitmap;
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
+    public static int checkRotationDegrees (String filePath)throws IOException
+    {
+        ExifInterface exif = new ExifInterface(filePath);
+        int rotation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
+        return exifToDegrees(rotation);
     }
+    private static int exifToDegrees(int exifOrientation) {
+        if (exifOrientation == ExifInterface.ORIENTATION_ROTATE_90) { return 90; }
+        else if (exifOrientation == ExifInterface.ORIENTATION_ROTATE_180) {  return 180; }
+        else if (exifOrientation == ExifInterface.ORIENTATION_ROTATE_270) {  return 270; }
+        return 0;
+    }
+
 }

@@ -25,24 +25,59 @@
                 android:layout_width="match_parent"
                 android:background="@color/background_floating_material_light"
                 android:orientation="horizontal">
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/editProfile_img_photo"
-                    android:src="@drawable/lst_profile_icon"
-                    android:background="#ffbcbcbc" />
-
                 <FrameLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/editProfile_img_photo"
+                        android:src="@drawable/lst_profile_icon"
+                        android:background="#ffbcbcbc"
+                        android:layout_gravity="center" />
+
+                    <FrameLayout
+                        android:layout_width="@dimen/personProfile_photoWidth"
+                        android:layout_height="@dimen/personProfile_photoHeight"
+                        android:background="@color/imgProgressBar_background"
+                        android:id="@+id/editProfile_frameImgProgressBar"
+                        android:visibility="gone"
+                        android:layout_gravity="center">
+
+                        <ProgressBar
+                            style="?android:attr/progressBarStyleSmall"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:id="@+id/editProfile_imgProgressBar"
+                            android:layout_gravity="center"
+                            />
+
+                    </FrameLayout>
+
+
+
+
+                </FrameLayout>
+
+
+                <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:id="@+id/editProfile_frame_changePhoto">
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:layout_gravity="center_vertical">
 
                     <LinearLayout
                         android:orientation="horizontal"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:id="@+id/editProfile_hLayout_changePhoto"
                         android:layout_gravity="center"
-                        android:gravity="center_vertical">
+                        android:gravity="center_vertical"
+                        android:background="@drawable/view_backgr_trans_selector"
+                        android:paddingRight="@dimen/editprofile_changePhoto_leftRightOffset"
+                        android:paddingLeft="@dimen/editprofile_changePhoto_leftRightOffset">
 
                         <ImageView
                             android:layout_width="wrap_content"
@@ -57,10 +92,121 @@
                             android:textSize="@dimen/textMediumSize"
                             android:text="@string/editprofile_chagePhoto"
                             android:id="@+id/editprofile_txt_changePhoto"
+                            android:paddingLeft="@dimen/editprofile_changePhoto_leftRightOffset" />
+                    </LinearLayout>
+                    <!--
+                    <LinearLayout
+                        android:orientation="horizontal"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:gravity="center_vertical">
+
+                        <ImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:id="@+id/editprofile_ic_rotatePhoto"
+                            android:background="@drawable/ic_menu_rotate_r"/>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textAppearance="?android:attr/textAppearanceMedium"
+                            android:textSize="@dimen/textMediumSize"
+                            android:text="@string/editprofile_rotatePhoto"
+                            android:id="@+id/editprofile_txt_rotatePhoto"
                             android:paddingLeft="@dimen/editprofile_changePhoto_leftOffset" />
                     </LinearLayout>
 
-                </FrameLayout>
+                    <LinearLayout
+                        android:orientation="horizontal"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:gravity="center_vertical">
+
+                        <ImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:id="@+id/editprofile_ic_rotatePhoto-"
+                            android:background="@drawable/ic_menu_rotate_r"/>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textAppearance="?android:attr/textAppearanceMedium"
+                            android:textSize="@dimen/textMediumSize"
+                            android:text="@string/editprofile_rotatePhoto"
+                            android:id="@+id/editprofile_txt_rotatePhoto-"
+                            android:paddingLeft="@dimen/editprofile_changePhoto_leftOffset" />
+                    </LinearLayout>
+                    -->
+                    <LinearLayout
+                        android:orientation="horizontal"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:gravity="center_vertical"
+                        android:id="@+id/editProfile_vLayout_rotateImgBlock"
+                        android:paddingTop="5dp">
+
+                        <LinearLayout
+                            android:orientation="horizontal"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:gravity="center_vertical"
+                            android:layout_marginRight="@dimen/editprofile_rotatePhoto_leftRightMargin"
+                            android:paddingRight="@dimen/editprofile_rotatePhoto_leftRightPadding"
+                            android:id="@+id/editProfile_hLayout_rotateImgL"
+                            android:background="@drawable/view_backgr_trans_selector">
+
+                            <ImageView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:id="@+id/editprofile_ic_rotatePhotoL"
+                                android:background="@drawable/ic_menu_rotate_l"/>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textAppearance="?android:attr/textAppearanceMedium"
+                                android:textSize="@dimen/textMediumSize"
+                                android:text="+90"
+                                android:id="@+id/editprofile_txt_rotatePhotoL"
+                                android:paddingLeft="@dimen/editprofile_changePhoto_leftRightOffset"
+                                android:paddingRight="@dimen/editprofile_changePhoto_leftRightOffset"/>
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:orientation="horizontal"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:gravity="center_vertical"
+                            android:layout_marginLeft="@dimen/editprofile_rotatePhoto_leftRightMargin"
+                            android:paddingRight="@dimen/editprofile_rotatePhoto_leftRightPadding"
+                            android:id="@+id/editProfile_hLayout_rotateImgR"
+                            android:background="@drawable/view_backgr_trans_selector">
+
+                            <ImageView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:id="@+id/editprofile_ic_rotatePhotoR"
+                                android:background="@drawable/ic_menu_rotate_r"/>
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textAppearance="?android:attr/textAppearanceMedium"
+                                android:textSize="@dimen/textMediumSize"
+                                android:text="-90"
+                                android:id="@+id/editprofile_txt_rotatePhotoR"
+                                android:paddingLeft="@dimen/editprofile_changePhoto_leftRightOffset" />
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                </LinearLayout>
 
             </LinearLayout>
 
