@@ -862,7 +862,8 @@ public class EditProfileFragment extends Fragment implements DatePickerFragment.
                                         String url = returnUri.toString();
                                         Bitmap bitmap1 = null;
                                         InputStream is = null;
-                                        if (url.startsWith("content://com.google.android.apps.photos.content")) {
+                                        if (url.startsWith("content://com.google.android.apps.photos.content")
+                                                ||url.startsWith("content://com.sec.android.gallery3d.provider")) {
                                             try {
                                                 try {
                                                     is = activity.getContentResolver().openInputStream(Uri.parse(url));
