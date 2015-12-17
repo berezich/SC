@@ -56,7 +56,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/changeEmail_btnCancel"
-            android:textSize="@dimen/textMediumSize"
+            android:textSize="@dimen/textSmallSize"
             android:id="@+id/changeEmail_btnCancel"
             android:layout_weight="1" />
 
@@ -64,7 +64,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/changeEmail_btnOk"
-            android:textSize="@dimen/textMediumSize"
+            android:textSize="@dimen/textSmallSize"
             android:id="@+id/changeEmail_btnOk"
             android:layout_weight="1" />
     </LinearLayout>
