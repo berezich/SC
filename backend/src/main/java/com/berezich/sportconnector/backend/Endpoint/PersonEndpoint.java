@@ -69,20 +69,24 @@ public class PersonEndpoint {
     static String ERROR_CONFIRM_ALREADY = "Ваша учетная запись %s уже активирована!";
     static String ERROR_CONFIRM_NOTFOUND = "Ошибка! Ваша учетная запись %s не найдена!";
     static String APP_NAME = "МСК Теннис";
+    static String MSG_EMAIL_GET_BY_ERR = "\n\n" +
+            "------------------------------------------------------------------\n" +
+            "Письмо сгенерировано автоматически, отвечать на него не нужно.\n" +
+            "Если это письмо пришло к Вам по ошибке, просто удалите его. ";
     static String subjectAccountConfirmation = "Регистрация в "+"\""+APP_NAME+"\"";
     static String msgBodyAccountConfirmation = "Для активации вашей учетной записи перейдите по ссылке: " +
-            "https://sportconnector-981.appspot.com/confirm.html?id=%s&x=%s";
+            "https://sportconnector-981.appspot.com/confirm.html?id=%s&x=%s"+MSG_EMAIL_GET_BY_ERR;
     static String ERROR_CONFIRM_EMAIL = "Ошибка! Ваш email %s не изменен!";
     static String ERROR_CONFIRM_EMAIL_ALREADY = "Ваш старый email %s уже изменен!";
     static String ERROR_CONFIRM_EMAIL_NOTFOUND = "Ошибка! Ваша учетная запись %s не найдена!";
     static String subjectConfirmEmail = "Смена E-mail "+"\""+APP_NAME+"\"";
     static String msgBodyConfirmEmail = "Для смены email перейдите по ссылке: " +
-            "https://sportconnector-981.appspot.com/email.html?id=%s&x=%s";
+            "https://sportconnector-981.appspot.com/email.html?id=%s&x=%s"+MSG_EMAIL_GET_BY_ERR;
     static String ERROR_CONFIRM_RESET_PASS_NOTFOUND = "Ошибка! Повторите процедуру восстановления пароля.";
     static String subjectResetPass = "Сброс пароля "+"\""+APP_NAME+"\"";
     static String msgBodyResetPass = "Для смены пароля перейдите по ссылке " +
             "и следуйте дальнейшим инструкциям.\n" +
-            "https://sportconnector-981.appspot.com/pass.html?x=%s";
+            "https://sportconnector-981.appspot.com/pass.html?x=%s"+MSG_EMAIL_GET_BY_ERR;
 
 
     static {

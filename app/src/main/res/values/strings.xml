@@ -2,7 +2,7 @@
     <string name="app_name">МСК Теннис</string>
 
     <!-- srvApi begin-->
-        <string name="srvApi_url">https://2-dot-sportconnector-981.appspot.com/_ah/api/</string>
+        <string name="srvApi_url">https://1-dot-sportconnector-981.appspot.com/_ah/api/</string>
     <!-- srvApi end-->
 
     <!-- main begin -->
