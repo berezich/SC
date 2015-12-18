@@ -8,9 +8,6 @@ import com.googlecode.objectify.annotation.Load;
 
 import java.util.Date;
 
-/**
- * Created by berezkin on 25.06.2015.
- */
 @Entity
 public class UpdateSpotInfo {
     @Id Long id;   //spotId
