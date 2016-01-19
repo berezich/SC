@@ -5,6 +5,7 @@ import com.berezich.sportconnector.backend.Person;
 import com.berezich.sportconnector.backend.Picture;
 import com.berezich.sportconnector.backend.ReqChangeEmail;
 import com.berezich.sportconnector.backend.ReqResetPass;
+import com.berezich.sportconnector.backend.Spot;
 import com.google.api.server.spi.config.Api;
 import com.google.api.server.spi.config.ApiMethod;
 import com.google.api.server.spi.config.ApiNamespace;
@@ -24,6 +25,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -377,6 +379,7 @@ public class PersonEndpoint {
             throw new BadRequestException("createResetPassMsg@: ReqResetPass construction error");
     }
 
+
     /**
      * confirmation reset pass of an existing person via email
      */
@@ -404,6 +407,28 @@ public class PersonEndpoint {
 
 
     }
+
+    /**
+     * Remove old records from ReqResetPass entities
+     */
+    protected void removeOldChangePassEntities(){
+        int limit = DEFAULT_LIST_LIMIT;
+        final long lifeTimeMin = 120;
+        Query<ReqResetPass> query = ofy().load().type(ReqResetPass.class).limit(limit);
+        QueryResultIterator<ReqResetPass> queryIterator = query.iterator();
+        Date curDate = Calendar.getInstance().getTime();
+        ReqResetPass reqResetPass;
+        int cnt=0;
+        while (queryIterator.hasNext()) {
+            reqResetPass = queryIterator.next();
+            if(curDate.getTime() - reqResetPass.getRegisterDate().getTime()> lifeTimeMin*60*1000) {
+                ofy().delete().entity(reqResetPass).now();
+                cnt++;
+            }
+        }
+        logger.info(String.format("%d ReqResetPass entities have been removed",cnt));
+    }
+
 
     /**
      * Change password of an existing person.
