@@ -7,7 +7,7 @@
         android:layout_height="match_parent"
         android:id="@+id/imageView2"
         android:layout_gravity="center"
-        android:src="@drawable/foto1"
+        android:src="@drawable/main_pic"
         android:scaleType="centerCrop" />
 
     <RelativeLayout
@@ -198,7 +198,7 @@
                 android:text="@string/registration_btnOk_txt"
                 android:id="@+id/registration_btn_ok"
                 android:layout_marginTop="@dimen/registration_btn_topOffset"
-                android:background="@drawable/btn_main"
+                android:background="@drawable/btn_blue"
                 android:textColor="@color/btn_text"/>
 
 
