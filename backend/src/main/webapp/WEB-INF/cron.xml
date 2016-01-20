@@ -2,7 +2,12 @@
 <cronentries>
     <cron>
         <url>/cron1</url>
-        <description>Repopulate the cache every 2 hours</description>
+        <description>Remove ReqResetPass every 2 hours</description>
+        <schedule>every 2 hours</schedule>
+    </cron>
+    <cron>
+        <url>/cron2</url>
+        <description>Remove ReqChangeEmail every 2 hours</description>
         <schedule>every 2 hours</schedule>
     </cron>
 </cronentries>

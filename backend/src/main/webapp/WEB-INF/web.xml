@@ -58,6 +58,42 @@
         <url-pattern>/cron1</url-pattern>
     </servlet-mapping>
 
+    <security-constraint>
+        <web-resource-collection>
+            <web-resource-name>Cron1</web-resource-name>
+            <url-pattern>/cron1/*</url-pattern>
+        </web-resource-collection>
+        <auth-constraint>
+            <role-name>admin</role-name>
+        </auth-constraint>
+        <user-data-constraint>
+            <transport-guarantee>CONFIDENTIAL</transport-guarantee>
+        </user-data-constraint>
+    </security-constraint>
+
+    <servlet>
+        <servlet-name>Cron2</servlet-name>
+        <servlet-class>com.berezich.sportconnector.backend.Endpoint.Cron2</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>Cron2</servlet-name>
+        <url-pattern>/cron2</url-pattern>
+    </servlet-mapping>
+
+    <security-constraint>
+        <web-resource-collection>
+            <web-resource-name>Cron2</web-resource-name>
+            <url-pattern>/cron2/*</url-pattern>
+        </web-resource-collection>
+        <auth-constraint>
+            <role-name>admin</role-name>
+        </auth-constraint>
+        <user-data-constraint>
+            <transport-guarantee>CONFIDENTIAL</transport-guarantee>
+        </user-data-constraint>
+    </security-constraint>
+
     <welcome-file-list>
         <welcome-file>index.html</welcome-file>
     </welcome-file-list>

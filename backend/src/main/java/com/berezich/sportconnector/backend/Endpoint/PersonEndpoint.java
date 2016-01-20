@@ -69,7 +69,7 @@ public class PersonEndpoint {
     static String emailForm = "sportconnector-981@appspot.gserviceaccount.com";
     static String ERROR_CONFIRM = "Ошибка! Ваша учетная запись %s не активирована!";
     static String ERROR_CONFIRM_ALREADY = "Ваша учетная запись %s уже активирована!";
-    static String ERROR_CONFIRM_NOTFOUND = "Ошибка! Ваша учетная запись %s не найдена!";
+    static String ERROR_CONFIRM_NOTFOUND = "Ошибка! Ваша учетная запись %s не найдена! Повторите процедуру регистрации.";
     static String APP_NAME = "МСК Теннис";
     static String MSG_EMAIL_GET_BY_ERR = "\n\n" +
             "------------------------------------------------------------------\n" +
@@ -77,18 +77,18 @@ public class PersonEndpoint {
             "Если это письмо пришло к Вам по ошибке, просто удалите его. ";
     static String subjectAccountConfirmation = "Регистрация в "+"\""+APP_NAME+"\"";
     static String msgBodyAccountConfirmation = "Для активации вашей учетной записи перейдите по ссылке: " +
-            "https://sportconnector-981.appspot.com/confirm.html?id=%s&x=%s"+MSG_EMAIL_GET_BY_ERR;
+            "https://1-dot-sportconnector-981.appspot.com/confirm.html?id=%s&x=%s"+MSG_EMAIL_GET_BY_ERR;
     static String ERROR_CONFIRM_EMAIL = "Ошибка! Ваш email %s не изменен!";
     static String ERROR_CONFIRM_EMAIL_ALREADY = "Ваш старый email %s уже изменен!";
-    static String ERROR_CONFIRM_EMAIL_NOTFOUND = "Ошибка! Ваша учетная запись %s не найдена!";
+    static String ERROR_CONFIRM_EMAIL_NOTFOUND = "Ошибка! Повторите процедуру смены email.";
     static String subjectConfirmEmail = "Смена E-mail "+"\""+APP_NAME+"\"";
     static String msgBodyConfirmEmail = "Для смены email перейдите по ссылке: " +
-            "https://sportconnector-981.appspot.com/email.html?id=%s&x=%s"+MSG_EMAIL_GET_BY_ERR;
+            "https://1-dot-sportconnector-981.appspot.com/email.html?id=%s&x=%s"+MSG_EMAIL_GET_BY_ERR;
     static String ERROR_CONFIRM_RESET_PASS_NOTFOUND = "Ошибка! Повторите процедуру восстановления пароля.";
     static String subjectResetPass = "Сброс пароля "+"\""+APP_NAME+"\"";
     static String msgBodyResetPass = "Для смены пароля перейдите по ссылке " +
             "и следуйте дальнейшим инструкциям.\n" +
-            "https://sportconnector-981.appspot.com/pass.html?x=%s"+MSG_EMAIL_GET_BY_ERR;
+            "https://1-dot-sportconnector-981.appspot.com/pass.html?x=%s"+MSG_EMAIL_GET_BY_ERR;
 
 
     static {
@@ -345,6 +345,28 @@ public class PersonEndpoint {
             throw new BadRequestException(String.format(ERROR_CONFIRM_EMAIL,oldEmail));
         }
     }
+
+    /**
+     * Remove old records from ReqChangeEmail entities
+     */
+    protected void removeOldReqChangeEmailEntities(){
+        int limit = DEFAULT_LIST_LIMIT;
+        final long lifeTimeMin = 120;
+        Query<ReqChangeEmail> query = ofy().load().type(ReqChangeEmail.class).limit(limit);
+        QueryResultIterator<ReqChangeEmail> queryIterator = query.iterator();
+        Date curDate = Calendar.getInstance().getTime();
+        ReqChangeEmail reqChangeEmail;
+        int cnt=0;
+        while (queryIterator.hasNext()) {
+            reqChangeEmail = queryIterator.next();
+            if(curDate.getTime() - reqChangeEmail.getRegisterDate().getTime()> lifeTimeMin*60*1000) {
+                ofy().delete().entity(reqChangeEmail).now();
+                cnt++;
+            }
+        }
+        logger.info(String.format("%d ReqChangeEmail entities have been removed",cnt));
+    }
+
     /**
     * reset pass of an existing person
      */
@@ -411,7 +433,7 @@ public class PersonEndpoint {
     /**
      * Remove old records from ReqResetPass entities
      */
-    protected void removeOldChangePassEntities(){
+    protected void removeOldResetPassEntities(){
         int limit = DEFAULT_LIST_LIMIT;
         final long lifeTimeMin = 120;
         Query<ReqResetPass> query = ofy().load().type(ReqResetPass.class).limit(limit);
