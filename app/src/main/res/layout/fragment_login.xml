@@ -7,7 +7,7 @@
         android:layout_height="match_parent"
         android:id="@+id/imageView2"
         android:layout_gravity="center"
-        android:src="@drawable/foto1"
+        android:src="@drawable/main_pic"
         android:scaleType="centerCrop" />
 
     <RelativeLayout
@@ -150,7 +150,7 @@
                 android:text="@string/login_btn_txt_login"
                 android:id="@+id/login_btn_ok"
                 android:layout_marginTop="15dp"
-                android:background="@drawable/btn_main"
+                android:background="@drawable/btn_blue"
                 android:textColor="@color/btn_text" />
 
             <Button
@@ -159,7 +159,7 @@
                 android:text="@string/login_btn_txt_registration"
                 android:id="@+id/loginRegister_btn"
                 android:layout_marginTop="15dp"
-                android:background="@drawable/btn_register"
+                android:background="@drawable/btn_orange"
                 android:textColor="@color/btn_text" />
 
             <TextView
