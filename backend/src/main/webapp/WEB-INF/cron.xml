@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cronentries>
+    <cron>
+        <url>/cron1</url>
+        <description>Remove ReqResetPass every 2 hours</description>
+        <schedule>every 2 hours</schedule>
+    </cron>
+    <cron>
+        <url>/cron2</url>
+        <description>Remove ReqChangeEmail every 2 hours</description>
+        <schedule>every 2 hours</schedule>
+    </cron>
+</cronentries>
