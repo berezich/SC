@@ -91,7 +91,7 @@ public class ChangePassFragment extends DialogFragment {
                                     case TOO_SHORT:
                                         if (edtNew!=null)
                                             edtNew.setError(String.format(getString( R.string.changePass_errNew_tooShort),
-                                                    getResources().getInteger(R.integer.changePass_minPassLength)));
+                                                    getResources().getInteger(R.integer.passMinLength_edtTxt)));
                                         return;
 
                                 }

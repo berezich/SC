@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <integer name="changePass_minPassLength">6</integer>
     <integer name="editProfile_minAge">12</integer>
     <integer name="editProfile_maxAge">99</integer>
 
     <integer name="loginPropertyTitleWeight">26</integer>
     <integer name="loginPropertyValueWeight">10</integer>
     <integer name="loginPassTitleWeight">21</integer>
-    <integer name="nameMaxLength_edtTxt">15</integer>
-    <integer name="surnameMaxLength_edtTxt">20</integer>
-    <integer name="emailMaxLength_edtTxt">25</integer>
+    <integer name="nameMaxLength_edtTxt">25</integer>
+    <integer name="surnameMaxLength_edtTxt">25</integer>
+    <integer name="emailMaxLength_edtTxt">129</integer>
+    <integer name="passMinLength_edtTxt">6</integer>
     <integer name="passMaxLength_edtTxt">30</integer>
     <integer name="detailsAboutMyselfMaxLength_edtTxt">150</integer>
 

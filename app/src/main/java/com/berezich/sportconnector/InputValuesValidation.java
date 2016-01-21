@@ -18,7 +18,7 @@ public class InputValuesValidation {
             confirmPass = "";
         if(pass.isEmpty() && confirmPass.isEmpty())
             return PASS_ERROR.EMPTY;
-        int minLength = ctx.getResources().getInteger(R.integer.changePass_minPassLength);
+        int minLength = ctx.getResources().getInteger(R.integer.passMinLength_edtTxt);
         if(pass.length()< minLength)
             return PASS_ERROR.TOO_SHORT;
         if(!pass.equals(confirmPass))

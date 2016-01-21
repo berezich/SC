@@ -68,7 +68,7 @@ public class PersonEndpoint {
     static String ERROR_CONFIRM = "Ошибка! Ваша учетная запись %s не активирована!";
     static String ERROR_CONFIRM_ALREADY = "Ваша учетная запись %s уже активирована!";
     static String ERROR_CONFIRM_NOTFOUND = "Ошибка! Ваша учетная запись %s не найдена!";
-    static String APP_NAME = "МСК Теннис";
+    static String APP_NAME = "На корте";
     static String MSG_EMAIL_GET_BY_ERR = "\n\n" +
             "------------------------------------------------------------------\n" +
             "Письмо сгенерировано автоматически, отвечать на него не нужно.\n" +

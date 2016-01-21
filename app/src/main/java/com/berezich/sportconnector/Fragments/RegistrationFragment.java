@@ -129,7 +129,7 @@ public class RegistrationFragment extends Fragment implements EndpointApi.Regist
                             break;
                         case TOO_SHORT:
                             errorStr=String.format(activity.getString(R.string.registration_err_pass_tooShort),
-                                    activity.getResources().getInteger(R.integer.changePass_minPassLength));
+                                    activity.getResources().getInteger(R.integer.passMinLength_edtTxt));
                             break;
                     }
                 }

@@ -127,7 +127,8 @@
                         android:password="true"
                         android:inputType="textPassword"
                         android:maxLength="@integer/passMaxLength_edtTxt"
-                        android:layout_weight="@integer/loginPropertyValueWeight" />
+                        android:layout_weight="@integer/loginPropertyValueWeight"
+                        android:singleLine="false" />
                 </LinearLayout>
 
                 <View

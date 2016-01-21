@@ -26,7 +26,7 @@
                 android:layout_height="wrap_content"
                 android:weightSum="1"
                 android:background="@color/background_material_light"
-                android:elevation="2dp">
+                android:elevation="@dimen/profile_block_elevation">
 
                 <ImageView
                     android:layout_width="wrap_content"
@@ -85,7 +85,8 @@
 
             <LinearLayout
                 style="@style/PersonProfile_Block"
-                android:id="@+id/profile_contactsBlock">
+                android:id="@+id/profile_contactsBlock"
+                android:elevation="@dimen/profile_block_elevation">
 
                 <TextView
                     style="@style/PersonProfile_TitleBlock"
@@ -107,7 +108,8 @@
             <LinearLayout
                 style="@style/PersonProfile_Block"
                 android:id="@+id/profile_descBlock"
-                android:showDividers="end">
+                android:showDividers="end"
+                android:elevation="@dimen/profile_block_elevation">
 
                 <TextView
                     style="@style/PersonProfile_TitleBlock"
@@ -134,7 +136,7 @@
                 android:divider="@drawable/devider_transparent"
                 android:paddingLeft="5dp"
                 android:paddingRight="5dp"
-                android:elevation="2dp">
+                android:elevation="@dimen/profile_block_elevation">
 
                 <TextView
                     style="@style/PersonProfile_TitleBlock"
