@@ -200,7 +200,7 @@ public class Clustering {
 
             try {
                 // Getting view from the layout file info_window_layout
-                View v = gmapFragment.getActivity().getLayoutInflater().inflate(R.layout.info_window, null);
+                View v = gmapFragment.getActivity().getLayoutInflater().inflate(R.layout.gmap_info_window, null);
                 if(chosenMarker!=null) {
                     String title = arg0.getTitle();
                     String[] fields = title.split("\n");
