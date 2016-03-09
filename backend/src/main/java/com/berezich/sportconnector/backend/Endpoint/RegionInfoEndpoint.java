@@ -56,6 +56,10 @@ public class RegionInfoEndpoint {
             httpMethod = ApiMethod.HttpMethod.GET)
     public RegionInfo get(@Named("id") Long id) throws NotFoundException, BadRequestException {
         Auth.oAuth_2_0_check(Auth.PERMISSIONS.ANDROID_APP);
+        return getRegionInfo(id);
+    }
+
+    protected RegionInfo getRegionInfo(Long id) throws NotFoundException, BadRequestException {
         logger.info("Getting StoreDataInfo with ID: " + id);
         RegionInfo regionInfo = ofy().load().type(RegionInfo.class).id(id).now();
         if (regionInfo == null) {

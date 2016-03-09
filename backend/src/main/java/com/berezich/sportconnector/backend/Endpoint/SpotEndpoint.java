@@ -536,7 +536,7 @@ public class SpotEndpoint {
         RegionInfo regionInfo = null;
         logger.setLevel(Level.INFO);
         try {
-            regionInfo =  regionInfoEndpoint.get(spot.getRegionId());
+            regionInfo =  regionInfoEndpoint.getRegionInfo(spot.getRegionId());
             regionInfo.setLastSpotUpdate(new Date());
             regionInfoEndpoint.update(regionInfo.getId(), regionInfo);
             logger.info("RegionInfo with id=" + regionInfo.getId() + " is updated");
