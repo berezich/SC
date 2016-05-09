@@ -14,15 +14,13 @@ import com.google.appengine.api.blobstore.BlobstoreServiceFactory;
 import com.googlecode.objectify.ObjectifyService;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
 
 import javax.inject.Named;
 
-/**
- * Created by Sashka on 29.08.2015.
- */
 @Api(
         name = "sportConnectorApi",
         version = "v1",
@@ -45,7 +43,8 @@ public class FileManager {
             path = "fileManager",
             httpMethod = ApiMethod.HttpMethod.GET)
     public FileUrl uploadFileHandle() throws BadRequestException {
-        Auth.oAuth_2_0_check(Auth.PERMISSIONS.ANDROID_APP);
+        Auth.oAuth_2_0_check(Arrays.asList(Auth.PERMISSIONS.ANDROID_APP,
+                Auth.PERMISSIONS.API_EXPLORER));
         BlobstoreService blobstoreService = BlobstoreServiceFactory.getBlobstoreService();
         return new FileUrl(blobstoreService.createUploadUrl("/upload_file"));
     }

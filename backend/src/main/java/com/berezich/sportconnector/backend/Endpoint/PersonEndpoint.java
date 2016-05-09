@@ -24,6 +24,7 @@ import java.net.URLEncoder;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -110,7 +111,8 @@ public class PersonEndpoint {
         // Objectify ID generator, e.g. long or String, then you should generate the unique ID yourself prior to saving.
         //
         // If your client provides the ID then you should probably use PUT instead.
-        Auth.oAuth_2_0_check(Auth.PERMISSIONS.ANDROID_APP);
+        Auth.oAuth_2_0_check(Arrays.asList(Auth.PERMISSIONS.ANDROID_APP,
+                Auth.PERMISSIONS.API_EXPLORER));
         account.setUuid();
         validateAccountProperties(account);
         Query<Person> query = ofy().load().type(Person.class).filter("email", account.getEmail());
@@ -178,7 +180,8 @@ public class PersonEndpoint {
             path = "authorizePerson",
             httpMethod = ApiMethod.HttpMethod.GET)
     public Person authorizePerson(@Named("email") String email, @Named("pass") String pass) throws NotFoundException,BadRequestException {
-        Auth.oAuth_2_0_check(Auth.PERMISSIONS.ANDROID_APP);
+        Auth.oAuth_2_0_check(Arrays.asList(Auth.PERMISSIONS.ANDROID_APP,
+                Auth.PERMISSIONS.API_EXPLORER));
         logger.info("Getting Person with ID: " + email);
         Person person = null;
         Query<Person> query = ofy().load().type(Person.class).filter("email", email);
@@ -271,7 +274,8 @@ public class PersonEndpoint {
             httpMethod = ApiMethod.HttpMethod.PUT)
     public void changeEmail(@Named("id") Long id, @Named("pass") String pass, @Named("oldEmail") String oldEmail, @Named("newEmail") String newEmail)
             throws NotFoundException, BadRequestException {
-        Auth.oAuth_2_0_check(Auth.PERMISSIONS.ANDROID_APP);
+        Auth.oAuth_2_0_check(Arrays.asList(Auth.PERMISSIONS.ANDROID_APP,
+                Auth.PERMISSIONS.API_EXPLORER));
         Person person = ofy().load().type(Person.class).id(id).now();
         if(person==null)
             throw new NotFoundException("Person with id:" + id + " not found");
@@ -376,7 +380,8 @@ public class PersonEndpoint {
             httpMethod = ApiMethod.HttpMethod.PUT)
     public void resetPass(@Named("email") String email)
             throws NotFoundException, BadRequestException {
-        Auth.oAuth_2_0_check(Auth.PERMISSIONS.ANDROID_APP);
+        Auth.oAuth_2_0_check(Arrays.asList(Auth.PERMISSIONS.ANDROID_APP,
+                Auth.PERMISSIONS.API_EXPLORER));
         Person person;
         Query<Person> query = ofy().load().type(Person.class).filter("email", email);
         if(!(query!=null && query.count()>0))
@@ -461,7 +466,8 @@ public class PersonEndpoint {
             httpMethod = ApiMethod.HttpMethod.GET)
     public void changePass(@Named("id") Long id, @Named("oldPass") String oldPass, @Named("newPass") String newPass)
             throws NotFoundException, BadRequestException {
-        Auth.oAuth_2_0_check(Auth.PERMISSIONS.ANDROID_APP);
+        Auth.oAuth_2_0_check(Arrays.asList(Auth.PERMISSIONS.ANDROID_APP,
+                Auth.PERMISSIONS.API_EXPLORER));
         Person person = ofy().load().type(Person.class).id(id).now();
         if(person==null)
             throw  new NotFoundException("Person with id:" + id + " not found");
@@ -492,7 +498,8 @@ public class PersonEndpoint {
             path = "person/{id}",
             httpMethod = ApiMethod.HttpMethod.PUT)
     public Person update(@Named("id") Long id, Person person) throws NotFoundException, BadRequestException {
-        Auth.oAuth_2_0_check(Auth.PERMISSIONS.ANDROID_APP);
+        Auth.oAuth_2_0_check(Arrays.asList(Auth.PERMISSIONS.ANDROID_APP,
+                Auth.PERMISSIONS.API_EXPLORER));
         Person oldPerson = ofy().load().type(Person.class).id(id).now();
         if(oldPerson==null)
             throw  new NotFoundException("Person with id:" + id + " not found");
@@ -641,7 +648,8 @@ public class PersonEndpoint {
             path = "personByIdLst",
             httpMethod = ApiMethod.HttpMethod.GET)
     public CollectionResponse<Person> listByIdLst(@Named("idLst") ArrayList<Long>idLst) throws BadRequestException{
-        Auth.oAuth_2_0_check(Auth.PERMISSIONS.ANDROID_APP);
+        Auth.oAuth_2_0_check(Arrays.asList(Auth.PERMISSIONS.ANDROID_APP,
+                Auth.PERMISSIONS.API_EXPLORER));
         Map<Long,Person> personMap = ofy().load().type(Person.class).ids(idLst);
         if(personMap==null)
             return null;

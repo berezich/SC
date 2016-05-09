@@ -12,6 +12,7 @@ import com.googlecode.objectify.ObjectifyService;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -19,7 +20,7 @@ import static com.googlecode.objectify.ObjectifyService.ofy;
 import static java.util.logging.Logger.getLogger;
 
 public class Auth {
-    enum PERMISSIONS{ANDROID_APP,IOS_APP,WEB_APP}
+    enum PERMISSIONS{ANDROID_APP,IOS_APP,WEB_APP,API_EXPLORER}
     static {
         ObjectifyService.register(ServerAdmin.class);
     }
@@ -33,42 +34,36 @@ public class Auth {
         else
             logger.info(String.format("serverAdmin login:%s not found",login));
         if(serverAdmin==null || !serverAdmin.getPass().equals(msgDigestAuth(pass)))
-        //if(serverAdmin==null || !serverAdmin.getPass().equals(pass))
             throw new BadRequestException("AdminAuthRequestException@: authorization failed");
-
     }
     /*
-      * OAuth 2.0 for service account created for application (android/IOs/web)
+      * OAuth 2.0 for service account created for application (android/IOs/web/apiExplorer)
      */
-    protected static void oAuth_2_0_check(PERMISSIONS permissions) throws BadRequestException{
+    protected static void oAuth_2_0_check(List<PERMISSIONS> permissions) throws BadRequestException{
         OAuthService oauth = OAuthServiceFactory.getOAuthService();
         String scope = "https://www.googleapis.com/auth/userinfo.email";
         Set<String> allowedClients = new HashSet<>();
 
-        //all google accounts
-        //allowedClients.add("292824132082.apps.googleusercontent.com");
-
-        //service account for Android app
-        if(permissions == PERMISSIONS.ANDROID_APP)
-            allowedClients.add("182489181232-bbiekce9fgm6gtelunr9lp82gmdk3uju.apps.googleusercontent.com");
-
-        if(true)
-            try {
-                //User user = oauth.getCurrentUser(scope);
-                String tokenAudience = oauth.getClientId(scope);
-                if (!allowedClients.contains(tokenAudience)) {
-                    throw new OAuthRequestException("audience of token '" + tokenAudience
-                            + "' is not in allowed list");
-                }
-                // proceed with authenticated user
-                // ...
-            } catch (OAuthRequestException ex) {
-                // handle auth error
-                throw new BadRequestException("OAuthRequestException@: " + ((ex.getMessage().equals(""))? "auth failed" : ex.getMessage()));
-            } catch (OAuthServiceFailureException ex) {
-                // optionally, handle an oauth service failure
-                throw new BadRequestException("OAuthServiceFailureException@: "+ ((ex.getMessage().equals(""))? "auth failed" : ex.getMessage()));
+        for (PERMISSIONS perm:permissions) {
+            //service account for Android app
+            if(perm == PERMISSIONS.ANDROID_APP)
+                allowedClients.add("182489181232-bbiekce9fgm6gtelunr9lp82gmdk3uju.apps.googleusercontent.com");
+            if(perm == PERMISSIONS.API_EXPLORER)
+                allowedClients.add(com.google.api.server.spi.Constant.API_EXPLORER_CLIENT_ID);
+        }
+        try {
+            String tokenAudience = oauth.getClientId(scope);
+            if (!allowedClients.contains(tokenAudience)) {
+                throw new OAuthRequestException("audience of token '" + tokenAudience
+                        + "' is not in allowed list");
             }
+        } catch (OAuthRequestException ex) {
+            // handle auth error
+            throw new BadRequestException("OAuthRequestException@: " + ((ex.getMessage().equals(""))? "auth failed" : ex.getMessage()));
+        } catch (OAuthServiceFailureException ex) {
+            // optionally, handle an oauth service failure
+            throw new BadRequestException("OAuthServiceFailureException@: "+ ((ex.getMessage().equals(""))? "auth failed" : ex.getMessage()));
+        }
     }
     private static String msgDigestAuth(String stringToEncrypt)
     {

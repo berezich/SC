@@ -8,6 +8,7 @@ import com.google.api.server.spi.response.BadRequestException;
 import com.google.api.server.spi.response.NotFoundException;
 import com.googlecode.objectify.ObjectifyService;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.logging.Logger;
 
@@ -55,7 +56,8 @@ public class RegionInfoEndpoint {
             path = "storeDataInfo/{id}",
             httpMethod = ApiMethod.HttpMethod.GET)
     public RegionInfo get(@Named("id") Long id) throws NotFoundException, BadRequestException {
-        Auth.oAuth_2_0_check(Auth.PERMISSIONS.ANDROID_APP);
+        Auth.oAuth_2_0_check(Arrays.asList(Auth.PERMISSIONS.ANDROID_APP,
+                Auth.PERMISSIONS.API_EXPLORER));
         return getRegionInfo(id);
     }
 

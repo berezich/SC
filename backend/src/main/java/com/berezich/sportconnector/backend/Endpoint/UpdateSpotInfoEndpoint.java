@@ -14,6 +14,7 @@ import com.googlecode.objectify.ObjectifyService;
 import com.googlecode.objectify.cmd.Query;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.Logger;
@@ -109,7 +110,8 @@ public class UpdateSpotInfoEndpoint {
                                                    @Named("date") Date lastUpdate,
                                                    @Nullable @Named("cursor") String cursor,
                                                    @Nullable @Named("limit") Integer limit) throws BadRequestException{
-        Auth.oAuth_2_0_check(Auth.PERMISSIONS.ANDROID_APP);
+        Auth.oAuth_2_0_check(Arrays.asList(Auth.PERMISSIONS.ANDROID_APP,
+                Auth.PERMISSIONS.API_EXPLORER));
         limit = limit == null ? DEFAULT_LIST_LIMIT : limit;
         Query<UpdateSpotInfo> query = ofy().load().type(UpdateSpotInfo.class).filter("regionId",regionId).filter("updateDate >",lastUpdate).limit(limit);
         if (cursor != null) {
