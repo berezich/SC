@@ -111,7 +111,7 @@ public class UpdateSpotInfoEndpoint {
                                                    @Nullable @Named("cursor") String cursor,
                                                    @Nullable @Named("limit") Integer limit) throws BadRequestException{
         Auth.oAuth_2_0_check(Arrays.asList(Auth.PERMISSIONS.ANDROID_APP,
-                Auth.PERMISSIONS.API_EXPLORER));
+                Auth.PERMISSIONS.API_EXPLORER, Auth.PERMISSIONS.IOS_APP));
         limit = limit == null ? DEFAULT_LIST_LIMIT : limit;
         Query<UpdateSpotInfo> query = ofy().load().type(UpdateSpotInfo.class).filter("regionId",regionId).filter("updateDate >",lastUpdate).limit(limit);
         if (cursor != null) {

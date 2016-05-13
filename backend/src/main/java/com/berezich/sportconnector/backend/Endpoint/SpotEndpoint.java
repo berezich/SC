@@ -305,7 +305,7 @@ public class SpotEndpoint {
                               @Named("isFavorite") boolean isFavorite,
                               @Named("typePerson")Person.TYPE type) throws NotFoundException, BadRequestException {
         Auth.oAuth_2_0_check(Arrays.asList(Auth.PERMISSIONS.ANDROID_APP,
-                Auth.PERMISSIONS.API_EXPLORER));
+                Auth.PERMISSIONS.API_EXPLORER, Auth.PERMISSIONS.IOS_APP));
         Person person = ofy().load().type(Person.class).id(idPerson).now();
         if(!person.getPass().equals(PersonEndpoint.msgDigest(pass))){
             logger.severe(String.format("Warning!!! Attempt of setting spot as favorite for person (id:%d) with not valid password", person.getId()));
@@ -512,7 +512,7 @@ public class SpotEndpoint {
             httpMethod = ApiMethod.HttpMethod.GET)
     public CollectionResponse<Spot> listByRegId(@Named("regionId") Long regionId, @Nullable @Named("cursor") String cursor, @Nullable @Named("limit") Integer limit) throws BadRequestException{
         Auth.oAuth_2_0_check(Arrays.asList(Auth.PERMISSIONS.ANDROID_APP,
-                Auth.PERMISSIONS.API_EXPLORER));
+                Auth.PERMISSIONS.API_EXPLORER, Auth.PERMISSIONS.IOS_APP));
         limit = limit == null ? DEFAULT_LIST_LIMIT : limit;
         Query<Spot> query = ofy().load().type(Spot.class).filter("regionId", regionId).limit(limit);
         if (cursor != null) {

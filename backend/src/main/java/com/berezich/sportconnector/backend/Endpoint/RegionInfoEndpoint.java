@@ -57,7 +57,7 @@ public class RegionInfoEndpoint {
             httpMethod = ApiMethod.HttpMethod.GET)
     public RegionInfo get(@Named("id") Long id) throws NotFoundException, BadRequestException {
         Auth.oAuth_2_0_check(Arrays.asList(Auth.PERMISSIONS.ANDROID_APP,
-                Auth.PERMISSIONS.API_EXPLORER));
+                Auth.PERMISSIONS.API_EXPLORER, Auth.PERMISSIONS.IOS_APP));
         return getRegionInfo(id);
     }
 

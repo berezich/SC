@@ -44,7 +44,7 @@ public class FileManager {
             httpMethod = ApiMethod.HttpMethod.GET)
     public FileUrl uploadFileHandle() throws BadRequestException {
         Auth.oAuth_2_0_check(Arrays.asList(Auth.PERMISSIONS.ANDROID_APP,
-                Auth.PERMISSIONS.API_EXPLORER));
+                Auth.PERMISSIONS.API_EXPLORER, Auth.PERMISSIONS.IOS_APP));
         BlobstoreService blobstoreService = BlobstoreServiceFactory.getBlobstoreService();
         return new FileUrl(blobstoreService.createUploadUrl("/upload_file"));
     }

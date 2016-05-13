@@ -48,6 +48,8 @@ public class Auth {
             //service account for Android app
             if(perm == PERMISSIONS.ANDROID_APP)
                 allowedClients.add("182489181232-bbiekce9fgm6gtelunr9lp82gmdk3uju.apps.googleusercontent.com");
+            if(perm == PERMISSIONS.IOS_APP)
+                allowedClients.add("114225000006862142769");
             if(perm == PERMISSIONS.API_EXPLORER)
                 allowedClients.add(com.google.api.server.spi.Constant.API_EXPLORER_CLIENT_ID);
         }

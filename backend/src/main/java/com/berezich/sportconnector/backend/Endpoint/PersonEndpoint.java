@@ -112,7 +112,7 @@ public class PersonEndpoint {
         //
         // If your client provides the ID then you should probably use PUT instead.
         Auth.oAuth_2_0_check(Arrays.asList(Auth.PERMISSIONS.ANDROID_APP,
-                Auth.PERMISSIONS.API_EXPLORER));
+                Auth.PERMISSIONS.API_EXPLORER, Auth.PERMISSIONS.IOS_APP));
         account.setUuid();
         validateAccountProperties(account);
         Query<Person> query = ofy().load().type(Person.class).filter("email", account.getEmail());
@@ -181,7 +181,7 @@ public class PersonEndpoint {
             httpMethod = ApiMethod.HttpMethod.GET)
     public Person authorizePerson(@Named("email") String email, @Named("pass") String pass) throws NotFoundException,BadRequestException {
         Auth.oAuth_2_0_check(Arrays.asList(Auth.PERMISSIONS.ANDROID_APP,
-                Auth.PERMISSIONS.API_EXPLORER));
+                Auth.PERMISSIONS.API_EXPLORER, Auth.PERMISSIONS.IOS_APP));
         logger.info("Getting Person with ID: " + email);
         Person person = null;
         Query<Person> query = ofy().load().type(Person.class).filter("email", email);
@@ -275,7 +275,7 @@ public class PersonEndpoint {
     public void changeEmail(@Named("id") Long id, @Named("pass") String pass, @Named("oldEmail") String oldEmail, @Named("newEmail") String newEmail)
             throws NotFoundException, BadRequestException {
         Auth.oAuth_2_0_check(Arrays.asList(Auth.PERMISSIONS.ANDROID_APP,
-                Auth.PERMISSIONS.API_EXPLORER));
+                Auth.PERMISSIONS.API_EXPLORER, Auth.PERMISSIONS.IOS_APP));
         Person person = ofy().load().type(Person.class).id(id).now();
         if(person==null)
             throw new NotFoundException("Person with id:" + id + " not found");
@@ -381,7 +381,7 @@ public class PersonEndpoint {
     public void resetPass(@Named("email") String email)
             throws NotFoundException, BadRequestException {
         Auth.oAuth_2_0_check(Arrays.asList(Auth.PERMISSIONS.ANDROID_APP,
-                Auth.PERMISSIONS.API_EXPLORER));
+                Auth.PERMISSIONS.API_EXPLORER, Auth.PERMISSIONS.IOS_APP));
         Person person;
         Query<Person> query = ofy().load().type(Person.class).filter("email", email);
         if(!(query!=null && query.count()>0))
@@ -467,7 +467,7 @@ public class PersonEndpoint {
     public void changePass(@Named("id") Long id, @Named("oldPass") String oldPass, @Named("newPass") String newPass)
             throws NotFoundException, BadRequestException {
         Auth.oAuth_2_0_check(Arrays.asList(Auth.PERMISSIONS.ANDROID_APP,
-                Auth.PERMISSIONS.API_EXPLORER));
+                Auth.PERMISSIONS.API_EXPLORER, Auth.PERMISSIONS.IOS_APP));
         Person person = ofy().load().type(Person.class).id(id).now();
         if(person==null)
             throw  new NotFoundException("Person with id:" + id + " not found");
@@ -499,7 +499,7 @@ public class PersonEndpoint {
             httpMethod = ApiMethod.HttpMethod.PUT)
     public Person update(@Named("id") Long id, Person person) throws NotFoundException, BadRequestException {
         Auth.oAuth_2_0_check(Arrays.asList(Auth.PERMISSIONS.ANDROID_APP,
-                Auth.PERMISSIONS.API_EXPLORER));
+                Auth.PERMISSIONS.API_EXPLORER, Auth.PERMISSIONS.IOS_APP));
         Person oldPerson = ofy().load().type(Person.class).id(id).now();
         if(oldPerson==null)
             throw  new NotFoundException("Person with id:" + id + " not found");
@@ -649,7 +649,7 @@ public class PersonEndpoint {
             httpMethod = ApiMethod.HttpMethod.GET)
     public CollectionResponse<Person> listByIdLst(@Named("idLst") ArrayList<Long>idLst) throws BadRequestException{
         Auth.oAuth_2_0_check(Arrays.asList(Auth.PERMISSIONS.ANDROID_APP,
-                Auth.PERMISSIONS.API_EXPLORER));
+                Auth.PERMISSIONS.API_EXPLORER, Auth.PERMISSIONS.IOS_APP));
         Map<Long,Person> personMap = ofy().load().type(Person.class).ids(idLst);
         if(personMap==null)
             return null;
