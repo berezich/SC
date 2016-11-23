@@ -257,6 +257,11 @@ public class PersonEndpoint {
             }
         }
         person.setRegistration(Calendar.getInstance().getTime());
+
+        Picture pic = person.getPhoto();
+        if(pic!=null && pic.getBlobKey()!=null && !pic.getBlobKey().equals(""))
+            person.setPhoto(new Picture(pic.getBlobKey()));
+
         ofy().save().entity(person).now();
         logger.info("Created Person.");
         Person personRes = ofy().load().entity(person).now();
